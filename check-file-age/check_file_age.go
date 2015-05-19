@@ -60,26 +60,39 @@ func newMonitor(warningAge, warningSize, criticalAge, criticalSize int64) *monit
 
 func main() {
 	var (
-		file          = flag.String("f", "", "file")
-		warningAge    = flag.Int64("w", 240, "warning age")
-		warningSize   = flag.Int64("W", 0, "warning size")
-		criticalAge   = flag.Int64("c", 600, "critical age")
-		criticalSize  = flag.Int64("C", 0, "critical size")
-		ignoreMissing = flag.Bool("i", false, "ignore missing")
+		file          string
+		warningAge    int64
+		warningSize   int64
+		criticalAge   int64
+		criticalSize  int64
+		ignoreMissing bool
 	)
+
+	flag.StringVar(&file, "f", "", "file")
+	flag.StringVar(&file, "file", "", "file")
+	flag.Int64Var(&warningAge, "w", 240, "warning age")
+	flag.Int64Var(&warningAge, "warning-age", 240, "warning age")
+	flag.Int64Var(&warningSize, "W", 0, "warning size")
+	flag.Int64Var(&warningSize, "warning-size", 0, "warning size")
+	flag.Int64Var(&criticalAge, "c", 600, "critical age")
+	flag.Int64Var(&criticalAge, "critical-age", 600, "critical age")
+	flag.Int64Var(&criticalSize, "C", 0, "critical size")
+	flag.Int64Var(&criticalSize, "critical-size", 0, "critical size")
+	flag.BoolVar(&ignoreMissing, "i", false, "ignore missing")
+	flag.BoolVar(&ignoreMissing, "ignore-missing", false, "ignore missing")
 
 	flag.Parse()
 
-	if *file == "" {
-		if *file = flag.Arg(0); *file == "" {
+	if file == "" {
+		if file = flag.Arg(0); file == "" {
 			fmt.Println("No file specified")
 			os.Exit(int(unknown))
 		}
 	}
 
-	stat, err := os.Stat(*file)
+	stat, err := os.Stat(file)
 	if err != nil {
-		if *ignoreMissing {
+		if ignoreMissing {
 			fmt.Println("No such file, but ignore missing is set.")
 			os.Exit(int(ok))
 		} else {
@@ -88,7 +101,7 @@ func main() {
 		}
 	}
 
-	monitor := newMonitor(*warningAge, *warningSize, *criticalAge, *criticalSize)
+	monitor := newMonitor(warningAge, warningSize, criticalAge, criticalSize)
 
 	result := ok
 
@@ -103,6 +116,6 @@ func main() {
 		result = critical
 	}
 
-	fmt.Printf("%s is %d seconds old and %d bytes.\n", *file, age, size)
+	fmt.Printf("%s is %d seconds old and %d bytes.\n", file, age, size)
 	os.Exit(int(result))
 }
