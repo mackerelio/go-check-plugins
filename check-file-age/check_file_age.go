@@ -16,6 +16,48 @@ const (
 	unknown
 )
 
+type monitor struct {
+	warningAge   int64
+	warningSize  int64
+	criticalAge  int64
+	criticalSize int64
+}
+
+func (m monitor) hasWarningAge() bool {
+	return m.warningAge != 0
+}
+
+func (m monitor) hasWarningSize() bool {
+	return m.warningSize != 0
+}
+
+func (m monitor) CheckWarning(age, size int64) bool {
+	return (m.hasWarningAge() && m.warningAge <= age) ||
+		(m.hasWarningSize() && m.warningSize <= size)
+}
+
+func (m monitor) hasCriticalAge() bool {
+	return m.criticalAge != 0
+}
+
+func (m monitor) hasCriticalSize() bool {
+	return m.criticalSize != 0
+}
+
+func (m monitor) CheckCritical(age, size int64) bool {
+	return (m.hasCriticalAge() && m.criticalAge <= age) ||
+		(m.hasCriticalSize() && m.criticalSize <= size)
+}
+
+func newMonitor(warningAge, warningSize, criticalAge, criticalSize int64) *monitor {
+	return &monitor{
+		warningAge:   warningAge,
+		warningSize:  warningSize,
+		criticalAge:  criticalAge,
+		criticalSize: criticalSize,
+	}
+}
+
 func main() {
 	var (
 		file          = flag.String("f", "", "file")
@@ -46,16 +88,18 @@ func main() {
 		}
 	}
 
+	monitor := newMonitor(*warningAge, *warningSize, *criticalAge, *criticalSize)
+
 	result := ok
 
 	age := time.Now().Unix() - stat.ModTime().Unix()
 	size := stat.Size()
 
-	if (*warningAge != 0 && *warningAge <= age) || (*warningSize != 0 && *warningSize <= size) {
+	if monitor.CheckWarning(age, size) {
 		result = warning
 	}
 
-	if (*criticalAge != 0 && *criticalAge <= age) || (*criticalSize != 0 && *criticalSize <= size) {
+	if monitor.CheckCritical(age, size) {
 		result = critical
 	}
 
