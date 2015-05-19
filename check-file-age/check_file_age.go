@@ -32,8 +32,8 @@ func (m monitor) hasWarningSize() bool {
 }
 
 func (m monitor) CheckWarning(age, size int64) bool {
-	return (m.hasWarningAge() && m.warningAge <= age) ||
-		(m.hasWarningSize() && m.warningSize <= size)
+	return (m.hasWarningAge() && m.warningAge < age) ||
+		(m.hasWarningSize() && m.warningSize > size)
 }
 
 func (m monitor) hasCriticalAge() bool {
@@ -45,8 +45,8 @@ func (m monitor) hasCriticalSize() bool {
 }
 
 func (m monitor) CheckCritical(age, size int64) bool {
-	return (m.hasCriticalAge() && m.criticalAge <= age) ||
-		(m.hasCriticalSize() && m.criticalSize <= size)
+	return (m.hasCriticalAge() && m.criticalAge < age) ||
+		(m.hasCriticalSize() && m.criticalSize > size)
 }
 
 func newMonitor(warningAge, warningSize, criticalAge, criticalSize int64) *monitor {
