@@ -68,18 +68,27 @@ func main() {
 		ignoreMissing bool
 	)
 
-	flag.StringVar(&file, "f", "", "file")
-	flag.StringVar(&file, "file", "", "file")
-	flag.Int64Var(&warningAge, "w", 240, "warning age")
-	flag.Int64Var(&warningAge, "warning-age", 240, "warning age")
-	flag.Int64Var(&warningSize, "W", 0, "warning size")
-	flag.Int64Var(&warningSize, "warning-size", 0, "warning size")
-	flag.Int64Var(&criticalAge, "c", 600, "critical age")
-	flag.Int64Var(&criticalAge, "critical-age", 600, "critical age")
-	flag.Int64Var(&criticalSize, "C", 0, "critical size")
-	flag.Int64Var(&criticalSize, "critical-size", 0, "critical size")
-	flag.BoolVar(&ignoreMissing, "i", false, "ignore missing")
-	flag.BoolVar(&ignoreMissing, "ignore-missing", false, "ignore missing")
+	var (
+		fileDesc       = "monitor file name"
+		warnAgeDesc    = "warning if more old than (default: 240)"
+		warnSizeDesc   = "warning if file size less than"
+		critAgeDesc    = "critical if more old than (default: 600)"
+		critSizeDesc   = "critical if file size less than (default 0)"
+		ignoreMissDesc = "skip alert if file doesn't exist"
+	)
+
+	flag.StringVar(&file, "f", "", fileDesc+" [shorthand]")
+	flag.StringVar(&file, "file", "", fileDesc)
+	flag.Int64Var(&warningAge, "w", 240, warnAgeDesc+" [shorthand]")
+	flag.Int64Var(&warningAge, "warning-age", 240, warnAgeDesc)
+	flag.Int64Var(&warningSize, "W", 0, warnSizeDesc+" [shorthand]")
+	flag.Int64Var(&warningSize, "warning-size", 0, warnSizeDesc)
+	flag.Int64Var(&criticalAge, "c", 600, critAgeDesc+" [shorthand]")
+	flag.Int64Var(&criticalAge, "critical-age", 600, critAgeDesc)
+	flag.Int64Var(&criticalSize, "C", 0, critSizeDesc+" [shorthand]")
+	flag.Int64Var(&criticalSize, "critical-size", 0, critSizeDesc)
+	flag.BoolVar(&ignoreMissing, "i", false, ignoreMissDesc+" [shorthand]")
+	flag.BoolVar(&ignoreMissing, "ignore-missing", false, ignoreMissDesc)
 
 	flag.Parse()
 
