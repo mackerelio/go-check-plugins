@@ -90,6 +90,14 @@ func main() {
 	flag.BoolVar(&ignoreMissing, "i", false, ignoreMissDesc+" [shorthand]")
 	flag.BoolVar(&ignoreMissing, "ignore-missing", false, ignoreMissDesc)
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage:\n")
+		fmt.Fprintf(os.Stderr, "  %s [-w <secs>] [-c <secs>] [-W <size>] [-C <size>] [-i] -f <file>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s [-h | --help]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "\n")
+		flag.PrintDefaults()
+	}
+
 	flag.Parse()
 
 	if file == "" {
