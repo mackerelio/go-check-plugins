@@ -2,41 +2,27 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/jessevdk/go-flags"
+	"github.com/mackerelio/checkers"
 )
 
 var opts struct {
 	URL string `short:"u" long:"url" description:"A URL to connect to"`
 }
 
-type checkStatus int
-
-const (
-	ok checkStatus = iota
-	warning
-	critical
-	unknown
-)
-
-func (chSt checkStatus) String() string {
-	switch {
-	case chSt == 0:
-		return "OK"
-	case chSt == 1:
-		return "WARNING"
-	case chSt == 2:
-		return "CRITICAL"
-	default:
-		return "UNKNOWN"
-	}
+func main() {
+	ckr := run(os.Args[1:])
+	ckr.Name = "HTTP"
+	ckr.Exit()
 }
 
-func main() {
-	_, err := flags.Parse(&opts)
+func run(args []string) *checkers.Checker {
+	_, err := flags.ParseArgs(&opts, args)
 	if err != nil || opts.URL == "" {
 		os.Exit(1)
 	}
@@ -45,23 +31,29 @@ func main() {
 	stTime := time.Now()
 	resp, err := http.Get(opts.URL)
 	if err != nil {
-		fmt.Printf("HTTP CRITICAL %s\n", err)
-		os.Exit(2)
+		return checkers.Critical(err.Error())
 	}
 	elapsed := time.Since(stTime)
-
 	defer resp.Body.Close()
-	checkSt := unknown
-	switch st := resp.StatusCode; true {
-	case st < 400:
-		checkSt = ok
-	case st < 500:
-		checkSt = warning
-	default:
-		checkSt = critical
+
+	cLength := resp.ContentLength
+	if cLength == -1 {
+		byt, _ := ioutil.ReadAll(resp.Body)
+		cLength = int64(len(byt))
 	}
 
-	fmt.Printf("HTTP %s: %s %s - %d bytes in %f second respons time",
-		checkSt.String(), resp.Proto, resp.Status, resp.ContentLength, elapsed.Seconds())
-	os.Exit(int(checkSt))
+	checkSt := checkers.UNKNOWN
+	switch st := resp.StatusCode; true {
+	case st < 400:
+		checkSt = checkers.OK
+	case st < 500:
+		checkSt = checkers.WARNING
+	default:
+		checkSt = checkers.CRITICAL
+	}
+
+	msg := fmt.Sprintf("%s %s - %d bytes in %f second respons time",
+		resp.Proto, resp.Status, cLength, elapsed.Seconds())
+
+	return checkers.NewChecker(checkSt, msg)
 }
