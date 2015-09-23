@@ -20,7 +20,7 @@ import (
 var opts struct {
 	WarningThreshold  string `short:"w" long:"warning" required:"true" value-name:"WL1,WL5,WL15" description:"Warning threshold for loadavg1,5,15"`
 	CriticalThreshold string `short:"c" long:"critical" required:"true" value-name:"CL1,CL5,CL15" description:"Critical threshold for loadavg1,5,15"`
-	PerCpu            bool   `short:"r" long:"percpu" default:"false" description:"Divide the load averages by cpu count"`
+	PerCPU            bool   `short:"r" long:"percpu" default:"false" description:"Divide the load averages by cpu count"`
 }
 
 type checkStatus int
@@ -93,7 +93,7 @@ func main() {
 	result := ok
 	for i := 0; i < 3; i++ {
 		load := loadavg[i]
-		if opts.PerCpu {
+		if opts.PerCPU {
 			numCPU := runtime.NumCPU()
 			load = load / float64(numCPU)
 		}
