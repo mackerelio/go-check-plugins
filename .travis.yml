@@ -1,0 +1,9 @@
+language: go
+go:
+- 1.4
+env: PATH=/home/travis/gopath/bin:$PATH
+script:
+- make lint
+- make cover
+after_script:
+- goveralls -coverprofile=.profile.cov

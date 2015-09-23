@@ -1,0 +1,5 @@
+.*
+!.gitignore
+!.goxc.json
+!.travis.yml
+/build

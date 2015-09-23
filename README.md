@@ -8,7 +8,7 @@ Specification
 
 The specs for the check plugins are mostly the same as the [Nagios](https://www.nagios.org/) plugin. In the settings file, the assign command’s exit status will be treated as shown below.
 
-| exit status          |   meaning|
+| exit status          |  meaning |
 |:---------------------|---------:|
 | 0                    | OK       |
 | 1                    | WARNING  |
