@@ -81,18 +81,10 @@ func main() {
 		os.Exit(int(unknown))
 	}
 
-	var (
-		cLoadavg [3]C.double
-		loadavg  [3]float64
-	)
-	C.getloadavg(&cLoadavg[0], 3)
-	for i, v := range cLoadavg {
-		loadavg[i] = float64(v)
-	}
+	loadavgs, _ := getloadavg()
 
 	result := ok
-	for i := 0; i < 3; i++ {
-		load := loadavg[i]
+	for i, load := range loadavgs {
 		if opts.PerCPU {
 			numCPU := runtime.NumCPU()
 			load = load / float64(numCPU)
@@ -106,6 +98,6 @@ func main() {
 		}
 	}
 
-	fmt.Printf("%s - load average: %.2f, %.2f, %.2f\n", result.String(), loadavg[0], loadavg[1], loadavg[2])
+	fmt.Printf("%s - load average: %.2f, %.2f, %.2f\n", result.String(), loadavgs[0], loadavgs[1], loadavgs[2])
 	os.Exit(int(result))
 }
