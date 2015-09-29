@@ -11,8 +11,9 @@ import (
 	"github.com/mackerelio/checkers"
 )
 
+// XXX more options
 var opts struct {
-	URL string `short:"u" long:"url" description:"A URL to connect to"`
+	URL string `short:"u" long:"url" required:"true" description:"A URL to connect to"`
 }
 
 func main() {
@@ -23,11 +24,10 @@ func main() {
 
 func run(args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
-	if err != nil || opts.URL == "" {
+	if err != nil {
 		os.Exit(1)
 	}
 
-	// XXX set UA and etc... check_http (go-check-plugins)
 	stTime := time.Now()
 	resp, err := http.Get(opts.URL)
 	if err != nil {

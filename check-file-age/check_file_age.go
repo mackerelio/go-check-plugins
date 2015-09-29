@@ -1,20 +1,19 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/jessevdk/go-flags"
+	"github.com/mackerelio/checkers"
 )
 
-type checkStatus int
-
-const (
-	ok checkStatus = iota
-	warning
-	critical
-	unknown
-)
+func main() {
+	ckr := run(os.Args[1:])
+	ckr.Name = "FileAge"
+	ckr.Exit()
+}
 
 type monitor struct {
 	warningAge   int64
@@ -58,81 +57,44 @@ func newMonitor(warningAge, warningSize, criticalAge, criticalSize int64) *monit
 	}
 }
 
-func main() {
-	var (
-		file          string
-		warningAge    int64
-		warningSize   int64
-		criticalAge   int64
-		criticalSize  int64
-		ignoreMissing bool
-	)
+var opts struct {
+	file          string `short:"f" long:"file" required:"true" description:"monitor file name"`
+	warningAge    int64  `short:"w" long:"warning-age" default:"240" description:"warning if more old than"`
+	warningSize   int64  `short:"W" long:"warning-size" description:"warning if file size less than"`
+	criticalAge   int64  `short:"c" long:"critical-age" default:"600" description:"critical if more old than"`
+	criticalSize  int64  `short:"C" long:"critical-size" default:"0" description:"critical if file size less than"`
+	ignoreMissing bool   `short:"i" long:"ignore-missing" description:"skip alert if file doesn't exist"`
+}
 
-	var (
-		fileDesc       = "monitor file name"
-		warnAgeDesc    = "warning if more old than (default: 240)"
-		warnSizeDesc   = "warning if file size less than"
-		critAgeDesc    = "critical if more old than (default: 600)"
-		critSizeDesc   = "critical if file size less than (default 0)"
-		ignoreMissDesc = "skip alert if file doesn't exist"
-	)
-
-	flag.StringVar(&file, "f", "", fileDesc+" [shorthand]")
-	flag.StringVar(&file, "file", "", fileDesc)
-	flag.Int64Var(&warningAge, "w", 240, warnAgeDesc+" [shorthand]")
-	flag.Int64Var(&warningAge, "warning-age", 240, warnAgeDesc)
-	flag.Int64Var(&warningSize, "W", 0, warnSizeDesc+" [shorthand]")
-	flag.Int64Var(&warningSize, "warning-size", 0, warnSizeDesc)
-	flag.Int64Var(&criticalAge, "c", 600, critAgeDesc+" [shorthand]")
-	flag.Int64Var(&criticalAge, "critical-age", 600, critAgeDesc)
-	flag.Int64Var(&criticalSize, "C", 0, critSizeDesc+" [shorthand]")
-	flag.Int64Var(&criticalSize, "critical-size", 0, critSizeDesc)
-	flag.BoolVar(&ignoreMissing, "i", false, ignoreMissDesc+" [shorthand]")
-	flag.BoolVar(&ignoreMissing, "ignore-missing", false, ignoreMissDesc)
-
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage:\n")
-		fmt.Fprintf(os.Stderr, "  %s [-w <secs>] [-c <secs>] [-W <size>] [-C <size>] [-i] -f <file>\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "  %s [-h | --help]\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "\n")
-		flag.PrintDefaults()
-	}
-
-	flag.Parse()
-
-	if file == "" {
-		if file = flag.Arg(0); file == "" {
-			fmt.Println("No file specified")
-			os.Exit(int(unknown))
-		}
-	}
-
-	stat, err := os.Stat(file)
+func run(args []string) *checkers.Checker {
+	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
-		if ignoreMissing {
-			fmt.Println("No such file, but ignore missing is set.")
-			os.Exit(int(ok))
-		} else {
-			fmt.Println(err.Error())
-			os.Exit(int(unknown))
-		}
+		os.Exit(1)
 	}
 
-	monitor := newMonitor(warningAge, warningSize, criticalAge, criticalSize)
+	stat, err := os.Stat(opts.file)
+	if err != nil {
+		if opts.ignoreMissing {
+			return checkers.Ok("No such file, but ignore missing is set.")
+		}
+		return checkers.Unknown(err.Error())
+	}
 
-	result := ok
+	monitor := newMonitor(opts.warningAge, opts.warningSize, opts.criticalAge, opts.criticalSize)
+
+	result := checkers.OK
 
 	age := time.Now().Unix() - stat.ModTime().Unix()
 	size := stat.Size()
 
 	if monitor.CheckWarning(age, size) {
-		result = warning
+		result = checkers.WARNING
 	}
 
 	if monitor.CheckCritical(age, size) {
-		result = critical
+		result = checkers.CRITICAL
 	}
 
-	fmt.Printf("%s is %d seconds old and %d bytes.\n", file, age, size)
-	os.Exit(int(result))
+	msg := fmt.Sprintf("%s is %d seconds old and %d bytes.\n", opts.file, age, size)
+	return checkers.NewChecker(result, msg)
 }
