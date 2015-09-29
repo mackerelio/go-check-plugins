@@ -1,11 +1,5 @@
 package main
 
-// // for getloadavg(2)
-/*
-#include <stdlib.h>
-*/
-import "C"
-
 import (
 	"errors"
 	"fmt"
@@ -15,34 +9,13 @@ import (
 	"strings"
 
 	"github.com/jessevdk/go-flags"
+	"github.com/mackerelio/checkers"
 )
 
 var opts struct {
 	WarningThreshold  string `short:"w" long:"warning" required:"true" value-name:"WL1,WL5,WL15" description:"Warning threshold for loadavg1,5,15"`
 	CriticalThreshold string `short:"c" long:"critical" required:"true" value-name:"CL1,CL5,CL15" description:"Critical threshold for loadavg1,5,15"`
 	PerCPU            bool   `short:"r" long:"percpu" default:"false" description:"Divide the load averages by cpu count"`
-}
-
-type checkStatus int
-
-const (
-	ok checkStatus = iota
-	warning
-	critical
-	unknown
-)
-
-func (chSt checkStatus) String() string {
-	switch {
-	case chSt == 0:
-		return "OK"
-	case chSt == 1:
-		return "WARNING"
-	case chSt == 2:
-		return "CRITICAL"
-	default:
-		return "UNKNOWN"
-	}
 }
 
 func parseThreshold(str string) ([3]float64, error) {
@@ -64,40 +37,46 @@ func parseThreshold(str string) ([3]float64, error) {
 }
 
 func main() {
-	_, err := flags.Parse(&opts)
+	ckr := run(os.Args[1:])
+	ckr.Name = "LOAD"
+	ckr.Exit()
+}
+
+func run(args []string) *checkers.Checker {
+	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
-		fmt.Print(err)
-		os.Exit(int(unknown))
+		os.Exit(1)
 	}
 
 	wload, err := parseThreshold(opts.WarningThreshold)
 	if err != nil {
-		fmt.Print(err)
-		os.Exit(int(unknown))
+		return checkers.Unknown(err.Error())
 	}
 	cload, err := parseThreshold(opts.CriticalThreshold)
 	if err != nil {
-		fmt.Print(err)
-		os.Exit(int(unknown))
+		return checkers.Unknown(err.Error())
 	}
 
-	loadavgs, _ := getloadavg()
+	loadavgs, err := getloadavg()
+	if err != nil {
+		return checkers.Unknown(err.Error())
+	}
 
-	result := ok
+	result := checkers.OK
 	for i, load := range loadavgs {
 		if opts.PerCPU {
 			numCPU := runtime.NumCPU()
 			load = load / float64(numCPU)
 		}
 		if load > cload[i] {
-			result = critical
+			result = checkers.CRITICAL
 			break
 		}
 		if load > wload[i] {
-			result = warning
+			result = checkers.WARNING
 		}
 	}
 
-	fmt.Printf("%s - load average: %.2f, %.2f, %.2f\n", result.String(), loadavgs[0], loadavgs[1], loadavgs[2])
-	os.Exit(int(result))
+	msg := fmt.Sprintf("load average: %.2f, %.2f, %.2f", loadavgs[0], loadavgs[1], loadavgs[2])
+	return checkers.NewChecker(result, msg)
 }
