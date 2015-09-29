@@ -58,12 +58,12 @@ func newMonitor(warningAge, warningSize, criticalAge, criticalSize int64) *monit
 }
 
 var opts struct {
-	file          string `short:"f" long:"file" required:"true" description:"monitor file name"`
-	warningAge    int64  `short:"w" long:"warning-age" default:"240" description:"warning if more old than"`
-	warningSize   int64  `short:"W" long:"warning-size" description:"warning if file size less than"`
-	criticalAge   int64  `short:"c" long:"critical-age" default:"600" description:"critical if more old than"`
-	criticalSize  int64  `short:"C" long:"critical-size" default:"0" description:"critical if file size less than"`
-	ignoreMissing bool   `short:"i" long:"ignore-missing" description:"skip alert if file doesn't exist"`
+	File          string `short:"f" long:"file" required:"true" description:"monitor file name"`
+	WarningAge    int64  `short:"w" long:"warning-age" default:"240" description:"warning if more old than"`
+	WarningSize   int64  `short:"W" long:"warning-size" description:"warning if file size less than"`
+	CriticalAge   int64  `short:"c" long:"critical-age" default:"600" description:"critical if more old than"`
+	CriticalSize  int64  `short:"C" long:"critical-size" default:"0" description:"critical if file size less than"`
+	IgnoreMissing bool   `short:"i" long:"ignore-missing" description:"skip alert if file doesn't exist"`
 }
 
 func run(args []string) *checkers.Checker {
@@ -72,15 +72,15 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	stat, err := os.Stat(opts.file)
+	stat, err := os.Stat(opts.File)
 	if err != nil {
-		if opts.ignoreMissing {
+		if opts.IgnoreMissing {
 			return checkers.Ok("No such file, but ignore missing is set.")
 		}
 		return checkers.Unknown(err.Error())
 	}
 
-	monitor := newMonitor(opts.warningAge, opts.warningSize, opts.criticalAge, opts.criticalSize)
+	monitor := newMonitor(opts.WarningAge, opts.WarningSize, opts.CriticalAge, opts.CriticalSize)
 
 	result := checkers.OK
 
@@ -95,6 +95,6 @@ func run(args []string) *checkers.Checker {
 		result = checkers.CRITICAL
 	}
 
-	msg := fmt.Sprintf("%s is %d seconds old and %d bytes.\n", opts.file, age, size)
+	msg := fmt.Sprintf("%s is %d seconds old and %d bytes.\n", opts.File, age, size)
 	return checkers.NewChecker(result, msg)
 }
