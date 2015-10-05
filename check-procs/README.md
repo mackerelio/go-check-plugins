@@ -12,5 +12,5 @@ command = "/path/to/check-procs --pattern=PROCESS_NAME --state=STATE --warn-unde
 
 ## Other
 
-* This is Go port of [Sensu-Plugins-process-checks](https://github.com/sensu-plugins/sensu-plugins-process-checks).
-* [check_procs](https://github.com/nagios-plugins/nagios-plugins/blob/master/plugins/check_procs.c)
+* This is a Go port of [Sensu-Plugins-process-checks](https://github.com/sensu-plugins/sensu-plugins-process-checks).
+* [Nagios Plugins - check_procs.c](https://github.com/nagios-plugins/nagios-plugins/blob/master/plugins/check_procs.c)
