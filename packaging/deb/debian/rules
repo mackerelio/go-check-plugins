@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+package=mackerel-check-plugins
+
+override_dh_auto_install:
+	dh_auto_install
+	install -d -m 755 debian/tmp/usr/local/bin
+	for i in http file-age procs;do \
+	    install -m755 debian/check-$$i debian/tmp/usr/local/bin; \
+	done
+
+override_dh_usrlocal:
+
