@@ -1,0 +1,10 @@
+{
+    "description": "configuration for packaging mackerel-checks",
+    "plugins": [
+       "file-age",
+       "http",
+       "load",
+       "procs"
+    ]
+}
+
