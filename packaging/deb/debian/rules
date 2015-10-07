@@ -3,7 +3,7 @@
 %:
 	dh $@
 
-package=mackerel-checks
+package=mackerel-check-plugins
 
 override_dh_auto_install:
 	dh_auto_install

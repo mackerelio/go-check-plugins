@@ -2,7 +2,7 @@
 %define _localbindir /usr/local/bin
 %define __targetdir /usr/local/bin
 
-Name:      mackerel-checks
+Name:      mackerel-check-plugins
 Version:   0.0.0
 Release:   1
 License:   Commercial

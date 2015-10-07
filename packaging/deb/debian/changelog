@@ -1,4 +1,4 @@
-mackerel-checks (0.0.0-1) unstable; urgency=low
+mackerel-check-plugins (0.0.0-1) unstable; urgency=low
 
   * Initial release
 

@@ -36,7 +36,7 @@ build: deps
 	done
 
 rpm: build
-	rpmbuild --define "_sourcedir `pwd`" -ba packaging/rpm/mackerel-checks.spec
+	rpmbuild --define "_sourcedir `pwd`" -ba packaging/rpm/mackerel-check-plugins.spec
 
 deb: build
 	cp build/check-* packaging/deb/debian/

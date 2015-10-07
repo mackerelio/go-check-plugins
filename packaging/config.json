@@ -1,5 +1,5 @@
 {
-    "description": "configuration for packaging mackerel-checks",
+    "description": "configuration for packaging mackerel-check-plugins",
     "plugins": [
        "file-age",
        "http",

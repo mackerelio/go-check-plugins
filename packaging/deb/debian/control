@@ -1,9 +1,9 @@
-Source: mackerel-checks
+Source: mackerel-check-plugins
 Maintainer: Shinji Tanaka <stanaka@hatena.ne.jp>
 Section: misc
 Priority: optional
 Standards-Version: 0.0.0
 
-Package: mackerel-checks
+Package: mackerel-check-plugins
 Architecture: all
 Description: macekrel.io check plugins

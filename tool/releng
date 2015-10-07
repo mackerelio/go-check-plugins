@@ -2,7 +2,7 @@
 
 =head DESCRIPTION
 
-releng script for mackerel-checks
+releng script for mackerel-check-plugins
 
 =head SYNOPSIS
 
@@ -207,7 +207,7 @@ sub update_versions {
     };
 
     # update rpm spec
-    replace 'packaging/rpm/mackerel-checks.spec' => sub {
+    replace 'packaging/rpm/mackerel-check-plugins.spec' => sub {
         my $content = shift;
         $content =~ s/^Version: $cur_ver_reg/Version: $next_version/ms;
         $content;
@@ -250,7 +250,7 @@ sub update_packaging_specs {
         $content =~ s/for i in.*?;do/$for_in/ms;
         $content;
     };
-    replace $_, $replace_sub for qw!packaging/rpm/mackerel-checks.spec packaging/deb/debian/rules!;
+    replace $_, $replace_sub for qw!packaging/rpm/mackerel-check-plugins.spec packaging/deb/debian/rules!;
 }
 
 sub update_changelog {
@@ -270,7 +270,7 @@ sub update_changelog {
     replace 'packaging/deb/debian/changelog' => sub {
         my $content = shift;
 
-        my $update = "mackerel-checks ($next_version-1) stable; urgency=low\n\n";
+        my $update = "mackerel-check-plugins ($next_version-1) stable; urgency=low\n\n";
         for my $rel (@releases) {
             $update .= sprintf "  * %s (by %s)\n    <%s>\n", $rel->{title}, $rel->{user}, $rel->{url};
         }
@@ -278,7 +278,7 @@ sub update_changelog {
         $update . $content;
     };
 
-    replace 'packaging/rpm/mackerel-checks.spec' => sub {
+    replace 'packaging/rpm/mackerel-check-plugins.spec' => sub {
         my $content = shift;
 
         my $update = sprintf "* %s <%s> - %s\n", $now->strftime('%a %b %d %Y'), $email, $next_version;
