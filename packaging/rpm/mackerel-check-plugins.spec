@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.0.0
+Version: 0.0.1  0.0.0
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -25,7 +25,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in http file-age procs;do \
+for i in file-age http load procs;do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -37,5 +37,7 @@ done
 %{__targetdir}
 
 %changelog
+* Wed Oct 07 2015 <itchyny@hatena.ne.jp> - 0.0.1
+
 * Wed Oct 7 2015 itchyny <itchyny@hatena.ne.jp> 0.0.0
 - Initial release
