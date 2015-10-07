@@ -209,7 +209,7 @@ sub update_versions {
     # update rpm spec
     replace 'packaging/rpm/mackerel-check-plugins.spec' => sub {
         my $content = shift;
-        $content =~ s/^Version: $cur_ver_reg/Version: $next_version/ms;
+        $content =~ s/^(Version:\s+)$cur_ver_reg/$1$next_version/ms;
         $content;
     };
 
