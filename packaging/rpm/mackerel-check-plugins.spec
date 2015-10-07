@@ -38,6 +38,7 @@ done
 
 %changelog
 * Wed Oct 07 2015 <itchyny@hatena.ne.jp> - 0.0.1
+- Fix release tools
 
-* Wed Oct 7 2015 itchyny <itchyny@hatena.ne.jp> 0.0.0
+* Wed Oct 07 2015 <itchyny@hatena.ne.jp> - 0.0.0
 - Initial release
