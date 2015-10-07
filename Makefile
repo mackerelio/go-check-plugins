@@ -1,6 +1,6 @@
 TARGET_OSARCH="linux/386"
 
-all: clean test build
+all: clean test build rpm deb
 
 test: lint
 	go test $(TESTFLAGS) ./...
@@ -27,9 +27,20 @@ cover: devel-deps
 build: deps
 	mkdir -p build
 	for i in check-*; do \
+	  if [ $$i = check-load ]; then \
+	    echo ""; \
+	  else \
 	  gox -osarch=$(TARGET_OSARCH) -output build/$$i \
 	    github.com/mackerelio/go-check-plugins/$$i; \
+		fi; \
 	done
+
+rpm: build
+	rpmbuild --define "_sourcedir `pwd`" -ba packaging/rpm/mackerel-checks.spec
+
+deb: build
+	cp build/check-* packaging/deb/debian/
+	cd packaging/deb && debuild --no-tgz-check -rfakeroot -uc -us
 
 clean:
 	if [ -d build ]; then \
@@ -38,4 +49,4 @@ clean:
 	fi
 	go clean
 
-.PHONY: all test deps devel-deps lint cover build clean
+.PHONY: all test deps devel-deps lint cover build clean rpm deb
