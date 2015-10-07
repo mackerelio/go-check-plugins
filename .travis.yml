@@ -11,5 +11,6 @@ install:
 script:
 - make lint
 - make cover
+- make all
 after_script:
 - goveralls -coverprofile=.profile.cov
