@@ -151,7 +151,7 @@ func timeStrToSeconds(etime string) int64 {
 func matchProc(proc procState, cmdPatRegexp *regexp.Regexp, cmdExcludePatRegexp *regexp.Regexp) bool {
 	return (opts.CmdPat == "" || cmdPatRegexp.MatchString(proc.cmd)) &&
 		(opts.CmdExcludePat == "" || !cmdExcludePatRegexp.MatchString(proc.cmd)) &&
-		(!opts.MatchSelf || proc.pid == strconv.Itoa(os.Getpid())) &&
+		(opts.MatchSelf || proc.pid != strconv.Itoa(os.Getpid())) &&
 		(opts.FilePid == "" || proc.pid == opts.FilePid) &&
 		(opts.Vsz == 0 || proc.vsz <= opts.Vsz) &&
 		(opts.Rss == 0 || proc.rss <= opts.Rss) &&
