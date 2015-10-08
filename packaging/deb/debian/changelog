@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.0.2-1) stable; urgency=low
+
+  * fix MatchSelf behaviour (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/9>
+
+ -- itchyny <itchyny@hatena.ne.jp>  Thu, 08 Oct 2015 14:50:01 +0900
+
 mackerel-check-plugins (0.0.1-1) stable; urgency=low
 
   * Fix release tools

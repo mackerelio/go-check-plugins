@@ -37,6 +37,9 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Oct 08 2015 <itchyny@hatena.ne.jp> - 0.0.2
+- fix MatchSelf behaviour (by Songmu)
+
 * Wed Oct 07 2015 <itchyny@hatena.ne.jp> - 0.0.1
 - Fix release tools
 
