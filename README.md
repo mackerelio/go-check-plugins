@@ -27,16 +27,6 @@ The specs for the check plugins are mostly the same as the [Nagios](https://www.
 Installation
 ------------
 
-## Install mackerel-agent
-
-ENG http://help.mackerel.io/entry/howto/install-agent
-
-JPN http://help-ja.mackerel.io/entry/howto/install-agent
-
-If the mackerel-agent has already be installed this step can be ignored.
-
-## Install mackerel-check-plugins
-
 Install the plugin pack from either the yum or the apt repository.
 
 ### CentOS 5/6
@@ -52,6 +42,17 @@ apt-get install mackerel-check-plugins
 ```
 
 mackerel-check-plugins will be installed to ```/usr/local/bin/check-*```.
+
+
+Use check plugins in Mackerel
+-----------------------------
+
+See the following documentation.
+
+English: http://help.mackerel.io/entry/custom-checks
+
+Japanese: http://help-ja.mackerel.io/entry/custom-checks
+
 
 Contribution
 ------------
