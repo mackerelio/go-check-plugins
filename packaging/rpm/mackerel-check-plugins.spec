@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.0.1
+Version:   0.0.2
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -37,6 +37,9 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Oct 08 2015 <itchyny@hatena.ne.jp> - 0.0.2
+- fix MatchSelf behaviour (by Songmu)
+
 * Wed Oct 07 2015 <itchyny@hatena.ne.jp> - 0.0.1
 - Fix release tools
 
