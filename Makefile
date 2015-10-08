@@ -49,4 +49,7 @@ clean:
 	fi
 	go clean
 
-.PHONY: all test deps devel-deps lint cover build clean rpm deb
+release:
+	tool/releng
+
+.PHONY: all test deps devel-deps lint cover build rpm deb clean release
