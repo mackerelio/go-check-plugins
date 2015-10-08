@@ -14,30 +14,21 @@ Documentation for each plugin is located in its respective sub directory.
 Specification
 -------------
 
-The specs for the check plugins are mostly the same as the [Nagios](https://www.nagios.org/) plugin. In the settings file, the assign command’s exit status will be treated as shown below.
+The specs for the check plugins are mostly the same as the plugins for [Nagios](https://www.nagios.org/) and [Sensu](https://sensuapp.org/).
+The exit status of the commands are treated as follows.
 
-| exit status          |  meaning |
-|:---------------------|---------:|
-| 0                    | OK       |
-| 1                    | WARNING  |
-| 2                    | CRITICAL |
-| other than 0,1, or 2 | UNKNOWN  |
+| exit status           |  meaning |
+|:----------------------|---------:|
+| 0                     | OK       |
+| 1                     | WARNING  |
+| 2                     | CRITICAL |
+| other than 0, 1, or 2 | UNKNOWN  |
 
 
 Installation
 ------------
 
-## Install mackerel-agent
-
-ENG http://help.mackerel.io/entry/howto/install-agent
-
-JPN http://help-ja.mackerel.io/entry/howto/install-agent
-
-If the mackerel-agent has already be installed this step can be ignored.
-
-## Install mackerel-check-plugins
-
-Install the plugin pack from either the yum or the apt repository.
+Install the plugin package from either the yum or the apt repository.
 
 ### CentOS 5/6
 
@@ -52,6 +43,17 @@ apt-get install mackerel-check-plugins
 ```
 
 mackerel-check-plugins will be installed to ```/usr/local/bin/check-*```.
+
+
+Use check plugins in Mackerel
+-----------------------------
+
+See the following documentation.
+
+English: http://help.mackerel.io/entry/custom-checks
+
+Japanese: http://help-ja.mackerel.io/entry/custom-checks
+
 
 Contribution
 ------------
