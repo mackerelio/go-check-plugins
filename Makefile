@@ -27,13 +27,9 @@ cover: devel-deps
 build: deps
 	mkdir -p build
 	for i in check-*; do \
-	  if [ $$i = check-load ]; then \
-	    echo ""; \
-	  else \
 	  gox -ldflags "-s -w" \
 	    -osarch=$(TARGET_OSARCH) -output build/$$i \
 	    github.com/mackerelio/go-check-plugins/$$i; \
-		fi; \
 	done
 
 rpm: build
