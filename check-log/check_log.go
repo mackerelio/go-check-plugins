@@ -139,7 +139,7 @@ func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, in
 	}
 
 	readBytes := int64(0)
-	if skipBytes > 0 && stat.Size() > skipBytes {
+	if skipBytes > 0 && stat.Size() >= skipBytes {
 		f.Seek(skipBytes, 0)
 		readBytes = skipBytes
 	}
@@ -150,7 +150,7 @@ func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, in
 
 	for {
 		lineBytes, err := r.ReadBytes('\n')
-		readBytes += int64(len(lineBytes)) + 1
+		readBytes += int64(len(lineBytes))
 		if err == io.EOF {
 			break
 		} else if err != nil {
