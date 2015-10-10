@@ -18,7 +18,6 @@ var opts struct {
 	LogFile         string `short:"f" long:"log-file" value-name:"FILE" description:"Path to log file"`
 	Pattern         string `short:"q" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
 	Exclude         string `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
-	Encoding        string `short:"e" long:"encoding" value-name:"ENCODING-PAGE" description:"Explicit encoding page to read log file with"`
 	Warn            int64  `short:"w" long:"warn" value-name:"N" description:"Warning level if pattern has a group"`
 	Crit            int64  `short:"c" long:"crit" value-name:"N" description:"Critical level if pattern has a group"`
 	OnlyWarn        bool   `short:"o" long:"warn-only" description:"Warn instead of critical on match"`
