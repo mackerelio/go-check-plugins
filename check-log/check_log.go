@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -32,6 +33,13 @@ func main() {
 	ckr.Exit()
 }
 
+func regCompileWithCase(ptn string, caseInsensitive bool) (*regexp.Regexp, error) {
+	if caseInsensitive {
+		ptn = strings.ToLower(ptn)
+	}
+	return regexp.Compile(ptn)
+}
+
 func run(args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
@@ -42,11 +50,14 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown("No log file specified")
 	}
 
-	excludeReg, err := regexp.Compile(opts.Exclude)
+	patternReg, err := regCompileWithCase(opts.Pattern, opts.CaseInsensitive)
+	if err != nil {
+		return checkers.Unknown("pattern is invalid")
+	}
+	excludeReg, err := regCompileWithCase(opts.Exclude, opts.CaseInsensitive)
 	if err != nil {
 		return checkers.Unknown("exclude pattern is invalid")
 	}
-	excludeReg = excludeReg
 
 	fileList := []string{}
 	if opts.LogFile != "" {
@@ -56,10 +67,7 @@ func run(args []string) *checkers.Checker {
 	if opts.FilePattern != "" {
 		dirStr := filepath.Dir(opts.FilePattern)
 		filePat := filepath.Base(opts.FilePattern)
-		if opts.CaseInsensitive {
-			filePat = strings.ToLower(filePat)
-		}
-		reg, err := regexp.Compile(filePat)
+		reg, err := regCompileWithCase(filePat, opts.CaseInsensitive)
 		if err != nil {
 			return checkers.Unknown("file-pattern is invalid")
 		}
@@ -83,12 +91,19 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 
-	warnNum := 0
-	critNum := 0
+	warnNum := int64(0)
+	critNum := int64(0)
 	errorOverall := ""
 
-	// for _, _ = range fileList {
-	//}
+	for _, f := range fileList {
+		w, c, errLines, err := searchLog(f, patternReg, excludeReg)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
+		warnNum += w
+		critNum += c
+		errorOverall += errLines
+	}
 
 	checkSt := checkers.OK
 	if warnNum > 0 {
@@ -99,6 +114,47 @@ func run(args []string) *checkers.Checker {
 	}
 	msg := fmt.Sprintf("%d warnings, %d criticals for pattern %s. %s", warnNum, critNum, opts.Pattern, errorOverall)
 	return checkers.NewChecker(checkSt, msg)
+}
+
+func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, int64, string, error) {
+	stateFile := getStateFile(opts.StateDir, logFile)
+	skipBytes, err := getBytesToSkip(stateFile)
+	if err != nil {
+		return 0, 0, "", err
+	}
+
+	f, err := os.Open(logFile)
+	if err != nil {
+		return 0, 0, "", err
+	}
+	defer f.Close()
+
+	stat, err := f.Stat()
+	if err != nil {
+		return 0, 0, "", err
+	}
+
+	if skipBytes > 0 && stat.Size() > skipBytes {
+		f.Seek(skipBytes, 0)
+	}
+	warnNum := int64(0)
+	critNum := int64(0)
+	errLines := ""
+	s := bufio.NewScanner(f)
+	for s.Scan() {
+		line := s.Text()
+		checkLine := line
+		if opts.CaseInsensitive {
+			checkLine = strings.ToLower(checkLine)
+		}
+		if patternReg.MatchString(checkLine) && !excludeReg.MatchString(checkLine) {
+			warnNum++
+			critNum++
+			errLines += "\n" + line
+		}
+	}
+	// writeBytesToSkip(stateFile, int64(s.Pos().Offset))
+	return warnNum, critNum, errLines, nil
 }
 
 var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
