@@ -107,7 +107,9 @@ func run(args []string) *checkers.Checker {
 		}
 		warnNum += w
 		critNum += c
-		errorOverall += errLines
+		if opts.ReturnContent {
+			errorOverall += errLines
+		}
 	}
 
 	checkSt := checkers.OK
