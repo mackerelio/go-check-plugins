@@ -19,7 +19,7 @@ var opts struct {
 	StateDir        string `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
 	LogFile         string `short:"f" long:"log-file" value-name:"FILE" description:"Path to log file"`
 	Pattern         string `short:"q" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
-	Exclude         string `short:"E" long:"exclude" default:"(?!)" value-name:"PAT" description:"Pattern to exclude from matching"`
+	Exclude         string `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
 	Warn            int64  `short:"w" long:"warn" value-name:"N" description:"Warning level if pattern has a group"`
 	Crit            int64  `short:"c" long:"crit" value-name:"N" description:"Critical level if pattern has a group"`
 	OnlyWarn        bool   `short:"o" long:"warn-only" description:"Warn instead of critical on match"`
@@ -55,9 +55,13 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		return checkers.Unknown("pattern is invalid")
 	}
-	excludeReg, err := regCompileWithCase(opts.Exclude, opts.CaseInsensitive)
-	if err != nil {
-		return checkers.Unknown("exclude pattern is invalid")
+
+	var excludeReg *regexp.Regexp
+	if opts.Exclude != "" {
+		excludeReg, err = regCompileWithCase(opts.Exclude, opts.CaseInsensitive)
+		if err != nil {
+			return checkers.Unknown("exclude pattern is invalid")
+		}
 	}
 
 	fileList := []string{}
@@ -123,7 +127,6 @@ func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, in
 	if err != nil {
 		return 0, 0, "", err
 	}
-
 	f, err := os.Open(logFile)
 	if err != nil {
 		return 0, 0, "", err
@@ -158,13 +161,13 @@ func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, in
 		if opts.CaseInsensitive {
 			checkLine = strings.ToLower(checkLine)
 		}
-		if patternReg.MatchString(checkLine) && !excludeReg.MatchString(checkLine) {
+		if patternReg.MatchString(checkLine) && (excludeReg == nil || !excludeReg.MatchString(checkLine)) {
 			warnNum++
 			critNum++
 			errLines += "\n" + line
 		}
 	}
-	writeBytesToSkip(stateFile, readBytes)
+	err = writeBytesToSkip(stateFile, readBytes)
 	return warnNum, critNum, errLines, nil
 }
 
