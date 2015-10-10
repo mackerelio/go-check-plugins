@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -134,15 +135,25 @@ func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, in
 		return 0, 0, "", err
 	}
 
+	readBytes := int64(0)
 	if skipBytes > 0 && stat.Size() > skipBytes {
 		f.Seek(skipBytes, 0)
+		readBytes = skipBytes
 	}
 	warnNum := int64(0)
 	critNum := int64(0)
 	errLines := ""
-	s := bufio.NewScanner(f)
-	for s.Scan() {
-		line := s.Text()
+	r := bufio.NewReader(f)
+
+	for {
+		lineBytes, err := r.ReadBytes('\n')
+		readBytes += int64(len(lineBytes)) + 1
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return 0, 0, "", err
+		}
+		line := strings.Trim(string(lineBytes), "\r\n")
 		checkLine := line
 		if opts.CaseInsensitive {
 			checkLine = strings.ToLower(checkLine)
@@ -153,7 +164,7 @@ func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, in
 			errLines += "\n" + line
 		}
 	}
-	// writeBytesToSkip(stateFile, int64(s.Pos().Offset))
+	writeBytesToSkip(stateFile, readBytes)
 	return warnNum, critNum, errLines, nil
 }
 
