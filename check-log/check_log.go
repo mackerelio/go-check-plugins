@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/jessevdk/go-flags"
@@ -104,4 +105,28 @@ var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
 
 func getStateFile(stateDir, f string) string {
 	return filepath.Join(stateDir, stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)))
+}
+
+func getBytesToSkip(f string) (int64, error) {
+	_, err := os.Stat(f)
+	if err != nil {
+		return 0, nil
+	}
+	b, err := ioutil.ReadFile(f)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.Atoi(strings.Trim(string(b), " \r\n"))
+	if err != nil {
+		return 0, err
+	}
+	return int64(i), nil
+}
+
+func writeBytesToSkip(f string, num int64) error {
+	err := os.MkdirAll(filepath.Dir(f), 0755)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(f, []byte(fmt.Sprintf("%d", num)), 0755)
 }
