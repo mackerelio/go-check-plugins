@@ -41,6 +41,12 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown("No log file specified")
 	}
 
+	excludeReg, err := regexp.Compile(opts.Exclude)
+	if err != nil {
+		return checkers.Unknown("exclude pattern is invalid")
+	}
+	excludeReg = excludeReg
+
 	fileList := []string{}
 	if opts.LogFile != "" {
 		fileList = append(fileList, opts.LogFile)
@@ -92,4 +98,10 @@ func run(args []string) *checkers.Checker {
 	}
 	msg := fmt.Sprintf("%d warnings, %d criticals for pattern %s. %s", warnNum, critNum, opts.Pattern, errorOverall)
 	return checkers.NewChecker(checkSt, msg)
+}
+
+var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
+
+func getStateFile(stateDir, f string) string {
+	return filepath.Join(stateDir, stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)))
 }
