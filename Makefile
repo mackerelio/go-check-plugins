@@ -30,7 +30,8 @@ build: deps
 	  if [ $$i = check-load ]; then \
 	    echo ""; \
 	  else \
-	  gox -osarch=$(TARGET_OSARCH) -output build/$$i \
+	  gox -ldflags "-s -w" \
+	    -osarch=$(TARGET_OSARCH) -output build/$$i \
 	    github.com/mackerelio/go-check-plugins/$$i; \
 		fi; \
 	done
