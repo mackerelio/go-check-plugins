@@ -60,4 +60,4 @@ Contribution
 
 * fork it
 * develop the plugin you want
-* create a pullrequest!
+* create a pull request!
