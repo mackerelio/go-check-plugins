@@ -4,6 +4,7 @@
 
 * reduce binary size by using ldflags #15 (Songmu)
 * Remove cgo dependency from check-load #16 (Songmu)
+* Add check-load in the packages
 
 
 ## 0.0.2 (2015-10-08)
