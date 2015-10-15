@@ -37,6 +37,10 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Oct 15 2015 <itchyny@hatena.ne.jp> - 0.0.3
+- reduce binary size by using ldflags (by Songmu)
+- Remove cgo dependency from check-load (by Songmu)
+
 * Thu Oct 08 2015 <itchyny@hatena.ne.jp> - 0.0.2
 - fix MatchSelf behaviour (by Songmu)
 
