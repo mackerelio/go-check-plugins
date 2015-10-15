@@ -8,7 +8,7 @@ Documentation for each plugin is located in its respective sub directory.
 
 * [check-file-age](./check-file-age/README.md)
 * [check-http](./check-http/README.md)
-* [check-load](./check-load/README.md) (This plugin is not yet included within the yum/apt packages)
+* [check-load](./check-load/README.md)
 * [check-procs](./check-procs/README.md)
 
 Specification
@@ -60,4 +60,4 @@ Contribution
 
 * fork it
 * develop the plugin you want
-* create a pullrequest!
+* create a pull request!
