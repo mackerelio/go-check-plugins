@@ -1,3 +1,13 @@
+mackerel-check-plugins (0.0.3-1) stable; urgency=low
+
+  * reduce binary size by using ldflags (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/15>
+  * Remove cgo dependency from check-load (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/16>
+  * Add check-load in the packages
+
+ -- itchyny <itchyny@hatena.ne.jp>  Thu, 15 Oct 2015 12:14:23 +0900
+
 mackerel-check-plugins (0.0.2-1) stable; urgency=low
 
   * fix MatchSelf behaviour (by Songmu)

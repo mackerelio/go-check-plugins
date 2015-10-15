@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.0.2
+Version:   0.0.3
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -25,7 +25,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in file-age http procs;do \
+for i in file-age http load procs;do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -37,6 +37,11 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Oct 15 2015 <itchyny@hatena.ne.jp> - 0.0.3
+- reduce binary size by using ldflags (by Songmu)
+- Remove cgo dependency from check-load (by Songmu)
+- Add check-load in the packages
+
 * Thu Oct 08 2015 <itchyny@hatena.ne.jp> - 0.0.2
 - fix MatchSelf behaviour (by Songmu)
 
