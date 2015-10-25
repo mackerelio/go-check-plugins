@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -155,15 +156,17 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		f.Seek(skipBytes, 0)
 	}
 
-	r := bufio.NewReader(f)
-	warnNum, critNum, readBytes, errLines, err := opts.searchReader(r)
+	warnNum, critNum, readBytes, errLines, err := opts.searchReader(f)
 
-	// XXX error check
-	writeBytesToSkip(stateFile, readBytes + skipBytes)
+	err = writeBytesToSkip(stateFile, readBytes+skipBytes)
+	if err != nil {
+		log.Printf("writeByteToSkip failed: %s\n", err.Error())
+	}
 	return warnNum, critNum, errLines, nil
 }
 
-func (opts *logOpts) searchReader(r *bufio.Reader) (warnNum, critNum, readBytes int64, errLines string, err error){
+func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes int64, errLines string, err error) {
+	r := bufio.NewReader(rdr)
 	for {
 		lineBytes, rErr := r.ReadBytes('\n')
 		readBytes += int64(len(lineBytes))
@@ -213,7 +216,7 @@ func (opts *logOpts) match(line string) (bool, []string) {
 	pReg := opts.patternReg
 	eReg := opts.excludeReg
 
-	matches := pReg.FindStringSubmatch(line);
+	matches := pReg.FindStringSubmatch(line)
 	matched := len(matches) > 0 && (eReg == nil || !eReg.MatchString(line))
 	return matched, matches
 }
