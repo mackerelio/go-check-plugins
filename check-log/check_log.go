@@ -22,7 +22,6 @@ var opts struct {
 	Exclude         string `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
 	Warn            int64  `short:"w" long:"warn" value-name:"N" description:"Warning level if pattern has a group"`
 	Crit            int64  `short:"c" long:"crit" value-name:"N" description:"Critical level if pattern has a group"`
-	OnlyWarn        bool   `short:"o" long:"warn-only" description:"Warn instead of critical on match"`
 	CaseInsensitive bool   `short:"i" long:"icase" description:"Run a case insensitive match"`
 	FilePattern     string `short:"F" long:"filepattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	ReturnContent   bool   `short:"r" long:"return" description:"Return matched line"`
