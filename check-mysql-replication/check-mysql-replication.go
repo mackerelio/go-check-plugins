@@ -1,47 +1,50 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	"os"
+
+	"github.com/jessevdk/go-flags"
+	"github.com/mackerelio/checkers"
 	"github.com/ziutek/mymysql/mysql"
 	_ "github.com/ziutek/mymysql/native"
-	"os"
 )
 
-// The exit status of the commands
-const (
-	OK       = 0
-	WARNING  = 1
-	CRITICAL = 2
-	UNKNOWN  = 3
-)
+var opts struct {
+	Host string `short:"h" long:"host" default:"localhost" description:"Hostname"`
+	Port string `short:"p" long:"port" default:"3306" description:"Port"`
+	User string `short:"u" long:"user" default:"root" description:"Username"`
+	Pass string `short:"P" long:"password" default:"" description:"Password"`
+	Crit int64  `short:"c" long:"critical" default:"250" description:"critical if the seconds behind master is over"`
+	Warn int64  `short:"w" long:"warning" default:"200" description:"warning if the seconds behind master is over"`
+}
 
 func main() {
-	optHost := flag.String("host", "localhost", "Hostname")
-	optPort := flag.String("port", "3306", "Port")
-	optUser := flag.String("username", "root", "Username")
-	optPass := flag.String("password", "", "Password")
-	optCrit := flag.Int("crit", 1, "critical if the second behind master is over")
-	optWarn := flag.Int("warn", 1, "warning if the second behind master is over")
-	flag.Parse()
+	ckr := run(os.Args[1:])
+	ckr.Name = "MySQL Replication"
+	ckr.Exit()
+}
 
-	target := fmt.Sprintf("%s:%s", *optHost, *optPort)
-	db := mysql.New("tcp", "", target, *optUser, *optPass, "")
-	err := db.Connect()
+func run(args []string) *checkers.Checker {
+	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
-		fmt.Println("UNKNOWN: couldn't connect DB")
-		os.Exit(UNKNOWN)
+		os.Exit(1)
+	}
+	target := fmt.Sprintf("%s:%s", opts.Host, opts.Port)
+	db := mysql.New("tcp", "", target, opts.User, opts.Pass, "")
+	err = db.Connect()
+	if err != nil {
+		return checkers.Unknown("couldn't connect DB")
 	}
 	defer db.Close()
 
-	rows, res, err := db.Query("show slave status")
+	rows, res, err := db.Query("SHOW SLAVE STATUS")
 	if err != nil {
-		fmt.Println("UNKNOWN: couldn't execute query")
-		os.Exit(UNKNOWN)
+		return checkers.Unknown("couldn't execute query")
 	}
+
 	if len(rows) == 0 {
-		fmt.Println("OK: MySQL is not slave")
-		os.Exit(OK)
+		return checkers.Ok("MySQL is not slave")
 	}
 
 	idxIoThreadRunning := res.Map("Slave_IO_Running")
@@ -49,23 +52,18 @@ func main() {
 	idxSecondsBehindMaster := res.Map("Seconds_Behind_Master")
 	ioThreadStatus := rows[0].Str(idxIoThreadRunning)
 	sqlThreadStatus := rows[0].Str(idxSQLThreadRunning)
-	secondsBehindMaster := rows[0].Int(idxSecondsBehindMaster)
+	secondsBehindMaster := rows[0].Int64(idxSecondsBehindMaster)
 
 	if ioThreadStatus == "No" || sqlThreadStatus == "No" {
-		fmt.Println("CRITICAL: MySQL replication has been stopped")
-		os.Exit(CRITICAL)
+		return checkers.Critical("MySQL replication has been stopped")
 	}
 
-	if secondsBehindMaster > *optCrit {
-		msg := fmt.Sprintf("CRITICAL: MySQL replication behind master %d seconds", secondsBehindMaster)
-		fmt.Println(msg)
-		os.Exit(CRITICAL)
-	} else if secondsBehindMaster > *optWarn {
-		msg := fmt.Sprintf("WARNING: MySQL replication behind master %d seconds", secondsBehindMaster)
-		fmt.Println(msg)
-		os.Exit(WARNING)
+	checkSt := checkers.OK
+	msg := fmt.Sprintf("MySQL replication behind master %d seconds", secondsBehindMaster)
+	if secondsBehindMaster > opts.Crit {
+		checkSt = checkers.CRITICAL
+	} else if secondsBehindMaster > opts.Warn {
+		checkSt = checkers.WARNING
 	}
-
-	fmt.Println("OK: MySQL replication works well")
-	os.Exit(OK)
+	return checkers.NewChecker(checkSt, msg)
 }
