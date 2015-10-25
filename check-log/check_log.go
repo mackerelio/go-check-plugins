@@ -20,8 +20,8 @@ var opts struct {
 	LogFile         string  `short:"f" long:"log-file" value-name:"FILE" description:"Path to log file"`
 	Pattern         string  `short:"q" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
 	Exclude         string  `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
-	WarnOver        int64   `short:"w" long:"warning-over" default:"0" description:"Trigger a warning if matched lines is over a number"`
-	CritOver        int64   `short:"c" long:"critical-over" default:"0" description:"Trigger a critical if matched lines is over a number"`
+	WarnOver        int64   `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
+	CritOver        int64   `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	WarnLevel       float64 `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
 	CritLevel       float64 `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
@@ -164,10 +164,32 @@ func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, in
 		if opts.CaseInsensitive {
 			checkLine = strings.ToLower(checkLine)
 		}
-		if patternReg.MatchString(checkLine) && (excludeReg == nil || !excludeReg.MatchString(checkLine)) {
-			warnNum++
-			critNum++
-			errLines += "\n" + line
+		if matches := patternReg.FindStringSubmatch(checkLine); len(matches) > 0 && (excludeReg == nil || !excludeReg.MatchString(checkLine)) {
+			if len(matches) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
+				level, err := strconv.ParseFloat(matches[1], 64)
+				if err != nil {
+					warnNum++
+					critNum++
+					errLines += "\n" + line
+				} else {
+					levelOver := false
+					if level > opts.WarnLevel {
+						levelOver = true
+						warnNum++
+					}
+					if level > opts.CritLevel {
+						levelOver = true
+						critNum++
+					}
+					if levelOver {
+						errLines += "\n" + line
+					}
+				}
+			} else {
+				warnNum++
+				critNum++
+				errLines += "\n" + line
+			}
 		}
 	}
 	err = writeBytesToSkip(stateFile, readBytes)
