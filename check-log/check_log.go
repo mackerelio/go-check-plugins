@@ -18,7 +18,7 @@ import (
 var opts struct {
 	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
 	LogFile         string  `short:"f" long:"log-file" value-name:"FILE" description:"Path to log file"`
-	Pattern         string  `short:"q" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
+	Pattern         string  `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
 	Exclude         string  `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
 	WarnOver        int64   `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver        int64   `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
