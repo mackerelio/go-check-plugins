@@ -164,8 +164,6 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 }
 
 func (opts *logOpts) searchReader(r *bufio.Reader) (warnNum, critNum, readBytes int64, errLines string, err error){
-	pReg := opts.patternReg
-	eReg := opts.excludeReg
 	for {
 		lineBytes, rErr := r.ReadBytes('\n')
 		readBytes += int64(len(lineBytes))
@@ -180,7 +178,7 @@ func (opts *logOpts) searchReader(r *bufio.Reader) (warnNum, critNum, readBytes 
 		if opts.CaseInsensitive {
 			checkLine = strings.ToLower(checkLine)
 		}
-		if matches := pReg.FindStringSubmatch(checkLine); len(matches) > 0 && (eReg == nil || !eReg.MatchString(checkLine)) {
+		if matched, matches := opts.match(checkLine); matched {
 			if len(matches) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
 				level, err := strconv.ParseFloat(matches[1], 64)
 				if err != nil {
@@ -209,6 +207,15 @@ func (opts *logOpts) searchReader(r *bufio.Reader) (warnNum, critNum, readBytes 
 		}
 	}
 	return
+}
+
+func (opts *logOpts) match(line string) (bool, []string) {
+	pReg := opts.patternReg
+	eReg := opts.excludeReg
+
+	matches := pReg.FindStringSubmatch(line);
+	matched := len(matches) > 0 && (eReg == nil || !eReg.MatchString(line))
+	return matched, matches
 }
 
 var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
