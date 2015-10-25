@@ -15,7 +15,7 @@ import (
 	"github.com/mackerelio/checkers"
 )
 
-var opts struct {
+type logOpts struct {
 	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
 	LogFile         string  `short:"f" long:"log-file" value-name:"FILE" description:"Path to log file"`
 	Pattern         string  `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
@@ -27,6 +27,59 @@ var opts struct {
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
 	FilePattern     string  `short:"F" long:"filepattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	ReturnContent   bool    `short:"r" long:"return" description:"Return matched line"`
+	patternReg      *regexp.Regexp
+	excludeReg      *regexp.Regexp
+	fileList        []string
+}
+
+func (opts *logOpts) prepare() error {
+	if opts.LogFile == "" && opts.FilePattern == "" {
+		return fmt.Errorf("No log file specified")
+	}
+
+	var err error
+	if opts.patternReg, err = regCompileWithCase(opts.Pattern, opts.CaseInsensitive); err != nil {
+		return fmt.Errorf("pattern is invalid")
+	}
+
+	if opts.Exclude != "" {
+		opts.excludeReg, err = regCompileWithCase(opts.Exclude, opts.CaseInsensitive)
+		if err != nil {
+			return fmt.Errorf("exclude pattern is invalid")
+		}
+	}
+
+	if opts.LogFile != "" {
+		opts.fileList = append(opts.fileList, opts.LogFile)
+	}
+
+	if opts.FilePattern != "" {
+		dirStr := filepath.Dir(opts.FilePattern)
+		filePat := filepath.Base(opts.FilePattern)
+		reg, err := regCompileWithCase(filePat, opts.CaseInsensitive)
+		if err != nil {
+			return fmt.Errorf("file-pattern is invalid")
+		}
+
+		fileInfos, err := ioutil.ReadDir(dirStr)
+		if err != nil {
+			return fmt.Errorf("cannot read the Directory:" + err.Error())
+		}
+
+		for _, fileInfo := range fileInfos {
+			if fileInfo.IsDir() {
+				continue
+			}
+			fname := fileInfo.Name()
+			if opts.CaseInsensitive {
+				fname = strings.ToLower(fname)
+			}
+			if reg.MatchString(fname) {
+				opts.fileList = append(opts.fileList, dirStr+string(filepath.Separator)+fileInfo.Name())
+			}
+		}
+	}
+	return nil
 }
 
 func main() {
@@ -43,66 +96,23 @@ func regCompileWithCase(ptn string, caseInsensitive bool) (*regexp.Regexp, error
 }
 
 func run(args []string) *checkers.Checker {
-	_, err := flags.ParseArgs(&opts, args)
+	opts := &logOpts{}
+	_, err := flags.ParseArgs(opts, args)
 	if err != nil {
 		os.Exit(1)
 	}
 
-	if opts.LogFile == "" && opts.FilePattern == "" {
-		return checkers.Unknown("No log file specified")
-	}
-
-	patternReg, err := regCompileWithCase(opts.Pattern, opts.CaseInsensitive)
+	err = opts.prepare()
 	if err != nil {
-		return checkers.Unknown("pattern is invalid")
-	}
-
-	var excludeReg *regexp.Regexp
-	if opts.Exclude != "" {
-		excludeReg, err = regCompileWithCase(opts.Exclude, opts.CaseInsensitive)
-		if err != nil {
-			return checkers.Unknown("exclude pattern is invalid")
-		}
-	}
-
-	fileList := []string{}
-	if opts.LogFile != "" {
-		fileList = append(fileList, opts.LogFile)
-	}
-
-	if opts.FilePattern != "" {
-		dirStr := filepath.Dir(opts.FilePattern)
-		filePat := filepath.Base(opts.FilePattern)
-		reg, err := regCompileWithCase(filePat, opts.CaseInsensitive)
-		if err != nil {
-			return checkers.Unknown("file-pattern is invalid")
-		}
-
-		fileInfos, err := ioutil.ReadDir(dirStr)
-		if err != nil {
-			return checkers.Unknown("cannot read the Directory:" + err.Error())
-		}
-
-		for _, fileInfo := range fileInfos {
-			if fileInfo.IsDir() {
-				continue
-			}
-			fname := fileInfo.Name()
-			if opts.CaseInsensitive {
-				fname = strings.ToLower(fname)
-			}
-			if reg.MatchString(fname) {
-				fileList = append(fileList, dirStr+string(filepath.Separator)+fileInfo.Name())
-			}
-		}
+		return checkers.Unknown(err.Error())
 	}
 
 	warnNum := int64(0)
 	critNum := int64(0)
 	errorOverall := ""
 
-	for _, f := range fileList {
-		w, c, errLines, err := searchLog(f, patternReg, excludeReg)
+	for _, f := range opts.fileList {
+		w, c, errLines, err := opts.searchLog(f)
 		if err != nil {
 			return checkers.Unknown(err.Error())
 		}
@@ -124,7 +134,7 @@ func run(args []string) *checkers.Checker {
 	return checkers.NewChecker(checkSt, msg)
 }
 
-func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, int64, string, error) {
+func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	stateFile := getStateFile(opts.StateDir, logFile)
 	skipBytes, err := getBytesToSkip(stateFile)
 	if err != nil {
@@ -164,7 +174,7 @@ func searchLog(logFile string, patternReg, excludeReg *regexp.Regexp) (int64, in
 		if opts.CaseInsensitive {
 			checkLine = strings.ToLower(checkLine)
 		}
-		if matches := patternReg.FindStringSubmatch(checkLine); len(matches) > 0 && (excludeReg == nil || !excludeReg.MatchString(checkLine)) {
+		if matches := opts.patternReg.FindStringSubmatch(checkLine); len(matches) > 0 && (opts.excludeReg == nil || !opts.excludeReg.MatchString(checkLine)) {
 			if len(matches) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
 				level, err := strconv.ParseFloat(matches[1], 64)
 				if err != nil {
