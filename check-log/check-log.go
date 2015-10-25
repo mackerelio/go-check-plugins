@@ -151,30 +151,36 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		return 0, 0, "", err
 	}
 
-	readBytes := int64(0)
 	if skipBytes > 0 && stat.Size() >= skipBytes {
 		f.Seek(skipBytes, 0)
-		readBytes = skipBytes
 	}
-	warnNum := int64(0)
-	critNum := int64(0)
-	errLines := ""
-	r := bufio.NewReader(f)
 
+	r := bufio.NewReader(f)
+	warnNum, critNum, readBytes, errLines, err := opts.searchReader(r)
+
+	// XXX error check
+	writeBytesToSkip(stateFile, readBytes + skipBytes)
+	return warnNum, critNum, errLines, nil
+}
+
+func (opts *logOpts) searchReader(r *bufio.Reader) (warnNum, critNum, readBytes int64, errLines string, err error){
+	pReg := opts.patternReg
+	eReg := opts.excludeReg
 	for {
-		lineBytes, err := r.ReadBytes('\n')
+		lineBytes, rErr := r.ReadBytes('\n')
 		readBytes += int64(len(lineBytes))
-		if err == io.EOF {
+		if rErr != nil {
+			if rErr != io.EOF {
+				err = rErr
+			}
 			break
-		} else if err != nil {
-			return 0, 0, "", err
 		}
 		line := strings.Trim(string(lineBytes), "\r\n")
 		checkLine := line
 		if opts.CaseInsensitive {
 			checkLine = strings.ToLower(checkLine)
 		}
-		if matches := opts.patternReg.FindStringSubmatch(checkLine); len(matches) > 0 && (opts.excludeReg == nil || !opts.excludeReg.MatchString(checkLine)) {
+		if matches := pReg.FindStringSubmatch(checkLine); len(matches) > 0 && (eReg == nil || !eReg.MatchString(checkLine)) {
 			if len(matches) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
 				level, err := strconv.ParseFloat(matches[1], 64)
 				if err != nil {
@@ -202,8 +208,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 			}
 		}
 	}
-	err = writeBytesToSkip(stateFile, readBytes)
-	return warnNum, critNum, errLines, nil
+	return
 }
 
 var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
