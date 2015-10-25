@@ -96,9 +96,14 @@ func regCompileWithCase(ptn string, caseInsensitive bool) (*regexp.Regexp, error
 	return regexp.Compile(ptn)
 }
 
-func run(args []string) *checkers.Checker {
+func parseArgs(args []string) (*logOpts, error) {
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
+	return opts, err
+}
+
+func run(args []string) *checkers.Checker {
+	opts, err := parseArgs(args)
 	if err != nil {
 		os.Exit(1)
 	}
@@ -187,7 +192,7 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 				if err != nil {
 					warnNum++
 					critNum++
-					errLines += "\n" + line
+					errLines += line + "\n"
 				} else {
 					levelOver := false
 					if level > opts.WarnLevel {
@@ -199,13 +204,13 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 						critNum++
 					}
 					if levelOver {
-						errLines += "\n" + line
+						errLines += line + "\n"
 					}
 				}
 			} else {
 				warnNum++
 				critNum++
-				errLines += "\n" + line
+				errLines += line + "\n"
 			}
 		}
 	}
