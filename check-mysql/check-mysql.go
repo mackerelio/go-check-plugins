@@ -36,9 +36,10 @@ func main() {
 		fmt.Println(`Usage:
   check-mysql [subcommand] [OPTIONS]
 
-Subcommand:
-  connection
-  replication`)
+SubCommands:`)
+		for k := range commands {
+			fmt.Printf("  %s\n", k)
+		}
 		os.Exit(1)
 	}
 	ckr := fn(argv)
