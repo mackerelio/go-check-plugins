@@ -16,15 +16,17 @@ import (
 )
 
 var opts struct {
-	StateDir        string `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
-	LogFile         string `short:"f" long:"log-file" value-name:"FILE" description:"Path to log file"`
-	Pattern         string `short:"q" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
-	Exclude         string `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
-	Warn            int64  `short:"w" long:"warn" value-name:"N" description:"Warning level if pattern has a group"`
-	Crit            int64  `short:"c" long:"crit" value-name:"N" description:"Critical level if pattern has a group"`
-	CaseInsensitive bool   `short:"i" long:"icase" description:"Run a case insensitive match"`
-	FilePattern     string `short:"F" long:"filepattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
-	ReturnContent   bool   `short:"r" long:"return" description:"Return matched line"`
+	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
+	LogFile         string  `short:"f" long:"log-file" value-name:"FILE" description:"Path to log file"`
+	Pattern         string  `short:"q" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
+	Exclude         string  `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
+	WarnOver        int64   `short:"w" long:"warning-over" default:"0" description:"Trigger a warning if matched lines is over a number"`
+	CritOver        int64   `short:"c" long:"critical-over" default:"0" description:"Trigger a critical if matched lines is over a number"`
+	WarnLevel       float64 `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
+	CritLevel       float64 `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
+	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
+	FilePattern     string  `short:"F" long:"filepattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
+	ReturnContent   bool    `short:"r" long:"return" description:"Return matched line"`
 }
 
 func main() {
@@ -112,10 +114,10 @@ func run(args []string) *checkers.Checker {
 	}
 
 	checkSt := checkers.OK
-	if warnNum > 0 {
+	if warnNum > opts.WarnOver {
 		checkSt = checkers.WARNING
 	}
-	if critNum > 0 {
+	if critNum > opts.CritOver {
 		checkSt = checkers.CRITICAL
 	}
 	msg := fmt.Sprintf("%d warnings, %d criticals for pattern %s. %s", warnNum, critNum, opts.Pattern, errorOverall)
