@@ -8,20 +8,21 @@ import (
 	"github.com/mackerelio/checkers"
 )
 
-var replicationOpts struct {
+type replicationOpts struct {
 	mysqlSetting
 	Crit int64 `short:"c" long:"critical" default:"250" description:"critical if the seconds behind master is over"`
 	Warn int64 `short:"w" long:"warning" default:"200" description:"warning if the seconds behind master is over"`
 }
 
 func checkReplication(args []string) *checkers.Checker {
-	psr := flags.NewParser(&replicationOpts, flags.Default)
+	opts := replicationOpts{}
+	psr := flags.NewParser(&opts, flags.Default)
 	psr.Usage = "replication [OPTIONS]"
 	_, err := psr.ParseArgs(args)
 	if err != nil {
 		os.Exit(1)
 	}
-	db := newMySQL(replicationOpts.mysqlSetting)
+	db := newMySQL(opts.mysqlSetting)
 	err = db.Connect()
 	if err != nil {
 		return checkers.Unknown("couldn't connect DB")
@@ -50,9 +51,9 @@ func checkReplication(args []string) *checkers.Checker {
 
 	checkSt := checkers.OK
 	msg := fmt.Sprintf("MySQL replication behind master %d seconds", secondsBehindMaster)
-	if secondsBehindMaster > replicationOpts.Crit {
+	if secondsBehindMaster > opts.Crit {
 		checkSt = checkers.CRITICAL
-	} else if secondsBehindMaster > replicationOpts.Warn {
+	} else if secondsBehindMaster > opts.Warn {
 		checkSt = checkers.WARNING
 	}
 	return checkers.NewChecker(checkSt, msg)

@@ -8,20 +8,21 @@ import (
 	"github.com/mackerelio/checkers"
 )
 
-var connectionOpts struct {
+type connectionOpts struct {
 	mysqlSetting
 	Crit int64 `short:"c" long:"critical" default:"250" description:"critical if the number of connection is over"`
 	Warn int64 `short:"w" long:"warning" default:"200" description:"warning if the number of connection is over"`
 }
 
 func checkConnection(args []string) *checkers.Checker {
-	psr := flags.NewParser(&connectionOpts, flags.Default)
+	opts := connectionOpts{}
+	psr := flags.NewParser(&opts, flags.Default)
 	psr.Usage = "connection [OPTIONS]"
 	_, err := psr.ParseArgs(args)
 	if err != nil {
 		os.Exit(1)
 	}
-	db := newMySQL(connectionOpts.mysqlSetting)
+	db := newMySQL(opts.mysqlSetting)
 	err = db.Connect()
 	if err != nil {
 		return checkers.Unknown("couldn't connect DB")
@@ -38,9 +39,9 @@ func checkConnection(args []string) *checkers.Checker {
 
 	checkSt := checkers.OK
 	msg := fmt.Sprintf("%d connections", threadsConnected)
-	if threadsConnected > connectionOpts.Crit {
+	if threadsConnected > opts.Crit {
 		checkSt = checkers.CRITICAL
-	} else if threadsConnected > connectionOpts.Warn {
+	} else if threadsConnected > opts.Warn {
 		checkSt = checkers.WARNING
 	}
 	return checkers.NewChecker(checkSt, msg)
