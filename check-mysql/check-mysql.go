@@ -11,20 +11,21 @@ import (
 	_ "github.com/ziutek/mymysql/native"
 )
 
-var cOpts struct {
+type mysqlSetting struct {
 	Host string `short:"h" long:"host" default:"localhost" description:"Hostname"`
 	Port string `short:"p" long:"port" default:"3306" description:"Port"`
 	User string `short:"u" long:"user" default:"root" description:"Username"`
 	Pass string `short:"P" long:"password" default:"" description:"Password"`
+}
+
+var cOpts struct {
+	mysqlSetting
 	Crit int64  `short:"c" long:"critical" default:"250" description:"critical if the number of connection is over"`
 	Warn int64  `short:"w" long:"warning" default:"200" description:"warning if the number of connection is over"`
 }
 
 var rOpts struct {
-	Host string `short:"h" long:"host" default:"localhost" description:"Hostname"`
-	Port string `short:"p" long:"port" default:"3306" description:"Port"`
-	User string `short:"u" long:"user" default:"root" description:"Username"`
-	Pass string `short:"P" long:"password" default:"" description:"Password"`
+	mysqlSetting
 	Crit int64  `short:"c" long:"critical" default:"250" description:"critical if the seconds behind master is over"`
 	Warn int64  `short:"w" long:"warning" default:"200" description:"warning if the seconds behind master is over"`
 }
@@ -58,6 +59,11 @@ Subcommand:
 	ckr.Exit()
 }
 
+func newMySQL(m mysqlSetting) mysql.Conn {
+	target := fmt.Sprintf("%s:%s", m.Host, m.Port)
+	return mysql.New("tcp", "", target, m.User, m.Pass, "")
+}
+
 func checkConnection(args []string) *checkers.Checker {
 	psr := flags.NewParser(&cOpts, flags.Default)
 	psr.Usage = "connection [OPTIONS]"
@@ -65,8 +71,7 @@ func checkConnection(args []string) *checkers.Checker {
 	if err != nil {
 		os.Exit(1)
 	}
-	target := fmt.Sprintf("%s:%s", cOpts.Host, cOpts.Port)
-	db := mysql.New("tcp", "", target, cOpts.User, cOpts.Pass, "")
+	db := newMySQL(cOpts.mysqlSetting)
 	err = db.Connect()
 	if err != nil {
 		return checkers.Unknown("couldn't connect DB")
@@ -98,8 +103,7 @@ func checkReplication(args []string) *checkers.Checker {
 	if err != nil {
 		os.Exit(1)
 	}
-	target := fmt.Sprintf("%s:%s", rOpts.Host, rOpts.Port)
-	db := mysql.New("tcp", "", target, rOpts.User, rOpts.Pass, "")
+	db := newMySQL(rOpts.mysqlSetting)
 	err = db.Connect()
 	if err != nil {
 		return checkers.Unknown("couldn't connect DB")
