@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"os"
@@ -101,17 +102,32 @@ func run(args []string) *checkers.Checker {
 
 func getProcs() (proc []procState, err error) {
 	var procs []procState
-	psformat := "user,pid,vsz,rss,pcpu,nlwp,state,etime,time,command"
-	if threadsUnknown {
-		psformat = "user,pid,vsz,rss,pcpu,state,etime,time,command"
-	}
-	output, err := exec.Command("ps", "axwwo", psformat).Output()
-	for _, line := range strings.Split(string(output), "\n")[1:] {
-		proc, err := parseProcState(line)
-		if err != nil {
-			continue
+	if (runtime.GOOS == "windows") {
+		// WMIC PATH Win32_PerfFormattedData_PerfProc_Process WHERE "Name != '_Total'" GET Name,IDProcess,VirtualBytes,WorkingSet,PercentProcessorTime,ThreadCount,ElapsedTime /FORMAT:CSV
+		output, _ := exec.Command("WMIC", "PATH", "Win32_PerfFormattedData_PerfProc_Process", "WHERE", "Name != '_Total'", "GET", "ElapsedTime,IDProcess,Name,PercentProcessorTime,ThreadCount,VirtualBytes,WorkingSet", "/FORMAT:CSV").Output()
+		// output, _ := exec.Command("cat", "./wmic2.csv").Output()
+		r := csv.NewReader(strings.NewReader(string(output[1:])))
+		records, err := r.ReadAll()
+		for _, record := range records[1:] {
+			proc, err := parsePerfProc(record)
+			if err != nil {
+				continue
+			}
+			procs = append(procs, proc)
 		}
-		procs = append(procs, proc)
+	} else {
+		psformat := "user,pid,vsz,rss,pcpu,nlwp,state,etime,time,command"
+		if threadsUnknown {
+			psformat = "user,pid,vsz,rss,pcpu,state,etime,time,command"
+		}
+		output, _ := exec.Command("ps", "axwwo", psformat).Output()
+		for _, line := range strings.Split(string(output), "\n")[1:] {
+			proc, err := parseProcState(line)
+			if err != nil {
+				continue
+			}
+			procs = append(procs, proc)
+		}
 	}
 	return procs, nil
 }
@@ -137,6 +153,20 @@ func parseProcState(line string) (proc procState, err error) {
 	esec := timeStrToSeconds(fields[7])
 	csec := timeStrToSeconds(fields[8])
 	return procState{strings.Join(fields[9:], " "), fields[0], fields[1], vsz, rss, pcpu, thcount, fields[6], esec, csec}, nil
+}
+
+func parsePerfProc(fields []string) (proc procState, err error) {
+	fieldsLen := 8
+	if len(fields) != fieldsLen {
+		return procState{}, errors.New("parseTaskList: insufficient words")
+	}
+	vsz, _ := strconv.ParseInt(fields[6], 10, 64) //VirtualBytes
+	rss, _ := strconv.ParseInt(fields[7], 10, 64) // WorkingSet
+	pcpu, _ := strconv.ParseFloat(fields[4], 64) // PercentProcessorTime
+	thcount, _ := strconv.ParseInt(fields[5], 10, 64) //ThreadCount
+	esec, _ := strconv.ParseInt(fields[1], 10, 64) // ElapsedTime
+	csec := int64(0)
+	return procState{fields[3] /* Name */, "", fields[2] /* IDProcess */, vsz, rss, pcpu, thcount, "", esec, csec}, nil
 }
 
 var timeRegexp = regexp.MustCompile(`(?:(\d+)-)?(?:(\d+):)?(\d+)[:.](\d+)`)
