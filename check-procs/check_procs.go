@@ -63,19 +63,7 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		os.Exit(1)
 	}
-	psformat := "user,pid,vsz,rss,pcpu,nlwp,state,etime,time,command"
-	if threadsUnknown {
-		psformat = "user,pid,vsz,rss,pcpu,state,etime,time,command"
-	}
-	output, err := exec.Command("ps", "axwwo", psformat).Output()
-	var procs []procState
-	for _, line := range strings.Split(string(output), "\n")[1:] {
-		proc, err := parseProcState(line)
-		if err != nil {
-			continue
-		}
-		procs = append(procs, proc)
-	}
+	procs, err := getProcs()
 	cmdPatRegexp := regexp.MustCompile(".*")
 	if opts.CmdPat != "" {
 		r, err := regexp.Compile(opts.CmdPat)
@@ -109,6 +97,23 @@ func run(args []string) *checkers.Checker {
 		result = checkers.WARNING
 	}
 	return checkers.NewChecker(result, msg)
+}
+
+func getProcs() (proc []procState, err error) {
+	var procs []procState
+	psformat := "user,pid,vsz,rss,pcpu,nlwp,state,etime,time,command"
+	if threadsUnknown {
+		psformat = "user,pid,vsz,rss,pcpu,state,etime,time,command"
+	}
+	output, err := exec.Command("ps", "axwwo", psformat).Output()
+	for _, line := range strings.Split(string(output), "\n")[1:] {
+		proc, err := parseProcState(line)
+		if err != nil {
+			continue
+		}
+		procs = append(procs, proc)
+	}
+	return procs, nil
 }
 
 func parseProcState(line string) (proc procState, err error) {
