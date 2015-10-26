@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.4 (2015-10-26)
+
+* Refactor Mysql checks #20 (Songmu)
+* Add Mysql checkes #19 (hiroakis)
+
 ## 0.0.3 (2015-10-15)
 
 * reduce binary size by using ldflags #15 (Songmu)
