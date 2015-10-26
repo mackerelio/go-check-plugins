@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.0.4
+Version:   0.0.5
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
