@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.0.4-1) stable; urgency=low
+
+  * Refactor Mysql checks (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/20>
+
+ -- daiksy <daiksy@hatena.ne.jp>  Mon, 26 Oct 2015 15:34:35 +0900
+
 mackerel-check-plugins (0.0.3-1) stable; urgency=low
 
   * reduce binary size by using ldflags (by Songmu)
