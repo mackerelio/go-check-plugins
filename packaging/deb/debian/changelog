@@ -1,5 +1,6 @@
 mackerel-check-plugins (0.0.5-1) stable; urgency=low
 
+  * Add mysql in packages
 
  -- daiksy <daiksy@hatena.ne.jp>  Mon, 26 Oct 2015 17:42:22 +0900
 
