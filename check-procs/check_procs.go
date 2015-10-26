@@ -108,6 +108,9 @@ func getProcs() (proc []procState, err error) {
 		// output, _ := exec.Command("cat", "./wmic2.csv").Output()
 		r := csv.NewReader(strings.NewReader(string(output[1:])))
 		records, err := r.ReadAll()
+		if (err != nil) {
+			return procs, nil
+		}
 		for _, record := range records[1:] {
 			proc, err := parsePerfProc(record)
 			if err != nil {
