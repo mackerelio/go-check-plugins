@@ -4,6 +4,7 @@
        "file-age",
        "http",
        "load",
-       "procs"
+       "procs",
+       "mysql"
     ]
 }
