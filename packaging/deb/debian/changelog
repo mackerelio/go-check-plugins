@@ -1,3 +1,8 @@
+mackerel-check-plugins (0.0.5-1) stable; urgency=low
+
+
+ -- daiksy <daiksy@hatena.ne.jp>  Mon, 26 Oct 2015 17:42:22 +0900
+
 mackerel-check-plugins (0.0.4-1) stable; urgency=low
 
   * Refactor Mysql checks (by Songmu)

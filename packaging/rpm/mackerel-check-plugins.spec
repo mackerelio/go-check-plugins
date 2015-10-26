@@ -37,6 +37,8 @@ done
 %{__targetdir}
 
 %changelog
+* Mon Oct 26 2015 <daiksy@hatena.ne.jp> - 0.0.5
+
 * Mon Oct 26 2015 <daiksy@hatena.ne.jp> - 0.0.4
 - Refactor Mysql checks (by Songmu)
 - Add Mysql checks (by hiroakis)

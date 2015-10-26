@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5 (2015-10-26)
+
+
+
 ## 0.0.4 (2015-10-26)
 
 * Refactor Mysql checks #20 (Songmu)
