@@ -8,7 +8,7 @@ Checks a log file for a regular expression.
 
 ```
 [plugin.checks.log]
-command = "/path/to/check-log --pattern=REGEXP --warning-over=N --critical-over=N"
+command = "/path/to/check-log --file=/path/to/file --pattern=REGEXP --warning-over=N --critical-over=N"
 ```
 
 ## See Other
