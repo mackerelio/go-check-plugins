@@ -26,7 +26,7 @@ type logOpts struct {
 	WarnLevel       float64 `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
 	CritLevel       float64 `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
-	FilePattern     string  `short:"F" long:"filepattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
+	FilePattern     string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	ReturnContent   bool    `short:"r" long:"return" description:"Return matched line"`
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
