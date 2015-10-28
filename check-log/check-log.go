@@ -72,9 +72,6 @@ func (opts *logOpts) prepare() error {
 				continue
 			}
 			fname := fileInfo.Name()
-			if opts.CaseInsensitive {
-				fname = strings.ToLower(fname)
-			}
 			if reg.MatchString(fname) {
 				opts.fileList = append(opts.fileList, dirStr+string(filepath.Separator)+fileInfo.Name())
 			}
@@ -91,7 +88,7 @@ func main() {
 
 func regCompileWithCase(ptn string, caseInsensitive bool) (*regexp.Regexp, error) {
 	if caseInsensitive {
-		ptn = strings.ToLower(ptn)
+		ptn = "(?i)" + ptn
 	}
 	return regexp.Compile(ptn)
 }
@@ -182,11 +179,7 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 			break
 		}
 		line := strings.Trim(string(lineBytes), "\r\n")
-		checkLine := line
-		if opts.CaseInsensitive {
-			checkLine = strings.ToLower(checkLine)
-		}
-		if matched, matches := opts.match(checkLine); matched {
+		if matched, matches := opts.match(line); matched {
 			if len(matches) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
 				level, err := strconv.ParseFloat(matches[1], 64)
 				if err != nil {
