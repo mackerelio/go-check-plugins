@@ -105,7 +105,6 @@ func getProcs() (proc []procState, err error) {
 	if (runtime.GOOS == "windows") {
 		// WMIC PATH Win32_PerfFormattedData_PerfProc_Process WHERE "Name != '_Total'" GET Name,IDProcess,VirtualBytes,WorkingSet,PercentProcessorTime,ThreadCount,ElapsedTime /FORMAT:CSV
 		output, _ := exec.Command("WMIC", "PATH", "Win32_PerfFormattedData_PerfProc_Process", "WHERE", "Name != '_Total'", "GET", "ElapsedTime,IDProcess,Name,PercentProcessorTime,ThreadCount,VirtualBytes,WorkingSet", "/FORMAT:CSV").Output()
-		// output, _ := exec.Command("cat", "./wmic2.csv").Output()
 		r := csv.NewReader(strings.NewReader(string(output[1:])))
 		records, err := r.ReadAll()
 		if (err != nil) {
