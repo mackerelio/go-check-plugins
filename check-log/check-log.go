@@ -64,7 +64,7 @@ func (opts *logOpts) prepare() error {
 
 		fileInfos, err := ioutil.ReadDir(dirStr)
 		if err != nil {
-			return fmt.Errorf("cannot read the Directory:" + err.Error())
+			return fmt.Errorf("cannot read the directory:" + err.Error())
 		}
 
 		for _, fileInfo := range fileInfos {
