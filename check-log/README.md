@@ -2,7 +2,7 @@
 
 ## Description
 
-Checks a log file for a regular expression.
+Checks a log file using a regular expression.
 
 ## Setting
 
