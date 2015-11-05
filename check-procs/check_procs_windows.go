@@ -38,5 +38,14 @@ func parsePerfProc(fields []string) (proc procState, err error) {
 	thcount, _ := strconv.ParseInt(fields[5], 10, 64) //ThreadCount
 	esec, _ := strconv.ParseInt(fields[1], 10, 64) // ElapsedTime
 	csec := int64(0)
-	return procState{fields[3] /* Name */, "", fields[2] /* IDProcess */, vsz, rss, pcpu, thcount, "", esec, csec}, nil
+	return procState{
+		cmd: fields[3], // Name
+		pid: fields[2], // IDProcess
+		vsz: vsz,
+		rss: rss,
+		pcpu: pcpu,
+		thcount: thcount,
+		esec: esec,
+		csec: csec,
+	}, nil
 }
