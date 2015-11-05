@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.0.5
+Version:   0.1.0
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -25,7 +25,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in file-age http load procs mysql;do \
+for i in file-age http load log procs mysql;do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -37,6 +37,10 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Nov 05 2015 <y.songmu@gmail.com> - 0.1.0
+- check-log (by Songmu)
+- Add check-log in the packages (by Songmu)
+
 * Mon Oct 26 2015 <daiksy@hatena.ne.jp> - 0.0.5
 - Add mysql in packages
 

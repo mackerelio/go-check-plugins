@@ -9,6 +9,7 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-file-age](./check-file-age/README.md)
 * [check-http](./check-http/README.md)
 * [check-load](./check-load/README.md)
+* [check-log](./check-log/README.md)
 * [check-mysql](./check-mysql/README.md)
 * [check-procs](./check-procs/README.md)
 

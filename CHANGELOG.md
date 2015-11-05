@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0 (2015-11-05)
+
+* check-log #21 (Songmu)
+* Add check-log in the packages #25 (Songmu)
+
+
 ## 0.0.5 (2015-10-26)
 
 * Add mysql in packages
