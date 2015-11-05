@@ -37,6 +37,10 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Nov 05 2015 <y.songmu@gmail.com> - 0.1.0
+- check-log (by Songmu)
+- Add check-log in the packages (by Songmu)
+
 * Mon Oct 26 2015 <daiksy@hatena.ne.jp> - 0.0.5
 - Add mysql in packages
 
