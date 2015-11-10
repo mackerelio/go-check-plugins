@@ -238,7 +238,7 @@ func getBytesToSkip(f string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return int64(i), nil
+	return i, nil
 }
 
 func writeBytesToSkip(f string, num int64) error {
