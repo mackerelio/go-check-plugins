@@ -234,7 +234,7 @@ func getBytesToSkip(f string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	i, err := strconv.Atoi(strings.Trim(string(b), " \r\n"))
+	i, err := strconv.ParseInt(strings.Trim(string(b), " \r\n"), 10, 64)
 	if err != nil {
 		return 0, err
 	}
