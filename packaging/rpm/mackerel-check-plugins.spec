@@ -39,7 +39,7 @@ done
 %changelog
 * Thu Nov 12 2015 <y.songmu@gmail.com> - 0.1.1
 - check-procs for windows (by mechairoi)
-- [bug] fix large file handling (by matsuzj)
+- [bug] [check-log] fix large file handling (by matsuzj)
 
 * Thu Nov 05 2015 <y.songmu@gmail.com> - 0.1.0
 - check-log (by Songmu)
