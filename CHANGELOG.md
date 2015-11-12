@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 (2015-11-12)
+
+* check-procs for windows #24 (mechairoi)
+* [bug] [check-log] fix large file handling #27 (matsuzj)
+
+
 ## 0.1.0 (2015-11-05)
 
 * check-log #21 (Songmu)
