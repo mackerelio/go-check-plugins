@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.1.0
+Version:   0.2.1
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -37,6 +37,10 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Nov 12 2015 <y.songmu@gmail.com> - 0.2.1
+- check-procs for windows (by mechairoi)
+- [bug] fix large file handling (by matsuzj)
+
 * Thu Nov 05 2015 <y.songmu@gmail.com> - 0.1.0
 - check-log (by Songmu)
 - Add check-log in the packages (by Songmu)
