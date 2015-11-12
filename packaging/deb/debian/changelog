@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.1.1-1) stable; urgency=low
+
+  * check-procs for windows (by mechairoi)
+    <https://github.com/mackerelio/go-check-plugins/pull/24>
+  * [bug] fix large file handling (by matsuzj)
+    <https://github.com/mackerelio/go-check-plugins/pull/27>
+
+ -- Songmu <y.songmu@gmail.com>  Thu, 12 Nov 2015 12:28:18 +0900
+
 mackerel-check-plugins (0.1.0-1) stable; urgency=low
 
   * check-log (by Songmu)
