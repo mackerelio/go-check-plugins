@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -18,7 +19,6 @@ type tcpOpts struct {
 	Hostname string  `short:"H" long:"hostname" description:"Host name or IP Address"`
 	Timeout  float64 `short:"t" long:"timeout" default:"10" description:"Seconds before connection times out"`
 	MaxBytes int     `short:"m" long:"maxbytes"`
-	// All      bool   `short:"A" long:"all" description:"All expect strings need to occur in server response. Default is any"`
 	Delay    float64 `short:"d" long:"delay" description:"Seconds to wait between sending string and polling for response"`
 	Warning  float64 `short:"w" long:"warning" description:"Response time to result in warning status (seconds)"`
 	Critical float64 `short:"c" long:"critical" description:"Response time to result in critical status (seconds)"`
@@ -26,11 +26,12 @@ type tcpOpts struct {
 }
 
 type exchange struct {
-	Send   string `short:"s" long:"send" description:"String to send to the server"`
-	Expect string `short:"e" long:"expect" description:"String to expect in server response"`
-	Quit   string `short:"q" long:"quit" description:"String to send server to initiate a clean close of the connection"`
-	Port   int    `short:"p" long:"port" description:"Port number"`
-	SSL    bool   `short:"S" long:"ssl" description:"Use SSL for the connection."`
+	Send          string `short:"s" long:"send" description:"String to send to the server"`
+	ExpectPattern string `short:"e" long:"expect-pattern" description:"Regexp pattern to expect in server response"`
+	Quit          string `short:"q" long:"quit" description:"String to send server to initiate a clean close of the connection"`
+	Port          int    `short:"p" long:"port" description:"Port number"`
+	SSL           bool   `short:"S" long:"ssl" description:"Use SSL for the connection."`
+	expectReg     *regexp.Regexp
 }
 
 func main() {
@@ -63,59 +64,61 @@ func (opts *tcpOpts) prepare() error {
 	} else if opts.Quit != "" {
 		opts.Quit += "\r\n"
 	}
-	return nil
+	var err error
+	if opts.ExpectPattern != "" {
+		opts.expectReg, err = regexp.Compile(opts.ExpectPattern)
+	}
+	return err
 }
 
 func defaultExchange(svc string) exchange {
 	switch svc {
 	case "FTP":
 		return exchange{
-			Port:   21,
-			Expect: "220",
-			Quit:   "QUIT",
+			Port:          21,
+			ExpectPattern: `^220`,
+			Quit:          "QUIT",
 		}
 	case "POP":
 		return exchange{
-			Port:   110,
-			Expect: "+OK",
-			Quit:   "QUIT",
+			Port:          110,
+			ExpectPattern: `^\+OK`,
+			Quit:          "QUIT",
 		}
 	case "SPOP":
 		return exchange{
-			Port:   995,
-			Expect: "+OK",
-			Quit:   "QUIT",
-			SSL:    true,
+			Port:          995,
+			ExpectPattern: `^\+OK`,
+			Quit:          "QUIT",
+			SSL:           true,
 		}
 	case "IMAP":
 		return exchange{
-			Port:   143,
-			Expect: "* OK",
-			Quit:   "a1 LOGOUT",
+			Port:          143,
+			ExpectPattern: `^\* OK`,
+			Quit:          "a1 LOGOUT",
 		}
 	case "SIMAP":
 		return exchange{
-			Port:   993,
-			Expect: "* OK",
-			Quit:   "a1 LOGOUT",
-			SSL:    true,
+			Port:          993,
+			ExpectPattern: `^\* OK`,
+			Quit:          "a1 LOGOUT",
+			SSL:           true,
 		}
 	case "SMTP":
 		return exchange{
-			Port:   25,
-			Expect: "220",
-			Quit:   "QUIT",
+			Port:          25,
+			ExpectPattern: `^220`,
+			Quit:          "QUIT",
 		}
 	case "SSMTP":
 		return exchange{
-			Port:   465,
-			Expect: "220",
-			Quit:   "QUIT",
-			SSL:    true,
+			Port:          465,
+			ExpectPattern: `^220`,
+			Quit:          "QUIT",
+			SSL:           true,
 		}
-
 	}
-
 	return exchange{}
 }
 
@@ -126,8 +129,8 @@ func (opts *tcpOpts) merge(ex exchange) {
 	if opts.Send == "" {
 		opts.Send = ex.Send
 	}
-	if opts.Expect == "" {
-		opts.Expect = ex.Expect
+	if opts.ExpectPattern == "" {
+		opts.ExpectPattern = ex.ExpectPattern
 	}
 	if opts.Quit == "" {
 		opts.Quit = ex.Quit
@@ -148,7 +151,7 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	}
 
 	send := opts.Send
-	expect := opts.Expect
+	expect := opts.ExpectPattern
 	quit := opts.Quit
 	address := fmt.Sprintf("%s:%d", opts.Hostname, opts.Port)
 
@@ -170,14 +173,14 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	}
 
 	res := ""
-	if opts.Expect != "" {
+	if opts.ExpectPattern != "" {
 		buf, err := slurp(conn, opts.MaxBytes, opts.Timeout)
 		if err != nil {
 			return checkers.Critical(err.Error())
 		}
 
 		res = string(buf)
-		if expect != "" && !strings.HasPrefix(res, expect) {
+		if expect != "" && !opts.expectReg.MatchString(res) {
 			return checkers.Critical("Unexpected response from host/socket: " + res)
 		}
 	}
