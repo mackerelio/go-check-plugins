@@ -53,10 +53,57 @@ func parseArgs(args []string) (*tcpOpts, error) {
 	return opts, err
 }
 
+var defaultExchangeMap = map[string]exchange{
+	"FTP": exchange{
+		Port:          21,
+		ExpectPattern: `^220`,
+		Quit:          "QUIT",
+	},
+	"POP": exchange{
+		Port:          110,
+		ExpectPattern: `^\+OK`,
+		Quit:          "QUIT",
+	},
+	"SPOP": exchange{
+		Port:          995,
+		ExpectPattern: `^\+OK`,
+		Quit:          "QUIT",
+		SSL:           true,
+	},
+	"IMAP": exchange{
+		Port:          143,
+		ExpectPattern: `^\* OK`,
+		Quit:          "a1 LOGOUT",
+	},
+	"SIMAP": exchange{
+		Port:          993,
+		ExpectPattern: `^\* OK`,
+		Quit:          "a1 LOGOUT",
+		SSL:           true,
+	},
+	"SMTP": exchange{
+		Port:          25,
+		ExpectPattern: `^220`,
+		Quit:          "QUIT",
+	},
+	"SSMTP": exchange{
+		Port:          465,
+		ExpectPattern: `^220`,
+		Quit:          "QUIT",
+		SSL:           true,
+	},
+}
+
 func (opts *tcpOpts) prepare() error {
 	opts.Service = strings.ToUpper(opts.Service)
-	defaultEx := defaultExchange(opts.Service)
-	opts.merge(defaultEx)
+
+	if opts.Service != "" {
+		defaultEx, ok := defaultExchangeMap[opts.Service]
+		if !ok {
+			return fmt.Errorf("check-tcp called with unknown service: %s", opts.Service)
+		}
+		opts.merge(defaultEx)
+	}
 
 	if opts.Escape {
 		opts.Quit = escapedString(opts.Quit)
@@ -69,57 +116,6 @@ func (opts *tcpOpts) prepare() error {
 		opts.expectReg, err = regexp.Compile(opts.ExpectPattern)
 	}
 	return err
-}
-
-func defaultExchange(svc string) exchange {
-	switch svc {
-	case "FTP":
-		return exchange{
-			Port:          21,
-			ExpectPattern: `^220`,
-			Quit:          "QUIT",
-		}
-	case "POP":
-		return exchange{
-			Port:          110,
-			ExpectPattern: `^\+OK`,
-			Quit:          "QUIT",
-		}
-	case "SPOP":
-		return exchange{
-			Port:          995,
-			ExpectPattern: `^\+OK`,
-			Quit:          "QUIT",
-			SSL:           true,
-		}
-	case "IMAP":
-		return exchange{
-			Port:          143,
-			ExpectPattern: `^\* OK`,
-			Quit:          "a1 LOGOUT",
-		}
-	case "SIMAP":
-		return exchange{
-			Port:          993,
-			ExpectPattern: `^\* OK`,
-			Quit:          "a1 LOGOUT",
-			SSL:           true,
-		}
-	case "SMTP":
-		return exchange{
-			Port:          25,
-			ExpectPattern: `^220`,
-			Quit:          "QUIT",
-		}
-	case "SSMTP":
-		return exchange{
-			Port:          465,
-			ExpectPattern: `^220`,
-			Quit:          "QUIT",
-			SSL:           true,
-		}
-	}
-	return exchange{}
 }
 
 func (opts *tcpOpts) merge(ex exchange) {
@@ -135,6 +131,9 @@ func (opts *tcpOpts) merge(ex exchange) {
 	if opts.Quit == "" {
 		opts.Quit = ex.Quit
 	}
+	if !opts.SSL {
+		opts.SSL = ex.SSL
+	}
 }
 
 func dial(address string, ssl bool) (net.Conn, error) {
@@ -149,12 +148,11 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
+	// prevent changing output of some commands
+	os.Setenv("LANG", "C")
+	os.Setenv("LC_ALL", "C")
 
-	send := opts.Send
-	expect := opts.ExpectPattern
-	quit := opts.Quit
 	address := fmt.Sprintf("%s:%d", opts.Hostname, opts.Port)
-
 	start := time.Now()
 	if opts.Delay > 0 {
 		time.Sleep(time.Duration(opts.Delay) * time.Second)
@@ -165,28 +163,27 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	}
 	defer conn.Close()
 
-	if send != "" {
-		err := write(conn, []byte(send), opts.Timeout)
+	if opts.Send != "" {
+		err := write(conn, []byte(opts.Send), opts.Timeout)
 		if err != nil {
 			return checkers.Critical(err.Error())
 		}
 	}
 
 	res := ""
-	if opts.ExpectPattern != "" {
+	if opts.expectReg != nil {
 		buf, err := slurp(conn, opts.MaxBytes, opts.Timeout)
 		if err != nil {
 			return checkers.Critical(err.Error())
 		}
-
 		res = string(buf)
-		if expect != "" && !opts.expectReg.MatchString(res) {
+		if !opts.expectReg.MatchString(res) {
 			return checkers.Critical("Unexpected response from host/socket: " + res)
 		}
 	}
 
-	if quit != "" {
-		err := write(conn, []byte(quit), opts.Timeout)
+	if opts.Quit != "" {
+		err := write(conn, []byte(opts.Quit), opts.Timeout)
 		if err != nil {
 			return checkers.Critical(err.Error())
 		}
