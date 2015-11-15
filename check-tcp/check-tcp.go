@@ -14,9 +14,9 @@ import (
 )
 
 type tcpOpts struct {
-	exchange
-	Service  string  `long:"service"`
+	Service  string  `long:"service" description:"Service name. e.g. ftp, smtp, pop, imap and so on"`
 	Hostname string  `short:"H" long:"hostname" description:"Host name or IP Address"`
+	exchange
 	Timeout  float64 `short:"t" long:"timeout" default:"10" description:"Seconds before connection times out"`
 	MaxBytes int     `short:"m" long:"maxbytes"`
 	Delay    float64 `short:"d" long:"delay" description:"Seconds to wait between sending string and polling for response"`
@@ -26,10 +26,10 @@ type tcpOpts struct {
 }
 
 type exchange struct {
+	Port          int    `short:"p" long:"port" description:"Port number"`
 	Send          string `short:"s" long:"send" description:"String to send to the server"`
 	ExpectPattern string `short:"e" long:"expect-pattern" description:"Regexp pattern to expect in server response"`
 	Quit          string `short:"q" long:"quit" description:"String to send server to initiate a clean close of the connection"`
-	Port          int    `short:"p" long:"port" description:"Port number"`
 	SSL           bool   `short:"S" long:"ssl" description:"Use SSL for the connection."`
 	expectReg     *regexp.Regexp
 }
