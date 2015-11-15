@@ -200,9 +200,17 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	if opts.Critical > 0 && elapsed > time.Duration(opts.Critical)*time.Second {
 		chkSt = checkers.CRITICAL
 	}
-
-	return checkers.NewChecker(chkSt, fmt.Sprintf("%.3f seconds response time on %s port %d [%s]",
-		float64(elapsed/time.Second), opts.Hostname, opts.Port, strings.Trim(res, "\r\n")))
+	msg := fmt.Sprintf("%.3f seconds response time on", float64(elapsed)/float64(time.Second))
+	if opts.Hostname != "" {
+		msg += " " + opts.Hostname
+	}
+	if opts.Port > 0 {
+		msg += fmt.Sprintf(" port %d", opts.Port)
+	}
+	if res != "" {
+		msg += fmt.Sprintf(" [%s]", strings.Trim(res, "\r\n"))
+	}
+	return checkers.NewChecker(chkSt, msg)
 }
 
 func write(conn net.Conn, content []byte, timeout float64) error {
