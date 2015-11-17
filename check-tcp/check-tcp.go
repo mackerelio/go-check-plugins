@@ -18,7 +18,7 @@ type tcpOpts struct {
 	Hostname string  `short:"H" long:"hostname" description:"Host name or IP Address"`
 	exchange
 	Timeout  float64 `short:"t" long:"timeout" default:"10" description:"Seconds before connection times out"`
-	MaxBytes int     `short:"m" long:"maxbytes"`
+	MaxBytes int     `short:"m" long:"maxbytes" description:"Close connection once more than this number of bytes are received"`
 	Delay    float64 `short:"d" long:"delay" description:"Seconds to wait between sending string and polling for response"`
 	Warning  float64 `short:"w" long:"warning" description:"Response time to result in warning status (seconds)"`
 	Critical float64 `short:"c" long:"critical" description:"Response time to result in critical status (seconds)"`
