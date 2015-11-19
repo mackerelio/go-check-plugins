@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0 (2015-11-20)
+
+* [check-procs] support `--critical-over=0` and `--warn-over=0` #31 (Songmu)
+* add check-tcp #32 (Songmu)
+
+
 ## 0.1.1 (2015-11-12)
 
 * check-procs for windows #24 (mechairoi)

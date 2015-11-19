@@ -37,6 +37,10 @@ done
 %{__targetdir}
 
 %changelog
+* Fri Nov 20 2015 <y.songmu@gmail.com> - 0.2.0
+- [check-procs] support `--critical-over=0` and `--warn-over=0` (by Songmu)
+- add check-tcp (by Songmu)
+
 * Thu Nov 12 2015 <y.songmu@gmail.com> - 0.1.1
 - check-procs for windows (by mechairoi)
 - [bug] [check-log] fix large file handling (by matsuzj)
