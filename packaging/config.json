@@ -6,6 +6,7 @@
        "load",
        "log",
        "procs",
+       "tcp",
        "mysql"
     ]
 }
