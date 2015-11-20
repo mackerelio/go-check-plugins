@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.1.1
+Version:   0.2.0
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -25,7 +25,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in file-age http load log procs mysql;do \
+for i in file-age http load log procs tcp mysql;do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -37,6 +37,10 @@ done
 %{__targetdir}
 
 %changelog
+* Fri Nov 20 2015 <y.songmu@gmail.com> - 0.2.0
+- [check-procs] support `--critical-over=0` and `--warn-over=0` (by Songmu)
+- add check-tcp (by Songmu)
+
 * Thu Nov 12 2015 <y.songmu@gmail.com> - 0.1.1
 - check-procs for windows (by mechairoi)
 - [bug] [check-log] fix large file handling (by matsuzj)

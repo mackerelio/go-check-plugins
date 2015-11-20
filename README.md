@@ -12,6 +12,7 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-log](./check-log/README.md)
 * [check-mysql](./check-mysql/README.md)
 * [check-procs](./check-procs/README.md)
+* [check-tcp](./check-tcp/README.md)
 
 Specification
 -------------
