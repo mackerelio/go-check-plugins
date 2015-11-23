@@ -133,7 +133,10 @@ func run(args []string) *checkers.Checker {
 	if critNum > opts.CritOver {
 		checkSt = checkers.CRITICAL
 	}
-	msg := fmt.Sprintf("%d warnings, %d criticals for pattern %s. %s", warnNum, critNum, opts.Pattern, errorOverall)
+	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", warnNum, critNum, opts.Pattern)
+	if errorOverall != "" {
+		msg += "\n" + errorOverall
+	}
 	return checkers.NewChecker(checkSt, msg)
 }
 
