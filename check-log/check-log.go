@@ -254,5 +254,5 @@ func writeBytesToSkip(f string, num int64) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(f, []byte(fmt.Sprintf("%d", num)), 0755)
+	return ioutil.WriteFile(f, []byte(fmt.Sprintf("%d", num)), 0644)
 }
