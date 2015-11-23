@@ -17,7 +17,6 @@ import (
 )
 
 type logOpts struct {
-	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
 	LogFile         string  `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
 	Pattern         string  `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
 	Exclude         string  `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
@@ -25,9 +24,11 @@ type logOpts struct {
 	CritOver        int64   `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	WarnLevel       float64 `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
 	CritLevel       float64 `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
-	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
-	FilePattern     string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	ReturnContent   bool    `short:"r" long:"return" description:"Return matched line"`
+	FilePattern     string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
+	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
+	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
+	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
 	fileList        []string
@@ -142,10 +143,15 @@ func run(args []string) *checkers.Checker {
 
 func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	stateFile := getStateFile(opts.StateDir, logFile)
-	skipBytes, err := getBytesToSkip(stateFile)
-	if err != nil {
-		return 0, 0, "", err
+	skipBytes := int64(0)
+	if !opts.NoState {
+		s, err := getBytesToSkip(stateFile)
+		if err != nil {
+			return 0, 0, "", err
+		}
+		skipBytes = s
 	}
+
 	f, err := os.Open(logFile)
 	if err != nil {
 		return 0, 0, "", err
@@ -174,9 +180,12 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	} else {
 		skipBytes += readBytes
 	}
-	err = writeBytesToSkip(stateFile, skipBytes)
-	if err != nil {
-		log.Printf("writeByteToSkip failed: %s\n", err.Error())
+
+	if !opts.NoState {
+		err = writeBytesToSkip(stateFile, skipBytes)
+		if err != nil {
+			log.Printf("writeByteToSkip failed: %s\n", err.Error())
+		}
 	}
 	return warnNum, critNum, errLines, nil
 }
