@@ -162,6 +162,9 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	}
 
 	warnNum, critNum, readBytes, errLines, err := opts.searchReader(f)
+	if err != nil {
+		return warnNum, critNum, errLines, err
+	}
 
 	if rotated {
 		skipBytes = readBytes
@@ -179,13 +182,13 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 	r := bufio.NewReader(rdr)
 	for {
 		lineBytes, rErr := r.ReadBytes('\n')
-		readBytes += int64(len(lineBytes))
 		if rErr != nil {
 			if rErr != io.EOF {
 				err = rErr
 			}
 			break
 		}
+		readBytes += int64(len(lineBytes))
 		line := strings.Trim(string(lineBytes), "\r\n")
 		if matched, matches := opts.match(line); matched {
 			if len(matches) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
