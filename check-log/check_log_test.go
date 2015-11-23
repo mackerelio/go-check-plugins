@@ -166,6 +166,23 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, int64(len(l1)*2+len(l2)*2), bytes, "something went wrong")
 	}
 	testRecoverAgain()
+
+	testRotate := func() {
+		fh.Close()
+		os.Remove(logf)
+		fh, _ = os.Create(logf)
+
+		fh.WriteString(l2)
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		bytes, _ = getBytesToSkip(stateFile)
+		assert.Equal(t, int64(len(l2)), bytes, "something went wrong")
+	}
+	testRotate()
 }
 
 func TestSearchReaderWithLevel(t *testing.T) {
