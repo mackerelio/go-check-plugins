@@ -185,6 +185,53 @@ func TestRun(t *testing.T) {
 	testRotate()
 }
 
+func TestRunWithMiddleOfLine(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	ptn := `FATAL`
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
+	opts.prepare()
+
+	stateFile := getStateFile(opts.StateDir, logf)
+
+	bytes, _ := getBytesToSkip(stateFile)
+	assert.Equal(t, int64(0), bytes, "something went wrong")
+
+	testMiddleOfLine := func() {
+		fh.WriteString("FATA")
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		bytes, _ = getBytesToSkip(stateFile)
+		assert.Equal(t, int64(0), bytes, "something went wrong")
+	}
+	testMiddleOfLine()
+
+	testFail := func() {
+		fh.WriteString("L\nSUCC")
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
+		assert.Equal(t, "FATAL\n", errLines, "something went wrong")
+
+		bytes, _ = getBytesToSkip(stateFile)
+		assert.Equal(t, int64(len("FATAL\n")), bytes, "something went wrong")
+	}
+	testFail()
+}
+
 func TestSearchReaderWithLevel(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-log-test")
 	if err != nil {
