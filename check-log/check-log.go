@@ -154,13 +154,21 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		return 0, 0, "", err
 	}
 
-	if skipBytes > 0 && stat.Size() >= skipBytes {
+	rotated := false
+	if stat.Size() < skipBytes {
+		rotated = true
+	} else if skipBytes > 0 {
 		f.Seek(skipBytes, 0)
 	}
 
 	warnNum, critNum, readBytes, errLines, err := opts.searchReader(f)
 
-	err = writeBytesToSkip(stateFile, readBytes+skipBytes)
+	if rotated {
+		skipBytes = readBytes
+	} else {
+		skipBytes += readBytes
+	}
+	err = writeBytesToSkip(stateFile, skipBytes)
 	if err != nil {
 		log.Printf("writeByteToSkip failed: %s\n", err.Error())
 	}
