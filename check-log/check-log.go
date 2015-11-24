@@ -133,7 +133,10 @@ func run(args []string) *checkers.Checker {
 	if critNum > opts.CritOver {
 		checkSt = checkers.CRITICAL
 	}
-	msg := fmt.Sprintf("%d warnings, %d criticals for pattern %s. %s", warnNum, critNum, opts.Pattern, errorOverall)
+	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", warnNum, critNum, opts.Pattern)
+	if errorOverall != "" {
+		msg += "\n" + errorOverall
+	}
 	return checkers.NewChecker(checkSt, msg)
 }
 
@@ -154,13 +157,24 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		return 0, 0, "", err
 	}
 
-	if skipBytes > 0 && stat.Size() >= skipBytes {
+	rotated := false
+	if stat.Size() < skipBytes {
+		rotated = true
+	} else if skipBytes > 0 {
 		f.Seek(skipBytes, 0)
 	}
 
 	warnNum, critNum, readBytes, errLines, err := opts.searchReader(f)
+	if err != nil {
+		return warnNum, critNum, errLines, err
+	}
 
-	err = writeBytesToSkip(stateFile, readBytes+skipBytes)
+	if rotated {
+		skipBytes = readBytes
+	} else {
+		skipBytes += readBytes
+	}
+	err = writeBytesToSkip(stateFile, skipBytes)
 	if err != nil {
 		log.Printf("writeByteToSkip failed: %s\n", err.Error())
 	}
@@ -171,13 +185,13 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 	r := bufio.NewReader(rdr)
 	for {
 		lineBytes, rErr := r.ReadBytes('\n')
-		readBytes += int64(len(lineBytes))
 		if rErr != nil {
 			if rErr != io.EOF {
 				err = rErr
 			}
 			break
 		}
+		readBytes += int64(len(lineBytes))
 		line := strings.Trim(string(lineBytes), "\r\n")
 		if matched, matches := opts.match(line); matched {
 			if len(matches) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
@@ -246,5 +260,5 @@ func writeBytesToSkip(f string, num int64) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(f, []byte(fmt.Sprintf("%d", num)), 0755)
+	return ioutil.WriteFile(f, []byte(fmt.Sprintf("%d", num)), 0644)
 }
