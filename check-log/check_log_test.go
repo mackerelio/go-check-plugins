@@ -232,6 +232,44 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	testFail()
 }
 
+func TestRunWithNoState(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	ptn := `FATAL`
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--no-state"})
+	opts.prepare()
+
+	fatal := "FATAL\n"
+	test2Line := func() {
+		fh.WriteString(fatal)
+		fh.WriteString(fatal)
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(2), w, "something went wrong")
+		assert.Equal(t, int64(2), c, "something went wrong")
+		assert.Equal(t, strings.Repeat(fatal, 2), errLines, "something went wrong")
+	}
+	test2Line()
+
+	test1LineAgain := func() {
+		fh.WriteString(fatal)
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(3), w, "something went wrong")
+		assert.Equal(t, int64(3), c, "something went wrong")
+		assert.Equal(t, strings.Repeat(fatal, 3), errLines, "something went wrong")
+	}
+	test1LineAgain()
+}
+
 func TestSearchReaderWithLevel(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-log-test")
 	if err != nil {
