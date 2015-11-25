@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.2.1-1) stable; urgency=low
+
+  * Fix bugs of check-log (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/35>
+  * [check-log] add --no-state option (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/36>
+
+ -- Songmu <y.songmu@gmail.com>  Wed, 25 Nov 2015 10:59:53 +0900
+
 mackerel-check-plugins (0.2.0-1) stable; urgency=low
 
   * [check-procs] support `--critical-over=0` and `--warn-over=0` (by Songmu)
