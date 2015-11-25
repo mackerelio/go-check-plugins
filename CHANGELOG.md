@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 (2015-11-25)
+
+* Fix bugs of check-log #35 (Songmu)
+* [check-log] add --no-state option #36 (Songmu)
+
+
 ## 0.2.0 (2015-11-20)
 
 * [check-procs] support `--critical-over=0` and `--warn-over=0` #31 (Songmu)

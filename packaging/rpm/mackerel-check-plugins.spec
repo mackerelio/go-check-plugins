@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.2.0
+Version:   0.2.1
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -37,6 +37,10 @@ done
 %{__targetdir}
 
 %changelog
+* Wed Nov 25 2015 <y.songmu@gmail.com> - 0.2.1
+- Fix bugs of check-log (by Songmu)
+- [check-log] add --no-state option (by Songmu)
+
 * Fri Nov 20 2015 <y.songmu@gmail.com> - 0.2.0
 - [check-procs] support `--critical-over=0` and `--warn-over=0` (by Songmu)
 - add check-tcp (by Songmu)
