@@ -14,8 +14,8 @@ import (
 )
 
 type tcpOpts struct {
-	Service  string  `long:"service" description:"Service name. e.g. ftp, smtp, pop, imap and so on"`
-	Hostname string  `short:"H" long:"hostname" description:"Host name or IP Address"`
+	Service  string `long:"service" description:"Service name. e.g. ftp, smtp, pop, imap and so on"`
+	Hostname string `short:"H" long:"hostname" description:"Host name or IP Address"`
 	exchange
 	Timeout  float64 `short:"t" long:"timeout" default:"10" description:"Seconds before connection times out"`
 	MaxBytes int     `short:"m" long:"maxbytes" description:"Close connection once more than this number of bytes are received"`
@@ -31,6 +31,7 @@ type exchange struct {
 	ExpectPattern string `short:"e" long:"expect-pattern" description:"Regexp pattern to expect in server response"`
 	Quit          string `short:"q" long:"quit" description:"String to send server to initiate a clean close of the connection"`
 	SSL           bool   `short:"S" long:"ssl" description:"Use SSL for the connection."`
+	UnixSock      string `short:"U" long:"unix-sock" description:"Unix Domain Socket"`
 	expectReg     *regexp.Regexp
 }
 
@@ -136,11 +137,11 @@ func (opts *tcpOpts) merge(ex exchange) {
 	}
 }
 
-func dial(address string, ssl bool) (net.Conn, error) {
+func dial(network, address string, ssl bool) (net.Conn, error) {
 	if ssl {
-		return tls.Dial("tcp", address, &tls.Config{})
+		return tls.Dial(network, address, &tls.Config{})
 	}
-	return net.Dial("tcp", address)
+	return net.Dial(network, address)
 }
 
 func (opts *tcpOpts) run() *checkers.Checker {
@@ -157,7 +158,12 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	if opts.Delay > 0 {
 		time.Sleep(time.Duration(opts.Delay) * time.Second)
 	}
-	conn, err := dial(address, opts.SSL)
+	var conn net.Conn
+	if opts.UnixSock != "" {
+		conn, err = dial("unix", opts.UnixSock, opts.SSL)
+	} else {
+		conn, err = dial("tcp", address, opts.SSL)
+	}
 	if err != nil {
 		return checkers.Critical(err.Error())
 	}
