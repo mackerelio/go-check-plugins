@@ -11,7 +11,7 @@ import (
 )
 
 type mysqlSetting struct {
-	Host string `short:"h" long:"host" default:"localhost" description:"Hostname"`
+	Host string `short:"H" long:"host" default:"localhost" description:"Hostname"`
 	Port string `short:"p" long:"port" default:"3306" description:"Port"`
 	User string `short:"u" long:"user" default:"root" description:"Username"`
 	Pass string `short:"P" long:"password" default:"" description:"Password"`
