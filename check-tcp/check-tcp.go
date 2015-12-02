@@ -14,8 +14,8 @@ import (
 )
 
 type tcpOpts struct {
-	Service  string  `long:"service" description:"Service name. e.g. ftp, smtp, pop, imap and so on"`
-	Hostname string  `short:"H" long:"hostname" description:"Host name or IP Address"`
+	Service  string `long:"service" description:"Service name. e.g. ftp, smtp, pop, imap and so on"`
+	Hostname string `short:"H" long:"hostname" description:"Host name or IP Address"`
 	exchange
 	Timeout  float64 `short:"t" long:"timeout" default:"10" description:"Seconds before connection times out"`
 	MaxBytes int     `short:"m" long:"maxbytes" description:"Close connection once more than this number of bytes are received"`
@@ -159,11 +159,11 @@ func (opts *tcpOpts) run() *checkers.Checker {
 		time.Sleep(time.Duration(opts.Delay) * time.Second)
 	}
 	var conn net.Conn
-        if opts.UnixSock != "" {
-                conn, err = dial("unix", opts.UnixSock, opts.SSL)
-        } else {
-                conn, err = dial("tcp", address, opts.SSL)
-        }
+	if opts.UnixSock != "" {
+		conn, err = dial("unix", opts.UnixSock, opts.SSL)
+	} else {
+		conn, err = dial("tcp", address, opts.SSL)
+	}
 	if err != nil {
 		return checkers.Critical(err.Error())
 	}

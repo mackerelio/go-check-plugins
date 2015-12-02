@@ -2,16 +2,16 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"strings"
-	"testing"
-	"time"
 	"io"
 	"io/ioutil"
 	"net"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
+	"strings"
+	"testing"
+	"time"
 
 	"github.com/mackerelio/checkers"
 	"github.com/stretchr/testify/assert"
@@ -105,31 +105,31 @@ func TestUnixDomainSocket(t *testing.T) {
 	sock := fmt.Sprintf("%s/test.sock", dir)
 
 	l, err := net.Listen("unix", sock)
-        if err != nil {
-                t.Error(err)
-        }
+	if err != nil {
+		t.Error(err)
+	}
 
-        go func() {
-                for {
-                        ls, err := l.Accept()
-                        if err != nil {
-                                t.Error(err)
-                        }
-                        go func(c net.Conn) {
-                                defer c.Close()
+	go func() {
+		for {
+			ls, err := l.Accept()
+			if err != nil {
+				t.Error(err)
+			}
+			go func(c net.Conn) {
+				defer c.Close()
 
-                                buf := make([]byte, 1024)
+				buf := make([]byte, 1024)
 
-                                _, err := c.Read(buf)
+				_, err := c.Read(buf)
 
-                                if err == io.EOF {
-                                        return
-                                }
+				if err == io.EOF {
+					return
+				}
 
-                                c.Write([]byte("OKOK"))
-                        }(ls)
-                }
-        }()
+				c.Write([]byte("OKOK"))
+			}(ls)
+		}
+	}()
 
 	testOk := func() {
 		opts, err := parseArgs([]string{"-U", sock, "--send", `PING`, "-E", "-e", "OKOK"})
