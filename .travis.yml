@@ -5,8 +5,6 @@ env:
   - PATH=/home/travis/gopath/bin:$PATH DEBIAN_FRONTEND=noninteractive
 sudo: false
 addons:
-  hosts:
-    - travis.dev
   apt:
     packages:
       - rpm
