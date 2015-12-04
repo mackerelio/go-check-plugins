@@ -9,7 +9,6 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -50,10 +49,7 @@ func TestHTTP(t *testing.T) {
 
 	u, _ := url.Parse(ts.URL)
 
-	host := u.Host
-	hostAndPort := strings.Split(host, ":")
-	host = hostAndPort[0]
-	port := hostAndPort[1]
+	host, port, _ := net.SplitHostPort(u.Host)
 
 	testOk := func() {
 		opts, err := parseArgs([]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.1\r\n\r\n`, "-E", "-e", "OKOK"})
