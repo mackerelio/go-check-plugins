@@ -21,6 +21,7 @@ command = "/path/to/check-tcp -H localhost -p 4224 -w 3 -c 5"
 -e, --expect-pattern= Regexp pattern to expect in server response
 -q, --quit=           String to send server to initiate a clean close of the connection
 -S, --ssl             Use SSL for the connection.
+-U, --unix-sock=      Unix Domain Socket
 -t, --timeout=        Seconds before connection times out (default: 10)
 -m, --maxbytes=       Close connection once more than this number of bytes are received
 -d, --delay=          Seconds to wait between sending string and polling for response
