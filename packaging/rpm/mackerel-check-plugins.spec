@@ -37,6 +37,11 @@ done
 %{__targetdir}
 
 %changelog
+* Tue Dec 08 2015 <y.songmu@gmail.com> - 0.2.2
+- A plugin to check ntpoffset (by hiroakis)
+- Check tcp unix domain socket (by tkuchiki)
+- [check-tcp] add ipv6 support (by Songmu)
+
 * Wed Nov 25 2015 <y.songmu@gmail.com> - 0.2.1
 - Fix bugs of check-log (by Songmu)
 - [check-log] add --no-state option (by Songmu)

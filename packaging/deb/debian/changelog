@@ -1,3 +1,14 @@
+mackerel-check-plugins (0.2.2-1) stable; urgency=low
+
+  * A plugin to check ntpoffset (by hiroakis)
+    <https://github.com/mackerelio/go-check-plugins/pull/38>
+  * Check tcp unix domain socket (by tkuchiki)
+    <https://github.com/mackerelio/go-check-plugins/pull/39>
+  * [check-tcp] add ipv6 support (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/42>
+
+ -- Songmu <y.songmu@gmail.com>  Tue, 08 Dec 2015 11:26:40 +0900
+
 mackerel-check-plugins (0.2.1-1) stable; urgency=low
 
   * Fix bugs of check-log (by Songmu)
