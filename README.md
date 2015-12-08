@@ -11,9 +11,9 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-load](./check-load/README.md)
 * [check-log](./check-log/README.md)
 * [check-mysql](./check-mysql/README.md)
+* [check-ntpoffset](./check-ntpoffset/README.md)
 * [check-procs](./check-procs/README.md)
 * [check-tcp](./check-tcp/README.md)
-* [check-ntpoffset](./check-ntpoffset/README.md)
 
 Specification
 -------------

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2 (2015-12-08)
+
+* A plugin to check ntpoffset #38 (hiroakis)
+* Check tcp unix domain socket #39 (tkuchiki)
+* [check-tcp] add ipv6 support #42 (Songmu)
+
+
 ## 0.2.1 (2015-11-25)
 
 * Fix bugs of check-log #35 (Songmu)
