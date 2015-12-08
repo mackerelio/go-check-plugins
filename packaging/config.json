@@ -5,6 +5,7 @@
        "http",
        "load",
        "log",
+       "ntpoffset",
        "procs",
        "tcp",
        "mysql"
