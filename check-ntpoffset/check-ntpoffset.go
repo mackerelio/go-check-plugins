@@ -60,7 +60,27 @@ func getNtpOffset() (float64, error) {
 		return offset, err
 	}
 
-	o := strings.Split(string(output), "=")
+	var line string
+	lines := strings.Split(string(output), "\n")
+	switch len(lines) {
+	case 2:
+		line = lines[0]
+	case 3:
+		/* example on ntp 4.2.2p1-18.el5.centos
+		   assID=0 status=06f4 leap_none, sync_ntp, 15 events, event_peer/strat_chg,
+		   offset=0.180
+		*/
+
+		if strings.Index(lines[0], `assID=0`) == 0 {
+			line = lines[1]
+			break
+		}
+		fallthrough
+	default:
+		return offset, errors.New("couldn't get ntp offset. ntpd process may be down")
+	}
+
+	o := strings.Split(string(line), "=")
 	if len(o) != 2 {
 		return offset, errors.New("couldn't get ntp offset. ntpd process may be down")
 	}
