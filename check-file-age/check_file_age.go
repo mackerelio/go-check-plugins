@@ -84,7 +84,8 @@ func run(args []string) *checkers.Checker {
 
 	result := checkers.OK
 
-	age := time.Now().Unix() - stat.ModTime().Unix()
+	mtime := stat.ModTime()
+	age := time.Now().Unix() - mtime.Unix()
 	size := stat.Size()
 
 	if monitor.CheckWarning(age, size) {
@@ -95,6 +96,6 @@ func run(args []string) *checkers.Checker {
 		result = checkers.CRITICAL
 	}
 
-	msg := fmt.Sprintf("%s is %d seconds old and %d bytes.\n", opts.File, age, size)
+	msg := fmt.Sprintf("%s is %d seconds old (%02d:%02d:%02d) and %d bytes.\n", opts.File, age, mtime.Hour(), mtime.Minute(), mtime.Second(), size)
 	return checkers.NewChecker(result, msg)
 }
