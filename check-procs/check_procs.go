@@ -5,6 +5,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -31,6 +32,8 @@ var opts struct {
 	EsecUnder     int64   `short:"E" long:"esec-under" value-name:"SECONDS" description:"Match process that are younger than this, in SECONDS"`
 	CPUOver       int64   `short:"i" long:"cpu-over" value-name:"SECONDS" description:"Match processes cpu time that is older than this, in SECONDS"`
 	CPUUnder      int64   `short:"I" long:"cpu-under" value-name:"SECONDS" description:"Match processes cpu time that is younger than this, in SECONDS"`
+	MaxRetry      int     `long:"retry" default:"1" value-name:"NUM" description:"If result is not OK, attempting to retry NUM counts"`
+	RetryInterval int64   `long:"interval" default:"2" value-name:"SECONDS" description:"MaxRetry is upper than 2, sleep SECONDS and retry"`
 }
 
 type procState struct {
@@ -57,7 +60,32 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		os.Exit(1)
 	}
-	procs, err := getProcs()
+	var result checkers.Status
+	var msg string
+	maxRetry := opts.MaxRetry
+	interval := opts.RetryInterval
+	if maxRetry < 1 {
+		maxRetry = 1
+	}
+	if interval < 1 {
+		interval = 1
+	}
+
+	for i := 1; i <= maxRetry; i++ {
+		result, msg = getResult()
+		if result.String() == "OK" {
+			break
+		}
+		if i < maxRetry {
+			time.Sleep(time.Duration(interval) * time.Second)
+		}
+	}
+
+	return checkers.NewChecker(result, msg)
+}
+
+func getResult() (result checkers.Status, msg string) {
+	procs, _ := getProcs()
 	cmdPatRegexp := regexp.MustCompile(".*")
 	if opts.CmdPat != "" {
 		r, err := regexp.Compile(opts.CmdPat)
@@ -81,8 +109,8 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 	count := int64(len(resultrocStates))
-	msg := gatherMsg(count)
-	result := checkers.OK
+	msg = gatherMsg(count)
+	result = checkers.OK
 	if opts.CritUnder != 0 && count < opts.CritUnder ||
 		opts.CritOver != nil && count > *opts.CritOver {
 		result = checkers.CRITICAL
@@ -90,7 +118,8 @@ func run(args []string) *checkers.Checker {
 		opts.WarnOver != nil && count > *opts.WarnOver {
 		result = checkers.WARNING
 	}
-	return checkers.NewChecker(result, msg)
+
+	return
 }
 
 func matchProc(proc procState, cmdPatRegexp *regexp.Regexp, cmdExcludePatRegexp *regexp.Regexp) bool {
