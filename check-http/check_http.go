@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"crypto/tls"
 	"os"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 // XXX more options
 var opts struct {
 	URL string `short:"u" long:"url" required:"true" description:"A URL to connect to"`
+	NoCheckCertificate bool `long:"no-check-certificate" description:"Do not check certificate"`
 }
 
 func main() {
@@ -28,8 +30,15 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
+	tr := &http.Transport {
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: opts.NoCheckCertificate,
+		},
+	}
+	client := &http.Client{ Transport: tr }
+
 	stTime := time.Now()
-	resp, err := http.Get(opts.URL)
+	resp, err := client.Get(opts.URL)
 	if err != nil {
 		return checkers.Critical(err.Error())
 	}
