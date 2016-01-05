@@ -58,7 +58,7 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	var queue int64 = 0
+	var queue int64
 	queueStr := "0"
 	monitor := newMonitor(opts.Warning, opts.Critical)
 
