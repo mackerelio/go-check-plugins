@@ -8,7 +8,7 @@ package=mackerel-check-plugins
 override_dh_auto_install:
 	dh_auto_install
 	install -d -m 755 debian/tmp/usr/local/bin
-	for i in file-age http load log ntpoffset procs tcp mysql;do \
+	for i in file-age http load log mailq ntpoffset postgresql procs tcp mysql;do \
 	    install -m755 debian/check-$$i debian/tmp/usr/local/bin; \
 	done
 

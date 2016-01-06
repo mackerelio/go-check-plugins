@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.2.2
+Version:   0.3.0
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -25,7 +25,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in file-age http load log ntpoffset procs tcp mysql;do \
+for i in file-age http load log mailq ntpoffset postgresql procs tcp mysql;do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 

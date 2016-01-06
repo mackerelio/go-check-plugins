@@ -10,8 +10,10 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-http](./check-http/README.md)
 * [check-load](./check-load/README.md)
 * [check-log](./check-log/README.md)
+* [check-mailq](./check-mailq/README.md)
 * [check-mysql](./check-mysql/README.md)
 * [check-ntpoffset](./check-ntpoffset/README.md)
+* [check-postgresql](./check-postgresql/README.md)
 * [check-procs](./check-procs/README.md)
 * [check-tcp](./check-tcp/README.md)
 
