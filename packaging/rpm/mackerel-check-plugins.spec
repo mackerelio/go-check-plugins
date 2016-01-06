@@ -37,6 +37,14 @@ done
 %{__targetdir}
 
 %changelog
+* Wed Jan 06 2016 <y.songmu@gmail.com> - 0.3.0
+- add check-postgresql (by supercaracal)
+- [check-ntpoffset] work on ntp 4.2.2 (by naokibtn)
+- check-file-age: show time in message (by naokibtn)
+- add --no-check-certificate options to check_http (by cl-lab-k)
+- add check-mailq, currently only available for postfix. (by tnmt)
+- add check-mailq and check-postgresql into package (by Songmu)
+
 * Tue Dec 08 2015 <y.songmu@gmail.com> - 0.2.2
 - A plugin to check ntpoffset (by hiroakis)
 - Check tcp unix domain socket (by tkuchiki)

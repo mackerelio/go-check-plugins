@@ -1,3 +1,20 @@
+mackerel-check-plugins (0.3.0-1) stable; urgency=low
+
+  * add check-postgresql (by supercaracal)
+    <https://github.com/mackerelio/go-check-plugins/pull/47>
+  * [check-ntpoffset] work on ntp 4.2.2 (by naokibtn)
+    <https://github.com/mackerelio/go-check-plugins/pull/50>
+  * check-file-age: show time in message (by naokibtn)
+    <https://github.com/mackerelio/go-check-plugins/pull/51>
+  * add --no-check-certificate options to check_http (by cl-lab-k)
+    <https://github.com/mackerelio/go-check-plugins/pull/52>
+  * add check-mailq, currently only available for postfix. (by tnmt)
+    <https://github.com/mackerelio/go-check-plugins/pull/54>
+  * add check-mailq and check-postgresql into package (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/55>
+
+ -- Songmu <y.songmu@gmail.com>  Wed, 06 Jan 2016 20:36:21 +0900
+
 mackerel-check-plugins (0.2.2-1) stable; urgency=low
 
   * A plugin to check ntpoffset (by hiroakis)
