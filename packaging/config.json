@@ -5,7 +5,9 @@
        "http",
        "load",
        "log",
+       "mailq",
        "ntpoffset",
+       "postgresql",
        "procs",
        "tcp",
        "mysql"
