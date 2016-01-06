@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 (2016-01-06)
+
+* add check-postgresql #47 (supercaracal)
+* [check-ntpoffset] work on ntp 4.2.2 #50 (naokibtn)
+* check-file-age: show time in message #51 (naokibtn)
+* add --no-check-certificate options to check_http #52 (cl-lab-k)
+* add check-mailq, currently only available for postfix. #54 (tnmt)
+* add check-mailq and check-postgresql into package #55 (Songmu)
+
+
 ## 0.2.2 (2015-12-08)
 
 * A plugin to check ntpoffset #38 (hiroakis)

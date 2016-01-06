@@ -27,8 +27,8 @@ deploy:
   api_key:
     secure: vmMQz+IjJ/LUa9SHAlLKyg4raSqkEBIRzqnjS1LK7ZjtcAROo6Pn0lUcC4qMZ96/VvNMdLyGndCOBXsdE2VBCY5goTI7uIW1oxbLM3qOMNQQldG1bOY34bjkiiDU15WLUsKKPEC2RdgwG1aAAsqcUDAeyRABYVBANSn9jylQnBC2b2mQMYUtVA1O9jl3Qg64Cy6MUUirE/SuKp/cnE3AakcQt54pNVsnM54bIyrbGhqThLj7p7uLJEm58oRWR7TTUSgmk/Rbj4aJSC4k5lzN9iL/Fr5AgnpEQQUg3ishE+5yqSW7f/PRqXC6ZI9p6XS7bhS8N178ImzouIsoKWltblsgUhfvE6ONyMpi1+RG+6Lp3HlpLuq0Pz/efEpcaSDg6lXDIvMBC2sA5pbPok6Yx4tJOSv8adWu9t0yGVJezYaqbN/071K9m3cM4YTQK4L39b2FxQ2ZrUhee8HZy5rDO8iqx2vgM+NXATz2L5Tjjzd4aqfIDX8R3PVImBci7se/wmamDUpOrcfSjrI2dzEQGBzBfIFIhCaCQSuEjpZqBKdcOztkn1uev7a0AAUeZ7my+uQNpAMO7/AapM7LLugmkLM06FgrHKWDPQP/T92MPyvmC04nNraetAVijVYLQnlK5+TdEMvkKHuY5afLp5mEzX+7jTSmjyaUNrbANs8bH/8=
   file:
-  - "/home/travis/rpmbuild/RPMS/noarch/mackerel-check-plugins-0.2.2-1.noarch.rpm"
-  - "/home/travis/gopath/src/github.com/mackerelio/go-check-plugins/packaging/mackerel-check-plugins_0.2.2-1_all.deb"
+  - "/home/travis/rpmbuild/RPMS/noarch/mackerel-check-plugins-0.3.0-1.noarch.rpm"
+  - "/home/travis/gopath/src/github.com/mackerelio/go-check-plugins/packaging/mackerel-check-plugins_0.3.0-1_all.deb"
   on:
     repo: mackerelio/go-check-plugins
     all_branches: true

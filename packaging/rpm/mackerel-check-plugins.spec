@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.2.2
+Version:   0.3.0
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -25,7 +25,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in file-age http load log ntpoffset procs tcp mysql;do \
+for i in file-age http load log mailq ntpoffset postgresql procs tcp mysql;do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -37,6 +37,14 @@ done
 %{__targetdir}
 
 %changelog
+* Wed Jan 06 2016 <y.songmu@gmail.com> - 0.3.0
+- add check-postgresql (by supercaracal)
+- [check-ntpoffset] work on ntp 4.2.2 (by naokibtn)
+- check-file-age: show time in message (by naokibtn)
+- add --no-check-certificate options to check_http (by cl-lab-k)
+- add check-mailq, currently only available for postfix. (by tnmt)
+- add check-mailq and check-postgresql into package (by Songmu)
+
 * Tue Dec 08 2015 <y.songmu@gmail.com> - 0.2.2
 - A plugin to check ntpoffset (by hiroakis)
 - Check tcp unix domain socket (by tkuchiki)
