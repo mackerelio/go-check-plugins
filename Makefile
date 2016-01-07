@@ -11,7 +11,7 @@ deps:
 devel-deps: deps
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/vet
-	go get golang.org/x/tools/cmd/cover
+	go get github.com/pierrre/gotestcover
 	go get github.com/mattn/goveralls
 
 LINT_RET = .golint.txt
@@ -22,7 +22,7 @@ lint: devel-deps
 	test ! -s $(LINT_RET)
 
 cover: devel-deps
-	tool/cover.sh
+	gotestcover -v -short -covermode=count -coverprofile=.profile.cov -parallelpackages=4 ./...
 
 build: deps
 	mkdir -p build
