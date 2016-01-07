@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 (2016-01-07)
+
+* build with go1.5 #43 (Songmu)
+
+
 ## 0.3.0 (2016-01-06)
 
 * add check-postgresql #47 (supercaracal)
