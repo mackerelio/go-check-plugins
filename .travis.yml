@@ -12,7 +12,6 @@ addons:
       - debhelper
 install:
 - go get github.com/mitchellh/gox
-- gox -build-toolchain -osarch=linux/386
 - mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 script:
 - make lint
