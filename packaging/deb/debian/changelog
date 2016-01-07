@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.3.1-1) stable; urgency=low
+
+  * build with go1.5 (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/43>
+
+ -- Songmu <y.songmu@gmail.com>  Thu, 07 Jan 2016 12:52:43 +0900
+
 mackerel-check-plugins (0.3.0-1) stable; urgency=low
 
   * add check-postgresql (by supercaracal)

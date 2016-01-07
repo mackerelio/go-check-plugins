@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.3.0
+Version:   0.3.1
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -37,6 +37,9 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Jan 07 2016 <y.songmu@gmail.com> - 0.3.1
+- build with go1.5 (by Songmu)
+
 * Wed Jan 06 2016 <y.songmu@gmail.com> - 0.3.0
 - add check-postgresql (by supercaracal)
 - [check-ntpoffset] work on ntp 4.2.2 (by naokibtn)
