@@ -27,7 +27,7 @@ func main() {
 func run(args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
-		return checkers.Critical(err.Error())
+		os.Exit(1)
 	}
 
 	offset, err := getNtpOffset()
