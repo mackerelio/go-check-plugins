@@ -80,8 +80,7 @@ func run(args []string) *checkers.Checker {
 			queue, err = strconv.ParseInt(queueStr, 10, 64)
 		}
 	} else {
-		fmt.Printf("%s: specified mta's check is not implemented.\n", opts.Mta)
-		os.Exit(0)
+		return checkers.Unknown(fmt.Sprintf("%s: specified mta's check is not implemented.", opts.Mta))
 	}
 
 	if monitor.checkWarning(queue) {
