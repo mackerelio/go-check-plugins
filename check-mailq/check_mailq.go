@@ -79,6 +79,21 @@ func run(args []string) *checkers.Checker {
 			queueStr = re.ReplaceAllString(line, "$1")
 			queue, err = strconv.ParseInt(queueStr, 10, 64)
 		}
+	} else if opts.Mta == "qmail" {
+		out, err := exec.Command("qmail-qstat").Output()
+
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
+
+		outs := strings.Split(string(out), "\n")
+		line := outs[0]
+
+		re := regexp.MustCompile(`^messages in queue: (\d+)`)
+		if re.MatchString(line) {
+			queueStr = re.ReplaceAllString(line, "$1")
+			queue, err = strconv.ParseInt(queueStr, 10, 64)
+		}
 	} else {
 		return checkers.Unknown(fmt.Sprintf("%s: specified mta's check is not implemented.", opts.Mta))
 	}
