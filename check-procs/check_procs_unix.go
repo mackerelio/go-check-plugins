@@ -53,20 +53,6 @@ func parseProcState(line string) (proc procState, err error) {
 	return procState{strings.Join(fields[10:], " "), fields[0], fields[1], fields[2], vsz, rss, pcpu, thcount, fields[6], esec, csec}, nil
 }
 
-func parsePerfProc(fields []string) (proc procState, err error) {
-	fieldsLen := 8
-	if len(fields) != fieldsLen {
-		return procState{}, errors.New("parseTaskList: insufficient words")
-	}
-	vsz, _ := strconv.ParseInt(fields[6], 10, 64) //VirtualBytes
-	rss, _ := strconv.ParseInt(fields[7], 10, 64) // WorkingSet
-	pcpu, _ := strconv.ParseFloat(fields[4], 64) // PercentProcessorTime
-	thcount, _ := strconv.ParseInt(fields[5], 10, 64) //ThreadCount
-	esec, _ := strconv.ParseInt(fields[1], 10, 64) // ElapsedTime
-	csec := int64(0)
-	return procState{fields[3] /* Name */, "", fields[2] /* IDProcess */, vsz, rss, pcpu, thcount, "", esec, csec}, nil
-}
-
 var timeRegexp = regexp.MustCompile(`(?:(\d+)-)?(?:(\d+):)?(\d+)[:.](\d+)`)
 
 func timeStrToSeconds(etime string) int64 {
