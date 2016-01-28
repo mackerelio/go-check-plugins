@@ -19,6 +19,7 @@ var opts struct {
 	MatchSelf     bool    `short:"m" long:"match-self" description:"Match itself"`
 	CmdPat        string  `short:"p" long:"pattern" value-name:"PATTERN" description:"Match a command against this pattern"`
 	CmdExcludePat string  `short:"x" long:"exclude-pattern" value-name:"PATTERN" description:"Don't match against a pattern to prevent false positives"`
+	Ppid          string  `long:"ppid" value-name:"PPID" description:"Check against a specific PPID"`
 	FilePid       string  `short:"f" long:"file-pid" value-name:"PID" description:"Check against a specific PID"`
 	Vsz           int64   `short:"z" long:"virtual-memory-size" value-name:"VSZ" description:"Trigger on a Virtual Memory size is bigger than this"`
 	Rss           int64   `short:"r" long:"resident-set-size" value-name:"RSS" description:"Trigger on a Resident Set size is bigger than this"`
@@ -36,6 +37,7 @@ var opts struct {
 type procState struct {
 	cmd     string
 	user    string
+	ppid    string
 	pid     string
 	vsz     int64
 	rss     int64
@@ -97,6 +99,7 @@ func matchProc(proc procState, cmdPatRegexp *regexp.Regexp, cmdExcludePatRegexp 
 	return (opts.CmdPat == "" || cmdPatRegexp.MatchString(proc.cmd)) &&
 		(opts.CmdExcludePat == "" || !cmdExcludePatRegexp.MatchString(proc.cmd)) &&
 		(opts.MatchSelf || proc.pid != strconv.Itoa(os.Getpid())) &&
+		(opts.Ppid == "" || proc.ppid == opts.Ppid) &&
 		(opts.FilePid == "" || proc.pid == opts.FilePid) &&
 		(opts.Vsz == 0 || proc.vsz <= opts.Vsz) &&
 		(opts.Rss == 0 || proc.rss <= opts.Rss) &&
@@ -148,6 +151,9 @@ func gatherMsg(count int64) string {
 	}
 	if opts.CPUOver != 0 {
 		msg += fmt.Sprintf("; csec > %d", opts.CPUOver)
+	}
+	if opts.Ppid != "" {
+		msg += fmt.Sprintf("; ppid %s", opts.Ppid)
 	}
 	if opts.FilePid != "" {
 		msg += fmt.Sprintf("; pid %s", opts.FilePid)
