@@ -15,9 +15,9 @@ var threadsUnknown = runtime.GOOS == "darwin"
 
 func getProcs() (proc []procState, err error) {
 	var procs []procState
-	psformat := "user,pid,vsz,rss,pcpu,nlwp,state,etime,time,command"
+	psformat := "user,ppid,pid,vsz,rss,pcpu,nlwp,state,etime,time,command"
 	if threadsUnknown {
-		psformat = "user,pid,vsz,rss,pcpu,state,etime,time,command"
+		psformat = "user,ppid,pid,vsz,rss,pcpu,state,etime,time,command"
 	}
 	output, _ := exec.Command("ps", "axwwo", psformat).Output()
 	for _, line := range strings.Split(string(output), "\n")[1:] {
@@ -32,39 +32,25 @@ func getProcs() (proc []procState, err error) {
 
 func parseProcState(line string) (proc procState, err error) {
 	fields := strings.Fields(line)
-	fieldsMinLen := 10
+	fieldsMinLen := 11
 	if threadsUnknown {
-		fieldsMinLen = 9
+		fieldsMinLen = 10
 	}
 	if len(fields) < fieldsMinLen {
 		return procState{}, errors.New("parseProcState: insufficient words")
 	}
-	vsz, _ := strconv.ParseInt(fields[2], 10, 64)
-	rss, _ := strconv.ParseInt(fields[3], 10, 64)
-	pcpu, _ := strconv.ParseFloat(fields[4], 64)
+	vsz, _ := strconv.ParseInt(fields[3], 10, 64)
+	rss, _ := strconv.ParseInt(fields[4], 10, 64)
+	pcpu, _ := strconv.ParseFloat(fields[5], 64)
 	if threadsUnknown {
-		esec := timeStrToSeconds(fields[6])
-		csec := timeStrToSeconds(fields[7])
-		return procState{strings.Join(fields[8:], " "), fields[0], fields[1], vsz, rss, pcpu, 1, fields[5], esec, csec}, nil
+		esec := timeStrToSeconds(fields[7])
+		csec := timeStrToSeconds(fields[8])
+		return procState{strings.Join(fields[9:], " "), fields[0], fields[1], fields[2], vsz, rss, pcpu, 1, fields[5], esec, csec}, nil
 	}
-	thcount, _ := strconv.ParseInt(fields[5], 10, 64)
-	esec := timeStrToSeconds(fields[7])
-	csec := timeStrToSeconds(fields[8])
-	return procState{strings.Join(fields[9:], " "), fields[0], fields[1], vsz, rss, pcpu, thcount, fields[6], esec, csec}, nil
-}
-
-func parsePerfProc(fields []string) (proc procState, err error) {
-	fieldsLen := 8
-	if len(fields) != fieldsLen {
-		return procState{}, errors.New("parseTaskList: insufficient words")
-	}
-	vsz, _ := strconv.ParseInt(fields[6], 10, 64) //VirtualBytes
-	rss, _ := strconv.ParseInt(fields[7], 10, 64) // WorkingSet
-	pcpu, _ := strconv.ParseFloat(fields[4], 64) // PercentProcessorTime
-	thcount, _ := strconv.ParseInt(fields[5], 10, 64) //ThreadCount
-	esec, _ := strconv.ParseInt(fields[1], 10, 64) // ElapsedTime
-	csec := int64(0)
-	return procState{fields[3] /* Name */, "", fields[2] /* IDProcess */, vsz, rss, pcpu, thcount, "", esec, csec}, nil
+	thcount, _ := strconv.ParseInt(fields[6], 10, 64)
+	esec := timeStrToSeconds(fields[8])
+	csec := timeStrToSeconds(fields[9])
+	return procState{strings.Join(fields[10:], " "), fields[0], fields[1], fields[2], vsz, rss, pcpu, thcount, fields[6], esec, csec}, nil
 }
 
 var timeRegexp = regexp.MustCompile(`(?:(\d+)-)?(?:(\d+):)?(\d+)[:.](\d+)`)
