@@ -1,3 +1,18 @@
+mackerel-check-plugins (0.4.0-1) stable; urgency=low
+
+  * Fix duplicated help message (by hfm)
+    <https://github.com/mackerelio/go-check-plugins/pull/58>
+  * add qmail queue check to check-mailq (by tnmt)
+    <https://github.com/mackerelio/go-check-plugins/pull/59>
+  * Add check-elasticsearch (by naokibtn)
+    <https://github.com/mackerelio/go-check-plugins/pull/62>
+  * Add check-redis (by naokibtn)
+    <https://github.com/mackerelio/go-check-plugins/pull/63>
+  * check-procs: check PPID (by hfm)
+    <https://github.com/mackerelio/go-check-plugins/pull/64>
+
+ -- Songmu <y.songmu@gmail.com>  Thu, 04 Feb 2016 11:37:26 +0900
+
 mackerel-check-plugins (0.3.1-1) stable; urgency=low
 
   * build with go1.5 (by Songmu)

@@ -6,6 +6,7 @@ Check Plugins for monitoring written in golang.
 
 Documentation for each plugin is located in its respective sub directory.
 
+* [check-elasticsearch](./check-elasticsearch/README.md)
 * [check-file-age](./check-file-age/README.md)
 * [check-http](./check-http/README.md)
 * [check-load](./check-load/README.md)
@@ -15,6 +16,7 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-ntpoffset](./check-ntpoffset/README.md)
 * [check-postgresql](./check-postgresql/README.md)
 * [check-procs](./check-procs/README.md)
+* [check-redis](./check-redis/README.md)
 * [check-tcp](./check-tcp/README.md)
 
 Specification

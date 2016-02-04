@@ -3,7 +3,7 @@
 %define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.3.1
+Version:   0.4.0
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
@@ -25,7 +25,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in file-age http load log mailq ntpoffset postgresql procs tcp mysql;do \
+for i in elasticsearch file-age http load log mailq ntpoffset postgresql procs redis tcp mysql;do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -37,6 +37,13 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Feb 04 2016 <y.songmu@gmail.com> - 0.4.0
+- Fix duplicated help message (by hfm)
+- add qmail queue check to check-mailq (by tnmt)
+- Add check-elasticsearch (by naokibtn)
+- Add check-redis (by naokibtn)
+- check-procs: check PPID (by hfm)
+
 * Thu Jan 07 2016 <y.songmu@gmail.com> - 0.3.1
 - build with go1.5 (by Songmu)
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 (2016-02-04)
+
+* Fix duplicated help message #58 (hfm)
+* add qmail queue check to check-mailq #59 (tnmt)
+* Add check-elasticsearch #62 (naokibtn)
+* Add check-redis #63 (naokibtn)
+* check-procs: check PPID #64 (hfm)
+
+
 ## 0.3.1 (2016-01-07)
 
 * build with go1.5 #43 (Songmu)
