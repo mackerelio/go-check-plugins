@@ -37,6 +37,13 @@ done
 %{__targetdir}
 
 %changelog
+* Thu Feb 04 2016 <y.songmu@gmail.com> - 0.4.0
+- Fix duplicated help message (by hfm)
+- add qmail queue check to check-mailq (by tnmt)
+- Add check-elasticsearch (by naokibtn)
+- Add check-redis (by naokibtn)
+- check-procs: check PPID (by hfm)
+
 * Thu Jan 07 2016 <y.songmu@gmail.com> - 0.3.1
 - build with go1.5 (by Songmu)
 
