@@ -1,6 +1,7 @@
 {
     "description": "configuration for packaging mackerel-check-plugins",
     "plugins": [
+       "elasticsearch",
        "file-age",
        "http",
        "load",
@@ -9,6 +10,7 @@
        "ntpoffset",
        "postgresql",
        "procs",
+       "redis",
        "tcp",
        "mysql"
     ]
