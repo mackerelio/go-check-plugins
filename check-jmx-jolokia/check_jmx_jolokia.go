@@ -24,7 +24,7 @@ type jmxJolokiaOpts struct {
 	Critical  float64 `short:"c" long:"critical" description:"Trigger a critical if over a number"`
 }
 
-type jmxJolokiaResult struct {
+type jmxJolokiaResponse struct {
 	Status int
 	Value  float64
 }
@@ -70,23 +70,23 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown(err.Error())
 	}
 
-	result := jmxJolokiaResult{}
-	if err := json.Unmarshal(body, &result); err != nil {
+	resJ := jmxJolokiaResponse{}
+	if err := json.Unmarshal(body, &resJ); err != nil {
 		return checkers.Unknown(err.Error())
 	}
 
-	if result.Status != 200 {
-		return checkers.Unknown(fmt.Sprintf("failed: response status %d", result.Status))
+	if resJ.Status != 200 {
+		return checkers.Unknown(fmt.Sprintf("failed: response status %d", resJ.Status))
 	}
 
 	checkSt := checkers.OK
-	msg := fmt.Sprintf("%s %s value %f", opts.MBean, opts.Attribute, result.Value)
-	if result.Value > opts.Critical {
+	msg := fmt.Sprintf("%s %s value %f", opts.MBean, opts.Attribute, resJ.Value)
+	if resJ.Value > opts.Critical {
 		checkSt = checkers.CRITICAL
-		msg = fmt.Sprintf("%s %s value is over %f > %f", opts.MBean, opts.Attribute, result.Value, opts.Critical)
-	} else if result.Value > opts.Warning {
+		msg = fmt.Sprintf("%s %s value is over %f > %f", opts.MBean, opts.Attribute, resJ.Value, opts.Critical)
+	} else if resJ.Value > opts.Warning {
 		checkSt = checkers.WARNING
-		msg = fmt.Sprintf("%s %s value is over %f > %f", opts.MBean, opts.Attribute, result.Value, opts.Warning)
+		msg = fmt.Sprintf("%s %s value is over %f > %f", opts.MBean, opts.Attribute, resJ.Value, opts.Warning)
 	}
 
 	return checkers.NewChecker(checkSt, msg)
