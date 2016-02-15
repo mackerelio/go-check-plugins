@@ -8,6 +8,7 @@ Documentation for each plugin is located in its respective sub directory.
 
 * [check-elasticsearch](./check-elasticsearch/README.md)
 * [check-file-age](./check-file-age/README.md)
+* [check-file-size](./check-file-size/README.md)
 * [check-http](./check-http/README.md)
 * [check-load](./check-load/README.md)
 * [check-log](./check-log/README.md)
