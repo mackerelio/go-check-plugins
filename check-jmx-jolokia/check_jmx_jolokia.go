@@ -67,7 +67,7 @@ func run(args []string) *checkers.Checker {
 	resJ := jmxJolokiaResponse{}
 	dec := json.NewDecoder(res.Body)
 	if err := dec.Decode(&resJ); err != nil {
-		return nil, err
+		return checkers.Critical(err.Error())
 	}
 
 	if resJ.Status != 200 {
