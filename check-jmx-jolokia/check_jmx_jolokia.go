@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -65,14 +64,10 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown(fmt.Sprintf("failed: http status code %d", res.StatusCode))
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return checkers.Unknown(err.Error())
-	}
-
 	resJ := jmxJolokiaResponse{}
-	if err := json.Unmarshal(body, &resJ); err != nil {
-		return checkers.Unknown(err.Error())
+	dec := json.NewDecoder(res.Body)
+	if err := dec.Decode(&resJ); err != nil {
+		return nil, err
 	}
 
 	if resJ.Status != 200 {
