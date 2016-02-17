@@ -8,6 +8,7 @@ Checks for MySQL
 
 - connection
 - replication
+- uptime
 
 ## check-mysql connection
 
