@@ -137,9 +137,11 @@ func (opts *tcpOpts) merge(ex exchange) {
 	}
 }
 
-func dial(network, address string, ssl bool) (net.Conn, error) {
+func dial(network, address string, ssl bool, no_check_certificate bool ) (net.Conn, error) {
 	if ssl {
-		return tls.Dial(network, address, &tls.Config{})
+		return tls.Dial(network, address, &tls.Config{
+			InsecureSkipVerify: no_check_certificate,
+		})
 	}
 	return net.Dial(network, address)
 }
@@ -160,9 +162,9 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	}
 	var conn net.Conn
 	if opts.UnixSock != "" {
-		conn, err = dial("unix", opts.UnixSock, opts.SSL)
+		conn, err = dial("unix", opts.UnixSock, opts.SSL, opts.NoCheckCertificate)
 	} else {
-		conn, err = dial("tcp", address, opts.SSL)
+		conn, err = dial("tcp", address, opts.SSL, opts.NoCheckCertificate)
 	}
 	if err != nil {
 		return checkers.Critical(err.Error())
