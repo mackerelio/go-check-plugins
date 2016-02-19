@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"io"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -237,13 +238,18 @@ func slurp(conn net.Conn, maxbytes int, timeout float64) ([]byte, error) {
 	for {
 		tmpBuf := make([]byte, readLimit)
 		i, err := conn.Read(tmpBuf)
+		if i > 0 {
+			buf = append(buf, tmpBuf[:i]...)
+			readBytes += i
+			if i < readLimit || (maxbytes > 0 && maxbytes <= readBytes) {
+				break
+			}
+		}
+		if err == io.EOF {
+			return buf, nil
+		}
 		if err != nil {
 			return buf, err
-		}
-		buf = append(buf, tmpBuf[:i]...)
-		readBytes += i
-		if i < readLimit || (maxbytes > 0 && maxbytes <= readBytes) {
-			break
 		}
 	}
 	return buf, nil
