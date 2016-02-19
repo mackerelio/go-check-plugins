@@ -32,6 +32,7 @@ type exchange struct {
 	Quit          string `short:"q" long:"quit" description:"String to send server to initiate a clean close of the connection"`
 	SSL           bool   `short:"S" long:"ssl" description:"Use SSL for the connection."`
 	UnixSock      string `short:"U" long:"unix-sock" description:"Unix Domain Socket"`
+	NoCheckCertificate bool `long:"no-check-certificate" description:"Do not check certificate"`
 	expectReg     *regexp.Regexp
 }
 
