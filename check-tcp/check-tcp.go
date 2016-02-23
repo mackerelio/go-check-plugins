@@ -138,10 +138,10 @@ func (opts *tcpOpts) merge(ex exchange) {
 	}
 }
 
-func dial(network, address string, ssl bool, no_check_certificate bool ) (net.Conn, error) {
+func dial(network, address string, ssl bool, noCheckCertificate bool ) (net.Conn, error) {
 	if ssl {
 		return tls.Dial(network, address, &tls.Config{
-			InsecureSkipVerify: no_check_certificate,
+			InsecureSkipVerify: noCheckCertificate,
 		})
 	}
 	return net.Dial(network, address)
