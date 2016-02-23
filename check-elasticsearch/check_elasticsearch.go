@@ -17,8 +17,9 @@ type healthStat struct {
 }
 
 var opts struct {
-	Host string `short:"H" long:"host" default:"localhost" description:"Elasticsearch host"`
-	Port int64  `short:"p" long:"port" default:"9200" description:"Elasticsearch port"`
+	Scheme string `short:"s" long:"scheme" default:"http" description:"Elasticsearch scheme"`
+	Host   string `short:"H" long:"host" default:"localhost" description:"Elasticsearch host"`
+	Port   int64  `short:"p" long:"port" default:"9200" description:"Elasticsearch port"`
 }
 
 func main() {
@@ -34,7 +35,7 @@ func run(args []string) *checkers.Checker {
 	}
 
 	client := &http.Client{}
-	url := fmt.Sprintf("http://%s:%d/_cluster/health", opts.Host, opts.Port)
+	url := fmt.Sprintf("%s://%s:%d/_cluster/health", opts.Scheme, opts.Host, opts.Port)
 
 	stTime := time.Now()
 	resp, err := client.Get(url)
