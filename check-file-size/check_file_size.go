@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jessevdk/go-flags"
-	"github.com/mackerelio/checkers"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/jessevdk/go-flags"
+	"github.com/mackerelio/checkers"
 )
 
 func main() {
@@ -25,12 +26,13 @@ var opts struct {
 	Depth int    `short:"d" long:"depth" default:"1" description:"max depth of the directory from base directory"`
 }
 
+var sizeReg = regexp.MustCompile(`^(\d+\.?\d*)(k|K|m|M|g|G|t|T)?$`)
+
 func sizeValue(input string) (float64, error) {
 	var size float64
 	var err error
 
-	reg := regexp.MustCompile(`^(\d+\.?\d*)(k|K|m|M|g|G|t|T)?$`)
-	r := reg.FindAllStringSubmatch(input, -1)
+	r := sizeReg.FindAllStringSubmatch(input, -1)
 	if len(r) == 0 {
 		msg := fmt.Errorf("%s is invalid", input)
 		return -1, msg
