@@ -169,13 +169,7 @@ func TestHTTPIPv6(t *testing.T) {
 		time.Sleep(time.Second / 5)
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "text/plain")
-		conn, bufrw, err := w.(http.Hijacker).Hijack()
-		if err != nil {
-			t.Error(err)
-		}
-		defer conn.Close()
-		bufrw.WriteString("OKOK")
-		bufrw.Flush()
+		fmt.Fprint(w, "OKOK")
 	})
 
 	l, err := net.Listen("tcp", "[::1]:0")
