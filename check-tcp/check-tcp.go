@@ -32,6 +32,7 @@ type exchange struct {
 	Quit          string `short:"q" long:"quit" description:"String to send server to initiate a clean close of the connection"`
 	SSL           bool   `short:"S" long:"ssl" description:"Use SSL for the connection."`
 	UnixSock      string `short:"U" long:"unix-sock" description:"Unix Domain Socket"`
+	NoCheckCertificate bool `long:"no-check-certificate" description:"Do not check certificate"`
 	expectReg     *regexp.Regexp
 }
 
@@ -137,9 +138,11 @@ func (opts *tcpOpts) merge(ex exchange) {
 	}
 }
 
-func dial(network, address string, ssl bool) (net.Conn, error) {
+func dial(network, address string, ssl bool, noCheckCertificate bool ) (net.Conn, error) {
 	if ssl {
-		return tls.Dial(network, address, &tls.Config{})
+		return tls.Dial(network, address, &tls.Config{
+			InsecureSkipVerify: noCheckCertificate,
+		})
 	}
 	return net.Dial(network, address)
 }
@@ -160,9 +163,9 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	}
 	var conn net.Conn
 	if opts.UnixSock != "" {
-		conn, err = dial("unix", opts.UnixSock, opts.SSL)
+		conn, err = dial("unix", opts.UnixSock, opts.SSL, opts.NoCheckCertificate)
 	} else {
-		conn, err = dial("tcp", address, opts.SSL)
+		conn, err = dial("tcp", address, opts.SSL, opts.NoCheckCertificate)
 	}
 	if err != nil {
 		return checkers.Critical(err.Error())
