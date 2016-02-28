@@ -150,11 +150,20 @@ func checkSlave(args []string) *checkers.Checker {
 	}
 	defer c.Close()
 
-	if _, ok := (*info)["master_link_status"]; !ok {
+	if status, ok := (*info)["master_link_status"]; ok {
+		msg := fmt.Sprintf("master_link_status: %s", status)
+
+		switch status {
+		case "up":
+			return checkers.Ok(msg)
+		case "down":
+			return checkers.Critical(msg)
+		default:
+			return checkers.Unknown(msg)
+		}
+
+	} else {
+		// it may be a master!
 		return checkers.Unknown("couldn't get master_link_status")
 	}
-
-	return checkers.Ok(
-		fmt.Sprintf("master_link_status: %s", (*info)["master_link_status"]),
-	)
 }
