@@ -120,10 +120,10 @@ func checkReachable(args []string) *checkers.Checker {
 	}
 
 	c, info, err := connectRedisGetInfo(opts)
-	defer c.Close()
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
+	defer c.Close()
 
 	if _, ok := (*info)["redis_version"]; !ok {
 		return checkers.Unknown("couldn't get redis_version")
@@ -145,10 +145,10 @@ func checkSlave(args []string) *checkers.Checker {
 	}
 
 	c, info, err := connectRedisGetInfo(opts)
-	defer c.Close()
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
+	defer c.Close()
 
 	if _, ok := (*info)["master_link_status"]; !ok {
 		return checkers.Unknown("couldn't get master_link_status")
