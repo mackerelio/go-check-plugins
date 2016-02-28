@@ -1,4 +1,4 @@
-# check-procs
+# check-log
 
 ## Description
 

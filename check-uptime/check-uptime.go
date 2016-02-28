@@ -11,8 +11,8 @@ import (
 )
 
 var opts struct {
-	WarnUnder *float64 `short:"w" long:"warn-under" value-name:"N" default:"1" description:"Trigger a warning if under the seconds"`
-	CritUnder *float64 `short:"c" long:"critical-under" value-name:"N" default:"1" description:"Trigger a critial if under the seconds"`
+	WarnUnder *float64 `short:"w" long:"warn-under" value-name:"N" description:"Trigger a warning if under the seconds"`
+	CritUnder *float64 `short:"c" long:"critical-under" value-name:"N" description:"Trigger a critial if under the seconds"`
 	WarnOver  *float64 `short:"W" long:"warn-over" value-name:"N" description:"Trigger a warning if over the seconds"`
 	CritOver  *float64 `short:"C" long:"critical-over" value-name:"N" description:"Trigger a critical if over the seconds"`
 }
