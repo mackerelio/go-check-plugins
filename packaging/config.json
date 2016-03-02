@@ -3,15 +3,20 @@
     "plugins": [
        "elasticsearch",
        "file-age",
+       "file-size",
        "http",
+       "jmx-jolokia",
        "load",
        "log",
        "mailq",
+       "memcached",
+       "mysql",
        "ntpoffset",
        "postgresql",
        "procs",
        "redis",
+       "solr",
        "tcp",
-       "mysql"
+       "uptime"
     ]
 }
