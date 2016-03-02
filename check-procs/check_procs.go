@@ -17,6 +17,7 @@ var opts struct {
 	WarnUnder     int64   `short:"W" long:"warn-under" value-name:"N" default:"1" description:"Trigger a warning if under a number"`
 	CritUnder     int64   `short:"C" long:"critical-under" value-name:"N" default:"1" description:"Trigger a critial if under a number"`
 	MatchSelf     bool    `short:"m" long:"match-self" description:"Match itself"`
+	MatchParent   bool    `short:"M" long:"match-parent" description:"Match parent"`
 	CmdPat        string  `short:"p" long:"pattern" value-name:"PATTERN" description:"Match a command against this pattern"`
 	CmdExcludePat string  `short:"x" long:"exclude-pattern" value-name:"PATTERN" description:"Don't match against a pattern to prevent false positives"`
 	Ppid          string  `long:"ppid" value-name:"PPID" description:"Check against a specific PPID"`
@@ -99,6 +100,7 @@ func matchProc(proc procState, cmdPatRegexp *regexp.Regexp, cmdExcludePatRegexp 
 	return (opts.CmdPat == "" || cmdPatRegexp.MatchString(proc.cmd)) &&
 		(opts.CmdExcludePat == "" || !cmdExcludePatRegexp.MatchString(proc.cmd)) &&
 		(opts.MatchSelf || proc.pid != strconv.Itoa(os.Getpid())) &&
+		(opts.MatchParent || proc.pid != strconv.Itoa(os.Getppid())) &&
 		(opts.Ppid == "" || proc.ppid == opts.Ppid) &&
 		(opts.FilePid == "" || proc.pid == opts.FilePid) &&
 		(opts.Vsz == 0 || proc.vsz <= opts.Vsz) &&
