@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.5.0 (2016-03-02)
+
+* add check-solr #46 (supercaracal)
+*  add check-jmx-jolokia #68 (y-kuno)
+* check-memcached #69 (naokibtn)
+* Add scheme option to check-elasticsearch #70 (yano3)
+* Check file size #72 (hiroakis)
+* Add uptime sub command to check-mysql #73 (kazeburo)
+* add check-cert-file #74 (kazeburo)
+* [tcp] Add --no-check-certificate #75 (kazeburo)
+* Fixed slurp. conn.read returns content with EOF #76 (kazeburo)
+* Fix check-tcp IPv6 testcase on OSX(?) #77 (hanazuki)
+* check-redis: Report critical if master_link_status is down #79 (hanazuki)
+* check-redis: Fixed panic #80 (yoheimuta)
+* check-procs: Fixed the counting logic with -p #81 (yoheimuta)
+* add check-uptime #82 (Songmu)
+
+
 ## 0.4.0 (2016-02-04)
 
 * Fix duplicated help message #58 (hfm)

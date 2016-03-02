@@ -1,3 +1,36 @@
+mackerel-check-plugins (0.5.0-1) stable; urgency=low
+
+  * add check-solr (by supercaracal)
+    <https://github.com/mackerelio/go-check-plugins/pull/46>
+  *  add check-jmx-jolokia (by y-kuno)
+    <https://github.com/mackerelio/go-check-plugins/pull/68>
+  * check-memcached (by naokibtn)
+    <https://github.com/mackerelio/go-check-plugins/pull/69>
+  * Add scheme option to check-elasticsearch (by yano3)
+    <https://github.com/mackerelio/go-check-plugins/pull/70>
+  * Check file size (by hiroakis)
+    <https://github.com/mackerelio/go-check-plugins/pull/72>
+  * Add uptime sub command to check-mysql (by kazeburo)
+    <https://github.com/mackerelio/go-check-plugins/pull/73>
+  * add check-cert-file (by kazeburo)
+    <https://github.com/mackerelio/go-check-plugins/pull/74>
+  * [tcp] Add --no-check-certificate (by kazeburo)
+    <https://github.com/mackerelio/go-check-plugins/pull/75>
+  * Fixed slurp. conn.read returns content with EOF (by kazeburo)
+    <https://github.com/mackerelio/go-check-plugins/pull/76>
+  * Fix check-tcp IPv6 testcase on OSX(?) (by hanazuki)
+    <https://github.com/mackerelio/go-check-plugins/pull/77>
+  * check-redis: Report critical if master_link_status is down (by hanazuki)
+    <https://github.com/mackerelio/go-check-plugins/pull/79>
+  * check-redis: Fixed panic (by yoheimuta)
+    <https://github.com/mackerelio/go-check-plugins/pull/80>
+  * check-procs: Fixed the counting logic with -p (by yoheimuta)
+    <https://github.com/mackerelio/go-check-plugins/pull/81>
+  * add check-uptime (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/82>
+
+ -- Songmu <y.songmu@gmail.com>  Wed, 02 Mar 2016 15:17:38 +0900
+
 mackerel-check-plugins (0.4.0-1) stable; urgency=low
 
   * Fix duplicated help message (by hfm)
