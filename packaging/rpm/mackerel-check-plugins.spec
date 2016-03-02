@@ -37,6 +37,23 @@ done
 %{__targetdir}
 
 %changelog
+* Wed Mar 02 2016 <y.songmu@gmail.com> - 0.5.0
+- add check-solr (by supercaracal)
+-  add check-jmx-jolokia (by y-kuno)
+- check-memcached (by naokibtn)
+- Add scheme option to check-elasticsearch (by yano3)
+- Check file size (by hiroakis)
+- Add uptime sub command to check-mysql (by kazeburo)
+- add check-cert-file (by kazeburo)
+- [tcp] Add --no-check-certificate (by kazeburo)
+- Fixed slurp. conn.read returns content with EOF (by kazeburo)
+- Fix check-tcp IPv6 testcase on OSX(?) (by hanazuki)
+- check-redis: Report critical if master_link_status is down (by hanazuki)
+- check-redis: Fixed panic (by yoheimuta)
+- check-procs: Fixed the counting logic with -p (by yoheimuta)
+- add check-uptime (by Songmu)
+- add file-size, jmx-jolokia, memcached, solr, uptime into package config (by Songmu)
+
 * Thu Feb 04 2016 <y.songmu@gmail.com> - 0.4.0
 - Fix duplicated help message (by hfm)
 - add qmail queue check to check-mailq (by tnmt)
