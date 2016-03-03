@@ -137,7 +137,7 @@ func checkReachable(args []string) *checkers.Checker {
 func checkSlave(args []string) *checkers.Checker {
 	opts := redisSetting{}
 	psr := flags.NewParser(&opts, flags.Default)
-	psr.Usage = "reachable [OPTIONS]"
+	psr.Usage = "slave [OPTIONS]"
 	_, err := psr.ParseArgs(args)
 	if err != nil {
 		fmt.Println(err)
