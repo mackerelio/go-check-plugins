@@ -8,7 +8,7 @@ Check uptime seconds.
 
 ```
 [plugin.checks.uptime]
-command = "/path/to/check-uptime --warning-under=600 --critical-under=120"
+command = "/path/to/check-uptime --warn-under=600 --critical-under=120"
 ```
 
 ## Options
