@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -36,6 +37,93 @@ func TestFTP(t *testing.T) {
 	assert.Equal(t, nil, err, "no errors")
 	ckr := opts.run()
 	assert.Equal(t, checkers.OK, ckr.Status, "should be OK")
+}
+
+type mockGearmanServer struct {
+	listener net.Listener
+	terdown  chan struct{}
+	done     chan struct{}
+}
+
+func makeGearmandMockServer() (*mockGearmanServer, error) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		return nil, err
+	}
+	server := &mockGearmanServer{
+		listener: listener,
+		terdown:  make(chan struct{}, 1),
+		done:     make(chan struct{}, 1),
+	}
+	return server, nil
+}
+
+func (s *mockGearmanServer) port() (int, error) {
+	_, port, err := net.SplitHostPort(s.listener.Addr().String())
+	if err != nil {
+		return 0, err
+	}
+	return strconv.Atoi(port)
+}
+
+func (s *mockGearmanServer) shutdown() {
+	s.terdown <- struct{}{}
+	s.listener.Close()
+	<-s.done
+}
+
+func (s *mockGearmanServer) run() {
+loop:
+	for {
+		select {
+		case <-s.terdown:
+			break loop
+		default:
+			conn, err := s.listener.Accept()
+			if err != nil {
+				continue loop
+			}
+
+			buf := make([]byte, 16)
+			i, err := conn.Read(buf)
+			if err != nil {
+				switch err {
+				case io.EOF:
+					// nothing to do
+				default:
+					panic(err)
+				}
+			}
+			req := string(buf[:i])
+			res := "ERR unknown_command Unknown+server+command\n"
+			if req == "version\n" {
+				res = "1.11\n"
+			}
+			_, err = conn.Write([]byte(res))
+			if err != nil {
+				panic(err)
+			}
+			conn.Close()
+		}
+	}
+	s.done <- struct{}{}
+}
+
+func TestGEARMAN(t *testing.T) {
+	server, err := makeGearmandMockServer()
+	if err != nil {
+		panic(err)
+	}
+	port, err := server.port()
+	if err != nil {
+		panic(err)
+	}
+	go server.run()
+	opts, err := parseArgs([]string{"--service=gearman", "-H", "127.0.0.1", "-p", strconv.Itoa(port)})
+	assert.Equal(t, nil, err, "no errors")
+	ckr := opts.run()
+	assert.Equal(t, checkers.OK, ckr.Status, "should be OK\n")
+	server.shutdown()
 }
 
 func TestHTTP(t *testing.T) {

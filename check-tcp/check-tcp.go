@@ -95,6 +95,11 @@ var defaultExchangeMap = map[string]exchange{
 		Quit:          "QUIT",
 		SSL:           true,
 	},
+	"GEARMAN": exchange{
+		Port:          7003,
+		Send:          "version\n",
+		ExpectPattern: `\A[0-9]+\.[0-9]+\n\z`,
+	},
 }
 
 func (opts *tcpOpts) prepare() error {
