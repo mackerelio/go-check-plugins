@@ -3,12 +3,12 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"regexp"
 	"strings"
 	"time"
-	"io"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -27,14 +27,14 @@ type tcpOpts struct {
 }
 
 type exchange struct {
-	Port          int    `short:"p" long:"port" description:"Port number"`
-	Send          string `short:"s" long:"send" description:"String to send to the server"`
-	ExpectPattern string `short:"e" long:"expect-pattern" description:"Regexp pattern to expect in server response"`
-	Quit          string `short:"q" long:"quit" description:"String to send server to initiate a clean close of the connection"`
-	SSL           bool   `short:"S" long:"ssl" description:"Use SSL for the connection."`
-	UnixSock      string `short:"U" long:"unix-sock" description:"Unix Domain Socket"`
-	NoCheckCertificate bool `long:"no-check-certificate" description:"Do not check certificate"`
-	expectReg     *regexp.Regexp
+	Port               int    `short:"p" long:"port" description:"Port number"`
+	Send               string `short:"s" long:"send" description:"String to send to the server"`
+	ExpectPattern      string `short:"e" long:"expect-pattern" description:"Regexp pattern to expect in server response"`
+	Quit               string `short:"q" long:"quit" description:"String to send server to initiate a clean close of the connection"`
+	SSL                bool   `short:"S" long:"ssl" description:"Use SSL for the connection."`
+	UnixSock           string `short:"U" long:"unix-sock" description:"Unix Domain Socket"`
+	NoCheckCertificate bool   `long:"no-check-certificate" description:"Do not check certificate"`
+	expectReg          *regexp.Regexp
 }
 
 func main() {
@@ -57,45 +57,45 @@ func parseArgs(args []string) (*tcpOpts, error) {
 }
 
 var defaultExchangeMap = map[string]exchange{
-	"FTP": exchange{
+	"FTP": {
 		Port:          21,
 		ExpectPattern: `^220`,
 		Quit:          "QUIT",
 	},
-	"POP": exchange{
+	"POP": {
 		Port:          110,
 		ExpectPattern: `^\+OK`,
 		Quit:          "QUIT",
 	},
-	"SPOP": exchange{
+	"SPOP": {
 		Port:          995,
 		ExpectPattern: `^\+OK`,
 		Quit:          "QUIT",
 		SSL:           true,
 	},
-	"IMAP": exchange{
+	"IMAP": {
 		Port:          143,
 		ExpectPattern: `^\* OK`,
 		Quit:          "a1 LOGOUT",
 	},
-	"SIMAP": exchange{
+	"SIMAP": {
 		Port:          993,
 		ExpectPattern: `^\* OK`,
 		Quit:          "a1 LOGOUT",
 		SSL:           true,
 	},
-	"SMTP": exchange{
+	"SMTP": {
 		Port:          25,
 		ExpectPattern: `^220`,
 		Quit:          "QUIT",
 	},
-	"SSMTP": exchange{
+	"SSMTP": {
 		Port:          465,
 		ExpectPattern: `^220`,
 		Quit:          "QUIT",
 		SSL:           true,
 	},
-	"GEARMAN": exchange{
+	"GEARMAN": {
 		Port:          7003,
 		Send:          "version\n",
 		ExpectPattern: `\A[0-9]+\.[0-9]+\n\z`,
@@ -144,7 +144,7 @@ func (opts *tcpOpts) merge(ex exchange) {
 	}
 }
 
-func dial(network, address string, ssl bool, noCheckCertificate bool ) (net.Conn, error) {
+func dial(network, address string, ssl bool, noCheckCertificate bool) (net.Conn, error) {
 	if ssl {
 		return tls.Dial(network, address, &tls.Config{
 			InsecureSkipVerify: noCheckCertificate,
