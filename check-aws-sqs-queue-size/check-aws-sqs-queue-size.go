@@ -66,10 +66,6 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	if err != nil {
-		return checkers.NewChecker(checkers.UNKNOWN, err.Error())
-	}
-
 	size, err := getSqsQueueSize(opts.Region, opts.AccessKeyID, opts.SecretAccessKey, opts.QueueName)
 	if err != nil {
 		return checkers.NewChecker(checkers.UNKNOWN, err.Error())
