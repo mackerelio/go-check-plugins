@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/mackerelio/checkers"
@@ -8,6 +9,7 @@ import (
 
 type replChecker struct {
 	subcommand
+	SecondsBehindMaster int `long:"seconds_behind_master" description:"seconds_behind_master option for masterha_check_repl"`
 }
 
 func (c replChecker) Execute(args []string) error {
@@ -28,7 +30,19 @@ func (c replChecker) makeCommandName() string {
 }
 
 func (c replChecker) makeCommandArgs() []string {
-	return make([]string, 0, 2)
+	args := make([]string, 0, c.ArgsLength())
+	if c.SecondsBehindMaster > 0 {
+		secondsBehindMaster := strconv.Itoa(c.SecondsBehindMaster)
+		args = append(args, "--seconds_behind_master", secondsBehindMaster)
+	}
+	return args
+}
+
+func (c replChecker) ArgsLength() int {
+	if c.SecondsBehindMaster > 0 {
+		return 4
+	}
+	return 2
 }
 
 func (c replChecker) parse(out string) (checkers.Status, string) {
