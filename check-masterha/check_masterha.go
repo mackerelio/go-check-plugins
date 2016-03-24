@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -24,13 +25,81 @@ type options struct {
 	SSH    sshChecker    `command:"ssh"    description:"check to masterha_check_ssh"`
 }
 
-type subcommand interface {
+type executer interface {
 	makeCommandName() string
 	makeCommandArgs() []string
 	parse(string) (checkers.Status, string)
 }
 
-func executeSubcommand(c subcommand) (*checkers.Checker, error) {
+type subcommand struct {
+	Config    string `short:"c" long:"conf" description:"target config file"`
+	ConfigDir string `long:"confdir" default:"/usr/local/masterha/conf" description:"config directory"`
+	All       bool   `short:"a" long:"all" description:"use all config file for target"`
+	Executer  executer
+}
+
+func (c subcommand) ConfigFiles() ([]string, error) {
+	if c.All {
+		files, err := ioutil.ReadDir("/service")
+		if err != nil {
+			return nil, err
+		}
+
+		configFiles := make([]string, 0, len(files))
+		for _, file := range files {
+			if strings.HasPrefix(file.Name(), "masterha_") {
+				configFile := c.ConfigDir + "/" + file.Name()[9:] + ".cnf"
+				configFiles = append(configFiles, configFile)
+			}
+		}
+		return configFiles, nil
+	}
+
+	configFiles := []string{c.Config}
+	return configFiles, nil
+}
+
+func (c subcommand) makeCommandName() string {
+	return c.Executer.makeCommandName()
+}
+
+func (c subcommand) makeCommandArgs() []string {
+	args := c.Executer.makeCommandArgs()
+	args = append(args, "--conf", c.Config)
+	return args
+}
+
+func (c subcommand) parse(result string) (checkers.Status, string) {
+	return c.Executer.parse(result)
+}
+
+func (c subcommand) executeAll() (*checkers.Checker, error) {
+	var checker *checkers.Checker
+	var err error
+
+	configFiles, err := c.ConfigFiles()
+	if err != nil {
+		return checker, err
+	}
+
+	for _, config := range configFiles {
+		checker, err = c.execute(config)
+		if err != nil {
+			return checker, err
+		}
+		if checker.Status != checkers.OK {
+			break
+		}
+	}
+
+	checker.Name = "MasterHA"
+	checker.Exit()
+	return checker, nil
+
+}
+
+func (c subcommand) execute(config string) (*checkers.Checker, error) {
+	c.Config = config
 	name := c.makeCommandName()
 	args := c.makeCommandArgs()
 

@@ -7,15 +7,17 @@ import (
 )
 
 type statusChecker struct {
-	Config string `short:"c" long:"conf" default:"" description:"target config file"`
-	All    bool   `short:"a" long:"all" description:"use all config file for target"`
+	subcommand
 }
 
 func (c statusChecker) Execute(args []string) error {
-	checker, err := executeSubcommand(c)
+	c.Executer = &c
+
+	checker, err := c.executeAll()
 	if err != nil {
 		return err
 	}
+
 	checker.Name = "MasterHA"
 	checker.Exit()
 	return nil
@@ -26,13 +28,7 @@ func (c statusChecker) makeCommandName() string {
 }
 
 func (c statusChecker) makeCommandArgs() []string {
-	args := make([]string, 0, 2)
-	if c.All {
-		args = append(args, "--all")
-	} else if c.Config != "" {
-		args = append(args, "--conf", c.Config)
-	}
-	return args
+	return make([]string, 0, 2)
 }
 
 func (c statusChecker) parse(out string) (checkers.Status, string) {

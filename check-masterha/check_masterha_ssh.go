@@ -7,14 +7,17 @@ import (
 )
 
 type sshChecker struct {
-	Config string `short:"c" long:"conf" required:"true" description:"target config file"`
+	subcommand
 }
 
 func (c sshChecker) Execute(args []string) error {
-	checker, err := executeSubcommand(c)
+	c.Executer = &c
+
+	checker, err := c.executeAll()
 	if err != nil {
 		return err
 	}
+
 	checker.Name = "MasterHA"
 	checker.Exit()
 	return nil
@@ -25,8 +28,7 @@ func (c sshChecker) makeCommandName() string {
 }
 
 func (c sshChecker) makeCommandArgs() []string {
-	args := [2]string{"--conf", c.Config}
-	return args[:]
+	return make([]string, 0, 2)
 }
 
 func (c sshChecker) parse(out string) (checkers.Status, string) {
