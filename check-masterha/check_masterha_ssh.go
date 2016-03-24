@@ -37,7 +37,7 @@ func (c sshChecker) parse(out string) (checkers.Status, string) {
 	if strings.Contains(lastLine, "All SSH connection tests passe") {
 		return checkers.OK, lastLine
 	} else if strings.Contains(lastLine, "SSH Configuration Check Failed!") {
-		return checkers.OK, lastLine
+		return checkers.CRITICAL, lastLine
 	} else {
 		msg := extractErrorMsg(out)
 		return checkers.UNKNOWN, msg
