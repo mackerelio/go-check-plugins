@@ -6,6 +6,7 @@ Check Plugins for monitoring written in golang.
 
 Documentation for each plugin is located in its respective sub directory.
 
+* [check-aws-sqs-queue-size](./check-aws-sqs-queue-size/README.md)
 * [check-cert-file](./check-cert-file/README.md)
 * [check-elasticsearch](./check-elasticsearch/README.md)
 * [check-file-age](./check-file-age/README.md)
