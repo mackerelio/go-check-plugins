@@ -26,9 +26,9 @@ type options struct {
 }
 
 type executer interface {
-	makeCommandName() string
-	makeCommandArgs() []string
-	parse(string) (checkers.Status, string)
+	MakeCommandName() string
+	MakeCommandArgs() []string
+	Parse(string) (checkers.Status, string)
 }
 
 type subcommand struct {
@@ -59,18 +59,18 @@ func (c subcommand) ConfigFiles() ([]string, error) {
 	return configFiles, nil
 }
 
-func (c subcommand) makeCommandName() string {
-	return c.Executer.makeCommandName()
+func (c subcommand) MakeCommandName() string {
+	return c.Executer.MakeCommandName()
 }
 
-func (c subcommand) makeCommandArgs() []string {
-	args := c.Executer.makeCommandArgs()
+func (c subcommand) MakeCommandArgs() []string {
+	args := c.Executer.MakeCommandArgs()
 	args = append(args, "--conf", c.Config)
 	return args
 }
 
-func (c subcommand) parse(result string) (checkers.Status, string) {
-	return c.Executer.parse(result)
+func (c subcommand) Parse(result string) (checkers.Status, string) {
+	return c.Executer.Parse(result)
 }
 
 func (c subcommand) executeAll() (*checkers.Checker, error) {
@@ -100,8 +100,8 @@ func (c subcommand) executeAll() (*checkers.Checker, error) {
 
 func (c subcommand) execute(config string) (*checkers.Checker, error) {
 	c.Config = config
-	name := c.makeCommandName()
-	args := c.makeCommandArgs()
+	name := c.MakeCommandName()
+	args := c.MakeCommandArgs()
 
 	cmd := exec.Command(name, args...)
 
@@ -117,7 +117,7 @@ func (c subcommand) execute(config string) (*checkers.Checker, error) {
 		return nil, err
 	}
 
-	result, msg := c.parse(buf.String())
+	result, msg := c.Parse(buf.String())
 	if failure && result == checkers.UNKNOWN {
 		result = checkers.WARNING
 	}

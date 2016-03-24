@@ -23,15 +23,15 @@ func (c statusChecker) Execute(args []string) error {
 	return nil
 }
 
-func (c statusChecker) makeCommandName() string {
+func (c statusChecker) MakeCommandName() string {
 	return "masterha_check_status"
 }
 
-func (c statusChecker) makeCommandArgs() []string {
+func (c statusChecker) MakeCommandArgs() []string {
 	return make([]string, 0, 2)
 }
 
-func (c statusChecker) parse(out string) (checkers.Status, string) {
+func (c statusChecker) Parse(out string) (checkers.Status, string) {
 	lines := strings.Split(out, "\n")
 	errors := make([]string, 0, 0)
 

@@ -23,15 +23,15 @@ func (c sshChecker) Execute(args []string) error {
 	return nil
 }
 
-func (c sshChecker) makeCommandName() string {
+func (c sshChecker) MakeCommandName() string {
 	return "masterha_check_ssh"
 }
 
-func (c sshChecker) makeCommandArgs() []string {
+func (c sshChecker) MakeCommandArgs() []string {
 	return make([]string, 0, 2)
 }
 
-func (c sshChecker) parse(out string) (checkers.Status, string) {
+func (c sshChecker) Parse(out string) (checkers.Status, string) {
 	lines := extractNonEmptyLines(strings.Split(out, "\n"))
 	lastLine := lines[len(lines)-1]
 	if strings.Contains(lastLine, "All SSH connection tests passe") {

@@ -25,11 +25,11 @@ func (c replChecker) Execute(args []string) error {
 	return nil
 }
 
-func (c replChecker) makeCommandName() string {
+func (c replChecker) MakeCommandName() string {
 	return "masterha_check_repl"
 }
 
-func (c replChecker) makeCommandArgs() []string {
+func (c replChecker) MakeCommandArgs() []string {
 	args := make([]string, 0, c.ArgsLength())
 	if c.SecondsBehindMaster > 0 {
 		secondsBehindMaster := strconv.Itoa(c.SecondsBehindMaster)
@@ -45,7 +45,7 @@ func (c replChecker) ArgsLength() int {
 	return 2
 }
 
-func (c replChecker) parse(out string) (checkers.Status, string) {
+func (c replChecker) Parse(out string) (checkers.Status, string) {
 	lines := extractNonEmptyLines(strings.Split(out, "\n"))
 	lastLine := lines[len(lines)-1]
 	if strings.Contains(lastLine, "MySQL Replication Health is OK.") {
