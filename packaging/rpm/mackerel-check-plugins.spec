@@ -45,6 +45,10 @@ done
 %{__oldtargetdir}
 
 %changelog
+* Fri Mar 25 2016 <y.songmu@gmail.com> - 0.5.1
+- use /usr/bin/check-* (by naokibtn)
+- use GOARCH=amd64 for now (by Songmu)
+
 * Wed Mar 02 2016 <y.songmu@gmail.com> - 0.5.0
 - add check-solr (by supercaracal)
 -  add check-jmx-jolokia (by y-kuno)

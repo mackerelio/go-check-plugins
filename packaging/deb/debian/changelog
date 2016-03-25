@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.5.1-1) stable; urgency=low
+
+  * use /usr/bin/check-* (by naokibtn)
+    <https://github.com/mackerelio/go-check-plugins/pull/91>
+  * use GOARCH=amd64 for now (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/93>
+
+ -- Songmu <y.songmu@gmail.com>  Fri, 25 Mar 2016 11:10:15 +0900
+
 mackerel-check-plugins (0.5.0-1) stable; urgency=low
 
   * add check-solr (by supercaracal)
