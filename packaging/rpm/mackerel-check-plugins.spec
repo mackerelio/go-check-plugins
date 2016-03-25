@@ -37,6 +37,9 @@ done
 %{__targetdir}
 
 %changelog
+* Fri Mar 25 2016 <y.songmu@gmail.com> - 0.5.2
+- Revert "use /usr/bin/check-*" (by Songmu)
+
 * Fri Mar 25 2016 <y.songmu@gmail.com> - 0.5.1
 - use /usr/bin/check-* (by naokibtn)
 - use GOARCH=amd64 for now (by Songmu)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2 (2016-03-25)
+
+* Revert "use /usr/bin/check-*" #95 (Songmu)
+
+
 ## 0.5.1 (2016-03-25)
 
 * use /usr/bin/check-* #91 (naokibtn)
