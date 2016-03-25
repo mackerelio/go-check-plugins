@@ -1,4 +1,4 @@
-TARGET_OSARCH="linux/386"
+TARGET_OSARCH="linux/amd64"
 
 all: clean test build rpm deb
 
