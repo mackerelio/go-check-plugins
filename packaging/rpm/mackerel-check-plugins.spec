@@ -1,7 +1,6 @@
 %define _binaries_in_noarch_packages_terminate_build   0
 %define _localbindir /usr/local/bin
-%define __targetdir /usr/bin
-%define __oldtargetdir /usr/local/bin
+%define __targetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
 Version:   0.5.1
@@ -30,19 +29,12 @@ for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcac
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
-%{__install} -d -m755 %{buildroot}%{__oldtargetdir}
-for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime; \
-do \
-    ln -s ../../bin/check-$i %{buildroot}%{__oldtargetdir}/check-$i; \
-done
-
 %clean
 %{__rm} -rf %{buildroot}
 
 %files
 %defattr(-, root, root, 0755)
 %{__targetdir}
-%{__oldtargetdir}
 
 %changelog
 * Fri Mar 25 2016 <y.songmu@gmail.com> - 0.5.1
