@@ -10,7 +10,6 @@ deps:
 
 devel-deps: deps
 	go get github.com/golang/lint/golint
-	go get golang.org/x/tools/cmd/vet
 	go get github.com/pierrre/gotestcover
 	go get github.com/mattn/goveralls
 
