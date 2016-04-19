@@ -12,9 +12,11 @@ import (
 
 // https://github.com/sensu-plugins/sensu-plugins-process-checks
 var opts struct {
-	WarnOver      *int64   `short:"w" long:"warn-over" value-name:"N" description:"Trigger a warning if over a number"`
-	CritOver      *int64   `short:"c" long:"critical-over" value-name:"N" description:"Trigger a critical if over a number"`
-	WarnUnder     int64   `short:"W" long:"warn-under" value-name:"N" default:"1" description:"Trigger a warning if under a number"`
+	WarningOver   *int64  `short:"w" long:"warning-over" value-name:"N" description:"Trigger a warning if over a number"`
+	WarnOver      *int64  `long:"warn-over" value-name:"N" description:"(DEPRECATED) Trigger a warning if over a number"`
+	CritOver      *int64  `short:"c" long:"critical-over" value-name:"N" description:"Trigger a critical if over a number"`
+	WarningUnder  int64   `short:"W" long:"warning-under" value-name:"N" default:"1" description:"Trigger a warning if under a number"`
+	WarnUnder     int64   `long:"warn-under" value-name:"N" default:"1" description:"(DEPRECATED) Trigger a warning if under a number"`
 	CritUnder     int64   `short:"C" long:"critical-under" value-name:"N" default:"1" description:"Trigger a critial if under a number"`
 	MatchSelf     bool    `short:"m" long:"match-self" description:"Match itself"`
 	MatchParent   bool    `short:"M" long:"match-parent" description:"Match parent"`
@@ -60,6 +62,15 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		os.Exit(1)
 	}
+
+	// for backward compatibility
+	if opts.WarnUnder != 1 && opts.WarningUnder == 1 {
+		opts.WarningUnder = opts.WarnUnder
+	}
+	if opts.WarnOver != nil && opts.WarningOver == nil {
+		opts.WarningOver = opts.WarnOver
+	}
+
 	procs, err := getProcs()
 	cmdPatRegexp := regexp.MustCompile(".*")
 	if opts.CmdPat != "" {
@@ -89,8 +100,8 @@ func run(args []string) *checkers.Checker {
 	if opts.CritUnder != 0 && count < opts.CritUnder ||
 		opts.CritOver != nil && count > *opts.CritOver {
 		result = checkers.CRITICAL
-	} else if opts.WarnUnder != 0 && count < opts.WarnUnder ||
-		opts.WarnOver != nil && count > *opts.WarnOver {
+	} else if opts.WarningUnder != 0 && count < opts.WarningUnder ||
+		opts.WarningOver != nil && count > *opts.WarningOver {
 		result = checkers.WARNING
 	}
 	return checkers.NewChecker(result, msg)
