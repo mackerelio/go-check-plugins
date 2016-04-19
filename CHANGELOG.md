@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.2 (2016-03-25)
+
+* Revert "use /usr/bin/check-*" #95 (Songmu)
+
+
+## 0.5.1 (2016-03-25)
+
+* use /usr/bin/check-* #91 (naokibtn)
+* use GOARCH=amd64 for now #93 (Songmu)
+
+
 ## 0.5.0 (2016-03-02)
 
 * add check-solr #46 (supercaracal)

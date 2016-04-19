@@ -1,4 +1,4 @@
-TARGET_OSARCH="linux/386"
+TARGET_OSARCH="linux/amd64"
 
 all: clean test build rpm deb
 
@@ -10,7 +10,6 @@ deps:
 
 devel-deps: deps
 	go get github.com/golang/lint/golint
-	go get golang.org/x/tools/cmd/vet
 	go get github.com/pierrre/gotestcover
 	go get github.com/mattn/goveralls
 
