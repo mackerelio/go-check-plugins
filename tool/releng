@@ -129,7 +129,11 @@ sub github_release_with_exit_code {
 
 sub http_get {
     my $url = shift;
-    my ($ok, $err, undef, $stdout) = run(command => [qw{curl -sf}, $url]);
+    my ($ok, $err, undef, $stdout, $stderr) = run(command => [qw{curl -sf}, $url]);
+    print "fetching $url\n";
+    print $ok . "\n";
+    print $err . "\n";
+    print $stderr . "\n";
     return {
         success => $ok,
         content => join('', @$stdout),
