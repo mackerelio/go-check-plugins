@@ -1,3 +1,26 @@
+mackerel-check-plugins (0.6.0-1) stable; urgency=low
+
+  * supported gearman ascii protocol for check-tcp (by karupanerura)
+    <https://github.com/mackerelio/go-check-plugins/pull/89>
+  * added check-masterha command to check masterha status (by karupanerura)
+    <https://github.com/mackerelio/go-check-plugins/pull/90>
+  * Plugin for checking AWS SQS queue size (by hiroakis)
+    <https://github.com/mackerelio/go-check-plugins/pull/92>
+  * fix: rpm should not include dir (by stanaka)
+    <https://github.com/mackerelio/go-check-plugins/pull/98>
+  * added ssh checker (by karupanerura)
+    <https://github.com/mackerelio/go-check-plugins/pull/101>
+  * remove 'golang.org/x/tools/cmd/vet' (by y-kuno)
+    <https://github.com/mackerelio/go-check-plugins/pull/102>
+  * [uptime/procs] `--warn-over/under` is deprecated. use `--warning-over/under` instead (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/104>
+  * add aws-sqs-queue-size, cert-file, masterha and ssh into package (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/105>
+  * bump up go version to 1.6.2 (by stanaka)
+    <https://github.com/mackerelio/go-check-plugins/pull/106>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 10 May 2016 08:02:46 +0000
+
 mackerel-check-plugins (0.5.2-1) stable; urgency=low
 
   * Revert "use /usr/bin/check-*" (by Songmu)
