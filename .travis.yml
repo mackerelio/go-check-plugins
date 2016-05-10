@@ -5,14 +5,14 @@ env:
   global:
   - PATH=~/gopath/bin:$PATH
   - DEBIAN_FRONTEND=noninteractive
-  - secure: "eVK4VPUaQNF1a3CMUz/5jWaNY0+Wj10HnscPhcvmnH+IUJ+B6n2W4M5ht5WXEmx5EnKgLIZveL9CtPJTTsW4lE1RO03xfuVoe8+dElUSlKLJEHIDKm7koYgFEURWZXRcMAMqW2yj3y7D34fnwP4Evt/HuV8ZtWktMtJUzLr12oFxQDS0RC7II5nh8BiqSGCkKC8QJ6qQzbjZavBQ8M70Y4WWPArYHzwcSQjOLxhQmGCyx9JI7/nIqSosldFwqiFTh+UH3x7Pntt1Ji6Ra0rAuGFN28nQc8ISxfytwAgV4h7ubAWPUom2rXdUpHVvWZXoxDJr8YYq4rGRmyuLl/gBUfv72l/u8wIlMo5gRB2vJXHwKAaogSheGtdVwv7BwPSvjA6oOz5imqkhIm5kNgyrXaBglF7fornPiJNVgv2lMzuLB3GgqjYxhfipFahJT99x91/xd6kZ5OSSUVYkTx/0JwkEmGXyOJNzynC22VNHj6u1T41hkRHHSUjzrNBwNhMEcXDy75VaJukKMi9YyyHgehitWUFnGq0rakMz3tQxeO8K6YVQqjD7NWPiHh1vh4vWYRn2/T7ewTksW1h+/ETJR98YYsjpHnuQSJh6gGj6i4jKKy04hWagVciJ3Jr4i6ouA8ggKoEMzEB9KXd44yJoXk/ozk5VOXPithyp8NuA5BA="
+  - secure: eVK4VPUaQNF1a3CMUz/5jWaNY0+Wj10HnscPhcvmnH+IUJ+B6n2W4M5ht5WXEmx5EnKgLIZveL9CtPJTTsW4lE1RO03xfuVoe8+dElUSlKLJEHIDKm7koYgFEURWZXRcMAMqW2yj3y7D34fnwP4Evt/HuV8ZtWktMtJUzLr12oFxQDS0RC7II5nh8BiqSGCkKC8QJ6qQzbjZavBQ8M70Y4WWPArYHzwcSQjOLxhQmGCyx9JI7/nIqSosldFwqiFTh+UH3x7Pntt1Ji6Ra0rAuGFN28nQc8ISxfytwAgV4h7ubAWPUom2rXdUpHVvWZXoxDJr8YYq4rGRmyuLl/gBUfv72l/u8wIlMo5gRB2vJXHwKAaogSheGtdVwv7BwPSvjA6oOz5imqkhIm5kNgyrXaBglF7fornPiJNVgv2lMzuLB3GgqjYxhfipFahJT99x91/xd6kZ5OSSUVYkTx/0JwkEmGXyOJNzynC22VNHj6u1T41hkRHHSUjzrNBwNhMEcXDy75VaJukKMi9YyyHgehitWUFnGq0rakMz3tQxeO8K6YVQqjD7NWPiHh1vh4vWYRn2/T7ewTksW1h+/ETJR98YYsjpHnuQSJh6gGj6i4jKKy04hWagVciJ3Jr4i6ouA8ggKoEMzEB9KXd44yJoXk/ozk5VOXPithyp8NuA5BA=
 sudo: false
 addons:
   apt:
     packages:
-      - rpm
-      - devscripts
-      - debhelper
+    - rpm
+    - devscripts
+    - debhelper
 install:
 - go get github.com/mitchellh/gox
 - mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
@@ -25,7 +25,8 @@ after_script:
 before_deploy:
 - go get github.com/aktau/github-release
 - mkdir -p ~/bin
-- git clone https://github.com/github/hub.git && cd hub && script/build -o ~/bin/hub && cd ..
+- git clone https://github.com/github/hub.git && cd hub && script/build -o ~/bin/hub
+  && cd ..
 - echo $TRAVIS_BRANCH
 - git config --add remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
 - git fetch
@@ -40,8 +41,12 @@ deploy:
   on:
     branch: master
 - provider: script
-  script: tool/releng --task=create-pullrequest --current-branch=$TRAVIS_BRANCH --package-name=mackerel-check-plugins -v
+  script: tool/releng --task=create-pullrequest --current-branch=$TRAVIS_BRANCH --package-name=mackerel-check-plugins
+    -v
   skip_cleanup: true
   on:
     all_branches: true
     condition: "$TRAVIS_BRANCH =~ ^bump-version-.*$"
+notifications:
+  slack:
+    secure: W4637ZIl5Gbwm93btsfysyvZpVw3GVMni1y7ea8lj4XFEyNV9aoW0OIkCjWIL9MrkxnkCcnhTKfOAPuFoqFYXXRJFkYCU9GYRsENqwvk9ev2xNyQ9OPIdNqVFcgzA4qiX97JwiuvkaDauRLsWKpdZUtMugrMEsnt1hH6E6uJ5CyVtuun9O5SyICet9tzyLyFpefrhKT8LJiwYDzT9PX6vaL2FCxDgservpPon4YkIkbaZcfURbkd0Gkm3IW5HSVAzAesEspDPAAbMp0ZKF6YPXk1kCuAttNcXoNfRyxIWD02qYTVvVLMVI9DbcDGzAeBPYaZ0vLFtCTwPWx342GqAVDy1sZ5xqYwwqpeVwPA7GdCARl3PgP1q04j4Dd6ZUMn5vM+HdMGtbKcT2vks/t9D8ozrX2F/SyTAVCVqt4xEBSVus4U8a7oK+JQXphnV++8ltDfyXoSdv4oQjHDmpZurcbEgmzWBFuenQK8CKM71voEZZSxhu4/7TksoXuo0zzxhopR9u9B/Y+/74azGBv3VW/JfzJ5gzi08Y56YA80pLHjbxJeykKzv4lR+c+WAWGxVhBD9xN4OKcer3ohDbTfhs0rDf270DOSYx3bstnvQ87NcNbJ1sPRwRhK8rbzvwtLnGUjMNK1kNRcr2rQmmJYlR3DH/hfHHEvAQPeseN90Ek=
