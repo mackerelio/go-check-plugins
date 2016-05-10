@@ -131,9 +131,10 @@ sub http_get {
     my $url = shift;
     my ($ok, $err, undef, $stdout, $stderr) = run(command => [qw{curl -sf}, $url]);
     print "fetching $url\n";
-    print " ok: $ok\n";
-    print " err: $err\n";
-    print " stderr: ". join('', @$stderr) . "\n";
+    printf(" ok: %s\n", $ok || "");
+    printf(" err: %s\n", $err || "");
+    printf " stdout: ". join('', @$stdout) . "\n";
+    printf " stderr: ". join('', @$stderr) . "\n";
     return {
         success => $ok,
         content => join('', @$stdout),
