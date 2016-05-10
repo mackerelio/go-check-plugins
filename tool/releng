@@ -403,7 +403,7 @@ sub create_pull_request {
     }
 
     # return if last commit is updating specs and changelogs
-    my $last_commitlog = `git log -1 --oneline | cut -d ' ' -f2-`;
+    my $last_commitlog = `git log --oneline master..HEAD | cut -d ' ' -f2-`;
     if($last_commitlog =~ /update changelogs/){
         infof "skip to update changelogs because the last commit is 'update changelogs'.\n";
         return;
@@ -418,10 +418,10 @@ sub create_pull_request {
         infof "skip to update changelogs because no merged pull request is found after the last release.\n"
     }
     if($ret || git_with_exit_code qw/diff --exit-code/){
-        git qw/commit -am/, "update changelogs";
         git qw/config --global push.default matching/;
         git qw/config user.email/, 'mackerel-developers@hatena.ne.jp';
         git qw/config user.name/, 'mackerel';
+        git qw/commit -am/, "update changelogs";
         git qw/push -u/, "https://$ENV{GITHUB_TOKEN}\@github.com/$REPO_NAME.git";
         infof "Difference is pushed to GitHub.\n";
     }
