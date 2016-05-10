@@ -1,6 +1,8 @@
 {
     "description": "configuration for packaging mackerel-check-plugins",
     "plugins": [
+       "aws-sqs-queue-size",
+       "cert-file",
        "elasticsearch",
        "file-age",
        "file-size",
@@ -9,6 +11,7 @@
        "load",
        "log",
        "mailq",
+       "masterha",
        "memcached",
        "mysql",
        "ntpoffset",
@@ -16,6 +19,7 @@
        "procs",
        "redis",
        "solr",
+       "ssh",
        "tcp",
        "uptime"
     ]
