@@ -45,6 +45,19 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Tue May 10 2016 <mackerel-developers@hatena.ne.jp> - 0.6.0-1
+- supported gearman ascii protocol for check-tcp (by karupanerura)
+- added check-masterha command to check masterha status (by karupanerura)
+- Plugin for checking AWS SQS queue size (by hiroakis)
+- Revert "Revert "use /usr/bin/check-*"" (by Songmu)
+- fix: rpm should not include dir (by stanaka)
+- added ssh checker (by karupanerura)
+- remove 'golang.org/x/tools/cmd/vet' (by y-kuno)
+- Refactoring the release process (by stanaka)
+- [uptime/procs] `--warn-over/under` is deprecated. use `--warning-over/under` instead (by Songmu)
+- add aws-sqs-queue-size, cert-file, masterha and ssh into package (by Songmu)
+- bump up go version to 1.6.2 (by stanaka)
+
 * Fri Mar 25 2016 <y.songmu@gmail.com> - 0.5.2
 - Revert "use /usr/bin/check-*" (by Songmu)
 
