@@ -140,9 +140,10 @@ func TestHTTP(t *testing.T) {
 	host, port, _ := net.SplitHostPort(u.Host)
 
 	testOk := func() {
-		opts, err := parseArgs([]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.1\r\n\r\n`, "-E", "-e", "OKOK"})
+		opts, err := parseArgs([]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOK"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
+		fmt.Println(ckr)
 		assert.Equal(t, checkers.OK, ckr.Status, "should be OK")
 		assert.Regexp(t, `seconds response time on`, ckr.Message, "Unexpected response")
 	}
@@ -150,7 +151,7 @@ func TestHTTP(t *testing.T) {
 
 	testUnexpected := func() {
 		opts, err := parseArgs(
-			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.1\r\n\r\n`, "-E", "-e", "OKOKOK"})
+			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOKOK"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "should be CRITICAL")
@@ -160,7 +161,7 @@ func TestHTTP(t *testing.T) {
 
 	testOverWarn := func() {
 		opts, err := parseArgs(
-			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.1\r\n\r\n`, "-E", "-e", "OKOK", "-w", "0.1"})
+			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOK", "-w", "0.1"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
 		assert.Equal(t, checkers.WARNING, ckr.Status, "should be Warning")
@@ -170,7 +171,7 @@ func TestHTTP(t *testing.T) {
 
 	testOverCrit := func() {
 		opts, err := parseArgs(
-			[]string{"-H", host, "-p", port, "--send", "GET / HTTP/1.1\r\n\r\n", "-e", "OKOK", "-c", "0.1"})
+			[]string{"-H", host, "-p", port, "--send", "GET / HTTP/1.0\r\n\r\n", "-e", "OKOK", "-c", "0.1"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "should be Critical")
@@ -275,7 +276,7 @@ func TestHTTPIPv6(t *testing.T) {
 	}()
 
 	testOk := func() {
-		opts, err := parseArgs([]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.1\r\n\r\n`, "-E", "-e", "OKOK"})
+		opts, err := parseArgs([]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOK"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
 		assert.Equal(t, checkers.OK, ckr.Status, "should be OK")
@@ -285,7 +286,7 @@ func TestHTTPIPv6(t *testing.T) {
 
 	testUnexpected := func() {
 		opts, err := parseArgs(
-			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.1\r\n\r\n`, "-E", "-e", "OKOKOK"})
+			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOKOK"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "should be CRITICAL")
@@ -295,7 +296,7 @@ func TestHTTPIPv6(t *testing.T) {
 
 	testOverWarn := func() {
 		opts, err := parseArgs(
-			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.1\r\n\r\n`, "-E", "-e", "OKOK", "-w", "0.1"})
+			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOK", "-w", "0.1"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
 		assert.Equal(t, checkers.WARNING, ckr.Status, "should be Warning")
@@ -305,7 +306,7 @@ func TestHTTPIPv6(t *testing.T) {
 
 	testOverCrit := func() {
 		opts, err := parseArgs(
-			[]string{"-H", host, "-p", port, "--send", "GET / HTTP/1.1\r\n\r\n", "-e", "OKOK", "-c", "0.1"})
+			[]string{"-H", host, "-p", port, "--send", "GET / HTTP/1.0\r\n\r\n", "-e", "OKOK", "-c", "0.1"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "should be Critical")
