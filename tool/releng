@@ -252,7 +252,8 @@ sub merged_prs {
     say "Pull Requests: " . join(", ", @pull_nums);
     my @releases;
     for my $pull_num (@pull_nums) {
-        my $url = sprintf "https://api.github.com/repos/%s/pulls/%d?state=closed", $REPO_NAME, $pull_num;
+        #my $url = sprintf "https://api.github.com/repos/%s/pulls/%d?state=closed", $REPO_NAME, $pull_num;
+        my $url = sprintf "https://api.github.com/repos/%s/pulls/%d", $REPO_NAME, $pull_num;
         my $res = http_get($url);
         unless ($res->{success}) {
             warnf "request to $url failed\n";
