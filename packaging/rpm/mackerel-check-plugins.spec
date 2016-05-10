@@ -4,14 +4,14 @@
 %define __oldtargetdir /usr/local/bin
 
 Name:      mackerel-check-plugins
-Version:   0.5.2
+Version:   %{_version}
 Release:   1
 License:   Commercial
 Summary:   macekrel.io check plugins
 URL:       https://mackerel.io
 Group:     Hatena
 Packager:  Hatena
-BuildArch: noarch
+BuildArch: %{buildarch}
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
