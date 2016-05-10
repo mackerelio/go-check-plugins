@@ -6,16 +6,12 @@ mackerel-check-plugins (0.6.0-1) stable; urgency=low
     <https://github.com/mackerelio/go-check-plugins/pull/90>
   * Plugin for checking AWS SQS queue size (by hiroakis)
     <https://github.com/mackerelio/go-check-plugins/pull/92>
-  * Revert "Revert "use /usr/bin/check-*"" (by Songmu)
-    <https://github.com/mackerelio/go-check-plugins/pull/97>
   * fix: rpm should not include dir (by stanaka)
     <https://github.com/mackerelio/go-check-plugins/pull/98>
   * added ssh checker (by karupanerura)
     <https://github.com/mackerelio/go-check-plugins/pull/101>
   * remove 'golang.org/x/tools/cmd/vet' (by y-kuno)
     <https://github.com/mackerelio/go-check-plugins/pull/102>
-  * Refactoring the release process (by stanaka)
-    <https://github.com/mackerelio/go-check-plugins/pull/103>
   * [uptime/procs] `--warn-over/under` is deprecated. use `--warning-over/under` instead (by Songmu)
     <https://github.com/mackerelio/go-check-plugins/pull/104>
   * add aws-sqs-queue-size, cert-file, masterha and ssh into package (by Songmu)
