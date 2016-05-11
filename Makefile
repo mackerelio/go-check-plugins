@@ -36,9 +36,9 @@ build: deps
 	done
 
 rpm: build
-	TARGET_OSARCH="linux/386" make build
+	make build TARGET_OSARCH="linux/386"
 	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${CURRENT_VERSION}" --define "buildarch noarch" -bb packaging/rpm/mackerel-check-plugins.spec
-	TARGET_OSARCH="linux/amd64" make build
+	make build TARGET_OSARCH="linux/amd64"
 	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${CURRENT_VERSION}" --define "buildarch x86_64" -bb packaging/rpm/mackerel-check-plugins.spec
 
 deb: deps

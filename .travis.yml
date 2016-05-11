@@ -25,8 +25,7 @@ after_script:
 before_deploy:
 - go get github.com/aktau/github-release
 - mkdir -p ~/bin
-- git clone https://github.com/github/hub.git && cd hub && script/build -o ~/bin/hub
-  && cd ..
+- git clone https://github.com/github/hub.git && cd hub && script/build -o ~/bin/hub && cd ..
 - echo $TRAVIS_BRANCH
 - git config --add remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
 - git fetch
