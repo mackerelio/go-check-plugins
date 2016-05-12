@@ -15,11 +15,7 @@ type replChecker struct {
 func (c replChecker) Execute(args []string) error {
 	c.Executer = &c
 
-	checker, err := c.executeAll()
-	if err != nil {
-		return err
-	}
-
+	checker := c.executeAll()
 	checker.Name = "MasterHA"
 	checker.Exit()
 	return nil

@@ -40,11 +40,10 @@ func TestSubcommandExecuteSuccessful(t *testing.T) {
 			ParseResult: "OK",
 		},
 	}
-	checker, err := subc.execute("/path/to/masterha/db002.conf")
+	checker := subc.execute("/path/to/masterha/db002.conf")
 	assert.Equal(t, "hello --conf /path/to/masterha/db002.conf\n", subc.Executer.(*mock.Executer).CommandResult)
 	assert.Equal(t, checkers.OK, checker.Status)
 	assert.Equal(t, "OK", checker.Message)
-	assert.Equal(t, nil, err)
 }
 
 func TestSubcommandExecuteUnknown(t *testing.T) {
@@ -60,11 +59,10 @@ func TestSubcommandExecuteUnknown(t *testing.T) {
 			ParseResult: "UNKNOWN",
 		},
 	}
-	checker, err := subc.execute(subc.Config)
+	checker := subc.execute(subc.Config)
 	assert.Equal(t, "", subc.Executer.(*mock.Executer).CommandResult)
 	assert.Equal(t, checkers.WARNING, checker.Status)
 	assert.Equal(t, "UNKNOWN", checker.Message)
-	assert.Equal(t, nil, err)
 }
 
 func TestExtractNonEmptyLines(t *testing.T) {

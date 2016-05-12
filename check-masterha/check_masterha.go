@@ -73,32 +73,28 @@ func (c subcommand) Parse(result string) (checkers.Status, string) {
 	return c.Executer.Parse(result)
 }
 
-func (c subcommand) executeAll() (*checkers.Checker, error) {
-	var checker *checkers.Checker
+func (c subcommand) executeAll() *checkers.Checker {
 	var err error
+	checker := checkers.NewChecker(checkers.UNKNOWN, "No target")
 
 	configFiles, err := c.ConfigFiles()
 	if err != nil {
-		return checker, err
+		checker.Status  = checkers.UNKNOWN
+		checker.Message = err.Error()
+		return checker
 	}
 
 	for _, config := range configFiles {
-		checker, err = c.execute(config)
-		if err != nil {
-			return checker, err
-		}
+		checker = c.execute(config)
 		if checker.Status != checkers.OK {
-			break
+			return checker
 		}
 	}
 
-	checker.Name = "MasterHA"
-	checker.Exit()
-	return checker, nil
-
+	return checker
 }
 
-func (c subcommand) execute(config string) (*checkers.Checker, error) {
+func (c subcommand) execute(config string) *checkers.Checker {
 	c.Config = config
 	name := c.MakeCommandName()
 	args := c.MakeCommandArgs()
@@ -114,7 +110,8 @@ func (c subcommand) execute(config string) (*checkers.Checker, error) {
 	if _, ok := err.(*exec.ExitError); ok {
 		failure = true
 	} else if err != nil {
-		return nil, err
+		checker := checkers.NewChecker(checkers.UNKNOWN, err.Error())
+		return checker
 	}
 
 	result, msg := c.Parse(buf.String())
@@ -122,7 +119,7 @@ func (c subcommand) execute(config string) (*checkers.Checker, error) {
 		result = checkers.WARNING
 	}
 	checker := checkers.NewChecker(result, msg)
-	return checker, nil
+	return checker
 }
 
 func extractNonEmptyLines(lines []string) []string {
