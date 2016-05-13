@@ -3,8 +3,6 @@
 ## 0.6.1 (2016-05-13)
 
 * no panic check-masterha when not found the targets, and refactoring #108 (karupanerura)
-* Use config.json to list up packaging target plugins #109 (stanaka)
-* Keep binaries on old path hard corded #110 (stanaka)
 
 
 ## 0.6.0 (2016-05-10)

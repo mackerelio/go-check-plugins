@@ -2,10 +2,6 @@ mackerel-check-plugins (0.6.1-1) stable; urgency=low
 
   * no panic check-masterha when not found the targets, and refactoring (by karupanerura)
     <https://github.com/mackerelio/go-check-plugins/pull/108>
-  * Use config.json to list up packaging target plugins (by stanaka)
-    <https://github.com/mackerelio/go-check-plugins/pull/109>
-  * Keep binaries on old path hard corded (by stanaka)
-    <https://github.com/mackerelio/go-check-plugins/pull/110>
 
  -- mackerel <mackerel-developers@hatena.ne.jp>  Fri, 13 May 2016 07:53:48 +0000
 
