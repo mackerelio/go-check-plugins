@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1 (2016-05-13)
+
+* no panic check-masterha when not found the targets, and refactoring #108 (karupanerura)
+
+
 ## 0.6.0 (2016-05-10)
 
 * supported gearman ascii protocol for check-tcp #89 (karupanerura)

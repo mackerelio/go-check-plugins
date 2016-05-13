@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.6.1-1) stable; urgency=low
+
+  * no panic check-masterha when not found the targets, and refactoring (by karupanerura)
+    <https://github.com/mackerelio/go-check-plugins/pull/108>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Fri, 13 May 2016 07:53:48 +0000
+
 mackerel-check-plugins (0.6.0-1) stable; urgency=low
 
   * supported gearman ascii protocol for check-tcp (by karupanerura)

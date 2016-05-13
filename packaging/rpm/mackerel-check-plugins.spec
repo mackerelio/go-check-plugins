@@ -30,7 +30,7 @@ for i in `cat %{_sourcedir}/packaging/config.json | jq -r '.plugins[]'`; do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
-# put symlinks to /usr/local/bin for backward compatibility of following plugins 
+# put symlinks to /usr/local/bin for backward compatibility of following plugins
 %{__install} -d -m755 %{buildroot}%{__oldtargetdir}
 for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime; do
     ln -s ../../bin/check-$i %{buildroot}%{__oldtargetdir}/check-$i; \
@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Fri May 13 2016 <mackerel-developers@hatena.ne.jp> - 0.6.1-1
+- no panic check-masterha when not found the targets, and refactoring (by karupanerura)
+
 * Tue May 10 2016 <mackerel-developers@hatena.ne.jp> - 0.6.0-1
 - supported gearman ascii protocol for check-tcp (by karupanerura)
 - added check-masterha command to check masterha status (by karupanerura)
