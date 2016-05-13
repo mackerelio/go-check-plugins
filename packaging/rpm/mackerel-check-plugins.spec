@@ -45,6 +45,11 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Fri May 13 2016 <mackerel-developers@hatena.ne.jp> - 0.6.1-1
+- no panic check-masterha when not found the targets, and refactoring (by karupanerura)
+- Use config.json to list up packaging target plugins (by stanaka)
+- Keep binaries on old path hard corded (by stanaka)
+
 * Tue May 10 2016 <mackerel-developers@hatena.ne.jp> - 0.6.0-1
 - supported gearman ascii protocol for check-tcp (by karupanerura)
 - added check-masterha command to check masterha status (by karupanerura)
