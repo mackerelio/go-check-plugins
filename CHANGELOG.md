@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1 (2016-05-13)
+
+* Use config.json to list up packaging target plugins #109 (stanaka)
+
+
 ## 0.6.0 (2016-05-10)
 
 * supported gearman ascii protocol for check-tcp #89 (karupanerura)

@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.6.1-1) stable; urgency=low
+
+  * Use config.json to list up packaging target plugins (by stanaka)
+    <https://github.com/mackerelio/go-check-plugins/pull/109>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Fri, 13 May 2016 07:38:10 +0000
+
 mackerel-check-plugins (0.6.0-1) stable; urgency=low
 
   * supported gearman ascii protocol for check-tcp (by karupanerura)
