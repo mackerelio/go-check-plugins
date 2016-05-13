@@ -30,8 +30,9 @@ for i in `cat %{_sourcedir}/packaging/config.json | jq -r '.plugins[]'`; do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
+# put symlinks to /usr/local/bin for backward compatibility of following plugins 
 %{__install} -d -m755 %{buildroot}%{__oldtargetdir}
-for i in `cat %{_sourcedir}/packaging/config.json | jq -r '.plugins[]'`; do \
+for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime; do
     ln -s ../../bin/check-$i %{buildroot}%{__oldtargetdir}/check-$i; \
 done
 
