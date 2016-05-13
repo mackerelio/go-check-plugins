@@ -34,7 +34,6 @@ before_deploy:
 - git checkout $TRAVIS_BRANCH
 - git fetch --depth=100 || true
 - git fetch --tags --depth=100 || true
-- which jq
 deploy:
 - provider: script
   script: tool/releng --task=upload-to-github-release -v

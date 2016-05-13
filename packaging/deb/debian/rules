@@ -8,7 +8,7 @@ package=mackerel-check-plugins
 override_dh_auto_install:
 	dh_auto_install
 	install -d -m 755 debian/tmp/usr/bin
-	for i in `cat ../config.json | jq -r '.plugins[]'`; do \
+	for i in `cat ../config.json | /usr/local/bin/jq -r '.plugins[]'`; do \
 	    install -m755 debian/check-$$i debian/tmp/usr/bin; \
 	done
 	install -d -m 755 debian/tmp/usr/local/bin
