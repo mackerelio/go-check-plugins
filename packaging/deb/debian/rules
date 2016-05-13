@@ -12,9 +12,9 @@ override_dh_auto_install:
 	    install -m755 debian/check-$$i debian/tmp/usr/bin; \
 	done
 	install -d -m 755 debian/tmp/usr/local/bin
-	for i in `cat ../config.json | jq -r '.plugins[]'`; do \
+	# put symlinks to /usr/local/bin for backward compatibility of following plugins
+	for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime; do \
 	    ln -s ../../bin/check-$$i debian/tmp/usr/local/bin/check-$$i; \
 	done
 
 override_dh_usrlocal:
-
