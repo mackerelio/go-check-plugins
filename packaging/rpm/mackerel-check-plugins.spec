@@ -26,13 +26,12 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime;do \
+for i in `cat %{_sourcedir}/packaging/config.json | jq -r '.plugins[]'`; do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
 %{__install} -d -m755 %{buildroot}%{__oldtargetdir}
-for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime; \
-do \
+for i in `cat %{_sourcedir}/packaging/config.json | jq -r '.plugins[]'`; do \
     ln -s ../../bin/check-$i %{buildroot}%{__oldtargetdir}/check-$i; \
 done
 
