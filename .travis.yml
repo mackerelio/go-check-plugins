@@ -13,6 +13,7 @@ addons:
     - rpm
     - devscripts
     - debhelper
+    - jq
 install:
 - go get github.com/mitchellh/gox
 - mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
@@ -33,6 +34,7 @@ before_deploy:
 - git checkout $TRAVIS_BRANCH
 - git fetch --depth=100 || true
 - git fetch --tags --depth=100 || true
+- which jq
 deploy:
 - provider: script
   script: tool/releng --task=upload-to-github-release -v
