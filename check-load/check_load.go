@@ -15,7 +15,7 @@ import (
 var opts struct {
 	WarningThreshold  string `short:"w" long:"warning" required:"true" value-name:"WL1,WL5,WL15" description:"Warning threshold for loadavg1,5,15"`
 	CriticalThreshold string `short:"c" long:"critical" required:"true" value-name:"CL1,CL5,CL15" description:"Critical threshold for loadavg1,5,15"`
-	PerCPU            bool   `short:"r" long:"percpu" default:"false" description:"Divide the load averages by cpu count"`
+	PerCPU            bool   `short:"r" long:"percpu" description:"Divide the load averages by cpu count"`
 }
 
 func parseThreshold(str string) ([3]float64, error) {
