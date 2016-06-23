@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Jun 23 2016 <mackerel-developers@hatena.ne.jp> - 0.6.2-1
+- Fixed argument parser error: (by karupanerura)
+
 * Fri May 13 2016 <mackerel-developers@hatena.ne.jp> - 0.6.1-1
 - no panic check-masterha when not found the targets, and refactoring (by karupanerura)
 

@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.6.2-1) stable; urgency=low
+
+  * Fixed argument parser error: (by karupanerura)
+    <https://github.com/mackerelio/go-check-plugins/pull/113>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 23 Jun 2016 05:35:41 +0000
+
 mackerel-check-plugins (0.6.1-1) stable; urgency=low
 
   * no panic check-masterha when not found the targets, and refactoring (by karupanerura)

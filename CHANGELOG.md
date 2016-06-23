@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.2 (2016-06-23)
+
+* Fixed argument parser error: #113 (karupanerura)
+
+
 ## 0.6.1 (2016-05-13)
 
 * no panic check-masterha when not found the targets, and refactoring #108 (karupanerura)
