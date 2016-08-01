@@ -1,5 +1,11 @@
 TARGET_OSARCH="linux/amd64"
 CURRENT_VERSION = $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $$1;exit}')
+ifeq ($(OS),Windows_NT)
+GOPATH_ROOT:=$(shell cygpath ${GOPATH})
+TARGET_OSARCH="windows/amd64"
+else
+GOPATH_ROOT:=${GOPATH}
+endif
 
 check-variables:
 	echo "CURRENT_VERSION: ${CURRENT_VERSION}"
@@ -32,7 +38,7 @@ build: deps
 	for i in check-*; do \
 	  gox -ldflags "-s -w" \
 	    -osarch=$(TARGET_OSARCH) -output build/$$i \
-	    `pwd | sed -e "s|${GOPATH}/src/||"`/$$i; \
+	    `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
 	done
 
 rpm: build
