@@ -305,3 +305,26 @@ Fatal level:17
 	assert.Equal(t, "FATAL level:22\nFatal level:17\n", errLines, "invalid errLines")
 	assert.Equal(t, int64(len(content)), readBytes, "readBytes should be 26")
 }
+
+func TestRunWithSkipNotExist(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+
+	ptn := `FATAL`
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--skip-not-exist"})
+	opts.prepare()
+
+	testLogFileNotExist := func() {
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+	}
+	testLogFileNotExist()
+}

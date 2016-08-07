@@ -29,6 +29,7 @@ type logOpts struct {
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
+	SkipNotExist    bool    `long:"skip-not-exist" description:"Skip searching content if LogFile does not exist"`
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
 	fileList        []string
@@ -154,6 +155,9 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 
 	f, err := os.Open(logFile)
 	if err != nil {
+		if opts.SkipNotExist {
+			return 0, 0, "", nil
+		}
 		return 0, 0, "", err
 	}
 	defer f.Close()
