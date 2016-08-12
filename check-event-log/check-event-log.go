@@ -32,14 +32,28 @@ type logOpts struct {
 	Verbose       bool   `long:"verbose" description:"Verbose output"`
 
 	logList    []string
-	codeList   []string
+	codeList   []int64
 	typeList   []string
 	sourceList []string
 }
 
 func (opts *logOpts) prepare() error {
 	opts.logList = strings.Split(opts.Log, ",")
-	opts.codeList = strings.Split(opts.Code, ",")
+	if len(opts.logList) == 0 {
+		opts.logList = []string{"Application"}
+	}
+	for _, code := range strings.Split(opts.Code, ",") {
+		negate := int64(1)
+		if code[0] == '!' {
+			negate = -1
+			code = code[1:]
+		}
+		i, err := strconv.Atoi(code)
+		if err != nil {
+			return err
+		}
+		opts.codeList = append(opts.codeList, int64(i)*negate)
+	}
 	opts.typeList = strings.Split(opts.Type, ",")
 	opts.sourceList = strings.Split(opts.Source, ",")
 	return nil
@@ -49,13 +63,6 @@ func main() {
 	ckr := run(os.Args[1:])
 	ckr.Name = "Event Log"
 	ckr.Exit()
-}
-
-func regCompileWithCase(ptn string, caseInsensitive bool) (*regexp.Regexp, error) {
-	if caseInsensitive {
-		ptn = "(?i)" + ptn
-	}
-	return regexp.Compile(ptn)
 }
 
 func parseArgs(args []string) (*logOpts, error) {
@@ -153,7 +160,7 @@ func getResourceMessage(providerName, sourceName string, eventID uint32, argsptr
 	return message, nil
 }
 
-func (opts *logOpts) searchLog(event string) (int64, int64, string, error) {
+func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines string, err error) {
 	stateFile := getStateFile(opts.StateDir, event)
 	recordNumber := int64(0)
 	if !opts.NoState {
@@ -238,11 +245,54 @@ func (opts *logOpts) searchLog(event string) (int64, int64, string, error) {
 			println(r.EventID)
 		}
 
+		if len(opts.codeList) > 0 {
+			found := false
+			for _, code := range opts.codeList {
+				if code > 0 && uint32(code) == r.EventID {
+					found = true
+					break
+				} else if code <= 0 && uint32(-code) != r.EventID {
+					found = true
+					break
+				}
+			}
+			if !found {
+				continue
+			}
+		}
+
+		if len(opts.sourceList) > 0 {
+			found := false
+			tn := strings.ToLower(eventlog.EventType(r.EventType).String())
+			for _, typ := range opts.typeList {
+				if typ == tn {
+					found = true
+					break
+				}
+			}
+			if !found {
+				continue
+			}
+		}
+
 		sourceName, sourceNameOff := bytesToString(buf[unsafe.Sizeof(eventlog.EVENTLOGRECORD{}):])
 		computerName, _ := bytesToString(buf[unsafe.Sizeof(eventlog.EVENTLOGRECORD{})+uintptr(sourceNameOff+2):])
 		if opts.Verbose {
 			println(sourceName)
 			println(computerName)
+		}
+
+		if len(opts.sourceList) > 0 {
+			found := false
+			for _, source := range opts.sourceList {
+				if source == sourceName {
+					found = true
+					break
+				}
+			}
+			if !found {
+				continue
+			}
 		}
 
 		off := uint32(0)
