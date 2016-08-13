@@ -27,8 +27,9 @@ type logOpts struct {
 	Type          string `long:"type" description:"Event types (comma separated)"`
 	Source        string `long:"source" description:"Event source (comma separated)"`
 	ReturnContent bool   `short:"r" long:"return" description:"Return matched line"`
-	StateDir      string `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
+	StateDir      string `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-event-log" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState       bool   `long:"no-state" description:"Don't use state file and read whole logs"`
+	FailFirst     bool   `long:"fail-first" description:"Count errors on first seek"`
 	Verbose       bool   `long:"verbose" description:"Verbose output"`
 
 	logList    []string
@@ -37,14 +38,22 @@ type logOpts struct {
 	sourceList []string
 }
 
+func stringList(s string) []string {
+	l := strings.Split(s, ",")
+	if len(l) == 0 || l[0] == "" {
+		return []string{}
+	}
+	return l
+}
+
 func (opts *logOpts) prepare() error {
-	opts.logList = strings.Split(opts.Log, ",")
-	if len(opts.logList) == 0 {
+	opts.logList = stringList(opts.Log)
+	if len(opts.logList) == 0 || opts.logList[0] == "" {
 		opts.logList = []string{"Application"}
 	}
-	for _, code := range strings.Split(opts.Code, ",") {
+	for _, code := range stringList(opts.Code) {
 		negate := int64(1)
-		if code[0] == '!' {
+		if code != "" && code[0] == '!' {
 			negate = -1
 			code = code[1:]
 		}
@@ -54,8 +63,8 @@ func (opts *logOpts) prepare() error {
 		}
 		opts.codeList = append(opts.codeList, int64(i)*negate)
 	}
-	opts.typeList = strings.Split(opts.Type, ",")
-	opts.sourceList = strings.Split(opts.Source, ",")
+	opts.typeList = stringList(opts.Type)
+	opts.sourceList = stringList(opts.Source)
 	return nil
 }
 
@@ -87,7 +96,7 @@ func run(args []string) *checkers.Checker {
 	critNum := int64(0)
 	errorOverall := ""
 
-	for _, f := range opts.sourceList {
+	for _, f := range opts.logList {
 		w, c, errLines, err := opts.searchLog(f)
 		if err != nil {
 			return checkers.Unknown(err.Error())
@@ -98,7 +107,7 @@ func run(args []string) *checkers.Checker {
 			errorOverall += errLines
 		}
 	}
-	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", 0, 0, "")
+	msg := fmt.Sprintf("%d warnings, %d criticals.", warnNum, critNum)
 	return checkers.NewChecker(checkSt, msg)
 }
 
@@ -114,6 +123,7 @@ func bytesToString(b []byte) (string, uint32) {
 	}
 	return string(utf16.Decode(s)), uint32(i * 2)
 }
+
 func getResourceMessage(providerName, sourceName string, eventID uint32, argsptr uintptr) (string, error) {
 	regkey := fmt.Sprintf(
 		"SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
@@ -164,7 +174,7 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 	stateFile := getStateFile(opts.StateDir, event)
 	recordNumber := int64(0)
 	if !opts.NoState {
-		s, err := getBytesToSkip(stateFile)
+		s, err := getLastOffset(stateFile)
 		if err != nil {
 			return 0, 0, "", err
 		}
@@ -191,15 +201,15 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 		log.Fatal(err)
 	}
 
-	flags := eventlog.EVENTLOG_FORWARDS_READ | eventlog.EVENTLOG_SEQUENTIAL_READ
+	flags := eventlog.EVENTLOG_FORWARDS_READ | eventlog.EVENTLOG_SEEK_READ
 
 	if recordNumber > 0 && oldnum <= uint32(recordNumber) {
 		if uint32(recordNumber)+1 == oldnum+num {
 			return 0, 0, "", nil
 		}
-		flags = eventlog.EVENTLOG_FORWARDS_READ | eventlog.EVENTLOG_SEEK_READ
+		recordNumber += 1
 	} else {
-		recordNumber = 0
+		recordNumber = 1
 	}
 
 	size := uint32(1)
@@ -239,11 +249,12 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 
 		r := *(*eventlog.EVENTLOGRECORD)(unsafe.Pointer(&buf[0]))
 		if opts.Verbose {
-			println(r.RecordNumber)
-			println(time.Unix(int64(r.TimeGenerated), 0).String())
-			println(time.Unix(int64(r.TimeWritten), 0).String())
-			println(r.EventID)
+			log.Printf("RecordNumber=%v", r.RecordNumber)
+			log.Printf("TimeGenerated=%v", time.Unix(int64(r.TimeGenerated), 0).String())
+			log.Printf("TimeWritten=%v", time.Unix(int64(r.TimeWritten), 0).String())
+			log.Printf("EventID=%v", r.EventID)
 		}
+		lastNumber = i
 
 		if len(opts.codeList) > 0 {
 			found := false
@@ -261,9 +272,13 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 			}
 		}
 
+		tn := eventlog.EventType(r.EventType).String()
+		if opts.Verbose {
+			log.Printf("EventType=%v", tn)
+		}
+		tn = strings.ToLower(tn)
 		if len(opts.sourceList) > 0 {
 			found := false
-			tn := strings.ToLower(eventlog.EventType(r.EventType).String())
 			for _, typ := range opts.typeList {
 				if typ == tn {
 					found = true
@@ -274,12 +289,20 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 				continue
 			}
 		}
+		switch tn {
+		case "error":
+			critNum++
+		case "audit failure":
+			critNum++
+		case "warning":
+			warnNum++
+		}
 
 		sourceName, sourceNameOff := bytesToString(buf[unsafe.Sizeof(eventlog.EVENTLOGRECORD{}):])
 		computerName, _ := bytesToString(buf[unsafe.Sizeof(eventlog.EVENTLOGRECORD{})+uintptr(sourceNameOff+2):])
 		if opts.Verbose {
-			println(sourceName)
-			println(computerName)
+			log.Printf("SourceName=%v", sourceName)
+			log.Println("ComputerName=%v", computerName)
 		}
 
 		if len(opts.sourceList) > 0 {
@@ -310,30 +333,34 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 		message, err := getResourceMessage(providerName, sourceName, r.EventID, argsptr)
 		if err == nil {
 			if opts.Verbose {
-				println(message)
+				log.Printf("Message=%v", message)
+			}
+			if opts.ReturnContent {
+				errLines += sourceName + ":" + strings.Replace(message, "\n", "", -1) + "\n"
 			}
 		}
-
-		lastNumber = r.RecordNumber
 	}
 
 	if !opts.NoState {
-		err = writeBytesToSkip(stateFile, int64(lastNumber))
+		err = writeLastOffset(stateFile, int64(lastNumber))
 		if err != nil {
-			log.Printf("writeByteToSkip failed: %s\n", err.Error())
+			log.Printf("writeLastOffset failed: %s\n", err.Error())
 		}
 	}
 
-	return 0, 0, "", nil
+	if recordNumber == 1 && !opts.FailFirst {
+		return 0, 0, "", nil
+	}
+	return warnNum, critNum, errLines, nil
 }
 
 var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
 
 func getStateFile(stateDir, f string) string {
-	return filepath.Join(stateDir, stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)))
+	return filepath.ToSlash(filepath.Join(stateDir, stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator))))
 }
 
-func getBytesToSkip(f string) (int64, error) {
+func getLastOffset(f string) (int64, error) {
 	_, err := os.Stat(f)
 	if err != nil {
 		return 0, nil
@@ -349,7 +376,7 @@ func getBytesToSkip(f string) (int64, error) {
 	return i, nil
 }
 
-func writeBytesToSkip(f string, num int64) error {
+func writeLastOffset(f string, num int64) error {
 	err := os.MkdirAll(filepath.Dir(f), 0755)
 	if err != nil {
 		return err
