@@ -3,11 +3,10 @@ package main
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
-	"reflect"
-	"strings"
 	"testing"
 
+	"github.com/go-ole/go-ole"
+	"github.com/go-ole/go-ole/oleutil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,42 +18,29 @@ func TestGetStateFile(t *testing.T) {
 	assert.Equal(t, sPath, "/var/lib/linux/hoge", "drive letter should be cared")
 }
 
-func TestWriteBytesToSkip(t *testing.T) {
+func TestWriteLastOffset(t *testing.T) {
 	f := ".tmp/fuga/piyo"
-	err := writeBytesToSkip(f, 15)
+	err := writeLastOffset(f, 15)
 	assert.Equal(t, err, nil, "err should be nil")
 
-	skipBytes, err := getBytesToSkip(f)
+	recordNumber, err := getLastOffset(f)
 	assert.Equal(t, err, nil, "err should be nil")
-	assert.Equal(t, skipBytes, int64(15))
+	assert.Equal(t, recordNumber, int64(15))
 }
 
-func TestSearchReader(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-event-log-test")
+func raiseEvent(t *testing.T, typ int, msg string) {
+	ole.CoInitialize(0)
+	defer ole.CoUninitialize()
+
+	unk, err := oleutil.CreateObject("Wscript.Shell")
 	if err != nil {
-		t.Fatalf("TempDir failed: %s", err)
+		t.Fatal(err)
 	}
-	defer os.RemoveAll(dir)
-
-	opts := &logOpts{
-		StateDir: dir,
-		LogFile:  filepath.Join(dir, "dummy"),
-		Pattern:  `FATAL`,
+	disp, err := unk.QueryInterface(ole.IID_IDispatch)
+	if err != nil {
+		t.Fatal(err)
 	}
-	opts.prepare()
-
-	content := `FATAL 11
-OK
-FATAL 22
-Fatal
-`
-	r := strings.NewReader(content)
-	warnNum, critNum, readBytes, errLines, err := opts.searchReader(r)
-
-	assert.Equal(t, int64(2), warnNum, "warnNum should be 2")
-	assert.Equal(t, int64(2), critNum, "critNum should be 2")
-	assert.Equal(t, "FATAL 11\nFATAL 22\n", errLines, "invalid errLines")
-	assert.Equal(t, int64(len(content)), readBytes, "readBytes should be 26")
+	oleutil.MustCallMethod(disp, "LogEvent", typ, msg)
 }
 
 func TestRun(t *testing.T) {
@@ -64,244 +50,88 @@ func TestRun(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
-	logf := filepath.Join(dir, "dummy")
-	fh, _ := os.Create(logf)
-	defer fh.Close()
-
-	ptn := `FATAL`
-	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
+	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application"})
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, logf)
+	stateFile := getStateFile(opts.StateDir, "Application")
 
-	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
+	recordNumber, _ := getLastOffset(stateFile)
+	lastNumber := recordNumber
+	assert.Equal(t, int64(0), recordNumber, "something went wrong")
 
 	testEmpty := func() {
-		w, c, errLines, err := opts.searchLog(logf)
+		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(0), w, "something went wrong")
 		assert.Equal(t, int64(0), c, "something went wrong")
 		assert.Equal(t, "", errLines, "something went wrong")
 
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(0), bytes, "something went wrong")
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, 0, recordNumber, "something went wrong")
 	}
 	testEmpty()
 
-	l1 := "FATAL\nFATAL\n"
-	test2Line := func() {
-		fh.WriteString(l1)
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(2), w, "something went wrong")
-		assert.Equal(t, int64(2), c, "something went wrong")
-		assert.Equal(t, l1, errLines, "something went wrong")
+	lastNumber = recordNumber
 
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
-	}
-	test2Line()
-
-	testReadAgain := func() {
-		w, c, errLines, err := opts.searchLog(logf)
+	testInfo := func() {
+		raiseEvent(t, 0, "check-event-log: something info occured")
+		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(0), w, "something went wrong")
 		assert.Equal(t, int64(0), c, "something went wrong")
 		assert.Equal(t, "", errLines, "something went wrong")
 
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
 	}
-	testReadAgain()
+	testInfo()
 
-	l2 := "SUCCESS\n"
-	testRecover := func() {
-		fh.WriteString(l2)
-		w, c, errLines, err := opts.searchLog(logf)
+	lastNumber = recordNumber
+
+	testWarning := func() {
+		raiseEvent(t, 2, "check-event-log: something warning occured")
+		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(0), c, "something went wrong")
 		assert.Equal(t, "", errLines, "something went wrong")
 
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
 	}
-	testRecover()
+	testWarning()
 
-	testSuccessAgain := func() {
-		w, c, errLines, err := opts.searchLog(logf)
+	lastNumber = recordNumber
+
+	testError := func() {
+		raiseEvent(t, 1, "check-event-log: something error occured")
+		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
 		assert.Equal(t, "", errLines, "something went wrong")
 
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
 	}
-	testSuccessAgain()
+	testError()
 
-	testErrorAgain := func() {
-		fh.WriteString(l1)
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(2), w, "something went wrong")
-		assert.Equal(t, int64(2), c, "something went wrong")
-		assert.Equal(t, l1, errLines, "something went wrong")
+	lastNumber = recordNumber
 
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)*2+len(l2)), bytes, "something went wrong")
-	}
-	testErrorAgain()
-
-	testRecoverAgain := func() {
-		fh.WriteString(l2)
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
-
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)*2+len(l2)*2), bytes, "something went wrong")
-	}
-	testRecoverAgain()
-
-	testRotate := func() {
-		fh.Close()
-		os.Remove(logf)
-		fh, _ = os.Create(logf)
-
-		fh.WriteString(l2)
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
-
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l2)), bytes, "something went wrong")
-	}
-	testRotate()
-}
-
-func TestRunWithMiddleOfLine(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-event-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	defer os.RemoveAll(dir)
-
-	logf := filepath.Join(dir, "dummy")
-	fh, _ := os.Create(logf)
-	defer fh.Close()
-
-	ptn := `FATAL`
-	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
+	opts, _ = parseArgs([]string{"-s", dir, "--log", "Application", "-r"})
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, logf)
-
-	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
-
-	testMiddleOfLine := func() {
-		fh.WriteString("FATA")
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
-
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(0), bytes, "something went wrong")
-	}
-	testMiddleOfLine()
-
-	testFail := func() {
-		fh.WriteString("L\nSUCC")
-		w, c, errLines, err := opts.searchLog(logf)
+	testReturn := func() {
+		raiseEvent(t, 1, "check-event-log: something error occured")
+		raiseEvent(t, 2, "check-event-log: something warning occured")
+		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "FATAL\n", errLines, "something went wrong")
+		assert.Equal(t, "WSH:check-event-log: something error occured\nWSH:check-event-log: something warning occured\n", errLines, "something went wrong")
 
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len("FATAL\n")), bytes, "something went wrong")
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
 	}
-	testFail()
-}
-
-func TestRunWithNoState(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-event-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	defer os.RemoveAll(dir)
-
-	logf := filepath.Join(dir, "dummy")
-	fh, _ := os.Create(logf)
-	defer fh.Close()
-
-	ptn := `FATAL`
-	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--no-state"})
-	opts.prepare()
-
-	fatal := "FATAL\n"
-	test2Line := func() {
-		fh.WriteString(fatal)
-		fh.WriteString(fatal)
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(2), w, "something went wrong")
-		assert.Equal(t, int64(2), c, "something went wrong")
-		assert.Equal(t, strings.Repeat(fatal, 2), errLines, "something went wrong")
-	}
-	test2Line()
-
-	test1LineAgain := func() {
-		fh.WriteString(fatal)
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(3), w, "something went wrong")
-		assert.Equal(t, int64(3), c, "something went wrong")
-		assert.Equal(t, strings.Repeat(fatal, 3), errLines, "something went wrong")
-	}
-	test1LineAgain()
-}
-
-func TestSearchReaderWithLevel(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-event-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	defer os.RemoveAll(dir)
-
-	logf := filepath.Join(dir, "dummy")
-	ptn := `FATAL level:([0-9]+)`
-	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-i", "-p", ptn, "--critical-level=17", "--warning-level=11"})
-	if !reflect.DeepEqual(&logOpts{
-		StateDir:        dir,
-		LogFile:         filepath.Join(dir, "dummy"),
-		CaseInsensitive: true,
-		Pattern:         `FATAL level:([0-9]+)`,
-		WarnLevel:       11,
-		CritLevel:       17,
-	}, opts) {
-		t.Errorf("something went wrong")
-	}
-	opts.prepare()
-
-	content := `FATAL level:11
-OK
-FATAL level:22
-Fatal level:17
-`
-	r := strings.NewReader(content)
-	warnNum, critNum, readBytes, errLines, err := opts.searchReader(r)
-
-	assert.Equal(t, int64(2), warnNum, "warnNum should be 2")
-	assert.Equal(t, int64(1), critNum, "critNum should be 1")
-	assert.Equal(t, "FATAL level:22\nFatal level:17\n", errLines, "invalid errLines")
-	assert.Equal(t, int64(len(content)), readBytes, "readBytes should be 26")
+	testReturn()
 }
