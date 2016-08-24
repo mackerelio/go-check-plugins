@@ -45,7 +45,7 @@ func checkReplication(args []string) *checkers.Checker {
 	sqlThreadStatus := rows[0].Str(idxSQLThreadRunning)
 	secondsBehindMaster := rows[0].Int64(idxSecondsBehindMaster)
 
-	if ioThreadStatus == "No" || sqlThreadStatus == "No" {
+	if !(ioThreadStatus == "Yes" && sqlThreadStatus == "Yes") {
 		return checkers.Critical("MySQL replication has been stopped")
 	}
 
