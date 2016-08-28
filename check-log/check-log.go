@@ -29,7 +29,7 @@ type logOpts struct {
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
-	SkipNotExist    bool    `long:"skip-not-exist" description:"Skip searching content if LogFile does not exist"`
+	Missing         string  `long:"missing" default:"" value-name:"(WARNING|OK)" description:"Exit status when log files missing"`
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
 	fileList        []string
@@ -114,9 +114,14 @@ func run(args []string) *checkers.Checker {
 
 	warnNum := int64(0)
 	critNum := int64(0)
+	missingNum := int64(0)
 	errorOverall := ""
 
 	for _, f := range opts.fileList {
+		_, err := os.Stat(f)
+		if err != nil {
+			missingNum++
+		}
 		w, c, errLines, err := opts.searchLog(f)
 		if err != nil {
 			return checkers.Unknown(err.Error())
@@ -128,16 +133,20 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 
+	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", warnNum, critNum, opts.Pattern)
+	if errorOverall != "" {
+		msg += "\n" + errorOverall
+	}
 	checkSt := checkers.OK
 	if warnNum > opts.WarnOver {
 		checkSt = checkers.WARNING
 	}
+	if missingNum > 0 && opts.Missing == "WARNING" {
+		checkSt = checkers.WARNING
+		msg += "\n" + fmt.Sprintf("%d files missing.", missingNum)
+	}
 	if critNum > opts.CritOver {
 		checkSt = checkers.CRITICAL
-	}
-	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", warnNum, critNum, opts.Pattern)
-	if errorOverall != "" {
-		msg += "\n" + errorOverall
 	}
 	return checkers.NewChecker(checkSt, msg)
 }
@@ -155,7 +164,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 
 	f, err := os.Open(logFile)
 	if err != nil {
-		if opts.SkipNotExist {
+		if opts.Missing != "" {
 			return 0, 0, "", nil
 		}
 		return 0, 0, "", err
