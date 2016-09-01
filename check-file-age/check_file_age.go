@@ -96,6 +96,6 @@ func run(args []string) *checkers.Checker {
 		result = checkers.CRITICAL
 	}
 
-	msg := fmt.Sprintf("%s is %d seconds old (%02d:%02d:%02d) and %d bytes.\n", opts.File, age, mtime.Hour(), mtime.Minute(), mtime.Second(), size)
+	msg := fmt.Sprintf("%s is %d seconds old (%02d:%02d:%02d) and %d bytes.", opts.File, age, mtime.Hour(), mtime.Minute(), mtime.Second(), size)
 	return checkers.NewChecker(result, msg)
 }
