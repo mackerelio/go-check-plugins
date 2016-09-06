@@ -6,13 +6,12 @@ import (
 	"os/exec"
 	"strings"
 
-	"golang.org/x/text/encoding/japanese"
-
 	"github.com/gocarina/gocsv"
+	"golang.org/x/text/encoding/japanese"
 )
 
 func getServiceState() ([]serviceState, error) {
-	b, err := exec.Command("wmic", "service", "get", "Caption,DelayedAutoStart,ErrorControl,Name,Started,StartMode,State", "/format:csv").Output()
+	b, err := exec.Command("wmic", "service", "get", "Caption,ErrorControl,Name,Started,StartMode,State", "/format:csv").Output()
 	if err != nil {
 		return nil, err
 	}
