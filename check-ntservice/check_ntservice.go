@@ -10,19 +10,18 @@ import (
 )
 
 var opts struct {
-	ServiceName string `long:"service-name" short:"s" required:"true" description:"service name"`
+	ServiceName string `long:"service-name" short:"s" description:"service name"`
 	ListService bool   `long:"list-service" short:"l" description:"list service"`
 }
 
 type serviceState struct {
-	Node             string `csv:"Node"`
-	Caption          string `csv:"Caption"`
-	DelayedAutoStart bool   `csv:"DelayedAutoStart"`
-	ErrorControl     string `csv:"ErrorControl"`
-	Name             string `csv:"Name"`
-	Started          bool   `csv:"Started"`
-	StartMode        string `csv:"StartMode"`
-	State            string `csv:"State"`
+	Node         string `csv:"Node"`
+	Caption      string `csv:"Caption"`
+	ErrorControl string `csv:"ErrorControl"`
+	Name         string `csv:"Name"`
+	Started      bool   `csv:"Started"`
+	StartMode    string `csv:"StartMode"`
+	State        string `csv:"State"`
 }
 
 func main() {
@@ -32,7 +31,8 @@ func main() {
 }
 
 func run(args []string) *checkers.Checker {
-	_, err := flags.ParseArgs(&opts, args)
+	var parser = flags.NewParser(&opts, flags.Default)
+	_, err := parser.ParseArgs(args)
 	if err != nil {
 		os.Exit(1)
 	}
@@ -43,7 +43,14 @@ func run(args []string) *checkers.Checker {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
+		for _, s := range ss {
+			fmt.Printf("%s: %s\n", s.Name, s.Caption)
+		}
 		os.Exit(0)
+	}
+	if opts.ServiceName == "" {
+		parser.WriteHelp(os.Stderr)
+		os.Exit(1)
 	}
 
 	if err != nil {
