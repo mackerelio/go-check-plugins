@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.3 (2016-09-07)
+
+* fix check-mysql replication to detect IO thread 'Connecting' #116 (hiroakis)
+* [file-age] Remove unnecessary newline #117 (b4b4r07)
+
+
 ## 0.6.2 (2016-06-23)
 
 * Fixed argument parser error: #113 (karupanerura)

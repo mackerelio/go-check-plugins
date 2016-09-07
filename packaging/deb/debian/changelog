@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.6.3-1) stable; urgency=low
+
+  * fix check-mysql replication to detect IO thread 'Connecting' (by hiroakis)
+    <https://github.com/mackerelio/go-check-plugins/pull/116>
+  * [file-age] Remove unnecessary newline (by b4b4r07)
+    <https://github.com/mackerelio/go-check-plugins/pull/117>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 07 Sep 2016 03:33:37 +0000
+
 mackerel-check-plugins (0.6.2-1) stable; urgency=low
 
   * Fixed argument parser error: (by karupanerura)
