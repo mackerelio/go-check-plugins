@@ -45,6 +45,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Sep 07 2016 <mackerel-developers@hatena.ne.jp> - 0.6.3-1
+- fix check-mysql replication to detect IO thread 'Connecting' (by hiroakis)
+- [file-age] Remove unnecessary newline (by b4b4r07)
+
 * Thu Jun 23 2016 <mackerel-developers@hatena.ne.jp> - 0.6.2-1
 - Fixed argument parser error: (by karupanerura)
 
