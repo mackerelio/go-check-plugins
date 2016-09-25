@@ -29,7 +29,7 @@ type logOpts struct {
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
-	Missing         string  `long:"missing" default:"" value-name:"(WARNING|OK)" description:"Exit status when log files missing"`
+	Missing         string  `long:"missing" default:"" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
 	fileList        []string
@@ -100,7 +100,7 @@ func regCompileWithCase(ptn string, caseInsensitive bool) (*regexp.Regexp, error
 
 func validateMissing(missing string) bool {
 	switch missing {
-	case "WARNING", "OK", "":
+	case "CRITICAL", "WARNING", "OK", "UNKNOWN", "":
 		return true
 	default:
 		return false
@@ -150,12 +150,20 @@ func run(args []string) *checkers.Checker {
 		msg += "\n" + errorOverall
 	}
 	checkSt := checkers.OK
+	if missingNum > 0 {
+		switch opts.Missing {
+		case "OK":
+		case "WARNING":
+			checkSt = checkers.WARNING
+		case "CRITICAL":
+			checkSt = checkers.CRITICAL
+		default:
+			checkSt = checkers.UNKNOWN
+		}
+		msg += "\n" + fmt.Sprintf("%d files missing.", missingNum)
+	}
 	if warnNum > opts.WarnOver {
 		checkSt = checkers.WARNING
-	}
-	if missingNum > 0 && opts.Missing == "WARNING" {
-		checkSt = checkers.WARNING
-		msg += "\n" + fmt.Sprintf("%d files missing.", missingNum)
 	}
 	if critNum > opts.CritOver {
 		checkSt = checkers.CRITICAL
