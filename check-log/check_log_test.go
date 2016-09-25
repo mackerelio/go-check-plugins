@@ -323,15 +323,6 @@ func TestRunWithMissingOk(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testLogFileMissing := func() {
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
-	}
-	testLogFileMissing()
-
 	testRunLogFileMissing := func() {
 		ckr := run(params)
 		assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
@@ -354,15 +345,6 @@ func TestRunWithMissingWarning(t *testing.T) {
 	params := []string{"-s", dir, "-f", logf, "-p", ptn, "--missing", missing}
 	opts, _ := parseArgs(params)
 	opts.prepare()
-
-	testLogFileMissing := func() {
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
-	}
-	testLogFileMissing()
 
 	testRunLogFileMissing := func() {
 		ckr := run(params)
@@ -387,15 +369,6 @@ func TestRunWithMissingCritical(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testLogFileMissing := func() {
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
-	}
-	testLogFileMissing()
-
 	testRunLogFileMissing := func() {
 		ckr := run(params)
 		assert.Equal(t, ckr.Status, checkers.CRITICAL, "ckr.Status should be CRITICAL")
@@ -418,15 +391,6 @@ func TestRunWithMissingUnknown(t *testing.T) {
 	params := []string{"-s", dir, "-f", logf, "-p", ptn, "--missing", missing}
 	opts, _ := parseArgs(params)
 	opts.prepare()
-
-	testLogFileMissing := func() {
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
-	}
-	testLogFileMissing()
 
 	testRunLogFileMissing := func() {
 		ckr := run(params)

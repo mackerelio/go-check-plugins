@@ -133,6 +133,7 @@ func run(args []string) *checkers.Checker {
 		_, err := os.Stat(f)
 		if err != nil {
 			missingNum++
+			continue
 		}
 		w, c, errLines, err := opts.searchLog(f)
 		if err != nil {
@@ -184,9 +185,6 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 
 	f, err := os.Open(logFile)
 	if err != nil {
-		if opts.Missing != "" {
-			return 0, 0, "", nil
-		}
 		return 0, 0, "", err
 	}
 	defer f.Close()
