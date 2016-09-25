@@ -288,6 +288,7 @@ func TestSearchReaderWithLevel(t *testing.T) {
 		Pattern:         `FATAL level:([0-9]+)`,
 		WarnLevel:       11,
 		CritLevel:       17,
+		Missing:         "UNKNOWN",
 	}, opts) {
 		t.Errorf("something went wrong")
 	}
