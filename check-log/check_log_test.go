@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -326,7 +327,8 @@ func TestRunWithMissingOk(t *testing.T) {
 	testRunLogFileMissing := func() {
 		ckr := run(params)
 		assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
-		assert.Equal(t, ckr.Message, "0 warnings, 0 criticals for pattern /FATAL/.\n1 files missing.", "something went wrong")
+		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\n1 files missing as follows.\n%s", logf)
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
 	}
 	testRunLogFileMissing()
 }
@@ -349,7 +351,8 @@ func TestRunWithMissingWarning(t *testing.T) {
 	testRunLogFileMissing := func() {
 		ckr := run(params)
 		assert.Equal(t, ckr.Status, checkers.WARNING, "ckr.Status should be WARNING")
-		assert.Equal(t, ckr.Message, "0 warnings, 0 criticals for pattern /FATAL/.\n1 files missing.", "something went wrong")
+		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\n1 files missing as follows.\n%s", logf)
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
 	}
 	testRunLogFileMissing()
 }
@@ -372,7 +375,8 @@ func TestRunWithMissingCritical(t *testing.T) {
 	testRunLogFileMissing := func() {
 		ckr := run(params)
 		assert.Equal(t, ckr.Status, checkers.CRITICAL, "ckr.Status should be CRITICAL")
-		assert.Equal(t, ckr.Message, "0 warnings, 0 criticals for pattern /FATAL/.\n1 files missing.", "something went wrong")
+		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\n1 files missing as follows.\n%s", logf)
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
 	}
 	testRunLogFileMissing()
 }
@@ -395,7 +399,8 @@ func TestRunWithMissingUnknown(t *testing.T) {
 	testRunLogFileMissing := func() {
 		ckr := run(params)
 		assert.Equal(t, ckr.Status, checkers.UNKNOWN, "ckr.Status should be UNKNOWN")
-		assert.Equal(t, ckr.Message, "0 warnings, 0 criticals for pattern /FATAL/.\n1 files missing.", "something went wrong")
+		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\n1 files missing as follows.\n%s", logf)
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
 	}
 	testRunLogFileMissing()
 }

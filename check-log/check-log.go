@@ -126,13 +126,13 @@ func run(args []string) *checkers.Checker {
 
 	warnNum := int64(0)
 	critNum := int64(0)
-	missingNum := int64(0)
+	var missingFiles []string
 	errorOverall := ""
 
 	for _, f := range opts.fileList {
 		_, err := os.Stat(f)
 		if err != nil {
-			missingNum++
+			missingFiles = append(missingFiles, f)
 			continue
 		}
 		w, c, errLines, err := opts.searchLog(f)
@@ -151,7 +151,7 @@ func run(args []string) *checkers.Checker {
 		msg += "\n" + errorOverall
 	}
 	checkSt := checkers.OK
-	if missingNum > 0 {
+	if len(missingFiles) > 0 {
 		switch opts.Missing {
 		case "OK":
 		case "WARNING":
@@ -161,7 +161,10 @@ func run(args []string) *checkers.Checker {
 		default:
 			checkSt = checkers.UNKNOWN
 		}
-		msg += "\n" + fmt.Sprintf("%d files missing.", missingNum)
+		msg += "\n" + fmt.Sprintf("%d files missing as follows.", len(missingFiles))
+		for _, f := range missingFiles {
+			msg += "\n" + f
+		}
 	}
 	if warnNum > opts.WarnOver {
 		checkSt = checkers.WARNING
