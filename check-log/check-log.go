@@ -79,6 +79,9 @@ func (opts *logOpts) prepare() error {
 			}
 		}
 	}
+	if !(validateMissing(opts.Missing)) {
+		return fmt.Errorf("missing option is invalid")
+	}
 	return nil
 }
 
@@ -93,6 +96,15 @@ func regCompileWithCase(ptn string, caseInsensitive bool) (*regexp.Regexp, error
 		ptn = "(?i)" + ptn
 	}
 	return regexp.Compile(ptn)
+}
+
+func validateMissing(missing string) bool {
+	switch missing {
+	case "WARNING", "OK", "":
+		return true
+	default:
+		return false
+	}
 }
 
 func parseArgs(args []string) (*logOpts, error) {
