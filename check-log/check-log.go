@@ -79,7 +79,7 @@ func (opts *logOpts) prepare() error {
 			}
 		}
 	}
-	if !(validateMissing(opts.Missing)) {
+	if !validateMissing(opts.Missing) {
 		return fmt.Errorf("missing option is invalid")
 	}
 	return nil
