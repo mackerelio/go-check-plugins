@@ -161,7 +161,7 @@ func run(args []string) *checkers.Checker {
 		default:
 			checkSt = checkers.UNKNOWN
 		}
-		msg += "\n" + fmt.Sprintf("%d files missing as follows.", len(missingFiles))
+		msg += "\n" + fmt.Sprintf("The following %d files are missing.", len(missingFiles))
 		for _, f := range missingFiles {
 			msg += "\n" + f
 		}
