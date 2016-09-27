@@ -14,6 +14,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
+	"github.com/mattn/go-encoding"
 )
 
 type logOpts struct {
@@ -29,6 +30,7 @@ type logOpts struct {
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
+	Encoding        string  `long:"encoding" description:"Encoding of log file"`
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
 	fileList        []string
@@ -170,7 +172,16 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		f.Seek(skipBytes, 0)
 	}
 
-	warnNum, critNum, readBytes, errLines, err := opts.searchReader(f)
+	var r io.Reader = f
+	if opts.Encoding != "" {
+		enc := encoding.GetEncoding(opts.Encoding)
+		if enc == nil {
+			return 0, 0, "", fmt.Errorf("unknown encoding:" + opts.Encoding)
+		}
+		r = enc.NewDecoder().Reader(f)
+	}
+
+	warnNum, critNum, readBytes, errLines, err := opts.searchReader(r)
 	if err != nil {
 		return warnNum, critNum, errLines, err
 	}
