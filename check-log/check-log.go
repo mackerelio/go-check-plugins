@@ -29,6 +29,7 @@ type logOpts struct {
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
+	Missing         string  `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
 	fileList        []string
@@ -78,6 +79,9 @@ func (opts *logOpts) prepare() error {
 			}
 		}
 	}
+	if !validateMissing(opts.Missing) {
+		return fmt.Errorf("missing option is invalid")
+	}
 	return nil
 }
 
@@ -92,6 +96,15 @@ func regCompileWithCase(ptn string, caseInsensitive bool) (*regexp.Regexp, error
 		ptn = "(?i)" + ptn
 	}
 	return regexp.Compile(ptn)
+}
+
+func validateMissing(missing string) bool {
+	switch missing {
+	case "CRITICAL", "WARNING", "OK", "UNKNOWN", "":
+		return true
+	default:
+		return false
+	}
 }
 
 func parseArgs(args []string) (*logOpts, error) {
@@ -113,9 +126,15 @@ func run(args []string) *checkers.Checker {
 
 	warnNum := int64(0)
 	critNum := int64(0)
+	var missingFiles []string
 	errorOverall := ""
 
 	for _, f := range opts.fileList {
+		_, err := os.Stat(f)
+		if err != nil {
+			missingFiles = append(missingFiles, f)
+			continue
+		}
 		w, c, errLines, err := opts.searchLog(f)
 		if err != nil {
 			return checkers.Unknown(err.Error())
@@ -127,16 +146,31 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 
+	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", warnNum, critNum, opts.Pattern)
+	if errorOverall != "" {
+		msg += "\n" + errorOverall
+	}
 	checkSt := checkers.OK
+	if len(missingFiles) > 0 {
+		switch opts.Missing {
+		case "OK":
+		case "WARNING":
+			checkSt = checkers.WARNING
+		case "CRITICAL":
+			checkSt = checkers.CRITICAL
+		default:
+			checkSt = checkers.UNKNOWN
+		}
+		msg += "\n" + fmt.Sprintf("The following %d files are missing.", len(missingFiles))
+		for _, f := range missingFiles {
+			msg += "\n" + f
+		}
+	}
 	if warnNum > opts.WarnOver {
 		checkSt = checkers.WARNING
 	}
 	if critNum > opts.CritOver {
 		checkSt = checkers.CRITICAL
-	}
-	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", warnNum, critNum, opts.Pattern)
-	if errorOverall != "" {
-		msg += "\n" + errorOverall
 	}
 	return checkers.NewChecker(checkSt, msg)
 }
