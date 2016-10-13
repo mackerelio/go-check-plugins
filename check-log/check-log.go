@@ -303,5 +303,19 @@ func writeBytesToSkip(f string, num int64) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(f, []byte(fmt.Sprintf("%d", num)), 0644)
+	return writeFileAtomically(f, []byte(fmt.Sprintf("%d", num)))
+}
+
+func writeFileAtomically(f string, contents []byte) error {
+	tmpf, err := ioutil.TempFile("", "")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmpf.Name())
+	_, err = tmpf.Write(contents)
+	if err != nil {
+		return err
+	}
+	tmpf.Close()
+	return os.Rename(tmpf.Name(), f)
 }
