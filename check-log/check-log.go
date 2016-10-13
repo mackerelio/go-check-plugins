@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"crypto/md5"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -176,7 +177,7 @@ func run(args []string) *checkers.Checker {
 }
 
 func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
-	stateFile := getStateFile(opts.StateDir, logFile)
+	stateFile := getStateFile(opts.StateDir, logFile, opts.Pattern)
 	skipBytes := int64(0)
 	if !opts.NoState {
 		s, err := getBytesToSkip(stateFile)
@@ -278,8 +279,15 @@ func (opts *logOpts) match(line string) (bool, []string) {
 
 var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
 
-func getStateFile(stateDir, f string) string {
-	return filepath.Join(stateDir, stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)))
+func getStateFile(stateDir, f, pattern string) string {
+	return filepath.Join(
+		stateDir,
+		fmt.Sprintf(
+			"%s-%x",
+			stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)),
+			md5.Sum([]byte(pattern)),
+		),
+	)
 }
 
 func getBytesToSkip(f string) (int64, error) {
