@@ -28,7 +28,7 @@ type logOpts struct {
 	ReturnContent   bool    `short:"r" long:"return" description:"Return matched line"`
 	FilePattern     string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
-	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
+	StateDir        string  `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
 	Missing         string  `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
 	patternReg      *regexp.Regexp
@@ -115,6 +115,13 @@ func parseArgs(args []string) (*logOpts, error) {
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
 	opts.origArgs = origArgs
+	if opts.StateDir == "" {
+		workdir := os.Getenv("MACKEREL_PLUGIN_WORKDIR")
+		if workdir == "" {
+			workdir = os.TempDir()
+		}
+		opts.StateDir = filepath.Join(workdir, "check-log")
+	}
 	return opts, err
 }
 
