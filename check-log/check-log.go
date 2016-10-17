@@ -34,6 +34,7 @@ type logOpts struct {
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
 	fileList        []string
+	origArgs        []string
 }
 
 func (opts *logOpts) prepare() error {
@@ -109,8 +110,11 @@ func validateMissing(missing string) bool {
 }
 
 func parseArgs(args []string) (*logOpts, error) {
+	var origArgs []string
+	copy(origArgs, args)
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
+	opts.origArgs = origArgs
 	return opts, err
 }
 
@@ -177,7 +181,7 @@ func run(args []string) *checkers.Checker {
 }
 
 func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
-	stateFile := getStateFile(opts.StateDir, logFile, opts.Pattern)
+	stateFile := getStateFile(opts.StateDir, logFile, opts.origArgs)
 	skipBytes := int64(0)
 	if !opts.NoState {
 		s, err := getBytesToSkip(stateFile)
@@ -279,13 +283,13 @@ func (opts *logOpts) match(line string) (bool, []string) {
 
 var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
 
-func getStateFile(stateDir, f, pattern string) string {
+func getStateFile(stateDir, f string, args []string) string {
 	return filepath.Join(
 		stateDir,
 		fmt.Sprintf(
 			"%s-%x",
 			stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)),
-			md5.Sum([]byte(pattern)),
+			md5.Sum([]byte(strings.Join(args, " "))),
 		),
 	)
 }

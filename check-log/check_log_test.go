@@ -14,10 +14,10 @@ import (
 )
 
 func TestGetStateFile(t *testing.T) {
-	sPath := getStateFile("/var/lib", "C:/Windows/hoge", "")
+	sPath := getStateFile("/var/lib", "C:/Windows/hoge", []string{})
 	assert.Equal(t, "/var/lib/C/Windows/hoge-d41d8cd98f00b204e9800998ecf8427e", sPath, "drive letter should be cared")
 
-	sPath = getStateFile("/var/lib", "/linux/hoge", "")
+	sPath = getStateFile("/var/lib", "/linux/hoge", []string{})
 	assert.Equal(t, "/var/lib/linux/hoge-d41d8cd98f00b204e9800998ecf8427e", sPath, "drive letter should be cared")
 }
 
@@ -74,7 +74,7 @@ func TestRun(t *testing.T) {
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, logf, opts.Pattern)
+	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
 	assert.Equal(t, int64(0), bytes, "something went wrong")
@@ -202,7 +202,7 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, logf, opts.Pattern)
+	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
 	assert.Equal(t, int64(0), bytes, "something went wrong")
