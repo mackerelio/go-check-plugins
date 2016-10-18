@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.7.0-1) stable; urgency=low
+
+  * Add option for skip searching logfile content if logfile does not exist (by a-know)
+    <https://github.com/mackerelio/go-check-plugins/pull/115>
+  * [check-log] write file atomically when saving read position into state file (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/119>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 18 Oct 2016 08:26:16 +0000
+
 mackerel-check-plugins (0.6.3-1) stable; urgency=low
 
   * fix check-mysql replication to detect IO thread 'Connecting' (by hiroakis)
