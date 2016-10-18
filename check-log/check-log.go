@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"crypto/md5"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -27,12 +28,13 @@ type logOpts struct {
 	ReturnContent   bool    `short:"r" long:"return" description:"Return matched line"`
 	FilePattern     string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
-	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
+	StateDir        string  `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
 	Missing         string  `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
 	fileList        []string
+	origArgs        []string
 }
 
 func (opts *logOpts) prepare() error {
@@ -108,8 +110,18 @@ func validateMissing(missing string) bool {
 }
 
 func parseArgs(args []string) (*logOpts, error) {
+	var origArgs []string
+	copy(origArgs, args)
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
+	opts.origArgs = origArgs
+	if opts.StateDir == "" {
+		workdir := os.Getenv("MACKEREL_PLUGIN_WORKDIR")
+		if workdir == "" {
+			workdir = os.TempDir()
+		}
+		opts.StateDir = filepath.Join(workdir, "check-log")
+	}
 	return opts, err
 }
 
@@ -176,7 +188,7 @@ func run(args []string) *checkers.Checker {
 }
 
 func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
-	stateFile := getStateFile(opts.StateDir, logFile)
+	stateFile := getStateFile(opts.StateDir, logFile, opts.origArgs)
 	skipBytes := int64(0)
 	if !opts.NoState {
 		s, err := getBytesToSkip(stateFile)
@@ -278,8 +290,15 @@ func (opts *logOpts) match(line string) (bool, []string) {
 
 var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
 
-func getStateFile(stateDir, f string) string {
-	return filepath.Join(stateDir, stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)))
+func getStateFile(stateDir, f string, args []string) string {
+	return filepath.Join(
+		stateDir,
+		fmt.Sprintf(
+			"%s-%x",
+			stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)),
+			md5.Sum([]byte(strings.Join(args, " "))),
+		),
+	)
 }
 
 func getBytesToSkip(f string) (int64, error) {
