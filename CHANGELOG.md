@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0 (2016-10-18)
+
+* Add option for skip searching logfile content if logfile does not exist #115 (a-know)
+* [check-log] write file atomically when saving read position into state file #119 (Songmu)
+
+
 ## 0.6.3 (2016-09-07)
 
 * fix check-mysql replication to detect IO thread 'Connecting' #116 (hiroakis)
