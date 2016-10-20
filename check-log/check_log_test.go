@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -8,15 +9,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/mackerelio/checkers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetStateFile(t *testing.T) {
-	sPath := getStateFile("/var/lib", "C:/Windows/hoge")
-	assert.Equal(t, sPath, "/var/lib/C/Windows/hoge", "drive letter should be cared")
+	sPath := getStateFile("/var/lib", "C:/Windows/hoge", []string{})
+	assert.Equal(t, "/var/lib/C/Windows/hoge-d41d8cd98f00b204e9800998ecf8427e", sPath, "drive letter should be cared")
 
-	sPath = getStateFile("/var/lib", "/linux/hoge")
-	assert.Equal(t, sPath, "/var/lib/linux/hoge", "drive letter should be cared")
+	sPath = getStateFile("/var/lib", "/linux/hoge", []string{})
+	assert.Equal(t, "/var/lib/linux/hoge-d41d8cd98f00b204e9800998ecf8427e", sPath, "drive letter should be cared")
 }
 
 func TestWriteBytesToSkip(t *testing.T) {
@@ -72,7 +74,7 @@ func TestRun(t *testing.T) {
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, logf)
+	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
 	assert.Equal(t, int64(0), bytes, "something went wrong")
@@ -200,7 +202,7 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, logf)
+	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
 	assert.Equal(t, int64(0), bytes, "something went wrong")
@@ -287,6 +289,7 @@ func TestSearchReaderWithLevel(t *testing.T) {
 		Pattern:         `FATAL level:([0-9]+)`,
 		WarnLevel:       11,
 		CritLevel:       17,
+		Missing:         "UNKNOWN",
 	}, opts) {
 		t.Errorf("something went wrong")
 	}
@@ -367,4 +370,100 @@ func TestRunWithoutEncoding(t *testing.T) {
 		assert.Equal(t, "エラー\n", errLines, "something went wrong")
 	}
 	testWithEncoding()
+}
+
+func TestRunWithMissingOk(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+
+	ptn := `FATAL`
+	missing := `OK`
+	params := []string{"-s", dir, "-f", logf, "-p", ptn, "--missing", missing}
+	opts, _ := parseArgs(params)
+	opts.prepare()
+
+	testRunLogFileMissing := func() {
+		ckr := run(params)
+		assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
+		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+	}
+	testRunLogFileMissing()
+}
+
+func TestRunWithMissingWarning(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+
+	ptn := `FATAL`
+	missing := `WARNING`
+	params := []string{"-s", dir, "-f", logf, "-p", ptn, "--missing", missing}
+	opts, _ := parseArgs(params)
+	opts.prepare()
+
+	testRunLogFileMissing := func() {
+		ckr := run(params)
+		assert.Equal(t, ckr.Status, checkers.WARNING, "ckr.Status should be WARNING")
+		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+	}
+	testRunLogFileMissing()
+}
+
+func TestRunWithMissingCritical(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+
+	ptn := `FATAL`
+	missing := `CRITICAL`
+	params := []string{"-s", dir, "-f", logf, "-p", ptn, "--missing", missing}
+	opts, _ := parseArgs(params)
+	opts.prepare()
+
+	testRunLogFileMissing := func() {
+		ckr := run(params)
+		assert.Equal(t, ckr.Status, checkers.CRITICAL, "ckr.Status should be CRITICAL")
+		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+	}
+	testRunLogFileMissing()
+}
+
+func TestRunWithMissingUnknown(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+
+	ptn := `FATAL`
+	missing := `UNKNOWN`
+	params := []string{"-s", dir, "-f", logf, "-p", ptn, "--missing", missing}
+	opts, _ := parseArgs(params)
+	opts.prepare()
+
+	testRunLogFileMissing := func() {
+		ckr := run(params)
+		assert.Equal(t, ckr.Status, checkers.UNKNOWN, "ckr.Status should be UNKNOWN")
+		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+	}
+	testRunLogFileMissing()
 }

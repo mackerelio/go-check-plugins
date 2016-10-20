@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"crypto/md5"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -28,12 +29,14 @@ type logOpts struct {
 	ReturnContent   bool    `short:"r" long:"return" description:"Return matched line"`
 	FilePattern     string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
-	StateDir        string  `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-log" value-name:"DIR" description:"Dir to keep state files under"`
+	StateDir        string  `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
 	Encoding        string  `long:"encoding" description:"Encoding of log file"`
+	Missing         string  `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
 	patternReg      *regexp.Regexp
 	excludeReg      *regexp.Regexp
 	fileList        []string
+	origArgs        []string
 }
 
 func (opts *logOpts) prepare() error {
@@ -80,6 +83,9 @@ func (opts *logOpts) prepare() error {
 			}
 		}
 	}
+	if !validateMissing(opts.Missing) {
+		return fmt.Errorf("missing option is invalid")
+	}
 	return nil
 }
 
@@ -96,9 +102,28 @@ func regCompileWithCase(ptn string, caseInsensitive bool) (*regexp.Regexp, error
 	return regexp.Compile(ptn)
 }
 
+func validateMissing(missing string) bool {
+	switch missing {
+	case "CRITICAL", "WARNING", "OK", "UNKNOWN", "":
+		return true
+	default:
+		return false
+	}
+}
+
 func parseArgs(args []string) (*logOpts, error) {
+	var origArgs []string
+	copy(origArgs, args)
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
+	opts.origArgs = origArgs
+	if opts.StateDir == "" {
+		workdir := os.Getenv("MACKEREL_PLUGIN_WORKDIR")
+		if workdir == "" {
+			workdir = os.TempDir()
+		}
+		opts.StateDir = filepath.Join(workdir, "check-log")
+	}
 	return opts, err
 }
 
@@ -115,9 +140,15 @@ func run(args []string) *checkers.Checker {
 
 	warnNum := int64(0)
 	critNum := int64(0)
+	var missingFiles []string
 	errorOverall := ""
 
 	for _, f := range opts.fileList {
+		_, err := os.Stat(f)
+		if err != nil {
+			missingFiles = append(missingFiles, f)
+			continue
+		}
 		w, c, errLines, err := opts.searchLog(f)
 		if err != nil {
 			return checkers.Unknown(err.Error())
@@ -129,22 +160,37 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 
+	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", warnNum, critNum, opts.Pattern)
+	if errorOverall != "" {
+		msg += "\n" + errorOverall
+	}
 	checkSt := checkers.OK
+	if len(missingFiles) > 0 {
+		switch opts.Missing {
+		case "OK":
+		case "WARNING":
+			checkSt = checkers.WARNING
+		case "CRITICAL":
+			checkSt = checkers.CRITICAL
+		default:
+			checkSt = checkers.UNKNOWN
+		}
+		msg += "\n" + fmt.Sprintf("The following %d files are missing.", len(missingFiles))
+		for _, f := range missingFiles {
+			msg += "\n" + f
+		}
+	}
 	if warnNum > opts.WarnOver {
 		checkSt = checkers.WARNING
 	}
 	if critNum > opts.CritOver {
 		checkSt = checkers.CRITICAL
 	}
-	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", warnNum, critNum, opts.Pattern)
-	if errorOverall != "" {
-		msg += "\n" + errorOverall
-	}
 	return checkers.NewChecker(checkSt, msg)
 }
 
 func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
-	stateFile := getStateFile(opts.StateDir, logFile)
+	stateFile := getStateFile(opts.StateDir, logFile, opts.origArgs)
 	skipBytes := int64(0)
 	if !opts.NoState {
 		s, err := getBytesToSkip(stateFile)
@@ -255,8 +301,15 @@ func (opts *logOpts) match(line string) (bool, []string) {
 
 var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
 
-func getStateFile(stateDir, f string) string {
-	return filepath.Join(stateDir, stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)))
+func getStateFile(stateDir, f string, args []string) string {
+	return filepath.Join(
+		stateDir,
+		fmt.Sprintf(
+			"%s-%x",
+			stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)),
+			md5.Sum([]byte(strings.Join(args, " "))),
+		),
+	)
 }
 
 func getBytesToSkip(f string) (int64, error) {
@@ -270,7 +323,7 @@ func getBytesToSkip(f string) (int64, error) {
 	}
 	i, err := strconv.ParseInt(strings.Trim(string(b), " \r\n"), 10, 64)
 	if err != nil {
-		return 0, err
+		log.Printf("failed to getBytesToSkip (ignoring): %s", err)
 	}
 	return i, nil
 }
@@ -280,5 +333,19 @@ func writeBytesToSkip(f string, num int64) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(f, []byte(fmt.Sprintf("%d", num)), 0644)
+	return writeFileAtomically(f, []byte(fmt.Sprintf("%d", num)))
+}
+
+func writeFileAtomically(f string, contents []byte) error {
+	tmpf, err := ioutil.TempFile("", "")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmpf.Name())
+	_, err = tmpf.Write(contents)
+	if err != nil {
+		return err
+	}
+	tmpf.Close()
+	return os.Rename(tmpf.Name(), f)
 }
