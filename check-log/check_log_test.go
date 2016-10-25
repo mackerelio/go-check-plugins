@@ -309,6 +309,69 @@ Fatal level:17
 	assert.Equal(t, int64(len(content)), readBytes, "readBytes should be 26")
 }
 
+func TestRunWithEncoding(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--encoding", "euc-jp"})
+	opts.prepare()
+
+	fatal := "\xa5\xa8\xa5\xe9\xa1\xbc\n" // エラー
+	testEncoding := func() {
+		fh.Write([]byte(fatal))
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
+		assert.Equal(t, "エラー\n", errLines, "something went wrong")
+	}
+	testEncoding()
+}
+
+func TestRunWithoutEncoding(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`})
+	opts.prepare()
+
+	fatal := "\xa5\xa8\xa5\xe9\xa1\xbc\nエラー\n" // エラー
+	testWithoutEncoding := func() {
+		fh.Write([]byte(fatal))
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
+		assert.Equal(t, "エラー\n", errLines, "something went wrong")
+	}
+	testWithoutEncoding()
+
+	fatal = "エラー\n"
+	testWithEncoding := func() {
+		fh.Write([]byte(fatal))
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
+		assert.Equal(t, "エラー\n", errLines, "something went wrong")
+	}
+	testWithEncoding()
+}
+
 func TestRunWithMissingOk(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-log-test")
 	if err != nil {
