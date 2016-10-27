@@ -1,14 +1,6 @@
 mackerel-check-plugins (0.8.0-1) stable; urgency=low
 
-  * Add check-file-age (by Sixeight)
-    <https://github.com/mackerelio/go-check-plugins/pull/1>
-  * add check-load (by tatsuru)
-    <https://github.com/mackerelio/go-check-plugins/pull/2>
-  * Refactor/check http (by Songmu)
-    <https://github.com/mackerelio/go-check-plugins/pull/3>
-  * Packaging preparation (by itchyny)
-    <https://github.com/mackerelio/go-check-plugins/pull/6>
-  * for windows (by daiksy)
+  * [check-log] improve Windows support (by daiksy)
     <https://github.com/mackerelio/go-check-plugins/pull/122>
 
  -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 27 Oct 2016 02:23:34 +0000

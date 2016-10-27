@@ -46,11 +46,7 @@ done
 
 %changelog
 * Thu Oct 27 2016 <mackerel-developers@hatena.ne.jp> - 0.8.0-1
-- Add check-file-age (by Sixeight)
-- add check-load (by tatsuru)
-- Refactor/check http (by Songmu)
-- Packaging preparation (by itchyny)
-- for windows (by daiksy)
+- [check-log] improve Windows support (by daiksy)
 
 * Tue Oct 18 2016 <mackerel-developers@hatena.ne.jp> - 0.7.0-1
 - Add option for skip searching logfile content if logfile does not exist (by a-know)
