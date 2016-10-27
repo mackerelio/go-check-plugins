@@ -2,11 +2,7 @@
 
 ## 0.8.0 (2016-10-27)
 
-* Add check-file-age #1 (Sixeight)
-* add check-load #2 (tatsuru)
-* Refactor/check http #3 (Songmu)
-* Packaging preparation #6 (itchyny)
-* for windows #122 (daiksy)
+* [check-log] improve Windows support #122 (daiksy)
 
 
 ## 0.7.0 (2016-10-18)
