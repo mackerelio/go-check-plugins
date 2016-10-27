@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.8.0-1) stable; urgency=low
+
+  * [check-log] improve Windows support (by daiksy)
+    <https://github.com/mackerelio/go-check-plugins/pull/122>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 27 Oct 2016 02:23:34 +0000
+
 mackerel-check-plugins (0.7.0-1) stable; urgency=low
 
   * Add option for skip searching logfile content if logfile does not exist (by a-know)

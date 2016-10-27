@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.0 (2016-10-27)
+
+* [check-log] improve Windows support #122 (daiksy)
+
+
 ## 0.7.0 (2016-10-18)
 
 * Add option for skip searching logfile content if logfile does not exist #115 (a-know)

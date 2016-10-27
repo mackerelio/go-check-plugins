@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Oct 27 2016 <mackerel-developers@hatena.ne.jp> - 0.8.0-1
+- [check-log] improve Windows support (by daiksy)
+
 * Tue Oct 18 2016 <mackerel-developers@hatena.ne.jp> - 0.7.0-1
 - Add option for skip searching logfile content if logfile does not exist (by a-know)
 - [check-log] write file atomically when saving read position into state file (by Songmu)
