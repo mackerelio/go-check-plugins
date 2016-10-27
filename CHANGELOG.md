@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.0 (2016-10-27)
+
+* Add check-file-age #1 (Sixeight)
+* add check-load #2 (tatsuru)
+* Refactor/check http #3 (Songmu)
+* Packaging preparation #6 (itchyny)
+* for windows #122 (daiksy)
+
+
 ## 0.7.0 (2016-10-18)
 
 * Add option for skip searching logfile content if logfile does not exist #115 (a-know)
