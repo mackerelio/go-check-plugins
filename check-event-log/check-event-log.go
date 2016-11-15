@@ -216,7 +216,7 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 		if uint32(recordNumber)+1 == oldnum+num {
 			return 0, 0, "", nil
 		}
-		recordNumber += 1
+		recordNumber++
 	} else {
 		recordNumber = 1
 	}
