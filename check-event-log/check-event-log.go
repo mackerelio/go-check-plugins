@@ -303,7 +303,7 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 		computerName, _ := bytesToString(buf[unsafe.Sizeof(eventlog.EVENTLOGRECORD{})+uintptr(sourceNameOff+2):])
 		if opts.Verbose {
 			log.Printf("SourceName=%v", sourceName)
-			log.Println("ComputerName=%v", computerName)
+			log.Printf("ComputerName=%v", computerName)
 		}
 
 		if opts.sourcePattern != nil {
