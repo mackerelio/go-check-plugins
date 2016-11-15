@@ -135,3 +135,66 @@ func TestRun(t *testing.T) {
 	}
 	testReturn()
 }
+
+func TestSourcePattern(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-event-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application"})
+	opts.prepare()
+
+	stateFile := getStateFile(opts.StateDir, "Application")
+
+	recordNumber, _ := getLastOffset(stateFile)
+	lastNumber := recordNumber
+	assert.Equal(t, int64(0), recordNumber, "something went wrong")
+
+	testEmpty := func() {
+		w, c, errLines, err := opts.searchLog("Application")
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, 0, recordNumber, "something went wrong")
+	}
+	testEmpty()
+
+	lastNumber = recordNumber
+
+	opts, _ = parseArgs([]string{"-s", dir, "--log", "Application", "--message-pattern", "テストエラーが(発生しました|起きました)"})
+	opts.prepare()
+
+	testMessagePattern := func() {
+		raiseEvent(t, 1, "check-event-log: テストエラーが発生しました")
+		w, c, errLines, err := opts.searchLog("Application")
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
+	}
+	testMessagePattern()
+
+	opts, _ = parseArgs([]string{"-s", dir, "--log", "Application", "--source-pattern", "[Ww][Ss][Hh]"})
+	opts.prepare()
+
+	testSourcePattern := func() {
+		raiseEvent(t, 2, "check-event-log: テストエラーが発生しました")
+		w, c, errLines, err := opts.searchLog("Application")
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
+	}
+	testSourcePattern()
+}
