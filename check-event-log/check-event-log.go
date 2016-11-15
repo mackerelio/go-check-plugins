@@ -22,20 +22,22 @@ import (
 )
 
 type logOpts struct {
-	Log           string `long:"log" description:"Event names (comma separated)"`
-	Code          string `long:"code" description:"Event codes (comma separated)"`
-	Type          string `long:"type" description:"Event types (comma separated)"`
-	Source        string `long:"source" description:"Event source (comma separated)"`
-	ReturnContent bool   `short:"r" long:"return" description:"Return matched line"`
-	StateDir      string `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-event-log" value-name:"DIR" description:"Dir to keep state files under"`
-	NoState       bool   `long:"no-state" description:"Don't use state file and read whole logs"`
-	FailFirst     bool   `long:"fail-first" description:"Count errors on first seek"`
-	Verbose       bool   `long:"verbose" description:"Verbose output"`
+	Log            string `long:"log" description:"Event Names (comma separated)"`
+	ID             string `long:"id" description:"Event IDs (comma separated)"`
+	Type           string `long:"type" description:"Event Types (comma separated)"`
+	SourcePattern  string `long:"source-pattern" description:"Event Source (regexp pattern)"`
+	MessagePattern string `long:"message-pattern" description:"Message Pattern (regexp pattern)"`
+	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
+	StateDir       string `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-event-log" value-name:"DIR" description:"Dir to keep state files under"`
+	NoState        bool   `long:"no-state" description:"Don't use state file and read whole logs"`
+	FailFirst      bool   `long:"fail-first" description:"Count errors on first seek"`
+	Verbose        bool   `long:"verbose" description:"Verbose output"`
 
-	logList    []string
-	codeList   []int64
-	typeList   []string
-	sourceList []string
+	logList        []string
+	idList         []int64
+	typeList       []string
+	sourcePattern  *regexp.Regexp
+	messagePattern *regexp.Regexp
 }
 
 func stringList(s string) []string {
@@ -51,20 +53,29 @@ func (opts *logOpts) prepare() error {
 	if len(opts.logList) == 0 || opts.logList[0] == "" {
 		opts.logList = []string{"Application"}
 	}
-	for _, code := range stringList(opts.Code) {
+	for _, id := range stringList(opts.ID) {
 		negate := int64(1)
-		if code != "" && code[0] == '!' {
+		if id != "" && id[0] == '!' {
 			negate = -1
-			code = code[1:]
+			id = id[1:]
 		}
-		i, err := strconv.Atoi(code)
+		i, err := strconv.Atoi(id)
 		if err != nil {
 			return err
 		}
-		opts.codeList = append(opts.codeList, int64(i)*negate)
+		opts.idList = append(opts.idList, int64(i)*negate)
 	}
 	opts.typeList = stringList(opts.Type)
-	opts.sourceList = stringList(opts.Source)
+
+	var err error
+	opts.sourcePattern, err = regexp.Compile(opts.SourcePattern)
+	if err != nil {
+		return err
+	}
+	opts.messagePattern, err = regexp.Compile(opts.MessagePattern)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -146,7 +157,7 @@ func getResourceMessage(providerName, sourceName string, eventID uint32, argsptr
 	handle, err := eventlog.LoadLibraryEx(syscall.StringToUTF16Ptr(val), 0,
 		eventlog.DONT_RESOLVE_DLL_REFERENCES|eventlog.LOAD_LIBRARY_AS_DATAFILE)
 	if err != nil {
-		log.Print(err)
+		return "", err
 	}
 	defer syscall.CloseHandle(handle)
 
@@ -170,8 +181,8 @@ func getResourceMessage(providerName, sourceName string, eventID uint32, argsptr
 	return message, nil
 }
 
-func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines string, err error) {
-	stateFile := getStateFile(opts.StateDir, event)
+func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLines string, err error) {
+	stateFile := getStateFile(opts.StateDir, eventName)
 	recordNumber := int64(0)
 	if !opts.NoState {
 		s, err := getLastOffset(stateFile)
@@ -181,9 +192,7 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 		recordNumber = s
 	}
 
-	providerName := event
-
-	ptr := syscall.StringToUTF16Ptr(providerName)
+	ptr := syscall.StringToUTF16Ptr(eventName)
 	h, err := eventlog.OpenEventLog(nil, ptr)
 	if err != nil {
 		log.Fatal(err)
@@ -242,7 +251,7 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 				&readBytes,
 				&nextSize)
 			if err != nil {
-				log.Println(err)
+				log.Printf("eventlog.ReadEventLog: %v", err)
 				break
 			}
 		}
@@ -256,13 +265,13 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 		}
 		lastNumber = i
 
-		if len(opts.codeList) > 0 {
+		if len(opts.idList) > 0 {
 			found := false
-			for _, code := range opts.codeList {
-				if code > 0 && uint32(code) == r.EventID {
+			for _, id := range opts.idList {
+				if id > 0 && uint32(id) == r.EventID {
 					found = true
 					break
-				} else if code <= 0 && uint32(-code) != r.EventID {
+				} else if id <= 0 && uint32(-id) != r.EventID {
 					found = true
 					break
 				}
@@ -277,7 +286,7 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 			log.Printf("EventType=%v", tn)
 		}
 		tn = strings.ToLower(tn)
-		if len(opts.sourceList) > 0 {
+		if len(opts.typeList) > 0 {
 			found := false
 			for _, typ := range opts.typeList {
 				if typ == tn {
@@ -289,14 +298,6 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 				continue
 			}
 		}
-		switch tn {
-		case "error":
-			critNum++
-		case "audit failure":
-			critNum++
-		case "warning":
-			warnNum++
-		}
 
 		sourceName, sourceNameOff := bytesToString(buf[unsafe.Sizeof(eventlog.EVENTLOGRECORD{}):])
 		computerName, _ := bytesToString(buf[unsafe.Sizeof(eventlog.EVENTLOGRECORD{})+uintptr(sourceNameOff+2):])
@@ -305,15 +306,8 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 			log.Println("ComputerName=%v", computerName)
 		}
 
-		if len(opts.sourceList) > 0 {
-			found := false
-			for _, source := range opts.sourceList {
-				if source == sourceName {
-					found = true
-					break
-				}
-			}
-			if !found {
+		if opts.sourcePattern != nil {
+			if !opts.sourcePattern.MatchString(sourceName) {
 				continue
 			}
 		}
@@ -330,14 +324,27 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 		if r.NumStrings > 0 {
 			argsptr = uintptr(unsafe.Pointer(&args[0]))
 		}
-		message, err := getResourceMessage(providerName, sourceName, r.EventID, argsptr)
+		message, err := getResourceMessage(eventName, sourceName, r.EventID, argsptr)
 		if err == nil {
 			if opts.Verbose {
 				log.Printf("Message=%v", message)
 			}
-			if opts.ReturnContent {
-				errLines += sourceName + ":" + strings.Replace(message, "\n", "", -1) + "\n"
+			if opts.messagePattern != nil {
+				if !opts.messagePattern.MatchString(message) {
+					continue
+				}
 			}
+		}
+		if opts.ReturnContent {
+			errLines += sourceName + ":" + strings.Replace(message, "\n", "", -1) + "\n"
+		}
+		switch tn {
+		case "error":
+			critNum++
+		case "audit failure":
+			critNum++
+		case "warning":
+			warnNum++
 		}
 	}
 
@@ -349,6 +356,9 @@ func (opts *logOpts) searchLog(event string) (warnNum, critNum int64, errLines s
 	}
 
 	if recordNumber == 1 && !opts.FailFirst {
+		if strings.Contains(errLines, "テストエラー") {
+			println("================================================")
+		}
 		return 0, 0, "", nil
 	}
 	return warnNum, critNum, errLines, nil
