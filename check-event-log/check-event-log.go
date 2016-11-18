@@ -21,6 +21,10 @@ import (
 	"github.com/mackerelio/go-check-plugins/check-event-log/internal/eventlog"
 )
 
+const (
+	errorInvalidParameter = syscall.Errno(87)
+)
+
 type logOpts struct {
 	Log            string `long:"log" description:"Event Names (comma separated)"`
 	ID             string `long:"id" description:"Event IDs (comma separated)"`
@@ -183,13 +187,13 @@ func getResourceMessage(providerName, sourceName string, eventID uint32, argsptr
 
 func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLines string, err error) {
 	stateFile := getStateFile(opts.StateDir, eventName)
-	recordNumber := int64(0)
+	recordNumber := uint32(0)
 	if !opts.NoState {
 		s, err := getLastOffset(stateFile)
-		if err != nil {
+		if err != nil && !os.IsNotExist(err) {
 			return 0, 0, "", err
 		}
-		recordNumber = s
+		recordNumber = uint32(s)
 	}
 
 	ptr := syscall.StringToUTF16Ptr(eventName)
@@ -199,7 +203,7 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 	}
 	defer eventlog.CloseEventLog(h)
 
-	var num, oldnum uint32
+	var num, oldnum, lastNumber uint32
 
 	eventlog.GetNumberOfEventLogRecords(h, &num)
 	if err != nil {
@@ -210,15 +214,21 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 		log.Fatal(err)
 	}
 
-	flags := eventlog.EVENTLOG_FORWARDS_READ | eventlog.EVENTLOG_SEEK_READ
+	if recordNumber == 0 {
+		if !opts.NoState {
+			err = writeLastOffset(stateFile, int64(oldnum+num-1))
+			return 0, 0, "", err
+		}
+	}
 
-	if recordNumber > 0 && oldnum <= uint32(recordNumber) {
-		if uint32(recordNumber)+1 == oldnum+num {
+	if oldnum <= recordNumber {
+		if recordNumber == oldnum+num-1 {
 			return 0, 0, "", nil
 		}
+		lastNumber = recordNumber
 		recordNumber++
 	} else {
-		recordNumber = 1
+		recordNumber = oldnum
 	}
 
 	size := uint32(1)
@@ -226,8 +236,12 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 
 	var readBytes uint32
 	var nextSize uint32
-	var lastNumber uint32
-	for i := uint32(recordNumber); i < oldnum+num; i++ {
+	for i := recordNumber; i < oldnum+num; i++ {
+		flags := eventlog.EVENTLOG_FORWARDS_READ | eventlog.EVENTLOG_SEEK_READ
+		if i == 0 {
+			flags = eventlog.EVENTLOG_FORWARDS_READ | eventlog.EVENTLOG_SEQUENTIAL_READ
+		}
+
 		err = eventlog.ReadEventLog(
 			h,
 			flags,
@@ -238,13 +252,16 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 			&nextSize)
 		if err != nil {
 			if err != syscall.ERROR_INSUFFICIENT_BUFFER {
+				if err != errorInvalidParameter {
+					return 0, 0, "", err
+				}
 				break
 			}
 			buf = make([]byte, nextSize)
 			size = nextSize
 			err = eventlog.ReadEventLog(
 				h,
-				eventlog.EVENTLOG_FORWARDS_READ|eventlog.EVENTLOG_SEQUENTIAL_READ,
+				flags,
 				i,
 				&buf[0],
 				size,
@@ -263,7 +280,7 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 			log.Printf("TimeWritten=%v", time.Unix(int64(r.TimeWritten), 0).String())
 			log.Printf("EventID=%v", r.EventID)
 		}
-		lastNumber = i
+		lastNumber = r.RecordNumber
 
 		if len(opts.idList) > 0 {
 			found := false
@@ -355,10 +372,7 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 		}
 	}
 
-	if recordNumber == 1 && !opts.FailFirst {
-		if strings.Contains(errLines, "テストエラー") {
-			println("================================================")
-		}
+	if recordNumber == 0 && !opts.FailFirst {
 		return 0, 0, "", nil
 	}
 	return warnNum, critNum, errLines, nil
@@ -373,7 +387,7 @@ func getStateFile(stateDir, f string) string {
 func getLastOffset(f string) (int64, error) {
 	_, err := os.Stat(f)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	b, err := ioutil.ReadFile(f)
 	if err != nil {
