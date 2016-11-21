@@ -65,9 +65,9 @@ Use check plugins in Mackerel
 
 See the following documentation.
 
-English: http://help.mackerel.io/entry/custom-checks
+English: https://mackerel.io/docs/entry/custom-checks
 
-Japanese: http://help-ja.mackerel.io/entry/custom-checks
+Japanese: https://mackerel.io/ja/docs/entry/custom-checks
 
 
 Contribution
