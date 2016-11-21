@@ -212,7 +212,7 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 	}
 
 	if recordNumber == 0 {
-		if !opts.NoState {
+		if !opts.NoState && !opts.FailFirst {
 			err = writeLastOffset(stateFile, int64(oldnum+num-1))
 			return 0, 0, "", err
 		}
