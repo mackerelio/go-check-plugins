@@ -2,6 +2,13 @@ machine:
   timezone:
     Asia/Tokyo
 
+dependencies:
+  override:
+    - mkdir -p $HOME/.go_project/src/github.com/mackerelio
+    - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_project/src/github.com/mackerelio/$CIRCLE_PROJECT_REPONAME
+    - |
+      echo 'export GOPATH=$GOPATH:$HOME/.go_project' >> ~/.circlerc
+
 test:
   pre:
     - go get github.com/mitchellh/gox
