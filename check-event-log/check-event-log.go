@@ -27,7 +27,6 @@ const (
 
 type logOpts struct {
 	Log            string `long:"log" description:"Event Names (comma separated)"`
-	ID             string `long:"id" description:"Event IDs (comma separated)"`
 	Type           string `long:"type" description:"Event Types (comma separated)"`
 	SourcePattern  string `long:"source-pattern" description:"Event Source (regexp pattern)"`
 	MessagePattern string `long:"message-pattern" description:"Message Pattern (regexp pattern)"`
@@ -40,7 +39,6 @@ type logOpts struct {
 	Verbose        bool   `long:"verbose" description:"Verbose output"`
 
 	logList        []string
-	idList         []int64
 	typeList       []string
 	sourcePattern  *regexp.Regexp
 	messagePattern *regexp.Regexp
@@ -58,18 +56,6 @@ func (opts *logOpts) prepare() error {
 	opts.logList = stringList(opts.Log)
 	if len(opts.logList) == 0 || opts.logList[0] == "" {
 		opts.logList = []string{"Application"}
-	}
-	for _, id := range stringList(opts.ID) {
-		negate := int64(1)
-		if id != "" && id[0] == '!' {
-			negate = -1
-			id = id[1:]
-		}
-		i, err := strconv.Atoi(id)
-		if err != nil {
-			return err
-		}
-		opts.idList = append(opts.idList, int64(i)*negate)
 	}
 	opts.typeList = stringList(opts.Type)
 
@@ -292,22 +278,6 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 			log.Printf("EventID=%v", r.EventID)
 		}
 		lastNumber = r.RecordNumber
-
-		if len(opts.idList) > 0 {
-			found := false
-			for _, id := range opts.idList {
-				if id > 0 && uint32(id) == r.EventID {
-					found = true
-					break
-				} else if id <= 0 && uint32(-id) != r.EventID {
-					found = true
-					break
-				}
-			}
-			if !found {
-				continue
-			}
-		}
 
 		tn := eventlog.EventType(r.EventType).String()
 		if opts.Verbose {
