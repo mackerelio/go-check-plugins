@@ -125,6 +125,9 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 	msg := fmt.Sprintf("%d warnings, %d criticals.", warnNum, critNum)
+	if errorOverall != "" {
+		msg += "\n" + errorOverall
+	}
 	if warnNum > opts.WarnOver {
 		checkSt = checkers.WARNING
 	}
