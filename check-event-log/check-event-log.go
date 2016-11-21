@@ -31,6 +31,8 @@ type logOpts struct {
 	Type           string `long:"type" description:"Event Types (comma separated)"`
 	SourcePattern  string `long:"source-pattern" description:"Event Source (regexp pattern)"`
 	MessagePattern string `long:"message-pattern" description:"Message Pattern (regexp pattern)"`
+	WarnOver       int64  `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
+	CritOver       int64  `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
 	StateDir       string `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-event-log" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState        bool   `long:"no-state" description:"Don't use state file and read whole logs"`
@@ -123,6 +125,12 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 	msg := fmt.Sprintf("%d warnings, %d criticals.", warnNum, critNum)
+	if warnNum > opts.WarnOver {
+		checkSt = checkers.WARNING
+	}
+	if critNum > opts.CritOver {
+		checkSt = checkers.CRITICAL
+	}
 	return checkers.NewChecker(checkSt, msg)
 }
 
