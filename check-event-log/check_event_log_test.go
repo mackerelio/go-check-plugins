@@ -198,3 +198,23 @@ func TestSourcePattern(t *testing.T) {
 	}
 	testSourcePattern()
 }
+
+func TestFailFirst(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-event-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application", "--fail-first", "--warning-over", "0", "--critical-over", "0"})
+	opts.prepare()
+
+	testFailFirst := func() {
+		w, c, errLines, err := opts.searchLog("Application")
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.NotEqual(t, int64(0), w, "something went wrong")
+		assert.NotEqual(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+	}
+	testFailFirst()
+}
