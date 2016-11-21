@@ -8,6 +8,20 @@ Checks a windows event log using a regular expression.
 
 ```
 [plugin.checks.event-log]
-command = "/path/to/check-event-log --log=Application --source-pattern=REGEXP --message-pattern=REGEXP --warning-over=N --critical-over=N"
+command = "/path/to/check-event-log --log=LOGTYPE --type=EVENTTYPE --source-pattern=REGEXP --message-pattern=REGEXP --warning-over=N --critical-over=N"
 ```
 
+### LOGTYPE
+
+* Application
+* Security
+* System
+
+### EVENTTYPE
+
+* Success
+* Error
+* Audit Failure
+* Audit Success
+* Information
+* Warning
