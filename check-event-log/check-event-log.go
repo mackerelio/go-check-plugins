@@ -80,6 +80,13 @@ func main() {
 func parseArgs(args []string) (*logOpts, error) {
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
+	if opts.StateDir == "" {
+		workdir := os.Getenv("MACKEREL_PLUGIN_WORKDIR")
+		if workdir == "" {
+			workdir = os.TempDir()
+		}
+		opts.StateDir = filepath.Join(workdir, "check-log")
+	}
 	return opts, err
 }
 
