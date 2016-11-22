@@ -4,10 +4,8 @@ machine:
 
 dependencies:
   override:
-    - mkdir -p $HOME/.go_project/src/github.com/mackerelio
-    - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_project/src/github.com/mackerelio/$CIRCLE_PROJECT_REPONAME
-    - |
-      echo 'export GOPATH=$GOPATH:$HOME/.go_project' >> ~/.circlerc
+    - mkdir -p $HOME/.go_workspace/src/github.com/mackerelio
+    - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_workspace/src/github.com/mackerelio/$CIRCLE_PROJECT_REPONAME
 
 test:
   pre:
