@@ -66,9 +66,6 @@ func run(args []string) *checkers.Checker {
 		if s.State == "Running" {
 			continue
 		}
-		if s.ErrorControl == "Ignore" {
-			continue
-		}
 		checkSt = checkers.CRITICAL
 		msg = fmt.Sprintf("%s: %s - %s", s.Name, s.Caption, s.State)
 		break
