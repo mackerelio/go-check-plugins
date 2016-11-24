@@ -292,7 +292,6 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 		if opts.Verbose {
 			log.Printf("EventType=%v", tn)
 		}
-		tn = strings.ToLower(tn)
 		if len(opts.typeList) > 0 {
 			found := false
 			for _, typ := range opts.typeList {
