@@ -5,6 +5,8 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/go-ole/go-ole"
@@ -13,11 +15,27 @@ import (
 )
 
 func TestGetStateFile(t *testing.T) {
-	sPath := getStateFile("/var/lib", "C:/Windows/hoge")
-	assert.Equal(t, sPath, "/var/lib/C/Windows/hoge", "drive letter should be cared")
+	opts := &logOpts{
+		StateDir: "/var/lib",
+		origArgs: []string{},
+	}
+	opts.prepare()
+	sPath := opts.getStateFile("Application")
+	if runtime.GOOS == "windows" {
+		sPath = filepath.ToSlash(sPath)
+	}
+	assert.Equal(t, sPath, "/var/lib/Application-d41d8cd98f00b204e9800998ecf8427e", "drive letter should be cared")
 
-	sPath = getStateFile("/var/lib", "/linux/hoge")
-	assert.Equal(t, sPath, "/var/lib/linux/hoge", "drive letter should be cared")
+	opts = &logOpts{
+		StateDir: "/var/lib",
+		origArgs: []string{"foo", "bar"},
+	}
+	opts.prepare()
+	sPath = opts.getStateFile("Security")
+	if runtime.GOOS == "windows" {
+		sPath = filepath.ToSlash(sPath)
+	}
+	assert.Equal(t, sPath, "/var/lib/Security-327b6f07435811239bc47e1544353273", "drive letter should be cared")
 }
 
 func TestWriteLastOffset(t *testing.T) {
@@ -55,7 +73,7 @@ func TestRun(t *testing.T) {
 	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application"})
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, "Application")
+	stateFile := opts.getStateFile("Application")
 
 	recordNumber, _ := getLastOffset(stateFile)
 	lastNumber := recordNumber
@@ -148,7 +166,7 @@ func TestSourcePattern(t *testing.T) {
 	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application"})
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, "Application")
+	stateFile := opts.getStateFile("Application")
 
 	recordNumber, _ := getLastOffset(stateFile)
 	lastNumber := recordNumber

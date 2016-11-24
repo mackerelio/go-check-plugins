@@ -3,6 +3,7 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -44,6 +45,7 @@ type logOpts struct {
 	typeList       []string
 	sourcePattern  *regexp.Regexp
 	messagePattern *regexp.Regexp
+	origArgs       []string
 }
 
 func stringList(s string) []string {
@@ -80,6 +82,8 @@ func main() {
 }
 
 func parseArgs(args []string) (*logOpts, error) {
+	var origArgs []string
+	copy(origArgs, args)
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
 	if opts.StateDir == "" {
@@ -87,8 +91,9 @@ func parseArgs(args []string) (*logOpts, error) {
 		if workdir == "" {
 			workdir = os.TempDir()
 		}
-		opts.StateDir = filepath.Join(workdir, "check-log")
+		opts.StateDir = filepath.Join(workdir, "check-event-log")
 	}
+	opts.origArgs = origArgs
 	return opts, err
 }
 
@@ -108,8 +113,8 @@ func run(args []string) *checkers.Checker {
 	critNum := int64(0)
 	errorOverall := ""
 
-	for _, f := range opts.logList {
-		w, c, errLines, err := opts.searchLog(f)
+	for _, lt := range opts.logList {
+		w, c, errLines, err := opts.searchLog(lt)
 		if err != nil {
 			return checkers.Unknown(err.Error())
 		}
@@ -191,8 +196,8 @@ func getResourceMessage(providerName, sourceName string, eventID uint32, argsptr
 	return message, nil
 }
 
-func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLines string, err error) {
-	stateFile := getStateFile(opts.StateDir, eventName)
+func (opts *logOpts) searchLog(logName string) (warnNum, critNum int64, errLines string, err error) {
+	stateFile := opts.getStateFile(logName)
 	recordNumber := uint32(0)
 	if !opts.NoState {
 		s, err := getLastOffset(stateFile)
@@ -202,7 +207,7 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 		recordNumber = uint32(s)
 	}
 
-	ptr := syscall.StringToUTF16Ptr(eventName)
+	ptr := syscall.StringToUTF16Ptr(logName)
 	h, err := eventlog.OpenEventLog(nil, ptr)
 	if err != nil {
 		log.Fatal(err)
@@ -330,7 +335,7 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 		if r.NumStrings > 0 {
 			argsptr = uintptr(unsafe.Pointer(&args[0]))
 		}
-		message, err := getResourceMessage(eventName, sourceName, r.EventID, argsptr)
+		message, err := getResourceMessage(logName, sourceName, r.EventID, argsptr)
 		if err == nil {
 			if opts.Verbose {
 				log.Printf("Message=%v", message)
@@ -345,11 +350,11 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 			errLines += sourceName + ":" + strings.Replace(message, "\n", "", -1) + "\n"
 		}
 		switch tn {
-		case "error":
+		case "Error":
 			critNum++
-		case "audit failure":
+		case "Audit Failure":
 			critNum++
-		case "warning":
+		case "Warning":
 			warnNum++
 		}
 	}
@@ -369,8 +374,15 @@ func (opts *logOpts) searchLog(eventName string) (warnNum, critNum int64, errLin
 
 var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
 
-func getStateFile(stateDir, f string) string {
-	return filepath.ToSlash(filepath.Join(stateDir, stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator))))
+func (opts *logOpts) getStateFile(logName string) string {
+	return filepath.Join(
+		opts.StateDir,
+		fmt.Sprintf(
+			"%s-%x",
+			stateRe.ReplaceAllString(logName, `$1`+string(filepath.Separator)),
+			md5.Sum([]byte(strings.Join(opts.origArgs, " "))),
+		),
+	)
 }
 
 func getLastOffset(f string) (int64, error) {
