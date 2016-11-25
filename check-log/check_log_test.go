@@ -18,7 +18,10 @@ func TestGetStateFile(t *testing.T) {
 	assert.Equal(t, "/var/lib/C/Windows/hoge-d41d8cd98f00b204e9800998ecf8427e", sPath, "drive letter should be cared")
 
 	sPath = getStateFile("/var/lib", "/linux/hoge", []string{})
-	assert.Equal(t, "/var/lib/linux/hoge-d41d8cd98f00b204e9800998ecf8427e", sPath, "drive letter should be cared")
+	assert.Equal(t, "/var/lib/linux/hoge-d41d8cd98f00b204e9800998ecf8427e", sPath, "arguments should be cared")
+
+	sPath = getStateFile("/var/lib", "/linux/hoge", []string{"aa", "BB"})
+	assert.Equal(t, "/var/lib/linux/hoge-c508092e97c59149a8644827e066ca83", sPath, "arguments should be cared")
 }
 
 func TestWriteBytesToSkip(t *testing.T) {
@@ -281,7 +284,10 @@ func TestSearchReaderWithLevel(t *testing.T) {
 
 	logf := filepath.Join(dir, "dummy")
 	ptn := `FATAL level:([0-9]+)`
-	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-i", "-p", ptn, "--critical-level=17", "--warning-level=11"})
+	origArgs := []string{"-s", dir, "-f", logf, "-i", "-p", ptn, "--critical-level=17", "--warning-level=11"}
+	args := make([]string, len(origArgs))
+	copy(args, origArgs)
+	opts, _ := parseArgs(args)
 	if !reflect.DeepEqual(&logOpts{
 		StateDir:        dir,
 		LogFile:         filepath.Join(dir, "dummy"),
@@ -290,8 +296,9 @@ func TestSearchReaderWithLevel(t *testing.T) {
 		WarnLevel:       11,
 		CritLevel:       17,
 		Missing:         "UNKNOWN",
+		origArgs:        origArgs,
 	}, opts) {
-		t.Errorf("something went wrong")
+		t.Errorf("something went wrong: %#v", opts)
 	}
 	opts.prepare()
 
