@@ -82,7 +82,7 @@ func main() {
 }
 
 func parseArgs(args []string) (*logOpts, error) {
-	var origArgs []string
+	origArgs := make([]string, len(args))
 	copy(origArgs, args)
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
