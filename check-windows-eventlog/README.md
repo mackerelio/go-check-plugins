@@ -1,4 +1,4 @@
-# check-event-log
+# check-windows-eventlog
 
 ## Description
 
@@ -8,7 +8,7 @@ Checks a windows event log using a regular expression.
 
 ```
 [plugin.checks.event-log]
-command = "/path/to/check-event-log --log=LOGTYPE --type=EVENTTYPE --source-pattern=REGEXP --message-pattern=REGEXP --warning-over=N --critical-over=N" --fail-first
+command = "/path/to/check-windows-eventlog --log=LOGTYPE --type=EVENTTYPE --source-pattern=REGEXP --message-pattern=REGEXP --warning-over=N --critical-over=N" --fail-first
 ```
 
 ### LOGTYPE

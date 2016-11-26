@@ -21,7 +21,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
-	"github.com/mackerelio/go-check-plugins/check-event-log/internal/eventlog"
+	"github.com/mackerelio/go-check-plugins/check-windows-eventlog/internal/eventlog"
 )
 
 const (
@@ -36,7 +36,7 @@ type logOpts struct {
 	WarnOver       int64  `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver       int64  `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
-	StateDir       string `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-event-log" value-name:"DIR" description:"Dir to keep state files under"`
+	StateDir       string `short:"s" long:"state-dir" default:"/var/mackerel-cache/check-windows-eventlog" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState        bool   `long:"no-state" description:"Don't use state file and read whole logs"`
 	FailFirst      bool   `long:"fail-first" description:"Count errors on first seek"`
 	Verbose        bool   `long:"verbose" description:"Verbose output"`
@@ -91,7 +91,7 @@ func parseArgs(args []string) (*logOpts, error) {
 		if workdir == "" {
 			workdir = os.TempDir()
 		}
-		opts.StateDir = filepath.Join(workdir, "check-event-log")
+		opts.StateDir = filepath.Join(workdir, "check-windows-eventlog")
 	}
 	opts.origArgs = origArgs
 	return opts, err

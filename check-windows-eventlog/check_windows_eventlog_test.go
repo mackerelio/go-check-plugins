@@ -65,7 +65,7 @@ func raiseEvent(t *testing.T, typ int, msg string) {
 }
 
 func TestRun(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-event-log-test")
+	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
@@ -110,7 +110,7 @@ func TestRun(t *testing.T) {
 	lastNumber = recordNumber
 
 	testInfo := func() {
-		raiseEvent(t, 0, "check-event-log: something info occured")
+		raiseEvent(t, 0, "check-windows-eventlog: something info occured")
 		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(0), w, "something went wrong")
@@ -125,7 +125,7 @@ func TestRun(t *testing.T) {
 	lastNumber = recordNumber
 
 	testWarning := func() {
-		raiseEvent(t, 2, "check-event-log: something warning occured")
+		raiseEvent(t, 2, "check-windows-eventlog: something warning occured")
 		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(1), w, "something went wrong")
@@ -140,7 +140,7 @@ func TestRun(t *testing.T) {
 	lastNumber = recordNumber
 
 	testError := func() {
-		raiseEvent(t, 1, "check-event-log: something error occured")
+		raiseEvent(t, 1, "check-windows-eventlog: something error occured")
 		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(0), w, "something went wrong")
@@ -192,13 +192,13 @@ func TestRun(t *testing.T) {
 	testEmpty()
 
 	testReturn := func() {
-		raiseEvent(t, 1, "check-event-log: something error occured")
-		raiseEvent(t, 2, "check-event-log: something warning occured")
+		raiseEvent(t, 1, "check-windows-eventlog: something error occured")
+		raiseEvent(t, 2, "check-windows-eventlog: something warning occured")
 		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "WSH:check-event-log: something error occured\nWSH:check-event-log: something warning occured\n", errLines, "something went wrong")
+		assert.Equal(t, "WSH:check-windows-eventlog: something error occured\nWSH:check-windows-eventlog: something warning occured\n", errLines, "something went wrong")
 
 		recordNumber, _ = getLastOffset(stateFile)
 		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
@@ -207,7 +207,7 @@ func TestRun(t *testing.T) {
 }
 
 func TestSourcePattern(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-event-log-test")
+	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
@@ -240,7 +240,7 @@ func TestSourcePattern(t *testing.T) {
 	opts.prepare()
 
 	testMessagePattern := func() {
-		raiseEvent(t, 1, "check-event-log: テストエラーが発生しました")
+		raiseEvent(t, 1, "check-windows-eventlog: テストエラーが発生しました")
 		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(0), w, "something went wrong")
@@ -256,7 +256,7 @@ func TestSourcePattern(t *testing.T) {
 	opts.prepare()
 
 	testSourcePattern := func() {
-		raiseEvent(t, 2, "check-event-log: テストエラーが発生しました")
+		raiseEvent(t, 2, "check-windows-eventlog: テストエラーが発生しました")
 		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(1), w, "something went wrong")
@@ -270,7 +270,7 @@ func TestSourcePattern(t *testing.T) {
 }
 
 func TestFailFirst(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-event-log-test")
+	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
