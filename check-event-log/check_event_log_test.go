@@ -1,8 +1,13 @@
+// +build windows
+
 package main
 
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"reflect"
+	"runtime"
 	"testing"
 
 	"github.com/go-ole/go-ole"
@@ -11,11 +16,27 @@ import (
 )
 
 func TestGetStateFile(t *testing.T) {
-	sPath := getStateFile("/var/lib", "C:/Windows/hoge")
-	assert.Equal(t, sPath, "/var/lib/C/Windows/hoge", "drive letter should be cared")
+	opts := &logOpts{
+		StateDir: "/var/lib",
+		origArgs: []string{},
+	}
+	opts.prepare()
+	sPath := opts.getStateFile("Application")
+	if runtime.GOOS == "windows" {
+		sPath = filepath.ToSlash(sPath)
+	}
+	assert.Equal(t, sPath, "/var/lib/Application-d41d8cd98f00b204e9800998ecf8427e", "arguments should be cared")
 
-	sPath = getStateFile("/var/lib", "/linux/hoge")
-	assert.Equal(t, sPath, "/var/lib/linux/hoge", "drive letter should be cared")
+	opts = &logOpts{
+		StateDir: "/var/lib",
+		origArgs: []string{"foo", "bar"},
+	}
+	opts.prepare()
+	sPath = opts.getStateFile("Security")
+	if runtime.GOOS == "windows" {
+		sPath = filepath.ToSlash(sPath)
+	}
+	assert.Equal(t, sPath, "/var/lib/Security-327b6f07435811239bc47e1544353273", "arguments should be cared")
 }
 
 func TestWriteLastOffset(t *testing.T) {
@@ -50,10 +71,25 @@ func TestRun(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
-	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application"})
+	origArgs := []string{"-s", dir, "--log", "Application"}
+	args := make([]string, len(origArgs))
+	copy(args, origArgs)
+	opts, err := parseArgs(args)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(&logOpts{
+		StateDir: dir,
+		Log:      `Application`,
+		origArgs: origArgs,
+	}, opts) {
+		t.Errorf("something went wrong: %#v", opts)
+	}
+
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, "Application")
+	stateFile := opts.getStateFile("Application")
 
 	recordNumber, _ := getLastOffset(stateFile)
 	lastNumber := recordNumber
@@ -118,8 +154,42 @@ func TestRun(t *testing.T) {
 
 	lastNumber = recordNumber
 
-	opts, _ = parseArgs([]string{"-s", dir, "--log", "Application", "-r"})
+	origArgs = []string{"-s", dir, "--log", "Application", "-r"}
+	args = make([]string, len(origArgs))
+	copy(args, origArgs)
+	opts, err = parseArgs(args)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(&logOpts{
+		StateDir:      dir,
+		Log:           `Application`,
+		ReturnContent: true,
+		origArgs:      origArgs,
+	}, opts) {
+		t.Errorf("something went wrong: %#v", opts)
+	}
+
 	opts.prepare()
+
+	stateFile = opts.getStateFile("Application")
+
+	recordNumber, _ = getLastOffset(stateFile)
+	lastNumber = recordNumber
+	assert.Equal(t, int64(0), recordNumber, "something went wrong")
+
+	testEmpty = func() {
+		w, c, errLines, err := opts.searchLog("Application")
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, 0, recordNumber, "something went wrong")
+	}
+	testEmpty()
 
 	testReturn := func() {
 		raiseEvent(t, 1, "check-event-log: something error occured")
@@ -146,7 +216,7 @@ func TestSourcePattern(t *testing.T) {
 	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application"})
 	opts.prepare()
 
-	stateFile := getStateFile(opts.StateDir, "Application")
+	stateFile := opts.getStateFile("Application")
 
 	recordNumber, _ := getLastOffset(stateFile)
 	lastNumber := recordNumber
