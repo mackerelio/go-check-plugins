@@ -1,3 +1,16 @@
+mackerel-check-plugins (0.8.1-1) stable; urgency=low
+
+  * Fix state in check-procs (by itchyny)
+    <https://github.com/mackerelio/go-check-plugins/pull/124>
+  * Fix the links to the document (by itchyny)
+    <https://github.com/mackerelio/go-check-plugins/pull/125>
+  * remove checking Ignore (by mattn)
+    <https://github.com/mackerelio/go-check-plugins/pull/126>
+  * [check-log] fix state file path (fix wrong slice copy) (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/127>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 29 Nov 2016 06:02:11 +0000
+
 mackerel-check-plugins (0.8.0-1) stable; urgency=low
 
   * [check-log] improve Windows support (by daiksy)

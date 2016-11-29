@@ -45,6 +45,12 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Tue Nov 29 2016 <mackerel-developers@hatena.ne.jp> - 0.8.1-1
+- Fix state in check-procs (by itchyny)
+- Fix the links to the document (by itchyny)
+- remove checking Ignore (by mattn)
+- [check-log] fix state file path (fix wrong slice copy) (by Songmu)
+
 * Thu Oct 27 2016 <mackerel-developers@hatena.ne.jp> - 0.8.0-1
 - [check-log] improve Windows support (by daiksy)
 
