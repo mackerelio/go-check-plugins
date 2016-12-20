@@ -335,15 +335,13 @@ func (opts *logOpts) searchLog(logName string) (warnNum, critNum int64, errLines
 		if r.NumStrings > 0 {
 			argsptr = uintptr(unsafe.Pointer(&args[0]))
 		}
-		message, err := getResourceMessage(logName, sourceName, r.EventID, argsptr)
-		if err == nil {
-			if opts.Verbose {
-				log.Printf("Message=%v", message)
-			}
-			if opts.messagePattern != nil {
-				if !opts.messagePattern.MatchString(message) {
-					continue
-				}
+		message, _ := getResourceMessage(logName, sourceName, r.EventID, argsptr)
+		if opts.Verbose {
+			log.Printf("Message=%v", message)
+		}
+		if opts.messagePattern != nil {
+			if !opts.messagePattern.MatchString(message) {
+				continue
 			}
 		}
 		if opts.ReturnContent {
