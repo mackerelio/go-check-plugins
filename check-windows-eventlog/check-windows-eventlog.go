@@ -345,6 +345,9 @@ func (opts *logOpts) searchLog(logName string) (warnNum, critNum int64, errLines
 			}
 		}
 		if opts.ReturnContent {
+			if message == "" {
+				message = "[mackerel-agent] No message resource found. Please make sure the event log occured on the server."
+			}
 			errLines += sourceName + ":" + strings.Replace(message, "\n", "", -1) + "\n"
 		}
 		switch tn {
