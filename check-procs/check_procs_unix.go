@@ -45,12 +45,12 @@ func parseProcState(line string) (proc procState, err error) {
 	if threadsUnknown {
 		esec := timeStrToSeconds(fields[7])
 		csec := timeStrToSeconds(fields[8])
-		return procState{strings.Join(fields[9:], " "), fields[0], fields[1], fields[2], vsz, rss, pcpu, 1, fields[5], esec, csec}, nil
+		return procState{strings.Join(fields[9:], " "), fields[0], fields[1], fields[2], vsz, rss, pcpu, 1, fields[6], esec, csec}, nil
 	}
 	thcount, _ := strconv.ParseInt(fields[6], 10, 64)
 	esec := timeStrToSeconds(fields[8])
 	csec := timeStrToSeconds(fields[9])
-	return procState{strings.Join(fields[10:], " "), fields[0], fields[1], fields[2], vsz, rss, pcpu, thcount, fields[6], esec, csec}, nil
+	return procState{strings.Join(fields[10:], " "), fields[0], fields[1], fields[2], vsz, rss, pcpu, thcount, fields[7], esec, csec}, nil
 }
 
 var timeRegexp = regexp.MustCompile(`(?:(\d+)-)?(?:(\d+):)?(\d+)[:.](\d+)`)
@@ -66,4 +66,3 @@ func timeStrToSeconds(etime string) int64 {
 	seconds, _ := strconv.ParseInt(match[4], 10, 64)
 	return (((days*24+hours)*60+minutes)*60 + seconds)
 }
-

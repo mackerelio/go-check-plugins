@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.1 (2016-11-29)
+
+* Fix state in check-procs #124 (itchyny)
+* Fix the links to the document #125 (itchyny)
+* remove checking Ignore #126 (mattn)
+* [check-log] fix state file path (fix wrong slice copy) #127 (Songmu)
+
+
 ## 0.8.0 (2016-10-27)
 
 * [check-log] improve Windows support #122 (daiksy)
