@@ -321,7 +321,11 @@ func getBytesToSkip(f string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	i, err := strconv.ParseInt(strings.Trim(string(b), " \r\n"), 10, 64)
+	str := strings.Trim(string(b), " \r\n")
+	if str == "" {
+		return 0, nil
+	}
+	i, err := strconv.ParseInt(str, 10, 64)
 	if err != nil {
 		log.Printf("failed to getBytesToSkip (ignoring): %s", err)
 	}
