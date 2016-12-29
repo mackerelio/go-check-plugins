@@ -262,11 +262,8 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 		readBytes += int64(len(lineBytes))
 
 		if opts.decoder != nil {
-			lineBytes, rErr = opts.decoder.Bytes(lineBytes)
-			if rErr != nil {
-				if rErr != io.EOF {
-					err = rErr
-				}
+			lineBytes, err = opts.decoder.Bytes(lineBytes)
+			if err != nil {
 				break
 			}
 		}
