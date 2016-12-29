@@ -17,11 +17,8 @@ To specify encoding of the log files, you can use `--encoding` option. Below's l
 * CP437
 * CP866
 * ISO-2022-JP
-* ISO-8859-10
-* ISO-8859-13
-* ISO-8859-14
-* ISO-8859-15
-* ISO-8859-16
+* LATIN-1
+* ISO-8859-1
 * ISO-8859-2
 * ISO-8859-3
 * ISO-8859-4
@@ -29,6 +26,11 @@ To specify encoding of the log files, you can use `--encoding` option. Below's l
 * ISO-8859-6
 * ISO-8859-7
 * ISO-8859-8
+* ISO-8859-10
+* ISO-8859-13
+* ISO-8859-14
+* ISO-8859-15
+* ISO-8859-16
 * KOI8R
 * KOI8U
 * Macintosh
@@ -51,6 +53,9 @@ To specify encoding of the log files, you can use `--encoding` option. Below's l
 * CP932
 * Shift_JIS
 * EUC-JP
+* UTF-16 (detect BOM)
+* UTF-16BE
+* UTF-16LE
 
 ## See Other
 
