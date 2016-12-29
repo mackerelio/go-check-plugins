@@ -263,8 +263,11 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 
 		if opts.decoder != nil {
 			lineBytes, rErr = opts.decoder.Bytes(lineBytes)
-			if rErr != nil && rErr != io.EOF {
-				err = rErr
+			if rErr != nil {
+				if rErr != io.EOF {
+					err = rErr
+				}
+				break
 			}
 		}
 		line := strings.Trim(string(lineBytes), "\r\n")
