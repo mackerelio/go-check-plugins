@@ -190,6 +190,55 @@ func TestRun(t *testing.T) {
 	testRotate()
 }
 
+func TestRunWithGlob(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf1 := filepath.Join(dir, "dummy1")
+	fh1, _ := os.Create(logf1)
+	defer fh1.Close()
+
+	logf2 := filepath.Join(dir, "dummy2")
+	fh2, _ := os.Create(logf2)
+	defer fh2.Close()
+
+	ptn := `FATAL`
+	params := []string{dir, "-g", filepath.Join(dir, "dummy*"), "-p", ptn}
+	opts, _ := parseArgs(params)
+	opts.prepare()
+
+	testSuccess := func() {
+		ckr := run(params)
+		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
+	}
+	testSuccess()
+
+	errorLine := "FATAL\n"
+	testCriticalOnce := func() {
+		fh1.WriteString(errorLine)
+		ckr := run(params)
+		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
+	}
+	testCriticalOnce()
+
+	testRecover := func() {
+		ckr := run(params)
+		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
+	}
+	testRecover()
+
+	testCriticalAgain := func() {
+		fh2.WriteString(errorLine)
+		ckr := run(params)
+		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
+	}
+	testCriticalAgain()
+
+}
+
 func TestRunWithMiddleOfLine(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-log-test")
 	if err != nil {
