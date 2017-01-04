@@ -16,6 +16,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 	"github.com/mattn/go-encoding"
+	enc "golang.org/x/text/encoding"
 )
 
 type logOpts struct {
@@ -37,6 +38,7 @@ type logOpts struct {
 	excludeReg      *regexp.Regexp
 	fileList        []string
 	origArgs        []string
+	decoder         *enc.Decoder
 }
 
 func (opts *logOpts) prepare() error {
@@ -220,11 +222,11 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 
 	var r io.Reader = f
 	if opts.Encoding != "" {
-		enc := encoding.GetEncoding(opts.Encoding)
-		if enc == nil {
+		e := encoding.GetEncoding(opts.Encoding)
+		if e == nil {
 			return 0, 0, "", fmt.Errorf("unknown encoding:" + opts.Encoding)
 		}
-		r = enc.NewDecoder().Reader(f)
+		opts.decoder = e.NewDecoder()
 	}
 
 	warnNum, critNum, readBytes, errLines, err := opts.searchReader(r)
@@ -258,6 +260,13 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 			break
 		}
 		readBytes += int64(len(lineBytes))
+
+		if opts.decoder != nil {
+			lineBytes, err = opts.decoder.Bytes(lineBytes)
+			if err != nil {
+				break
+			}
+		}
 		line := strings.Trim(string(lineBytes), "\r\n")
 		if matched, matches := opts.match(line); matched {
 			if len(matches) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
