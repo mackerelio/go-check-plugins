@@ -330,10 +330,23 @@ func TestRunWithEncoding(t *testing.T) {
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--encoding", "euc-jp"})
 	opts.prepare()
 
-	fatal := "\xa5\xa8\xa5\xe9\xa1\xbc\n" // エラー
 	testEncoding := func() {
-		fh.Write([]byte(fatal))
+		fh.Write([]byte("\xa5\xa8\xa5\xe9\xa1\xbc\n")) // エラー
 		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
+		assert.Equal(t, "エラー\n", errLines, "something went wrong")
+
+		fh.Write([]byte("\xb0\xdb\xbe\xef\n")) // 異常
+		w, c, errLines, err = opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		fh.Write([]byte("\xa5\xa8\xa5\xe9\xa1\xbc\n")) // エラー
+		w, c, errLines, err = opts.searchLog(logf)
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(1), c, "something went wrong")
