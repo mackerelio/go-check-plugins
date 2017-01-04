@@ -1,3 +1,18 @@
+mackerel-check-plugins (0.9.0-1) stable; urgency=low
+
+  * Fix check load (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/4>
+  * Release version 0.0.1 (by itchyny)
+    <https://github.com/mackerelio/go-check-plugins/pull/7>
+  * fix MatchSelf behaviour (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/9>
+  * add check-windows-eventlog (by daiksy)
+    <https://github.com/mackerelio/go-check-plugins/pull/129>
+  * [check-log]fix encoding option (by daiksy)
+    <https://github.com/mackerelio/go-check-plugins/pull/131>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 04 Jan 2017 07:11:14 +0000
+
 mackerel-check-plugins (0.8.1-1) stable; urgency=low
 
   * Fix state in check-procs (by itchyny)
