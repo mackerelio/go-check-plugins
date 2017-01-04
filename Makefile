@@ -35,7 +35,7 @@ cover: devel-deps
 
 build: deps
 	mkdir -p build
-	for i in check-*; do \
+	for i in $(filter-out check-windows-%, $(wildcard check-*)); do \
 	  gox -ldflags "-s -w" \
 	    -osarch=$(TARGET_OSARCH) -output build/$$i \
 	    `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
