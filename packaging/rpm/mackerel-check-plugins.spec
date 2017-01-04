@@ -46,9 +46,6 @@ done
 
 %changelog
 * Wed Jan 04 2017 <mackerel-developers@hatena.ne.jp> - 0.9.0-1
-- Fix check load (by Songmu)
-- Release version 0.0.1 (by itchyny)
-- fix MatchSelf behaviour (by Songmu)
 - add check-windows-eventlog (by daiksy)
 - [check-log]fix encoding option (by daiksy)
 
