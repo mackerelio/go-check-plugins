@@ -28,6 +28,7 @@ type logOpts struct {
 	CritLevel       float64 `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
 	ReturnContent   bool    `short:"r" long:"return" description:"Return matched line"`
 	FilePattern     string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
+	FileGlob        string  `short:"g" long:"file-glob" value-name:"FILE" description:"Check against files matching given glob, instead of one file / file-pattern"`
 	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir        string  `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
@@ -40,7 +41,7 @@ type logOpts struct {
 }
 
 func (opts *logOpts) prepare() error {
-	if opts.LogFile == "" && opts.FilePattern == "" {
+	if opts.LogFile == "" && opts.FilePattern == "" && opts.FileGlob == "" {
 		return fmt.Errorf("No log file specified")
 	}
 
@@ -58,6 +59,17 @@ func (opts *logOpts) prepare() error {
 
 	if opts.LogFile != "" {
 		opts.fileList = append(opts.fileList, opts.LogFile)
+	}
+
+	if opts.FileGlob != "" {
+		files, err := filepath.Glob(opts.FileGlob)
+		if err != nil {
+			return fmt.Errorf("file-glob is invalid")
+		}
+
+		for _, file := range files {
+			opts.fileList = append(opts.fileList, file)
+		}
 	}
 
 	if opts.FilePattern != "" {
