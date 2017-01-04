@@ -45,6 +45,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jan 04 2017 <mackerel-developers@hatena.ne.jp> - 0.9.0-1
+- add check-windows-eventlog (by daiksy)
+- [check-log]fix encoding option (by daiksy)
+
 * Tue Nov 29 2016 <mackerel-developers@hatena.ne.jp> - 0.8.1-1
 - Fix state in check-procs (by itchyny)
 - Fix the links to the document (by itchyny)

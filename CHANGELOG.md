@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0 (2017-01-04)
+
+* add check-windows-eventlog #129 (daiksy)
+* [check-log]fix encoding option #131 (daiksy)
+
+
 ## 0.8.1 (2016-11-29)
 
 * Fix state in check-procs #124 (itchyny)
