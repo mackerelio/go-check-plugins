@@ -536,3 +536,27 @@ func TestRunWithMissingUnknown(t *testing.T) {
 	}
 	testRunLogFileMissing()
 }
+
+func TestRunWithGlobAndMissingWarning(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logfGlob := filepath.Join(dir, "dummy*")
+
+	ptn := `FATAL`
+	missing := `WARNING`
+	params := []string{"-s", dir, "-f", logfGlob, "-p", ptn, "--missing", missing}
+	opts, _ := parseArgs(params)
+	opts.prepare()
+
+	testRunLogFileMissing := func() {
+		ckr := run(params)
+		assert.Equal(t, ckr.Status, checkers.WARNING, "ckr.Status should be WARNING")
+		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logfGlob)
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+	}
+	testRunLogFileMissing()
+}
