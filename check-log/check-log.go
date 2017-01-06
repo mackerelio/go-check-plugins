@@ -16,6 +16,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 	"github.com/mattn/go-encoding"
+	"github.com/mattn/go-zglob"
 	enc "golang.org/x/text/encoding"
 )
 
@@ -60,8 +61,9 @@ func (opts *logOpts) prepare() error {
 	}
 
 	if opts.LogFile != "" {
-		files, err := filepath.Glob(opts.LogFile)
-		if err != nil {
+		files, err := zglob.Glob(opts.LogFile)
+		// unless --missing specified, we should ignore file not found error
+		if err != nil && err != os.ErrNotExist {
 			return fmt.Errorf("invalid glob for --file")
 		}
 
