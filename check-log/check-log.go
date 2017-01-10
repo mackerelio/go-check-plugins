@@ -61,14 +61,10 @@ func (opts *logOpts) prepare() error {
 	}
 
 	if opts.LogFile != "" {
-		files, err := zglob.Glob(opts.LogFile)
+		opts.fileListFromGlob, err = zglob.Glob(opts.LogFile)
 		// unless --missing specified, we should ignore file not found error
 		if err != nil && err != os.ErrNotExist {
 			return fmt.Errorf("invalid glob for --file")
-		}
-
-		for _, file := range files {
-			opts.fileListFromGlob = append(opts.fileListFromGlob, file)
 		}
 	}
 
