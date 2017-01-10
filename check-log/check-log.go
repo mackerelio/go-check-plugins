@@ -16,29 +16,31 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 	"github.com/mattn/go-encoding"
+	"github.com/mattn/go-zglob"
 	enc "golang.org/x/text/encoding"
 )
 
 type logOpts struct {
-	LogFile         string  `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
-	Pattern         string  `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
-	Exclude         string  `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
-	WarnOver        int64   `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
-	CritOver        int64   `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
-	WarnLevel       float64 `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
-	CritLevel       float64 `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
-	ReturnContent   bool    `short:"r" long:"return" description:"Return matched line"`
-	FilePattern     string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
-	CaseInsensitive bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
-	StateDir        string  `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
-	NoState         bool    `long:"no-state" description:"Don't use state file and read whole logs"`
-	Encoding        string  `long:"encoding" description:"Encoding of log file"`
-	Missing         string  `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
-	patternReg      *regexp.Regexp
-	excludeReg      *regexp.Regexp
-	fileList        []string
-	origArgs        []string
-	decoder         *enc.Decoder
+	LogFile             string  `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
+	Pattern             string  `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
+	Exclude             string  `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
+	WarnOver            int64   `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
+	CritOver            int64   `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
+	WarnLevel           float64 `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
+	CritLevel           float64 `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
+	ReturnContent       bool    `short:"r" long:"return" description:"Return matched line"`
+	FilePattern         string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
+	CaseInsensitive     bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
+	StateDir            string  `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
+	NoState             bool    `long:"no-state" description:"Don't use state file and read whole logs"`
+	Encoding            string  `long:"encoding" description:"Encoding of log file"`
+	Missing             string  `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
+	patternReg          *regexp.Regexp
+	excludeReg          *regexp.Regexp
+	fileListFromGlob    []string
+	fileListFromPattern []string
+	origArgs            []string
+	decoder             *enc.Decoder
 }
 
 func (opts *logOpts) prepare() error {
@@ -59,7 +61,11 @@ func (opts *logOpts) prepare() error {
 	}
 
 	if opts.LogFile != "" {
-		opts.fileList = append(opts.fileList, opts.LogFile)
+		opts.fileListFromGlob, err = zglob.Glob(opts.LogFile)
+		// unless --missing specified, we should ignore file not found error
+		if err != nil && err != os.ErrNotExist {
+			return fmt.Errorf("invalid glob for --file")
+		}
 	}
 
 	if opts.FilePattern != "" {
@@ -81,7 +87,7 @@ func (opts *logOpts) prepare() error {
 			}
 			fname := fileInfo.Name()
 			if reg.MatchString(fname) {
-				opts.fileList = append(opts.fileList, dirStr+string(filepath.Separator)+fileInfo.Name())
+				opts.fileListFromPattern = append(opts.fileListFromPattern, dirStr+string(filepath.Separator)+fileInfo.Name())
 			}
 		}
 	}
@@ -145,7 +151,11 @@ func run(args []string) *checkers.Checker {
 	var missingFiles []string
 	errorOverall := ""
 
-	for _, f := range opts.fileList {
+	if opts.LogFile != "" && len(opts.fileListFromGlob) == 0 {
+		missingFiles = append(missingFiles, opts.LogFile)
+	}
+
+	for _, f := range append(opts.fileListFromGlob, opts.fileListFromPattern...) {
 		_, err := os.Stat(f)
 		if err != nil {
 			missingFiles = append(missingFiles, f)
