@@ -45,6 +45,14 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jan 11 2017 <mackerel-developers@hatena.ne.jp> - 0.9.1-1
+- Fix check load (by Songmu)
+- Release version 0.0.1 (by itchyny)
+- fix MatchSelf behaviour (by Songmu)
+- add check-windows-eventlog (by daiksy)
+- [check-log]fix encoding option (by daiksy)
+- Release version 0.9.0 (by astj)
+
 * Tue Nov 29 2016 <mackerel-developers@hatena.ne.jp> - 0.8.1-1
 - Fix state in check-procs (by itchyny)
 - Fix the links to the document (by itchyny)
