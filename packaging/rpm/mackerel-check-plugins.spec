@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jan 11 2017 <mackerel-developers@hatena.ne.jp> - 0.9.1-1
+- [check-log] support glob in --file option (by astj)
+
 * Wed Jan 04 2017 <mackerel-developers@hatena.ne.jp> - 0.9.0-1
 - add check-windows-eventlog (by daiksy)
 - [check-log]fix encoding option (by daiksy)

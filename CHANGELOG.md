@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.1 (2017-01-11)
+
+* [check-log] support glob in --file option #133 (astj)
+
+
 ## 0.9.0 (2017-01-04)
 
 * add check-windows-eventlog #129 (daiksy)
