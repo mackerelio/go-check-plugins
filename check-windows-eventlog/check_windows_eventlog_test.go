@@ -206,7 +206,7 @@ func TestRun(t *testing.T) {
 	testReturn()
 }
 
-func TestSourcePattern(t *testing.T) {
+func TestPattern(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
 	if err != nil {
 		t.Errorf("something went wrong")
@@ -217,10 +217,18 @@ func TestSourcePattern(t *testing.T) {
 	opts.prepare()
 
 	stateFile := opts.getStateFile("Application")
-
 	recordNumber, _ := getLastOffset(stateFile)
 	lastNumber := recordNumber
 	assert.Equal(t, int64(0), recordNumber, "something went wrong")
+
+	reset := func(args []string) {
+		opts, _ = parseArgs(args)
+		opts.prepare()
+
+		lastNumber = recordNumber
+		stateFile = opts.getStateFile("Application")
+		writeLastOffset(stateFile, lastNumber)
+	}
 
 	testEmpty := func() {
 		w, c, errLines, err := opts.searchLog("Application")
@@ -234,10 +242,7 @@ func TestSourcePattern(t *testing.T) {
 	}
 	testEmpty()
 
-	lastNumber = recordNumber
-
-	opts, _ = parseArgs([]string{"-s", dir, "--log", "Application", "--message-pattern", "テストエラーが(発生しました|起きました)"})
-	opts.prepare()
+	reset([]string{"-s", dir, "--log", "Application", "--message-pattern", "テストエラーが(発生しました|起きました)"})
 
 	testMessagePattern := func() {
 		raiseEvent(t, 1, "check-windows-eventlog: テストエラーが発生しました")
@@ -252,8 +257,7 @@ func TestSourcePattern(t *testing.T) {
 	}
 	testMessagePattern()
 
-	opts, _ = parseArgs([]string{"-s", dir, "--log", "Application", "--source-pattern", "[Ww][Ss][Hh]"})
-	opts.prepare()
+	reset([]string{"-s", dir, "--log", "Application", "--source-pattern", "[Ww][Ss][Hh]"})
 
 	testSourcePattern := func() {
 		raiseEvent(t, 2, "check-windows-eventlog: テストエラーが発生しました")
@@ -267,6 +271,52 @@ func TestSourcePattern(t *testing.T) {
 		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
 	}
 	testSourcePattern()
+
+	reset([]string{"-s", dir, "--log", "Application", "--message-pattern", "テストエラー", "--message-exclude", "起きました"})
+
+	testMessageExclude := func() {
+		raiseEvent(t, 1, "check-windows-eventlog: テストエラーが発生しました")
+		raiseEvent(t, 1, "check-windows-eventlog: テストエラーが起きました")
+		w, c, errLines, err := opts.searchLog("Application")
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
+	}
+	testMessageExclude()
+
+	reset([]string{"-s", dir, "--log", "Application", "--source-pattern", "[Ww][Ss]", "--source-exclude", "[h]"})
+
+	testSourceExclude := func() {
+		raiseEvent(t, 2, "check-windows-eventlog: テストエラーが発生しました")
+		w, c, errLines, err := opts.searchLog("Application")
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
+	}
+	testSourceExclude()
+
+	reset([]string{"-s", dir, "--log", "Application", "--source-pattern", "[Ww][Ss]", "--source-exclude", "[H]"})
+
+	testSourceExclude = func() {
+		raiseEvent(t, 2, "check-windows-eventlog: テストエラーが発生しました")
+		w, c, errLines, err := opts.searchLog("Application")
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		recordNumber, _ = getLastOffset(stateFile)
+		assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
+	}
+	testSourceExclude()
 }
 
 func TestFailFirst(t *testing.T) {

@@ -68,21 +68,29 @@ func (opts *logOpts) prepare() error {
 	opts.typeList = stringList(opts.Type)
 
 	var err error
-	opts.sourcePattern, err = regexp.Compile(opts.SourcePattern)
-	if err != nil {
-		return err
+	if opts.SourcePattern != "" {
+		opts.sourcePattern, err = regexp.Compile(opts.SourcePattern)
+		if err != nil {
+			return err
+		}
 	}
-	opts.sourceExclude, err = regexp.Compile(opts.SourceExclude)
-	if err != nil {
-		return err
+	if opts.SourceExclude != "" {
+		opts.sourceExclude, err = regexp.Compile(opts.SourceExclude)
+		if err != nil {
+			return err
+		}
 	}
-	opts.messagePattern, err = regexp.Compile(opts.MessagePattern)
-	if err != nil {
-		return err
+	if opts.MessagePattern != "" {
+		opts.messagePattern, err = regexp.Compile(opts.MessagePattern)
+		if err != nil {
+			return err
+		}
 	}
-	opts.messageExclude, err = regexp.Compile(opts.MessageExclude)
-	if err != nil {
-		return err
+	if opts.MessageExclude != "" {
+		opts.messageExclude, err = regexp.Compile(opts.MessageExclude)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
