@@ -319,6 +319,67 @@ func TestPattern(t *testing.T) {
 	testSourceExclude()
 }
 
+func TestIDs(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application"})
+	opts.prepare()
+
+	stateFile := opts.getStateFile("Application")
+	recordNumber, _ := getLastOffset(stateFile)
+	lastNumber := recordNumber
+	assert.Equal(t, int64(0), recordNumber, "something went wrong")
+
+	reset := func(args []string) {
+		opts, _ = parseArgs(args)
+		opts.prepare()
+
+		lastNumber = recordNumber
+		stateFile = opts.getStateFile("Application")
+		writeLastOffset(stateFile, lastNumber)
+	}
+
+	_, _, _, err = opts.searchLog("Application")
+	if err != nil {
+		t.Fatal(err)
+	}
+	recordNumber, _ = getLastOffset(stateFile)
+
+	tests := []struct {
+		id string
+		w  int64
+		c  int64
+	}{
+		{"1,2", 1, 1},
+		{"!1", 1, 0},
+		{"0,1-2", 1, 1},
+		{"1-2,!2", 0, 1},
+	}
+
+	for _, test := range tests {
+		reset([]string{"-s", dir, "--log", "Application", "--source-pattern", "WSH", "--id", test.id})
+
+		testID := func() {
+			t.Logf("testing: %v", test.id)
+			raiseEvent(t, 1, "check-windows-eventlog: テストエラーが発生しました")
+			raiseEvent(t, 2, "check-windows-eventlog: テストエラーが発生しました")
+			w, c, errLines, err := opts.searchLog("Application")
+			assert.Equal(t, err, nil, "err should be nil")
+			assert.Equal(t, int64(test.w), w, "something went wrong")
+			assert.Equal(t, int64(test.c), c, "something went wrong")
+			assert.Equal(t, "", errLines, "something went wrong")
+
+			recordNumber, _ = getLastOffset(stateFile)
+			assert.NotEqual(t, lastNumber, recordNumber, "something went wrong")
+		}
+		testID()
+	}
+}
+
 func TestFailFirst(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
 	if err != nil {

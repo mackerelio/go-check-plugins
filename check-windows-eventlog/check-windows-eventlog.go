@@ -28,6 +28,17 @@ const (
 	errorInvalidParameter = syscall.Errno(87)
 )
 
+var (
+	rid1 = regexp.MustCompile(`^([0-9]+)$`)
+	rid2 = regexp.MustCompile(`^([0-9]+)-([0-9]+)$`)
+)
+
+type idRange struct {
+	hi   uint32
+	lo   uint32
+	bang bool
+}
+
 type logOpts struct {
 	Log            string `long:"log" description:"Event Names (comma separated)"`
 	Type           string `long:"type" description:"Event Types (comma separated)"`
@@ -35,6 +46,7 @@ type logOpts struct {
 	SourceExclude  string `long:"source-exclude" description:"Event Source excluded (regexp pattern)"`
 	MessagePattern string `long:"message-pattern" description:"Message Pattern (regexp pattern)"`
 	MessageExclude string `long:"message-exclude" description:"Message Pattern excluded (regexp pattern)"`
+	ID             string `long:"id" description:"Event IDs (separated by comma)"`
 	WarnOver       int64  `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver       int64  `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
@@ -45,6 +57,7 @@ type logOpts struct {
 
 	logList        []string
 	typeList       []string
+	idRangeList    []idRange
 	sourcePattern  *regexp.Regexp
 	sourceExclude  *regexp.Regexp
 	messagePattern *regexp.Regexp
@@ -60,6 +73,42 @@ func stringList(s string) []string {
 	return l
 }
 
+func idRangeList(s string) ([]idRange, error) {
+	var idrl []idRange
+	var id1, id2 uint64
+	var err error
+	for _, t := range strings.Split(s, ",") {
+		t = strings.TrimSpace(t)
+		bang := strings.HasPrefix(t, "!")
+		if bang {
+			t = t[1:]
+		}
+		if m1 := rid1.FindAllStringSubmatch(t, -1); len(m1) > 0 {
+			id1, err = strconv.ParseUint(m1[0][1], 10, 32)
+			if err != nil {
+				return nil, fmt.Errorf("invalid id list: %v", err)
+			}
+			id2 = id1
+		} else if m2 := rid2.FindAllStringSubmatch(t, -1); len(m2) > 0 {
+			id1, err = strconv.ParseUint(m2[0][1], 10, 32)
+			if err != nil {
+				return nil, fmt.Errorf("invalid id list: %v", err)
+			}
+			id2, err = strconv.ParseUint(m2[0][2], 10, 32)
+			if err != nil {
+				return nil, fmt.Errorf("invalid id list: %v", err)
+			}
+			if id1 > id2 {
+				id1, id2 = id2, id1
+			}
+		} else {
+			return nil, fmt.Errorf("invalid id list")
+		}
+		idrl = append(idrl, idRange{lo: uint32(id1), hi: uint32(id2), bang: bang})
+	}
+	return idrl, nil
+}
+
 func (opts *logOpts) prepare() error {
 	opts.logList = stringList(opts.Log)
 	if len(opts.logList) == 0 || opts.logList[0] == "" {
@@ -68,6 +117,13 @@ func (opts *logOpts) prepare() error {
 	opts.typeList = stringList(opts.Type)
 
 	var err error
+
+	if opts.ID != "" {
+		opts.idRangeList, err = idRangeList(opts.ID)
+		if err != nil {
+			return err
+		}
+	}
 	if opts.SourcePattern != "" {
 		opts.sourcePattern, err = regexp.Compile(opts.SourcePattern)
 		if err != nil {
@@ -267,6 +323,8 @@ func (opts *logOpts) searchLog(logName string) (warnNum, critNum int64, errLines
 
 	var readBytes uint32
 	var nextSize uint32
+
+loop_events:
 	for i := recordNumber; i < oldnum+num; i++ {
 		flags := eventlog.EVENTLOG_FORWARDS_READ | eventlog.EVENTLOG_SEEK_READ
 		if i == 0 {
@@ -312,6 +370,27 @@ func (opts *logOpts) searchLog(logName string) (warnNum, critNum int64, errLines
 			log.Printf("EventID=%v", r.EventID)
 		}
 		lastNumber = r.RecordNumber
+
+		if opts.idRangeList != nil {
+			eventID := r.EventID & 0x0000FFFF
+			found := false
+			for _, idr := range opts.idRangeList {
+				if !idr.bang {
+					if idr.lo <= eventID && eventID <= idr.hi {
+						found = true
+					}
+				} else {
+					if idr.lo <= eventID && eventID <= idr.hi {
+						found = false
+					} else {
+						found = true
+					}
+				}
+			}
+			if !found {
+				continue loop_events
+			}
+		}
 
 		tn := eventlog.EventType(r.EventType).String()
 		if opts.Verbose {
