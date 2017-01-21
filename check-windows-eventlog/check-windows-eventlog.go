@@ -32,7 +32,9 @@ type logOpts struct {
 	Log            string `long:"log" description:"Event Names (comma separated)"`
 	Type           string `long:"type" description:"Event Types (comma separated)"`
 	SourcePattern  string `long:"source-pattern" description:"Event Source (regexp pattern)"`
+	SourceExclude  string `long:"source-exclude" description:"Event Source excluded (regexp pattern)"`
 	MessagePattern string `long:"message-pattern" description:"Message Pattern (regexp pattern)"`
+	MessageExclude string `long:"message-exclude" description:"Message Pattern excluded (regexp pattern)"`
 	WarnOver       int64  `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver       int64  `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
@@ -44,7 +46,9 @@ type logOpts struct {
 	logList        []string
 	typeList       []string
 	sourcePattern  *regexp.Regexp
+	sourceExclude  *regexp.Regexp
 	messagePattern *regexp.Regexp
+	messageExclude *regexp.Regexp
 	origArgs       []string
 }
 
@@ -68,7 +72,15 @@ func (opts *logOpts) prepare() error {
 	if err != nil {
 		return err
 	}
+	opts.sourceExclude, err = regexp.Compile(opts.SourceExclude)
+	if err != nil {
+		return err
+	}
 	opts.messagePattern, err = regexp.Compile(opts.MessagePattern)
+	if err != nil {
+		return err
+	}
+	opts.messageExclude, err = regexp.Compile(opts.MessageExclude)
 	if err != nil {
 		return err
 	}
@@ -317,8 +329,15 @@ func (opts *logOpts) searchLog(logName string) (warnNum, critNum int64, errLines
 			log.Printf("ComputerName=%v", computerName)
 		}
 
+		// match source if pattern provied
 		if opts.sourcePattern != nil {
 			if !opts.sourcePattern.MatchString(sourceName) {
+				continue
+			}
+		}
+		// exclude-match source if pattern provied
+		if opts.sourceExclude != nil {
+			if opts.sourceExclude.MatchString(sourceName) {
 				continue
 			}
 		}
@@ -339,11 +358,20 @@ func (opts *logOpts) searchLog(logName string) (warnNum, critNum int64, errLines
 		if opts.Verbose {
 			log.Printf("Message=%v", message)
 		}
+
+		// match message if pattern provied
 		if opts.messagePattern != nil {
 			if !opts.messagePattern.MatchString(message) {
 				continue
 			}
 		}
+		// exclude-match message if pattern provied
+		if opts.messageExclude != nil {
+			if opts.messageExclude.MatchString(message) {
+				continue
+			}
+		}
+
 		if opts.ReturnContent {
 			if message == "" {
 				message = "[mackerel-agent] No message resource found. Please make sure the event log occured on the server."
