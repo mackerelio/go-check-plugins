@@ -11,14 +11,6 @@ Checks a windows event log using a regular expression.
 command = "/path/to/check-windows-eventlog --log=LOGTYPE --type=EVENTTYPE --source-pattern=REGEXP --source-exclude=REGEXP --message-pattern=REGEXP --message-exclude=REGEXP --warning-over=N --critical-over=N" --fail-first
 ```
 
-## Tutorial
-
-find message matches `foo` but not match `bar`
-
-```
---message-pattern foo --message-exclude bar
-```
-
 ### LOGTYPE
 
 * Application
@@ -33,3 +25,17 @@ find message matches `foo` but not match `bar`
 * Audit Success
 * Information
 * Warning
+
+## Tutorial
+
+1. find message matches `foo` but not match `bar`.
+
+    ```
+    --message-pattern foo --message-exclude bar
+    ```
+
+2. find event-id is between 900 and 1200, but ignore 1101.
+
+    ```
+    --id 900-1200,!1101
+    ```
