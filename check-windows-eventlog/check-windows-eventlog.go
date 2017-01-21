@@ -372,17 +372,20 @@ loop_events:
 		lastNumber = r.RecordNumber
 
 		if opts.idRangeList != nil {
+			// even code takes last 4 bytes
 			eventID := r.EventID & 0x0000FFFF
 			found := false
+			exact := false
 			for _, idr := range opts.idRangeList {
 				if !idr.bang {
+					exact = true
 					if idr.lo <= eventID && eventID <= idr.hi {
 						found = true
 					}
 				} else {
 					if idr.lo <= eventID && eventID <= idr.hi {
 						found = false
-					} else {
+					} else if !exact {
 						found = true
 					}
 				}
