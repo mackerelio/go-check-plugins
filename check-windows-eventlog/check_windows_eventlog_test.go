@@ -380,8 +380,8 @@ func TestIDs(t *testing.T) {
 
 		testID := func() {
 			t.Logf("testing: --event-id-pattern %q, --event-id-exclude=%q", test.pattern, test.exclude)
-			raiseEvent(t, 1, "check-windows-eventlog: テストエラーが発生しました(C)")
-			raiseEvent(t, 2, "check-windows-eventlog: テストエラーが発生しました(W)")
+			raiseEvent(t, 1, "check-windows-eventlog: critical event occured")
+			raiseEvent(t, 2, "check-windows-eventlog: warning event occured")
 			w, c, errLines, err := opts.searchLog("Application")
 			assert.Equal(t, err, nil, "err should be nil")
 			assert.Equal(t, int64(test.w), w, "something went wrong")
