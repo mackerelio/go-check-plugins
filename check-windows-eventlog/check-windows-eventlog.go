@@ -34,9 +34,8 @@ var (
 )
 
 type idRange struct {
-	hi   uint32
-	lo   uint32
-	bang bool
+	hi uint32
+	lo uint32
 }
 
 type logOpts struct {
@@ -46,7 +45,8 @@ type logOpts struct {
 	SourceExclude  string `long:"source-exclude" description:"Event Source excluded (regexp pattern)"`
 	MessagePattern string `long:"message-pattern" description:"Message Pattern (regexp pattern)"`
 	MessageExclude string `long:"message-exclude" description:"Message Pattern excluded (regexp pattern)"`
-	EventID        string `long:"event-id" description:"Event IDs (separated by comma)"`
+	EventIDPattern string `long:"event-id-pattern" description:"Event IDs acceptable (separated by comma, or range)"`
+	EventIDExclude string `long:"event-id-exclude" description:"Event IDs ignorable (separated by comma, or range)"`
 	WarnOver       int64  `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver       int64  `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
@@ -57,7 +57,8 @@ type logOpts struct {
 
 	logList        []string
 	typeList       []string
-	idRangeList    []idRange
+	eventIDPattern []idRange
+	eventIDExclude []idRange
 	sourcePattern  *regexp.Regexp
 	sourceExclude  *regexp.Regexp
 	messagePattern *regexp.Regexp
@@ -79,10 +80,6 @@ func idRangeList(s string) ([]idRange, error) {
 	var err error
 	for _, t := range strings.Split(s, ",") {
 		t = strings.TrimSpace(t)
-		bang := strings.HasPrefix(t, "!")
-		if bang {
-			t = t[1:]
-		}
 		if m1 := rid1.FindAllStringSubmatch(t, -1); len(m1) > 0 {
 			id1, err = strconv.ParseUint(m1[0][1], 10, 32)
 			if err != nil {
@@ -102,9 +99,9 @@ func idRangeList(s string) ([]idRange, error) {
 				id1, id2 = id2, id1
 			}
 		} else {
-			return nil, fmt.Errorf("invalid id list")
+			return nil, fmt.Errorf("invalid event-id format")
 		}
-		idrl = append(idrl, idRange{lo: uint32(id1), hi: uint32(id2), bang: bang})
+		idrl = append(idrl, idRange{lo: uint32(id1), hi: uint32(id2)})
 	}
 	return idrl, nil
 }
@@ -118,8 +115,14 @@ func (opts *logOpts) prepare() error {
 
 	var err error
 
-	if opts.EventID != "" {
-		opts.idRangeList, err = idRangeList(opts.EventID)
+	if opts.EventIDPattern != "" {
+		opts.eventIDPattern, err = idRangeList(opts.EventIDPattern)
+		if err != nil {
+			return err
+		}
+	}
+	if opts.EventIDExclude != "" {
+		opts.eventIDExclude, err = idRangeList(opts.EventIDExclude)
 		if err != nil {
 			return err
 		}
@@ -371,26 +374,29 @@ loop_events:
 		}
 		lastNumber = r.RecordNumber
 
-		if opts.idRangeList != nil {
-			// even code takes last 4 bytes
-			eventID := r.EventID & 0x0000FFFF
-			found := false
-			exact := false
-			for _, idr := range opts.idRangeList {
-				if !idr.bang {
-					exact = true
-					if idr.lo <= eventID && eventID <= idr.hi {
-						found = true
-					}
-				} else {
-					if idr.lo <= eventID && eventID <= idr.hi {
-						found = false
-					} else if !exact {
-						found = true
-					}
+		// even code takes last 4 byte
+		eventID := r.EventID & 0x0000FFFF
+		if len(opts.eventIDPattern) > 0 {
+			accepted := false
+			for _, idr := range opts.eventIDPattern {
+				if idr.lo <= eventID && eventID <= idr.hi {
+					accepted = true
+					break
 				}
 			}
-			if !found {
+			if !accepted {
+				continue loop_events
+			}
+		}
+		if len(opts.eventIDExclude) > 0 {
+			ignored := false
+			for _, idr := range opts.eventIDExclude {
+				if idr.lo <= eventID && eventID <= idr.hi {
+					ignored = true
+					break
+				}
+			}
+			if ignored {
 				continue loop_events
 			}
 		}
