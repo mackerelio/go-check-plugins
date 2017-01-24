@@ -363,7 +363,7 @@ func TestIDs(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		reset([]string{"-s", dir, "--log", "Application", "--source-pattern", "WSH", "--id", test.id})
+		reset([]string{"-s", dir, "--log", "Application", "--source-pattern", "WSH", "--event-id", test.id})
 
 		testID := func() {
 			t.Logf("testing: %v", test.id)
