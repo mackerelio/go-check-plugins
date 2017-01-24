@@ -46,7 +46,7 @@ type logOpts struct {
 	SourceExclude  string `long:"source-exclude" description:"Event Source excluded (regexp pattern)"`
 	MessagePattern string `long:"message-pattern" description:"Message Pattern (regexp pattern)"`
 	MessageExclude string `long:"message-exclude" description:"Message Pattern excluded (regexp pattern)"`
-	ID             string `long:"id" description:"Event IDs (separated by comma)"`
+	EventID        string `long:"event-id" description:"Event IDs (separated by comma)"`
 	WarnOver       int64  `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver       int64  `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
@@ -118,8 +118,8 @@ func (opts *logOpts) prepare() error {
 
 	var err error
 
-	if opts.ID != "" {
-		opts.idRangeList, err = idRangeList(opts.ID)
+	if opts.EventID != "" {
+		opts.idRangeList, err = idRangeList(opts.EventID)
 		if err != nil {
 			return err
 		}
