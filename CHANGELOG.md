@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.2 (2017-01-25)
+
+* add --source-exclude and --message-exclude, --id #136 (daiksy)
+* Fix exclude #137 (mattn)
+
+
 ## 0.9.1 (2017-01-11)
 
 * [check-log] support glob in --file option #133 (astj)

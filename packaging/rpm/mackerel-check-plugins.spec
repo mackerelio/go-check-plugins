@@ -45,6 +45,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jan 25 2017 <mackerel-developers@hatena.ne.jp> - 0.9.2-1
+- add --source-exclude and --message-exclude, --id (by daiksy)
+- Fix exclude (by mattn)
+
 * Wed Jan 11 2017 <mackerel-developers@hatena.ne.jp> - 0.9.1-1
 - [check-log] support glob in --file option (by astj)
 
