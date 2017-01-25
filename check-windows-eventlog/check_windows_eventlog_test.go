@@ -350,25 +350,38 @@ func TestIDs(t *testing.T) {
 	recordNumber, _ = getLastOffset(stateFile)
 
 	tests := []struct {
-		id string
-		w  int64
-		c  int64
+		pattern string
+		exclude string
+		c       int64
+		w       int64
 	}{
-		{"1,2", 1, 1},
-		{"!1", 1, 0},
-		{"0,1-2", 1, 1},
-		{"1-2,!2", 0, 1},
-		{"1,!2", 0, 1},
-		{"0,!2", 0, 0},
+		{"1,2", "", 1, 1},
+		{"1", "1", 0, 0},
+		{"1", "2", 1, 0},
+		{"0,1-2", "", 1, 1},
+		{"1-2", "2", 1, 0},
+		{"1", "2", 1, 0},
+		{"0", "2", 0, 0},
+		{"", "1-2", 0, 0},
+		{"", "2-3", 1, 0},
+		{"", "3-2", 1, 0},
+		{"2", "1-2", 0, 0},
+		{"2", "2-3", 0, 0},
+		{"2", "3-4", 0, 1},
+		{"2", "1,3", 0, 1},
 	}
 
 	for _, test := range tests {
-		reset([]string{"-s", dir, "--log", "Application", "--source-pattern", "WSH", "--id", test.id})
+		reset([]string{
+			"-s", dir, "--log", "Application", "--source-pattern", "WSH",
+			"--event-id-pattern", test.pattern,
+			"--event-id-exclude", test.exclude,
+		})
 
 		testID := func() {
-			t.Logf("testing: %v", test.id)
-			raiseEvent(t, 1, "check-windows-eventlog: テストエラーが発生しました")
-			raiseEvent(t, 2, "check-windows-eventlog: テストエラーが発生しました")
+			t.Logf("testing: --event-id-pattern %q, --event-id-exclude=%q", test.pattern, test.exclude)
+			raiseEvent(t, 1, "check-windows-eventlog: critical event occured")
+			raiseEvent(t, 2, "check-windows-eventlog: warning event occured")
 			w, c, errLines, err := opts.searchLog("Application")
 			assert.Equal(t, err, nil, "err should be nil")
 			assert.Equal(t, int64(test.w), w, "something went wrong")
