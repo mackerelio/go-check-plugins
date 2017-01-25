@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.2 (2017-01-25)
+
+* [check-windows-eventlog] add --source-exclude, --message-exclude and --event-id #136 (mattn, daiksy)
+* [check-windows-eventlog] remove --event-id and add --event-id-pattern, --event-id-exclude #137 (mattn)
+
+
 ## 0.9.1 (2017-01-11)
 
 * [check-log] support glob in --file option #133 (astj)
