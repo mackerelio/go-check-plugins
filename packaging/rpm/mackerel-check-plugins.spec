@@ -46,8 +46,8 @@ done
 
 %changelog
 * Wed Jan 25 2017 <mackerel-developers@hatena.ne.jp> - 0.9.2-1
-* [check-windows-eventlog] add --source-exclude, --message-exclude and --event-id (by mattn, daiksy)
-* [check-windows-eventlog] remove --event-id and add --event-id-pattern, --event-id-exclude (by mattn)
+- [check-windows-eventlog] add --source-exclude, --message-exclude and --event-id (by mattn, daiksy)
+- [check-windows-eventlog] remove --event-id and add --event-id-pattern, --event-id-exclude (by mattn)
 
 * Wed Jan 11 2017 <mackerel-developers@hatena.ne.jp> - 0.9.1-1
 - [check-log] support glob in --file option (by astj)
