@@ -2,8 +2,8 @@
 
 ## 0.9.2 (2017-01-25)
 
-* add --source-exclude and --message-exclude, --id #136 (daiksy)
-* Fix exclude #137 (mattn)
+* [check-windows-eventlog] add --source-exclude, --message-exclude and --event-id #136 (mattn, daiksy)
+* [check-windows-eventlog] remove --event-id and add --event-id-pattern, --event-id-exclude #137 (mattn)
 
 
 ## 0.9.1 (2017-01-11)
