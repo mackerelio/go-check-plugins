@@ -405,9 +405,11 @@ loop_events:
 		if opts.Verbose {
 			log.Printf("EventType=%v", tn)
 		}
+		tn = strings.Replace(tn, " ", "", -1)
 		if len(opts.typeList) > 0 {
 			found := false
 			for _, typ := range opts.typeList {
+				typ = strings.Replace(typ, " ", "", -1)
 				if typ == tn {
 					found = true
 					break
@@ -477,7 +479,7 @@ loop_events:
 		switch tn {
 		case "Error":
 			critNum++
-		case "Audit Failure":
+		case "AuditFailure":
 			critNum++
 		case "Warning":
 			warnNum++
