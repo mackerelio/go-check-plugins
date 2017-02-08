@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.3 (2017-02-08)
+
+* fix matching for 'Audit Success' and 'Audit Failure' #139 (mattn)
+
+
 ## 0.9.2 (2017-01-25)
 
 * [check-windows-eventlog] add --source-exclude, --message-exclude and --event-id #136 (mattn, daiksy)

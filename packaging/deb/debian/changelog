@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.9.3-1) stable; urgency=low
+
+  * fix matching for 'Audit Success' and 'Audit Failure' (by mattn)
+    <https://github.com/mackerelio/go-check-plugins/pull/139>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 08 Feb 2017 01:52:19 +0000
+
 mackerel-check-plugins (0.9.2-1) stable; urgency=low
 
   * [check-windows-eventlog] add --source-exclude, --message-exclude and
