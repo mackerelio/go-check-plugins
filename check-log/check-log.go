@@ -362,9 +362,9 @@ func writeFileAtomically(f string, contents []byte) error {
 	}
 	defer os.Remove(tmpf.Name())
 	_, err = tmpf.Write(contents)
+	defer tmpf.Close()
 	if err != nil {
 		return err
 	}
-	tmpf.Close()
 	return os.Rename(tmpf.Name(), f)
 }
