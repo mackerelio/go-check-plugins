@@ -361,8 +361,8 @@ func writeFileAtomically(f string, contents []byte) error {
 		return err
 	}
 	defer os.Remove(tmpf.Name())
-	defer tmpf.Close()
 	_, err = tmpf.Write(contents)
+	tmpf.Close() // should be called before rename
 	if err != nil {
 		return err
 	}
