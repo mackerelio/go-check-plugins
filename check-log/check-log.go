@@ -356,7 +356,8 @@ func writeBytesToSkip(f string, num int64) error {
 }
 
 func writeFileAtomically(f string, contents []byte) error {
-	tmpf, err := ioutil.TempFile("", "")
+	// MUST be located on same disk partition
+	tmpf, err := ioutil.TempFile(filepath.Dir(f), "tmp")
 	if err != nil {
 		return err
 	}
