@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.4 (2017-02-22)
+
+* ensure close temporary file in writeFileAtomically #141 (itchyny)
+* Write the file in same directory #142 (mattn)
+
+
 ## 0.9.3 (2017-02-08)
 
 * fix matching for 'Audit Success' and 'Audit Failure' #139 (mattn)
