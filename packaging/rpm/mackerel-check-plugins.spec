@@ -45,6 +45,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Feb 22 2017 <mackerel-developers@hatena.ne.jp> - 0.9.4-1
+- ensure close temporary file in writeFileAtomically (by itchyny)
+- Write the file in same directory (by mattn)
+
 * Wed Feb 08 2017 <mackerel-developers@hatena.ne.jp> - 0.9.3-1
 - fix matching for 'Audit Success' and 'Audit Failure' (by mattn)
 
