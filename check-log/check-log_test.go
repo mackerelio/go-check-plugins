@@ -15,13 +15,30 @@ import (
 
 func TestGetStateFile(t *testing.T) {
 	sPath := getStateFile("/var/lib", "C:/Windows/hoge", []string{})
-	assert.Equal(t, "/var/lib/C/Windows/hoge-d41d8cd98f00b204e9800998ecf8427e", sPath, "drive letter should be cared")
+	assert.Equal(t, filepath.Join(
+		string(filepath.Separator),
+		"var",
+		"lib",
+		"C",
+		"Windows",
+		"hoge-d41d8cd98f00b204e9800998ecf8427e",
+	), sPath, "drive letter should be cared")
 
 	sPath = getStateFile("/var/lib", "/linux/hoge", []string{})
-	assert.Equal(t, "/var/lib/linux/hoge-d41d8cd98f00b204e9800998ecf8427e", sPath, "arguments should be cared")
+	assert.Equal(t, filepath.Join(string(filepath.Separator),
+		"var",
+		"lib",
+		"linux",
+		"hoge-d41d8cd98f00b204e9800998ecf8427e",
+	), sPath, "arguments should be cared")
 
 	sPath = getStateFile("/var/lib", "/linux/hoge", []string{"aa", "BB"})
-	assert.Equal(t, "/var/lib/linux/hoge-c508092e97c59149a8644827e066ca83", sPath, "arguments should be cared")
+	assert.Equal(t, filepath.Join(string(filepath.Separator),
+		"var",
+		"lib",
+		"linux",
+		"hoge-c508092e97c59149a8644827e066ca83",
+	), sPath, "arguments should be cared")
 }
 
 func TestWriteBytesToSkip(t *testing.T) {
