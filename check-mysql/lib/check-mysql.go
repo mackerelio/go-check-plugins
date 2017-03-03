@@ -7,6 +7,7 @@ import (
 
 	"github.com/mackerelio/checkers"
 	"github.com/ziutek/mymysql/mysql"
+	// MySQL Driver
 	_ "github.com/ziutek/mymysql/native"
 )
 

@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	// PostgreSQL Driver
 	_ "github.com/lib/pq"
 	"github.com/mackerelio/checkers"
 )
