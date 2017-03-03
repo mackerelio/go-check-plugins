@@ -21,7 +21,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
-	"github.com/mackerelio/go-check-plugins/check-windows-eventlog/internal/eventlog"
+	"github.com/mackerelio/go-check-plugins/check-windows-eventlog/lib/internal/eventlog"
 )
 
 const (
