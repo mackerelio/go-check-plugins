@@ -10,7 +10,10 @@ install:
   - 7z x go1.7.windows-386.zip -oC:\ >nul
   - go version
   - go env
-build: off
+build_script:
+- go build -o check-log/check-log.exe ./check-log
+- go build -o check-procs/check-procs.exe ./check-procs
+- go build -o check-windows-eventlog/check-windows-evenglog.exe ./check-windows-eventlog
 test_script:
 - go get -d -v -t ./...
 - go tool vet -all .
