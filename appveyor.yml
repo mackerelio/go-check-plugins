@@ -1,0 +1,19 @@
+version: 0.9.4-{build}
+clone_folder: c:\gopath\src\github.com\mackerelio\go-check-plugins
+environment:
+  GOPATH: c:\gopath
+install:
+  - set PATH=c:\go\bin;%GOPATH%\bin;%PATH%;C:\MinGW\bin
+  - echo %Path%
+  - rd c:\go /s /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go1.7.windows-386.zip
+  - 7z x go1.7.windows-386.zip -oC:\ >nul
+  - go version
+  - go env
+build: off
+test_script:
+- FOR /F "usebackq" %%w IN (`git rev-parse --show-cdup`) DO SET CDUP=%%w
+- cd %CDUP%
+- go get -d -v -t ./...
+- go tool vet -all .
+- go test ./check-log ./check-procs ./check-ntservice ./check-windows-eventlog
