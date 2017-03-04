@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -23,7 +24,7 @@ var helpReg = regexp.MustCompile(`--?h(?:elp)?`)
 //go:generate sh -c "perl tool/gen_mackerel_check.pl > mackerel-check_gen.go"
 func run(args []string) int {
 	var plug string
-	f, err := os.Executable()
+	f, err := exec.LookPath(args[0])
 	if err != nil {
 		log.Println(err)
 		return exitError
