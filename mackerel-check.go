@@ -23,7 +23,11 @@ var helpReg = regexp.MustCompile(`--?h(?:elp)?`)
 //go:generate sh -c "perl tool/gen_mackerel_check.pl > mackerel-check_gen.go"
 func run(args []string) int {
 	var plug string
-	f := args[0]
+	f, err := os.Executable()
+	if err != nil {
+		log.Println(err)
+		return exitError
+	}
 	fi, err := os.Lstat(f)
 	if err != nil {
 		log.Println(err)
