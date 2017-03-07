@@ -145,12 +145,13 @@ func (opts *tcpOpts) merge(ex exchange) {
 }
 
 func dial(network, address string, ssl bool, noCheckCertificate bool, timeoutDur time.Duration) (net.Conn, error) {
+	d := &net.Dialer{Timeout: timeoutDur}
 	if ssl {
-		return tls.Dial(network, address, &tls.Config{
+		return tls.DialWithDialer(d, network, address, &tls.Config{
 			InsecureSkipVerify: noCheckCertificate,
 		})
 	}
-	return net.Dial(network, address)
+	return d.Dial(network, address)
 }
 
 func (opts *tcpOpts) run() *checkers.Checker {
