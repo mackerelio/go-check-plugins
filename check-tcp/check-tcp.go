@@ -144,7 +144,7 @@ func (opts *tcpOpts) merge(ex exchange) {
 	}
 }
 
-func dial(network, address string, ssl bool, noCheckCertificate bool) (net.Conn, error) {
+func dial(network, address string, ssl bool, noCheckCertificate bool, timeoutDur time.Duration) (net.Conn, error) {
 	if ssl {
 		return tls.Dial(network, address, &tls.Config{
 			InsecureSkipVerify: noCheckCertificate,
@@ -162,24 +162,26 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	os.Setenv("LANG", "C")
 	os.Setenv("LC_ALL", "C")
 
-	address := fmt.Sprintf("%s:%d", opts.Hostname, opts.Port)
+	proto := "tcp"
+	addr := fmt.Sprintf("%s:%d", opts.Hostname, opts.Port)
+	if opts.UnixSock != "" {
+		proto = "unix"
+		addr = opts.UnixSock
+	}
+	timeoutDur := time.Duration(opts.Timeout * float64(time.Second))
 	start := time.Now()
 	if opts.Delay > 0 {
 		time.Sleep(time.Duration(opts.Delay) * time.Second)
 	}
-	var conn net.Conn
-	if opts.UnixSock != "" {
-		conn, err = dial("unix", opts.UnixSock, opts.SSL, opts.NoCheckCertificate)
-	} else {
-		conn, err = dial("tcp", address, opts.SSL, opts.NoCheckCertificate)
-	}
+
+	conn, err := dial(proto, addr, opts.SSL, opts.NoCheckCertificate, timeoutDur)
 	if err != nil {
 		return checkers.Critical(err.Error())
 	}
 	defer conn.Close()
 
 	if opts.Send != "" {
-		err := write(conn, []byte(opts.Send), opts.Timeout)
+		err := write(conn, []byte(opts.Send), timeoutDur)
 		if err != nil {
 			return checkers.Critical(err.Error())
 		}
@@ -187,7 +189,7 @@ func (opts *tcpOpts) run() *checkers.Checker {
 
 	res := ""
 	if opts.expectReg != nil {
-		buf, err := slurp(conn, opts.MaxBytes, opts.Timeout)
+		buf, err := slurp(conn, opts.MaxBytes, timeoutDur)
 		if err != nil {
 			return checkers.Critical(err.Error())
 		}
@@ -198,7 +200,7 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	}
 
 	if opts.Quit != "" {
-		err := write(conn, []byte(opts.Quit), opts.Timeout)
+		err := write(conn, []byte(opts.Quit), timeoutDur)
 		if err != nil {
 			return checkers.Critical(err.Error())
 		}
@@ -225,23 +227,23 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	return checkers.NewChecker(chkSt, msg)
 }
 
-func write(conn net.Conn, content []byte, timeout float64) error {
-	if timeout > 0 {
-		conn.SetWriteDeadline(time.Now().Add(time.Duration(timeout) * time.Second))
+func write(conn net.Conn, content []byte, timeoutDur time.Duration) error {
+	if timeoutDur > 0 {
+		conn.SetWriteDeadline(time.Now().Add(timeoutDur))
 	}
 	_, err := conn.Write(content)
 	return err
 }
 
-func slurp(conn net.Conn, maxbytes int, timeout float64) ([]byte, error) {
+func slurp(conn net.Conn, maxbytes int, timeoutDur time.Duration) ([]byte, error) {
 	buf := []byte{}
 	readLimit := 32 * 1024
 	if maxbytes > 0 {
 		readLimit = maxbytes
 	}
 	readBytes := 0
-	if timeout > 0 {
-		conn.SetReadDeadline(time.Now().Add(time.Duration(timeout) * time.Second))
+	if timeoutDur > 0 {
+		conn.SetReadDeadline(time.Now().Add(timeoutDur))
 	}
 	for {
 		tmpBuf := make([]byte, readLimit)
