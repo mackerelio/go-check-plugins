@@ -1,5 +1,6 @@
 TARGET_OSARCH="linux/amd64"
 CURRENT_VERSION = $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $$1;exit}')
+CURRENT_REVISION = $(shell git rev-parse --short HEAD)
 ifeq ($(OS),Windows_NT)
 GOPATH_ROOT:=$(shell cygpath ${GOPATH})
 TARGET_OSARCH="windows/amd64"
@@ -40,6 +41,11 @@ build: deps
 	    -osarch=$(TARGET_OSARCH) -output build/$$i \
 	    `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
 	done
+
+build/mackerel-check: deps
+	mkdir -p build
+	go build -ldflags="-s -w -X main.version=$(CURRENT_VERSION) -X main.gitcommit=$(CURRENT_REVISION)" \
+	  -o build/mackerel-check
 
 rpm: build
 	make build TARGET_OSARCH="linux/386"
