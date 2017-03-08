@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 )
 
@@ -48,9 +49,7 @@ func run(args []string) int {
 			printHelp()
 			return exitOK
 		}
-		osargs := []string{f}
-		osargs = append(osargs, args[2:]...)
-		os.Args = osargs
+		os.Args = append([]string{f}, args[2:]...)
 	}
 
 	err = runPlugin(plug)
@@ -64,7 +63,7 @@ func run(args []string) int {
 var version, gitcommit string
 
 func printHelp() {
-	fmt.Printf(`mackerel-check %s
+	fmt.Printf(`mackerel-check %s (rev %s) [%s %s %s]
 
 Usage: mackerel-check <plugin> [<args>]
 
@@ -72,5 +71,5 @@ Following plugins are available:
     %s
 
 See `+"`mackerel-check <plugin> -h` "+`for more information on a specific plugin
-`, version, strings.Join(plugins, "\n    "))
+`, version, gitcommit, runtime.GOOS, runtime.GOARCH, runtime.Version(), strings.Join(plugins, "\n    "))
 }
