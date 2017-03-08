@@ -24,12 +24,9 @@ devel-deps: deps
 	go get github.com/pierrre/gotestcover
 	go get github.com/mattn/goveralls
 
-LINT_RET = .golint.txt
 lint: devel-deps
 	go vet ./...
-	rm -f $(LINT_RET)
-	golint ./... | tee -a $(LINT_RET)
-	test ! -s $(LINT_RET)
+	golint -set_exit_status ./...
 
 cover: devel-deps
 	gotestcover -v -short -covermode=count -coverprofile=.profile.cov -parallelpackages=4 ./...
