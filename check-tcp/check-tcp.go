@@ -206,16 +206,16 @@ func (opts *tcpOpts) run() *checkers.Checker {
 			return checkers.Critical(err.Error())
 		}
 	}
-	elapsed := time.Now().Sub(start)
+	elapsedSeconds := float64(time.Now().Sub(start)) / float64(time.Second)
 
 	chkSt := checkers.OK
-	if opts.Warning > 0 && elapsed > time.Duration(opts.Warning)*time.Second {
+	if opts.Warning > 0 && elapsedSeconds > opts.Warning {
 		chkSt = checkers.WARNING
 	}
-	if opts.Critical > 0 && elapsed > time.Duration(opts.Critical)*time.Second {
+	if opts.Critical > 0 && elapsedSeconds > opts.Critical {
 		chkSt = checkers.CRITICAL
 	}
-	msg := fmt.Sprintf("%.3f seconds response time on", float64(elapsed)/float64(time.Second))
+	msg := fmt.Sprintf("%.3f seconds response time on", elapsedSeconds)
 	if opts.Hostname != "" {
 		msg += " " + opts.Hostname
 	}

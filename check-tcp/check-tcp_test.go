@@ -235,7 +235,7 @@ func TestUnixDomainSocket(t *testing.T) {
 	testUnexpected()
 
 	testOverWarn := func() {
-		opts, err := parseArgs([]string{"-U", sock, "--send", `PING`, "-E", "-e", "OKOK", "-w", "0.1"})
+		opts, err := parseArgs([]string{"-U", sock, "--send", `PING`, "-E", "-e", "OKOK", "-w", "0.000000001"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
 		assert.Equal(t, checkers.WARNING, ckr.Status, "should be Warning")
@@ -244,7 +244,7 @@ func TestUnixDomainSocket(t *testing.T) {
 	testOverWarn()
 
 	testOverCrit := func() {
-		opts, err := parseArgs([]string{"-U", sock, "--send", `PING`, "-E", "-e", "OKOK", "-c", "0.1"})
+		opts, err := parseArgs([]string{"-U", sock, "--send", `PING`, "-E", "-e", "OKOK", "-c", "0.000000001"})
 		assert.Equal(t, nil, err, "no errors")
 		ckr := opts.run()
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "should be Critical")
