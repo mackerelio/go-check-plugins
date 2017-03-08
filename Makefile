@@ -11,7 +11,7 @@ endif
 check-variables:
 	echo "CURRENT_VERSION: ${CURRENT_VERSION}"
 
-all: clean test build rpm deb
+all: clean testconvention test build rpm deb
 
 test: lint
 	go test $(TESTFLAGS) ./...
@@ -27,7 +27,10 @@ devel-deps: deps
 lint: devel-deps
 	go vet ./...
 	golint -set_exit_status ./...
+
+testconvention:
 	prove -r t/
+	test `go generate ./... && git diff | wc -l` = 0 || (echo 'please `go generate ./...` and commit them' && exit 1)
 
 cover: devel-deps
 	gotestcover -v -short -covermode=count -coverprofile=.profile.cov -parallelpackages=4 ./...
@@ -63,4 +66,4 @@ clean:
 	fi
 	go clean
 
-.PHONY: all test deps devel-deps lint cover build rpm deb clean release
+.PHONY: all test testconvention deps devel-deps lint cover build rpm deb clean release
