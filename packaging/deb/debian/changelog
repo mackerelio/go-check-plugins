@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.9.5-1) stable; urgency=low
+
+  * add appveyor.yml and fix failing tests on windows (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/145>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 09 Mar 2017 02:57:33 +0000
+
 mackerel-check-plugins (0.9.4-1) stable; urgency=low
 
   * ensure close temporary file in writeFileAtomically (by itchyny)

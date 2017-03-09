@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.5 (2017-03-09)
+
+* add appveyor.yml and fix failing tests on windows #145 (Songmu)
+
+
 ## 0.9.4 (2017-02-22)
 
 * ensure close temporary file in writeFileAtomically #141 (itchyny)

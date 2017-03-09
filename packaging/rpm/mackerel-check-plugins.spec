@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Mar 09 2017 <mackerel-developers@hatena.ne.jp> - 0.9.5-1
+- add appveyor.yml and fix failing tests on windows (by Songmu)
+
 * Wed Feb 22 2017 <mackerel-developers@hatena.ne.jp> - 0.9.4-1
 - ensure close temporary file in writeFileAtomically (by itchyny)
 - Write the file in same directory (by mattn)
