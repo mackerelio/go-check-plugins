@@ -5,7 +5,7 @@ env:
   global:
   - PATH=~/gopath/bin:$PATH
   - DEBIAN_FRONTEND=noninteractive
-  - secure: "A7F4DYfPLjDwh/B0CWAX2y9cChZtGENRF9dJy5l35gK6pc0a4oVzm2GuzZFYubp1ByWIW+No+iXnw2CGYCS2jMdYMeNLjrfN4orEENVrsXIaq+itF7+Ub/O3WaM9ukpfeXZKzFS/EyxvyRYMPmpc2pwqA1HGQ5qTDVzlFE+zCnD4rAAQdCf5KbNuZEcXyOOWKUX8d0ZmmvVYjJM8CKqfxNwWXsVaNBzXww8isa9FaRMiWlei2ca1ORvzVg4xkvcd66xgdj6n07a8oMMaOdmqG4I3qAeh92ruEpWLT4uVzzobDpVUezJ3vH8IXoBizu0Xg9aijFHqlZ6PBDT+jISI2cpfzMgRHORvHk+Qha5AxWkVLinvo/FBGHYEZzkvNOSAqbi+RdesKnDKf4Lktx9LRSRr7Q4fhFUIY2ya33GHS4RjpNtYPrpSZ+QRAVkoRCkPJFhmfgaPYmyC94tTv2c8QDY2p1aXFC10wY5FF/Z2P0Mbcy/q92GSKxxHMM523UVBvgItAdEZEBqLSvFIuM5rf3UcOtJlgoIiiLJ9hskDEOw10Kl0uIuq/tlBp71SuFpYxFPB8lumTzaa8TQQO4pCoyq3zhe0PlbZk621pJRcxnF5pIEen6/7xmwr8+DASE/4yiV+vfhYz9/mUAbwR31k/5lVgvr/tBJLgvY9vyfM0eE="
+  - secure: "JFcsVSj4tI+yz9nu3qTgcWs0VwtUgOBIymH4qw6/ns+S3wcGuBXTgMxd9inIY/qUZhTHDzKMB44OxCwMXyqYKj+o9fe96Vs6tpKJU9XZWa2LvWeegSyA1dA60yMs3L73gTy0ASJC5wRGZTTa9dlqUNYxH7i8M6v1tz4tc9uUM7md+am6Cct5FZlGrYnmV70iLkVhb9nQKRVzgjh2AamgOFekSO4S0cxZe9VwO1tdJ26F/fWpOk2P5maRfQbOE7cQh+1v/NdgsO/fu/kZvcXE5CEerx/dXDudJnNEfIn6qbg4bbhbb3cFi9pBeokp1dSte/53tFDS1llHjoNeSx8JSgtgS6Xe0T5NuMquVe7sKPT9v9ysXBxH5VdvOc+kmvSTCePuNFHcH/sv11gkyQqhSZtEPEodegbkb5EGPkGgLGA9Puagb/1nzEN5e1ZwaiX9xadXTIzBduPYLKqo/vRfXA+Kg0CJ/LNwTCwmigcJNOA2OQP+osCvmseQegO7cUUccmL4DyGsx1QAwNFMaw5gVYiEDCZYKtr6PirkymzLQeQa7VvYxk5qh9cQEUGcnmnpmlVSkT6yhqAZWbm4CWOQVSHiY5+2jHR2oL5NH0PE2qWXLUhG/XgYQa09qN3qxiv7ALs+tbh8rIB4S7AonGsSgdFyx3ITfnrdThI4JFG88J8="
 sudo: false
 addons:
   apt:
@@ -36,12 +36,12 @@ before_deploy:
 - git fetch --tags --depth=100 || true
 deploy:
 - provider: script
-  script: tool/releng --task=upload-to-github-release -v && tool/releng --task=upload-master-to-github-release -v
+  script: tool/releng --task=upload-to-github-release && tool/releng --task=upload-master-to-github-release
   skip_cleanup: true
   on:
     branch: master
 - provider: script
-  script: tool/releng --task=create-pullrequest --current-branch=$TRAVIS_BRANCH --package-name=mackerel-check-plugins -v
+  script: tool/releng --task=create-pullrequest --current-branch=$TRAVIS_BRANCH --package-name=mackerel-check-plugins
   skip_cleanup: true
   on:
     all_branches: true
