@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.5 (2017-03-09)
+
+* add appveyor.yml and fix failing tests on windows #145 (Songmu)
+* [check-tcp] connect timeout #146 (Songmu)
+* [check-tcp] [bugfix] fix decimal threshold value handling #147 (Songmu)
+* use new bot token #148 (daiksy)
+* use new bot token #150 (daiksy)
+
+
 ## 0.9.4 (2017-02-22)
 
 * ensure close temporary file in writeFileAtomically #141 (itchyny)

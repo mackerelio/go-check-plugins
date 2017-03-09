@@ -1,3 +1,18 @@
+mackerel-check-plugins (0.9.5-1) stable; urgency=low
+
+  * add appveyor.yml and fix failing tests on windows (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/145>
+  * [check-tcp] connect timeout (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/146>
+  * [check-tcp] [bugfix] fix decimal threshold value handling (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/147>
+  * use new bot token (by daiksy)
+    <https://github.com/mackerelio/go-check-plugins/pull/148>
+  * use new bot token (by daiksy)
+    <https://github.com/mackerelio/go-check-plugins/pull/150>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 09 Mar 2017 08:37:31 +0000
+
 mackerel-check-plugins (0.9.4-1) stable; urgency=low
 
   * ensure close temporary file in writeFileAtomically (by itchyny)
