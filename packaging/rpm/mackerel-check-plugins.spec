@@ -49,8 +49,6 @@ done
 - add appveyor.yml and fix failing tests on windows (by Songmu)
 - [check-tcp] connect timeout (by Songmu)
 - [check-tcp] [bugfix] fix decimal threshold value handling (by Songmu)
-- use new bot token (by daiksy)
-- use new bot token (by daiksy)
 
 * Wed Feb 22 2017 <mackerel-developers@hatena.ne.jp> - 0.9.4-1
 - ensure close temporary file in writeFileAtomically (by itchyny)

@@ -6,10 +6,6 @@ mackerel-check-plugins (0.9.5-1) stable; urgency=low
     <https://github.com/mackerelio/go-check-plugins/pull/146>
   * [check-tcp] [bugfix] fix decimal threshold value handling (by Songmu)
     <https://github.com/mackerelio/go-check-plugins/pull/147>
-  * use new bot token (by daiksy)
-    <https://github.com/mackerelio/go-check-plugins/pull/148>
-  * use new bot token (by daiksy)
-    <https://github.com/mackerelio/go-check-plugins/pull/150>
 
  -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 09 Mar 2017 08:37:31 +0000
 
