@@ -29,7 +29,8 @@ use lib $FindBin::Bin;
 use MCUtil qw/http_get command infof warnf/;
 
 use JSON::PP qw/decode_json/;
-use Getopt::Long qw/GetOptions/;
+use Getopt::Long qw/GetOptions :config auto_help/;
+use Pod::Usage qw/pod2usage/;
 use File::Basename qw/basename/;
 
 chomp(my $path = `git rev-parse --show-toplevel`);
@@ -151,32 +152,13 @@ if (!$ENV{HARNESS_ACTIVE}) {
     # When called via `prove`, tests will run.
 }
 
-sub help {
-  print <<EOS;
-$0
-  --help
-  --task=<task>            # 'upload-to-github-release'
-                           # or 'upload-master-to-github-release'
-  --package-name=<name>    # target package name. if not specified,
-                           # the repository name is used.
-  --dry-run
-EOS
-
-}
-
 sub main {
-    my $help;
     my $task;
-    GetOptions ("help" => \$help,
+    GetOptions (
         "task=s"           => \$task,
         "dry-run"          => \$dry_run,
         "package-name=s"   => \$package_name,
-    );
-
-    if ($help){
-        help();
-        exit 0;
-    }
+    ) or pod2usage(1);
 
     if ($task && $task eq "upload-to-github-release") {
         infof "Upload files to GitHub Release.\n";
@@ -187,5 +169,4 @@ sub main {
         upload_to_github_release("staging", "staging", 1);
         return;
     }
-    help();
 }
