@@ -141,8 +141,8 @@ sub update_packaging_specs {
 sub update_changelog {
     my ($next_version, @releases) = @_;
 
-    chomp(my $email = `git config user.email`);
-    chomp(my $name  = `git config user.name`);
+    my $email = 'mackerel-developers@hatena.ne.jp';
+    my $name  = 'mackerel';
 
     my $old_locale = setlocale(LC_TIME);
     setlocale(LC_TIME, "C");
