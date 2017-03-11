@@ -28,59 +28,6 @@ use JSON::PP qw/decode_json/;
 use ExtUtils::MakeMaker qw/prompt/;
 use Time::Piece qw/localtime/;
 use POSIX qw(setlocale LC_TIME);
-use version;
-
-sub last_release {
-    my @out = `git tag`;
-
-    my ($tag) =
-        sort { version->parse($b) <=> version->parse($a) }
-        map {/^v([0-9]+(?:\.[0-9]+){2})$/; $1 || ()}
-        map {chomp; $_} @out;
-    $tag;
-}
-
-sub merged_prs {
-    my $current_tag = shift;
-
-    my $data = eval { decode_json scalar `ghch -f v$current_tag` };
-    if ($! || $@) {
-        die "parse json failed: $@";
-    }
-    return grep {$_->{title} !~ /\[nitp?\]/i} @{ $data->{pull_requests} };
-}
-
-sub parse_version {
-    my $ver = shift;
-    my ($major, $minor, $patch) = $ver =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)$/;
-    ($major, $minor, $patch)
-}
-
-sub suggest_next_version {
-    my $ver = shift;
-    my ($major, $minor, $patch) = parse_version($ver);
-    join '.', $major, ++$minor, 0;
-}
-
-sub is_valid_version {
-    my $ver = shift;
-    my ($major) = parse_version($ver);
-    defined $major;
-}
-
-sub decide_next_version {
-    my $current_version = shift;
-    my $next_version = suggest_next_version($current_version);
-    $next_version = prompt("next version", $next_version);
-
-    if (!is_valid_version($next_version)) {
-        die qq{"$next_version" is invalid version string\n};
-    }
-    if (version->parse($next_version) < version->parse($current_version)) {
-        die qq{"$next_version" is smaller than current version "$current_version"\n};
-    }
-    $next_version;
-}
 
 sub update_versions {
     my ($current_version, $next_version) = @_;
@@ -175,15 +122,6 @@ sub update_changelog {
     };
 }
 
-sub build_pull_request_body {
-    my ($next_version, @releases) = @_;
-    my $body = "Release version $next_version\n\n";
-    for my $rel (@releases) {
-        $body .= sprintf "- %s #%s\n", $rel->{title}, $rel->{number};
-    }
-    $body;
-}
-
 sub load_packaging_confg {
     decode_json slurp 'packaging/config.json';
 }
@@ -200,8 +138,6 @@ sub main {
     git qw/checkout master/;
     git qw/pull/;
 
-    my $config = load_packaging_confg;
-
     my $current_version = last_release;
     my $next_version    = decide_next_version($current_version);
 
@@ -213,6 +149,7 @@ sub main {
     update_versions($current_version, $next_version);
     my @plugins = retrieve_plugins;
     update_readme(@plugins);
+    my $config = load_packaging_confg;
     update_packaging_specs(@{ $config->{plugins} });
     git qw/commit -am/, "ready for next release. version: $next_version";
 
