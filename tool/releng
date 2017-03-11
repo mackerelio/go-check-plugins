@@ -148,13 +148,16 @@ sub main {
         "task=s"           => \$task,
         "dry-run"          => \$dry_run,
         "package-name=s"   => \$package_name,
-    ) or pod2usage(1);
+    ) or pod2usage;
 
-    if ($task && $task eq "upload-to-github-release") {
-        infof "Upload files to GitHub Release.\n";
-        upload_to_github_release();
-    } elsif ($task && $task eq "upload-master-to-github-release") {
-        infof "Upload files on master branch to GitHub Release.\n";
-        upload_to_github_release("staging", "staging", 1);
-    }
+    ({
+        'upload-to-github-release' => sub {
+            infof "Upload files to GitHub Release.\n";
+            upload_to_github_release();
+        },
+        'upload-mastert-to-github-release' => sub {
+            infof "Upload files on master branch to GitHub Release.\n";
+            upload_to_github_release("staging", "staging", 1);
+        },
+    }->{$task} || \&pod2usage)->();
 }
