@@ -155,7 +155,7 @@ sub main {
             infof "Upload files to GitHub Release.\n";
             upload_to_github_release();
         },
-        'upload-mastert-to-github-release' => sub {
+        'upload-master-to-github-release' => sub {
             infof "Upload files on master branch to GitHub Release.\n";
             upload_to_github_release("staging", "staging", 1);
         },
