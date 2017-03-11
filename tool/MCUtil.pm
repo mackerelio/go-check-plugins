@@ -134,7 +134,7 @@ sub is_valid_version {
 sub decide_next_version {
     my $current_version = shift;
     my $next_version = suggest_next_version($current_version);
-    $next_version = prompt("next version", $next_version);
+    $next_version = prompt("input next version:", $next_version);
 
     if (!is_valid_version($next_version)) {
         die qq{"$next_version" is invalid version string\n};
@@ -211,7 +211,8 @@ sub create_release_pull_request(&) {
     git qw/pull/;
 
     my $current_version = last_release;
-    my $next_version    = decide_next_version($current_version);
+    infof "current version: %s\n", $current_version;
+    my $next_version = decide_next_version($current_version);
 
     $branch_name = "bump-version-$next_version";
     infof "checkout new releasing branch [$branch_name]\n";
