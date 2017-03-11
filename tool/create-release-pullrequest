@@ -25,7 +25,6 @@ use lib $FindBin::Bin;
 use MCUtil;
 
 use JSON::PP qw/decode_json/;
-use ExtUtils::MakeMaker qw/prompt/;
 use Time::Piece qw/localtime/;
 use POSIX qw(setlocale LC_TIME);
 
@@ -135,55 +134,21 @@ if (!$ENV{HARNESS_ACTIVE}) {
 }
 
 sub main {
-    git qw/checkout master/;
-    git qw/pull/;
+    create_release_pull_request {
+        my ($current_version, $next_version, $releases) = @_;
 
-    my $current_version = last_release;
-    my $next_version    = decide_next_version($current_version);
-
-    my $branch_name = "bump-version-$next_version";
-    infof "checkout new releasing branch [$branch_name]\n";
-    git qw/checkout -b/, $branch_name;
-
-    infof "bump versions and update readme\n";
-    update_versions($current_version, $next_version);
-    my @plugins = retrieve_plugins;
-    update_readme(@plugins);
-    my $config = load_packaging_confg;
-    update_packaging_specs(@{ $config->{plugins} });
-    git qw/commit -am/, "ready for next release. version: $next_version";
-
-    infof "update changelogs\n";
-    my @releases = merged_prs $current_version;
-    update_changelog($next_version, @releases);
-    git qw/commit -am/, "update changelogs";
-
-    git qw/diff/, qw/--word-diff/, "master..$branch_name";
-    my $pr_body = build_pull_request_body($next_version, @releases);
-    say $pr_body;
-
-    if (prompt('push changes?', 'y') !~ /^y(?:es)?$/i ) {
-        warnf('releng is aborted. remove the branch [%s] before next releng', $branch_name);
-        return;
-    }
-
-    infof "push changes\n";
-    git qw/push --set-upstream origin/, $branch_name;
-    hub qw/pull-request -m/, $pr_body;
-
-    infof "Releasing pull request is created. Review and merge it. You can update changelogs and commit more in this branch before merging.\n";
+        update_versions($current_version, $next_version);
+        my @plugins = retrieve_plugins;
+        update_readme(@plugins);
+        my $config = load_packaging_confg;
+        update_packaging_specs(@{ $config->{plugins} });
+        update_changelog($next_version, @$releases);
+    };
 }
 
 sub run_tests {
     require Test::More;
     Test::More->import;
-
-    my $version = '0.1.2';
-    my ($major, $minor, $patch) = parse_version($version);
-    is($major, 0);
-    is($minor, 1);
-    is($patch, 2);
-    is( suggest_next_version($version), '0.2.0' );
 
     my $config = load_packaging_confg;
     ok($config->{description});
