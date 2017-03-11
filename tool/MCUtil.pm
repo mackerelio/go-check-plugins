@@ -197,6 +197,15 @@ sub scope_guard(&) {
 
 sub create_release_pull_request(&) {
     my $code = shift;
+    chomp(my $current_branch = `git symbolic-ref --short HEAD`);
+    my $branch_name;
+    my $cleanup = sub {
+        infof "cleanup\n";
+        git qw/checkout --force/, $current_branch;
+        git qw/br -D/, $branch_name if $branch_name;
+        exit 1;
+    };
+    $SIG{INT} = $cleanup;
 
     git qw/checkout master/;
     git qw/pull/;
@@ -204,7 +213,7 @@ sub create_release_pull_request(&) {
     my $current_version = last_release;
     my $next_version    = decide_next_version($current_version);
 
-    my $branch_name = "bump-version-$next_version";
+    $branch_name = "bump-version-$next_version";
     infof "checkout new releasing branch [$branch_name]\n";
     git qw/checkout -b/, $branch_name;
 
@@ -219,9 +228,10 @@ sub create_release_pull_request(&) {
     say $pr_body;
 
     if (prompt('push changes?', 'y') !~ /^y(?:es)?$/i ) {
-        warnf('releng is aborted. remove the branch [%s] before next releng', $branch_name);
-        return;
+        warnf "releng is aborted.\n";
+        $cleanup->(); # exit internally
     }
+    $SIG{INT} = 'DEFAULT';
 
     infof "push changes\n";
     git qw/push --set-upstream origin/, $branch_name;
