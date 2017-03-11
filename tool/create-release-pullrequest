@@ -31,8 +31,6 @@ use Time::Piece;
 use POSIX qw(setlocale LC_TIME);
 use version;
 
-
-###
 sub last_release {
     my @out = `git tag`;
 
@@ -45,28 +43,20 @@ sub last_release {
 
 sub merged_prs {
     my $current_tag = shift;
-    my @pull_nums = sort {$a <=> $b} map {m/Merge pull request #([0-9]+) /; $1 || ()  } `git log v$current_tag... --merges --oneline`;
 
+    my $json = `ghch -f v$current_tag`;
+    my $data = eval { decode_json $json };
+    if ($@) {
+        die "parse json failed.\n";
+    }
     my @releases;
-    for my $pull_num (@pull_nums) {
-        my $url = sprintf "https://api.github.com/repos/mackerelio/go-check-plugins/pulls/%d?state=closed", $pull_num;
-        my $res = http_get($url);
-        unless ($res->{success}) {
-            warnf "request to $url failed\n";
-            exit;
-        }
-        my $data = eval { decode_json $res->{content} };
-        if ($@) {
-            warnf "parse json failed. url: $url\n";
-            next;
-        }
-
+    for my $pr (@{ $data->{pull_requests} }) {
         push @releases, {
-            num   => $pull_num,
+            num   => $pr->{number},
             title => $data->{title},
             user  => $data->{user}{login},
             url   => $data->{html_url},
-        } if $data->{title} !~ /\[nit\]/i;
+        } if $pr->{title} !~ /\[nitp?\]/i;
     }
     @releases;
 }
