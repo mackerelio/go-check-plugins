@@ -24,10 +24,9 @@ use FindBin;
 use lib $FindBin::Bin;
 use MCUtil;
 
-use IPC::Cmd qw/run/;
-use JSON::PP;
+use JSON::PP qw/decode_json/;
 use ExtUtils::MakeMaker qw/prompt/;
-use Time::Piece;
+use Time::Piece qw/localtime/;
 use POSIX qw(setlocale LC_TIME);
 use version;
 
