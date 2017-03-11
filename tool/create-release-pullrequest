@@ -44,21 +44,11 @@ sub last_release {
 sub merged_prs {
     my $current_tag = shift;
 
-    my $json = `ghch -f v$current_tag`;
-    my $data = eval { decode_json $json };
-    if ($@) {
-        die "parse json failed.\n";
+    my $data = eval { decode_json scalar `ghch -f v$current_tag` };
+    if ($! || $@) {
+        die "parse json failed: $@";
     }
-    my @releases;
-    for my $pr (@{ $data->{pull_requests} }) {
-        push @releases, {
-            num   => $pr->{number},
-            title => $data->{title},
-            user  => $data->{user}{login},
-            url   => $data->{html_url},
-        } if $pr->{title} !~ /\[nitp?\]/i;
-    }
-    @releases;
+    return grep {$_->{title} !~ /\[nitp?\]/i} @{ $data->{pull_requests} };
 }
 
 sub parse_version {
@@ -157,7 +147,7 @@ sub update_changelog {
 
         my $update = "mackerel-check-plugins ($next_version-1) stable; urgency=low\n\n";
         for my $rel (@releases) {
-            $update .= sprintf "  * %s (by %s)\n    <%s>\n", $rel->{title}, $rel->{user}, $rel->{url};
+            $update .= sprintf "  * %s (by %s)\n    <%s>\n", $rel->{title}, $rel->{user}{login}, $rel->{html_url};
         }
         $update .= sprintf "\n -- %s <%s>  %s\n\n", $name, $email, $now->strftime("%a, %d %b %Y %H:%M:%S %z");
         $update . $content;
@@ -168,7 +158,7 @@ sub update_changelog {
 
         my $update = sprintf "* %s <%s> - %s\n", $now->strftime('%a %b %d %Y'), $email, $next_version;
         for my $rel (@releases) {
-            $update .= sprintf "- %s (by %s)\n", $rel->{title}, $rel->{user};
+            $update .= sprintf "- %s (by %s)\n", $rel->{title}, $rel->{user}{login};
         }
         $content =~ s/%changelog/%changelog\n$update/;
         $content;
@@ -179,7 +169,7 @@ sub update_changelog {
 
         my $update = sprintf "\n\n## %s (%s)\n\n", $next_version, $now->strftime('%Y-%m-%d');
         for my $rel (@releases) {
-            $update .= sprintf "* %s #%d (%s)\n", $rel->{title}, $rel->{num}, $rel->{user};
+            $update .= sprintf "* %s #%d (%s)\n", $rel->{title}, $rel->{number}, $rel->{user}{login};
         }
         $content =~ s/\A# Changelog/# Changelog$update/;
         $content;
@@ -190,7 +180,7 @@ sub build_pull_request_body {
     my ($next_version, @releases) = @_;
     my $body = "Release version $next_version\n\n";
     for my $rel (@releases) {
-        $body .= sprintf "- %s #%s\n", $rel->{title}, $rel->{num};
+        $body .= sprintf "- %s #%s\n", $rel->{title}, $rel->{number};
     }
     $body;
 }
