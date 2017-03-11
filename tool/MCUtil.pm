@@ -4,16 +4,25 @@ use 5.014;
 use warnings;
 use utf8;
 
+use IPC::Cmd qw/run/;
+use Carp qw/croak/;
+
 use parent 'Exporter';
 
 our @EXPORT = qw/
-    command git hub
+    command_with_exit_code command git hub
     http_get
     debugf infof warnf errorf
     replace slurp spew
     scope_guard/;
 
 sub DEBUG() { $ENV{MC_RELENG_DEBUG} }
+
+
+sub command_with_exit_code {
+    say('+ '. join ' ', @_) if DEBUG;
+    my $ret = system(@_);
+}
 
 sub command {say('+ '. join ' ', @_) if DEBUG; !system(@_) or croak $!}
 sub _git {
