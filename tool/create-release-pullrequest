@@ -108,12 +108,6 @@ sub update_versions {
 
     ### update versions
     my $cur_ver_reg = quotemeta $current_version;
-    # update .travis.yml
-    replace '.travis.yml' => sub {
-        my $content = shift;
-        $content =~ s/$cur_ver_reg/$next_version/msg;
-        $content;
-    };
 
     # update rpm spec
     replace 'packaging/rpm/mackerel-check-plugins.spec' => sub {
@@ -124,14 +118,7 @@ sub update_versions {
 }
 
 sub retrieve_plugins {
-    my @plugin_dirs = <check-*>;
-    for my $plugin_dir (@plugin_dirs) {
-        my $readme = "$plugin_dir/README.md";
-        unless (-f $readme) {
-            warnf "[$readme] is misssing!!! You must locate it.\n";
-        }
-    }
-    sort map {s/^check-//; $_} @plugin_dirs;
+    sort map {s/^check-//; $_} <check-*>;
 }
 
 sub update_readme {
