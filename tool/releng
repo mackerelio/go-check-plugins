@@ -54,25 +54,12 @@ sub github_release {
     unshift  @_, $com; goto \&command
 }
 
-sub current_branch {
-    state $c = do {
-        chomp(my $branch = `git symbolic-ref --short HEAD`);
-        $branch;
-    };
-}
-
 sub next_version {
-    state $v = sub {
-        if (current_branch() =~ /^bump-version-([\d\.]+)$/) {
-            return $1;
-        } elsif (current_branch() =~ /^master$/){
-            my $next = `git log --merges --oneline`;
-            if ($next =~ /^.+Merge pull request #[0-9]+ from .+\/bump-version-([0-9\.]+)$/m) {
-                return $1;
-            }
-        }
-        return '';
-    }->();
+    state $v = do {
+        my $next = `git log --merges --oneline`;
+        my ($v) = $next =~ /^.+Merge pull request #[0-9]+ from .+\/bump-version-([0-9\.]+)$/m;
+        $v;
+    };
 }
 
 sub find_latest_release_pullrequest {
@@ -95,8 +82,11 @@ sub find_latest_release_pullrequest {
 }
 
 sub upload_to_github_release {
+    chomp(my $current_branch = `git symbolic-ref --short HEAD`);
+    return unless $current_branch eq 'master';
+
     my $tag = shift || "v" . next_version();
-    my $name = shift || $REPO ."-" . next_version();
+    my $name = shift || $REPO . "-" . next_version();
     my $erase_if_exist = shift || 0;
     while (1) {
         eval { github_release qw/release --user/, $OWNER,
@@ -163,10 +153,8 @@ sub main {
     if ($task && $task eq "upload-to-github-release") {
         infof "Upload files to GitHub Release.\n";
         upload_to_github_release();
-        return;
     } elsif ($task && $task eq "upload-master-to-github-release") {
         infof "Upload files on master branch to GitHub Release.\n";
         upload_to_github_release("staging", "staging", 1);
-        return;
     }
 }
