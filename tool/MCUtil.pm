@@ -19,7 +19,8 @@ our @EXPORT = qw/
     replace slurp spew
     parse_version decide_next_version suggest_next_version is_valid_version
     last_release merged_prs build_pull_request_body
-    scope_guard/;
+    scope_guard
+    create_release_pull_request/;
 
 sub DEBUG() { $ENV{MC_RELENG_DEBUG} }
 
@@ -107,7 +108,7 @@ sub spew {
 }
 sub replace {
     my ($file, $code) = @_;
-    my $content = $code->(slurp($file));
+    my $content = $code->(slurp($file), $file);
     spew($file, $content);
 }
 
@@ -176,6 +177,10 @@ sub build_pull_request_body {
 
 # scope_guard
 package MCUtil::g {
+    use 5.014;
+    use warnings;
+    use utf8;
+
     sub new {
         my ($class, $code) = @_;
         bless $code, $class;
@@ -188,6 +193,41 @@ package MCUtil::g {
 sub scope_guard(&) {
     my $code = shift;
     MCUtil::g->new($code);
+}
+
+sub create_release_pull_request(&) {
+    my $code = shift;
+
+    git qw/checkout master/;
+    git qw/pull/;
+
+    my $current_version = last_release;
+    my $next_version    = decide_next_version($current_version);
+
+    my $branch_name = "bump-version-$next_version";
+    infof "checkout new releasing branch [$branch_name]\n";
+    git qw/checkout -b/, $branch_name;
+
+    my @releases = merged_prs $current_version;
+    infof "bump versions and update documents\n";
+    # main process
+    $code->($current_version, $next_version, [@releases]);
+    git qw/commit -am/, "ready for next release and update changelogs. version: $next_version";
+
+    git qw/diff/, qw/--word-diff/, "master..$branch_name";
+    my $pr_body = build_pull_request_body($next_version, @releases);
+    say $pr_body;
+
+    if (prompt('push changes?', 'y') !~ /^y(?:es)?$/i ) {
+        warnf('releng is aborted. remove the branch [%s] before next releng', $branch_name);
+        return;
+    }
+
+    infof "push changes\n";
+    git qw/push --set-upstream origin/, $branch_name;
+    hub qw/pull-request -m/, $pr_body;
+
+    infof "Releasing pull request is created. Review and merge it. You can update changelogs and commit more in this branch before merging.\n";
 }
 
 1
