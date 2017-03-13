@@ -202,7 +202,7 @@ sub create_release_pull_request(&) {
     my $cleanup = sub {
         infof "cleanup\n";
         git qw/checkout --force/, $current_branch;
-        git qw/br -D/, $branch_name if $branch_name;
+        git qw/branch -D/, $branch_name if $branch_name;
         exit 1;
     };
     $SIG{INT} = $cleanup;
@@ -222,7 +222,8 @@ sub create_release_pull_request(&) {
     infof "bump versions and update documents\n";
     # main process
     $code->($current_version, $next_version, [@releases]);
-    git qw/commit -am/, "ready for next release and update changelogs. version: $next_version";
+    git qw/add ./;
+    git qw/commit -m/, "ready for next release and update changelogs. version: $next_version";
 
     git qw/diff/, qw/--word-diff/, "master..$branch_name";
     my $pr_body = build_pull_request_body($next_version, @releases);
