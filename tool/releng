@@ -88,31 +88,35 @@ sub upload_to_github_release {
     my $tag = shift || "v" . next_version();
     my $name = shift || $REPO . "-" . next_version();
     my $erase_if_exist = shift || 0;
-    while (1) {
-        eval { github_release qw/release --user/, $OWNER,
-            qw/--repo/, $REPO,
-            qw/--tag/, $tag,
-            qw/--name/, $name,
-            qw/--description/, "pre-release",
-            qw/--pre-release/
-        };
-        if (!$@) {
-            last;
-        }
+
+    my $release_api_url = sprintf 'https://api.github.com/repos/%s/%s/releases/tags/%s', $OWNER, $REPO, $tag;
+    my $status = `curl -s -I $release_api_url -o /dev/null -w '\%{http_code}'`;
+    if ($?) {
+        warnf "curl failed\n";
+        return;
+    }
+
+    if ($status == 200) {
         if (!$erase_if_exist) {
             infof "The release of this version has already existed at GitHub Release, so skip the process.\n";
             return;
         }
-
-        eval { github_release qw/delete --user/, $OWNER,
-            qw/--repo/, $REPO,
-            qw/--tag/, $tag
-        };
-        if ($@) {
-            infof "The release of this version has already existed at GitHub Release, and cannot be erased.\n";
-            return;
+        else {
+            github_release qw/delete --user/, $OWNER,
+                qw/--repo/, $REPO,
+                qw/--tag/, $tag;
         }
     }
+    elsif ($status != 404) {
+        warnf "something went wrong while requesting github api. url:%s, status: %d", $release_api_url, $status;
+        return;
+    }
+    github_release qw/release --user/, $OWNER,
+        qw/--repo/, $REPO,
+        qw/--tag/, $tag,
+        qw/--name/, $name,
+        qw/--description/, "pre-release",
+        qw/--pre-release/;
 
     # upload files
     my $latest_release_pullrequest = find_latest_release_pullrequest();
