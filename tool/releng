@@ -79,12 +79,16 @@ sub find_latest_release_pullrequest {
 }
 
 sub upload_to_github_release {
+    my %args = @_;
+
     chomp(my $current_branch = `git symbolic-ref --short HEAD`);
     return unless $current_branch eq 'master';
 
-    my $tag = shift || "v" . next_version();
-    my $name = shift || $REPO . "-" . next_version();
-    my $erase_if_exist = shift || 0;
+    my $is_staging = $args{staging};
+    my ($tag, $name) = ("staging")x2;
+    if (!$is_staging) {
+        ($tag, $name) = ("v" . next_version(), $REPO . "-" . next_version());
+    }
 
     my $release_api_url = sprintf 'https://api.github.com/repos/%s/%s/releases/tags/%s', $OWNER, $REPO, $tag;
     my $status = `curl -s -I $release_api_url -o /dev/null -w '\%{http_code}'`;
@@ -94,7 +98,7 @@ sub upload_to_github_release {
     }
 
     if ($status == 200) {
-        if (!$erase_if_exist) {
+        if (!$is_staging) {
             infof "The release of this version has already existed at GitHub Release, so skip the process.\n";
             return;
         }
@@ -108,16 +112,22 @@ sub upload_to_github_release {
         warnf "something went wrong while requesting github api. url:%s, status: %d", $release_api_url, $status;
         return;
     }
+
+    my $latest_release_pullrequest = find_latest_release_pullrequest();
+    unless ($latest_release_pullrequest) {
+        warnf "faild to find latest release pull request";
+        return
+    }
+
+    my $description = $latest_release_pullrequest->{body};
     github_release qw/release --user/, $OWNER,
         qw/--repo/, $REPO,
         qw/--tag/, $tag,
         qw/--name/, $name,
-        qw/--description/, "pre-release",
+        qw/--description/, $description,
         qw/--pre-release/;
 
     # upload files
-    my $latest_release_pullrequest = find_latest_release_pullrequest();
-    my $description = $latest_release_pullrequest->{body};
     my @filepaths = glob("~/rpmbuild/RPMS/*/*.rpm packaging/*.deb snapshot/*.zip snapshot/*.tar.gz");
     infof "uploading following files:\n" . join("\n", @filepaths). "\n";
     for my $path (@filepaths){
@@ -128,12 +138,13 @@ sub upload_to_github_release {
             qw/--name/, $filename,
             qw/--file/, $path;
     }
-    my @args = (qw/edit --user/, $OWNER,
-        qw/--repo/, $REPO,
-        qw/--tag/, $tag,
-        qw/--description/, $description);
-    push @args, "--pre-release" if $erase_if_exist;
-    github_release @args;
+    if (!$is_staging) {
+        github_release qw/edit --user/, $OWNER,
+            qw/--repo/, $REPO,
+            qw/--tag/, $tag,
+            qw/--name/, $name,
+            qw/--description/, $description;
+    }
 }
 
 ### main process
@@ -157,7 +168,7 @@ sub main {
         },
         'upload-master-to-github-release' => sub {
             infof "Upload files on master branch to GitHub Release.\n";
-            upload_to_github_release("staging", "staging", 1);
+            upload_to_github_release(staging => 1);
         },
     }->{$task} || \&pod2usage)->();
 }
