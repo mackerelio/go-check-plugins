@@ -8,6 +8,8 @@ use IPC::Cmd qw/run/;
 use Carp qw/croak/;
 use ExtUtils::MakeMaker qw/prompt/;
 use JSON::PP qw/decode_json/;
+use POSIX qw(setlocale LC_TIME);
+use Time::Piece qw/localtime/;
 use version;
 
 use parent 'Exporter';
@@ -195,8 +197,70 @@ sub scope_guard(&) {
     MCUtil::g->new($code);
 }
 
-sub create_release_pull_request(&) {
-    my $code = shift;
+sub update_versions {
+    my ($package_name, $current_version, $next_version) = @_;
+
+    ### update versions
+    my $cur_ver_reg = quotemeta $current_version;
+
+    # update rpm spec
+    replace sprintf('packaging/rpm/%s.spec', $package_name) => sub {
+        my $content = shift;
+        $content =~ s/^(Version:\s+)$cur_ver_reg/$1$next_version/ms;
+        $content;
+    };
+}
+
+sub update_changelog {
+    my ($package_name, $next_version, @releases) = @_;
+
+    my $email = 'mackerel-developers@hatena.ne.jp';
+    my $name  = 'mackerel';
+
+    my $old_locale = setlocale(LC_TIME);
+    setlocale(LC_TIME, "C");
+    my $g = scope_guard {
+        setlocale(LC_TIME, $old_locale);
+    };
+
+    my $now = localtime;
+
+    replace 'packaging/deb/debian/changelog' => sub {
+        my $content = shift;
+
+        my $update = sprintf "%s (%s-1) stable; urgency=low\n\n", $package_name, $next_version;
+        for my $rel (@releases) {
+            $update .= sprintf "  * %s (by %s)\n    <%s>\n", $rel->{title}, $rel->{user}{login}, $rel->{html_url};
+        }
+        $update .= sprintf "\n -- %s <%s>  %s\n\n", $name, $email, $now->strftime("%a, %d %b %Y %H:%M:%S %z");
+        $update . $content;
+    };
+
+    replace sprintf('packaging/rpm/%s.spec', $package_name) => sub {
+        my $content = shift;
+
+        my $update = sprintf "* %s <%s> - %s\n", $now->strftime('%a %b %d %Y'), $email, $next_version;
+        for my $rel (@releases) {
+            $update .= sprintf "- %s (by %s)\n", $rel->{title}, $rel->{user}{login};
+        }
+        $content =~ s/%changelog/%changelog\n$update/;
+        $content;
+    };
+
+    replace 'CHANGELOG.md' => sub {
+        my $content = shift;
+
+        my $update = sprintf "\n\n## %s (%s)\n\n", $next_version, $now->strftime('%Y-%m-%d');
+        for my $rel (@releases) {
+            $update .= sprintf "* %s #%d (%s)\n", $rel->{title}, $rel->{number}, $rel->{user}{login};
+        }
+        $content =~ s/\A# Changelog/# Changelog$update/;
+        $content;
+    };
+}
+
+sub create_release_pull_request {
+    my ($package_name, $code) = @_;
     chomp(my $current_branch = `git symbolic-ref --short HEAD`);
     my $branch_name;
     my $cleanup = sub {
@@ -220,6 +284,8 @@ sub create_release_pull_request(&) {
 
     my @releases = merged_prs $current_version;
     infof "bump versions and update documents\n";
+    update_versions $package_name, $next_version;
+    update_changelog $package_name, $next_version, @releases;
     # main process
     $code->($current_version, $next_version, [@releases]);
     git qw/add ./;
