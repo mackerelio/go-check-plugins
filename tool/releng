@@ -9,8 +9,6 @@ Release Engineering script for mackerel related packages.
     % releng
         --help
         --task=<task>            # 'github-release'
-        --package-name=<name>    # target package name. if not specified,
-                                 # the repository name is used.
         --dry-run
 
 =head DEPENDENCY
@@ -40,7 +38,6 @@ my $REPO  = $directories[-1];
 my $OWNER = $directories[-2];
 
 my $dry_run;
-my $package_name = $REPO;
 
 sub github_release {
     if ($dry_run) {
@@ -149,9 +146,8 @@ if (!$ENV{HARNESS_ACTIVE}) {
 sub main {
     my $task;
     GetOptions (
-        "task=s"           => \$task,
-        "dry-run"          => \$dry_run,
-        "package-name=s"   => \$package_name,
+        "task=s"  => \$task,
+        "dry-run" => \$dry_run,
     ) or pod2usage;
 
     ({
