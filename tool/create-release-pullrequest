@@ -18,13 +18,11 @@ use 5.014;
 use strict;
 use warnings;
 use utf8;
-use Carp;
 
-use FindBin;
-use lib $FindBin::Bin;
-use MCUtil;
+use Mackerel::ReleaseUtils qw/replace create_release_pull_request/;
 
 use JSON::PP qw/decode_json/;
+use Path::Tiny qw/path/;
 
 sub retrieve_plugins {
     sort map {s/^check-//; $_} <check-*>;
@@ -58,7 +56,7 @@ sub update_packaging_specs {
 }
 
 sub load_packaging_confg {
-    decode_json slurp 'packaging/config.json';
+    decode_json path('packaging/config.json')->slurp;
 }
 
 ### main process

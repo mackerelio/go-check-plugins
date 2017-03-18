@@ -22,10 +22,10 @@ use strict;
 use warnings;
 use utf8;
 
-use FindBin;
-use lib $FindBin::Bin;
-use MCUtil qw/http_get command infof warnf/;
+use Mackerel::ReleaseUtils qw/command/;
+use Mackerel::ReleaseUtils::Log qw/infof warnf/;
 
+use HTTP::Tinyish;
 use JSON::PP qw/decode_json/;
 use Getopt::Long qw/GetOptions :config auto_help/;
 use Pod::Usage qw/pod2usage/;
@@ -61,7 +61,7 @@ sub next_version {
 
 sub find_latest_release_pullrequest {
     my $url = sprintf "https://api.github.com/repos/%s/%s/pulls?state=close&sort=updated&direction=desc", $OWNER, $REPO;
-    my $res = http_get($url);
+    my $res = HTTP::Tinyish->new->get($url);
     unless ($res->{success}) {
         warnf "request to $url failed\n";
         return; #exit;
