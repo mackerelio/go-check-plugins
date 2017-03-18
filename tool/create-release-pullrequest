@@ -67,10 +67,10 @@ sub update_packaging_specs {
 
     my $replace_sub = sub {
         my $content = shift;
-        $content =~ s/for i in.*?;do/$for_in/ms;
+        $content =~ s/for i in.*?;\s*do/$for_in/ms;
         $content;
     };
-    replace $_, $replace_sub for qw!packaging/rpm/mackerel-check-plugins.spec packaging/deb/debian/rules!;
+    replace $_, $replace_sub for qw(packaging/rpm/mackerel-check-plugins.spec packaging/deb/debian/rules);
 }
 
 sub update_changelog {
