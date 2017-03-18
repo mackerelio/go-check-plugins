@@ -25,22 +25,6 @@ use lib $FindBin::Bin;
 use MCUtil;
 
 use JSON::PP qw/decode_json/;
-use Time::Piece qw/localtime/;
-use POSIX qw(setlocale LC_TIME);
-
-sub update_versions {
-    my ($current_version, $next_version) = @_;
-
-    ### update versions
-    my $cur_ver_reg = quotemeta $current_version;
-
-    # update rpm spec
-    replace 'packaging/rpm/mackerel-check-plugins.spec' => sub {
-        my $content = shift;
-        $content =~ s/^(Version:\s+)$cur_ver_reg/$1$next_version/ms;
-        $content;
-    };
-}
 
 sub retrieve_plugins {
     sort map {s/^check-//; $_} <check-*>;
@@ -73,54 +57,6 @@ sub update_packaging_specs {
     replace $_, $replace_sub for qw(packaging/rpm/mackerel-check-plugins.spec packaging/deb/debian/rules);
 }
 
-sub update_changelog {
-    my ($next_version, @releases) = @_;
-
-    my $email = 'mackerel-developers@hatena.ne.jp';
-    my $name  = 'mackerel';
-
-    my $old_locale = setlocale(LC_TIME);
-    setlocale(LC_TIME, "C");
-    my $g = scope_guard {
-        setlocale(LC_TIME, $old_locale);
-    };
-
-    my $now = localtime;
-
-    replace 'packaging/deb/debian/changelog' => sub {
-        my $content = shift;
-
-        my $update = "mackerel-check-plugins ($next_version-1) stable; urgency=low\n\n";
-        for my $rel (@releases) {
-            $update .= sprintf "  * %s (by %s)\n    <%s>\n", $rel->{title}, $rel->{user}{login}, $rel->{html_url};
-        }
-        $update .= sprintf "\n -- %s <%s>  %s\n\n", $name, $email, $now->strftime("%a, %d %b %Y %H:%M:%S %z");
-        $update . $content;
-    };
-
-    replace 'packaging/rpm/mackerel-check-plugins.spec' => sub {
-        my $content = shift;
-
-        my $update = sprintf "* %s <%s> - %s\n", $now->strftime('%a %b %d %Y'), $email, $next_version;
-        for my $rel (@releases) {
-            $update .= sprintf "- %s (by %s)\n", $rel->{title}, $rel->{user}{login};
-        }
-        $content =~ s/%changelog/%changelog\n$update/;
-        $content;
-    };
-
-    replace 'CHANGELOG.md' => sub {
-        my $content = shift;
-
-        my $update = sprintf "\n\n## %s (%s)\n\n", $next_version, $now->strftime('%Y-%m-%d');
-        for my $rel (@releases) {
-            $update .= sprintf "* %s #%d (%s)\n", $rel->{title}, $rel->{number}, $rel->{user}{login};
-        }
-        $content =~ s/\A# Changelog/# Changelog$update/;
-        $content;
-    };
-}
-
 sub load_packaging_confg {
     decode_json slurp 'packaging/config.json';
 }
@@ -134,15 +70,13 @@ if (!$ENV{HARNESS_ACTIVE}) {
 }
 
 sub main {
-    create_release_pull_request {
+    create_release_pull_request 'mackerel-check-plugins' => sub {
         my ($current_version, $next_version, $releases) = @_;
 
-        update_versions($current_version, $next_version);
         my @plugins = retrieve_plugins;
         update_readme(@plugins);
         my $config = load_packaging_confg;
         update_packaging_specs(@{ $config->{plugins} });
-        update_changelog($next_version, @$releases);
     };
 }
 
