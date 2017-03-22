@@ -1,3 +1,14 @@
+mackerel-check-plugins (0.9.6-1) stable; urgency=low
+
+  * Change directory structure convention of each plugin (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/144>
+  * run tests under ./check-XXX/lib (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/152>
+  * fix test for AppVayor (by daiksy)
+    <https://github.com/mackerelio/go-check-plugins/pull/154>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 22 Mar 2017 09:06:44 +0000
+
 mackerel-check-plugins (0.9.5-1) stable; urgency=low
 
   * add appveyor.yml and fix failing tests on windows (by Songmu)

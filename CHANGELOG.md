@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.6 (2017-03-22)
+
+* Change directory structure convention of each plugin #144 (Songmu)
+* run tests under ./check-XXX/lib #152 (astj)
+* fix test for AppVayor #154 (daiksy)
+
+
 ## 0.9.5 (2017-03-09)
 
 * add appveyor.yml and fix failing tests on windows #145 (Songmu)

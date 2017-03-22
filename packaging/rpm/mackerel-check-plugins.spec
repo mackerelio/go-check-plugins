@@ -45,6 +45,11 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Mar 22 2017 <mackerel-developers@hatena.ne.jp> - 0.9.6-1
+- Change directory structure convention of each plugin (by Songmu)
+- run tests under ./check-XXX/lib (by astj)
+- fix test for AppVayor (by daiksy)
+
 * Thu Mar 09 2017 <mackerel-developers@hatena.ne.jp> - 0.9.5-1
 - add appveyor.yml and fix failing tests on windows (by Songmu)
 - [check-tcp] connect timeout (by Songmu)
