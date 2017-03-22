@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-func stopSpoolerService() error {
-	_, err := exec.Command("net", "stop", "Spooler").CombinedOutput()
+func stopFaxService() error {
+	_, err := exec.Command("net", "stop", "Fax").CombinedOutput()
 	return err
 }
 
-func startSpoolerService() error {
-	_, err := exec.Command("net", "start", "Spooler").CombinedOutput()
+func startFaxService() error {
+	_, err := exec.Command("net", "start", "Fax").CombinedOutput()
 	return err
 }
 
@@ -26,27 +26,27 @@ func TestNtService(t *testing.T) {
 		t.Errorf("failed to get service status: %v", err)
 	}
 	for _, s := range ss {
-		if s.Name == "Spooler" {
+		if s.Name == "Fax" {
 			if s.State != "Running" {
-				t.Error("Spooler service should be started in default")
+				t.Error("Fax service should be started in default")
 			}
 		}
 	}
 
-	err = stopSpoolerService()
+	err = stopFaxService()
 	if err != nil {
-		t.Skipf("failed to stop Spooler service. But ignore this: %v", err)
+		t.Skipf("failed to stop Fax service. But ignore this: %v", err)
 	}
-	defer startSpoolerService()
+	defer startFaxService()
 
 	ss, err = getServiceState()
 	if err != nil {
 		t.Errorf("failed to get service status: %v", err)
 	}
 	for _, s := range ss {
-		if s.Name == "Spooler" {
+		if s.Name == "Fax" {
 			if s.State == "Running" {
-				t.Error("Spooler service should be stopped now")
+				t.Error("Fax service should be stopped now")
 			}
 		}
 	}
