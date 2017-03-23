@@ -319,7 +319,7 @@ func (opts *logOpts) match(line string) (bool, []string) {
 	return matched, matches
 }
 
-var stateRe = regexp.MustCompile(`^([A-Z]):[/\\]`)
+var stateRe = regexp.MustCompile(`^([a-zA-Z]):[/\\]`)
 
 func getStateFile(stateDir, f string, args []string) string {
 	return filepath.Join(
