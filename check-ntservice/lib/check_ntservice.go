@@ -14,14 +14,11 @@ var opts struct {
 	ListService bool   `long:"list-service" short:"l" description:"list service"`
 }
 
-type serviceState struct {
-	Node         string `csv:"Node"`
-	Caption      string `csv:"Caption"`
-	ErrorControl string `csv:"ErrorControl"`
-	Name         string `csv:"Name"`
-	Started      bool   `csv:"Started"`
-	StartMode    string `csv:"StartMode"`
-	State        string `csv:"State"`
+// Win32Service is struct for Win32_Service.
+type Win32Service struct {
+	Caption string
+	Name    string
+	State   string
 }
 
 // Do the plugin

@@ -28,7 +28,7 @@ func TestNtService(t *testing.T) {
 	for _, s := range ss {
 		if s.Name == "Fax" {
 			if s.State != "Running" {
-				t.Error("Fax service should be started in default")
+				t.Errorf("Fax service should be started in default: %v", s.State)
 			}
 		}
 	}

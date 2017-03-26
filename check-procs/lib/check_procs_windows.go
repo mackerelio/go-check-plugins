@@ -1,51 +1,39 @@
 package checkprocs
 
 import (
-	"encoding/csv"
-	"errors"
-	"os/exec"
-	"strconv"
-	"strings"
+	"fmt"
+
+	"github.com/StackExchange/wmi"
 )
 
-func getProcs() (proc []procState, err error) {
-	var procs []procState
-	// WMIC PATH Win32_PerfFormattedData_PerfProc_Process WHERE "Name != '_Total'" GET Name,IDProcess,VirtualBytes,WorkingSet,PercentProcessorTime,ThreadCount,ElapsedTime /FORMAT:CSV
-	output, _ := exec.Command("WMIC", "PATH", "Win32_PerfFormattedData_PerfProc_Process", "WHERE", "Name != '_Total'", "GET", "ElapsedTime,IDProcess,Name,PercentProcessorTime,ThreadCount,VirtualBytes,WorkingSet", "/FORMAT:CSV").Output()
-	r := csv.NewReader(strings.NewReader(string(output[1:])))
-	records, err := r.ReadAll()
-	if (err != nil) {
-		return procs, nil
-	}
-	for _, record := range records[1:] {
-		proc, err := parsePerfProc(record)
-		if err != nil {
-			continue
-		}
-		procs = append(procs, proc)
-	}
-	return procs, nil
+// Win32PerfFormattedDataPerfProcProcess is struct for Win32_PerfFormattedData_PerfProc_Process.
+type Win32PerfFormattedDataPerfProcProcess struct {
+	ElapsedTime          uint64
+	IDProcess            uint32
+	Name                 string
+	PercentProcessorTime uint64
+	ThreadCount          uint64
+	VirtualBytes         uint64
+	WorkingSet           uint64
 }
 
-func parsePerfProc(fields []string) (proc procState, err error) {
-	fieldsLen := 8
-	if len(fields) != fieldsLen {
-		return procState{}, errors.New("parseTaskList: insufficient words")
+func getProcs() (proc []procState, err error) {
+	var records []Win32PerfFormattedDataPerfProcProcess
+	err = wmi.Query("SELECT * FROM Win32_PerfFormattedData_PerfProc_Process WHERE Name != '_Total'", &records)
+	if err != nil {
+		return nil, err
 	}
-	vsz, _ := strconv.ParseInt(fields[6], 10, 64) //VirtualBytes
-	rss, _ := strconv.ParseInt(fields[7], 10, 64) // WorkingSet
-	pcpu, _ := strconv.ParseFloat(fields[4], 64) // PercentProcessorTime
-	thcount, _ := strconv.ParseInt(fields[5], 10, 64) //ThreadCount
-	esec, _ := strconv.ParseInt(fields[1], 10, 64) // ElapsedTime
-	csec := int64(0)
-	return procState{
-		cmd: fields[3], // Name
-		pid: fields[2], // IDProcess
-		vsz: vsz,
-		rss: rss,
-		pcpu: pcpu,
-		thcount: thcount,
-		esec: esec,
-		csec: csec,
-	}, nil
+	for _, record := range records {
+		proc = append(proc, procState{
+			cmd:     record.Name,
+			pid:     fmt.Sprint(record.IDProcess),
+			vsz:     int64(record.VirtualBytes),
+			rss:     int64(record.WorkingSet),
+			pcpu:    float64(record.PercentProcessorTime),
+			thcount: int64(record.ThreadCount),
+			esec:    int64(record.ElapsedTime),
+			csec:    0,
+		})
+	}
+	return proc, nil
 }

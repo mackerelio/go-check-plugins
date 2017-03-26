@@ -3,25 +3,14 @@
 package checkntservice
 
 import (
-	"os/exec"
-	"strings"
-
-	"github.com/gocarina/gocsv"
-	"golang.org/x/text/encoding/japanese"
+	"github.com/StackExchange/wmi"
 )
 
-func getServiceState() ([]serviceState, error) {
-	b, err := exec.Command("wmic", "service", "get", "Caption,ErrorControl,Name,Started,StartMode,State", "/format:csv").Output()
+func getServiceState() ([]Win32Service, error) {
+	var records []Win32Service
+	err := wmi.Query("SELECT * FROM Win32_Service", &records)
 	if err != nil {
 		return nil, err
 	}
-	b, err = japanese.ShiftJIS.NewDecoder().Bytes(b)
-	if err != nil {
-		return nil, err
-	}
-	csv := strings.Replace(string(b), "\r", "", -1)
-	csv = strings.TrimLeft(csv, " \t\n")
-	var state []serviceState
-	err = gocsv.UnmarshalString(csv, &state)
-	return state, err
+	return records, nil
 }

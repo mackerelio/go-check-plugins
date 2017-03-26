@@ -6,6 +6,6 @@ import (
 	"syscall"
 )
 
-func getServiceState() ([]serviceState, error) {
+func getServiceState() ([]Win32Service, error) {
 	return nil, syscall.ENOSYS
 }
