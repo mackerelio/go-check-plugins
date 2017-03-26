@@ -3,6 +3,7 @@ package checkntservice
 import (
 	"os/exec"
 	"runtime"
+	"syscall"
 	"testing"
 )
 
@@ -17,11 +18,13 @@ func startFaxService() error {
 }
 
 func TestNtService(t *testing.T) {
+	ss, err := getServiceState()
 	if runtime.GOOS != "windows" {
+		if err == nil || err != syscall.ENOSYS {
+			t.Fatal(runtime.GOOS + " should fail because it's not Windows")
+		}
 		t.Skip(runtime.GOOS + " doesn't implement Windows NT service")
 	}
-
-	ss, err := getServiceState()
 	if err != nil {
 		t.Errorf("failed to get service status: %v", err)
 	}
