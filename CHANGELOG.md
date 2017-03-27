@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.7 (2017-03-27)
+
+* check lower-case driver letters #156 (mattn)
+
+
 ## 0.9.6 (2017-03-22)
 
 * Change directory structure convention of each plugin #144 (Songmu)

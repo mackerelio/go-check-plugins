@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Mon Mar 27 2017 <mackerel-developers@hatena.ne.jp> - 0.9.7-1
+- check lower-case driver letters (by mattn)
+
 * Wed Mar 22 2017 <mackerel-developers@hatena.ne.jp> - 0.9.6-1
 - Change directory structure convention of each plugin (by Songmu)
 - run tests under ./check-XXX/lib (by astj)
