@@ -4,10 +4,11 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"./mock"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/mackerelio/go-check-plugins/check-masterha/lib/mock"
+
 	"github.com/mackerelio/checkers"
+	"github.com/stretchr/testify/assert"
 )
 
 var subc = subcommand{
@@ -33,11 +34,11 @@ func TestSubcommandExecuteSuccessful(t *testing.T) {
 		ConfigDir: "/usr/local/masterha/conf",
 		All:       false,
 		Executer: &mock.Executer{
-			CommandName: "echo",
-			CommandArgs: []string{"hello"},
+			CommandName:   "echo",
+			CommandArgs:   []string{"hello"},
 			CommandResult: "* should set result to here *",
-			Status: checkers.OK,
-			ParseResult: "OK",
+			Status:        checkers.OK,
+			ParseResult:   "OK",
 		},
 	}
 	checker := subc.execute("/path/to/masterha/db002.conf")
@@ -52,11 +53,11 @@ func TestSubcommandExecuteUnknown(t *testing.T) {
 		ConfigDir: "/usr/local/masterha/conf",
 		All:       false,
 		Executer: &mock.Executer{
-			CommandName: "false",
-			CommandArgs: []string{""},
+			CommandName:   "false",
+			CommandArgs:   []string{""},
 			CommandResult: "* should set result to here *",
-			Status: checkers.UNKNOWN,
-			ParseResult: "UNKNOWN",
+			Status:        checkers.UNKNOWN,
+			ParseResult:   "UNKNOWN",
 		},
 	}
 	checker := subc.execute(subc.Config)
@@ -75,7 +76,6 @@ db003 (pid:1111) is running(0:PING_OK), master:XX.XX.XX.XX
 	extracted := extractNonEmptyLines(lines)
 	assert.Equal(t, 3, len(extracted))
 }
-
 
 func TestExtractErrorMsg(t *testing.T) {
 	body := `Thu Mar 24 14:31:00 2016 - [warn] Global configuration file /etc/masterha_default.cnf not found. Skipping.
@@ -109,4 +109,3 @@ MySQL Replication Health is NOT OK!
 	extracted := extractErrorMsg(body)
 	assert.Equal(t, 4, len(strings.Split(extracted, "\n")))
 }
-
