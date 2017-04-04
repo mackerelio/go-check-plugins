@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+
+=head DESCRIPTION
+
+releng script for mackerel-check-plugins
+
+=head SYNOPSIS
+
+    % tool/releng
+
+=head DEPENDENCY
+
+`git` command and `hub` or `gh` command are required.
+
+=cut
+
+use 5.014;
+use strict;
+use warnings;
+use utf8;
+
+use Mackerel::ReleaseUtils qw/replace create_release_pull_request/;
+
+use JSON::PP qw/decode_json/;
+use Path::Tiny qw/path/;
+
+sub retrieve_plugins {
+    sort map {s/^check-//; $_} <check-*>;
+}
+
+sub update_readme {
+    my @plugins = @_;
+
+    my $doc_links = '';
+    for my $plug (@plugins) {
+        $doc_links .= "* [check-$plug](./check-$plug/README.md)\n"
+    }
+    replace 'README.md' => sub {
+        my $readme = shift;
+        my $plu_reg = qr/check-[-0-9a-zA-Z_]+/;
+        $readme =~ s!(?:\* \[$plu_reg\]\(\./$plu_reg/README\.md\)\n)+!$doc_links!ms;
+        $readme;
+    };
+}
+
+sub update_packaging_specs {
+    my @plugins = @_;
+    my $for_in = 'for i in ' . join(' ', @plugins) . ';do';
+
+    my $replace_sub = sub {
+        my $content = shift;
+        $content =~ s/for i in.*?;\s*do/$for_in/ms;
+        $content;
+    };
+    replace $_, $replace_sub for qw(packaging/rpm/mackerel-check-plugins.spec packaging/deb/debian/rules);
+}
+
+sub load_packaging_confg {
+    decode_json path('packaging/config.json')->slurp;
+}
+
+### main process
+if (!$ENV{HARNESS_ACTIVE}) {
+    main() unless caller;
+} else {
+    # When called via `prove`, tests will run.
+    run_tests();
+}
+
+sub main {
+    create_release_pull_request 'mackerel-check-plugins' => sub {
+        my ($current_version, $next_version, $releases) = @_;
+
+        my @plugins = retrieve_plugins;
+        update_readme(@plugins);
+        my $config = load_packaging_confg;
+        update_packaging_specs(@{ $config->{plugins} });
+    };
+}
+
+sub run_tests {
+    require Test::More;
+    Test::More->import;
+
+    my $config = load_packaging_confg;
+    ok($config->{description});
+
+    my $plugins_to_be_packaged = $config->{plugins};
+    isa_ok($plugins_to_be_packaged, 'ARRAY');
+
+    my %plugins = map { $_ => 1, } retrieve_plugins;
+    for my $plug (@$plugins_to_be_packaged) {
+        ok($plugins{$plug}, "$plug ok");
+    }
+    done_testing();
+}
