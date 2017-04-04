@@ -30,7 +30,7 @@ lint: devel-deps
 
 testconvention:
 	prove -r t/
-	go generate ./... && git diff --exit-code || (echo 'please `go generate ./...` and commit them' && false)
+	@go generate ./... && git diff --exit-code || (echo 'please `go generate ./...` and commit them' && false)
 
 cover: devel-deps
 	gotestcover -v -short -covermode=count -coverprofile=.profile.cov -parallelpackages=4 ./...
