@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Apr 06 2017 <mackerel-developers@hatena.ne.jp> - 0.10.0-1
+- bump go to 1.8 (by astj)
+
 * Mon Mar 27 2017 <mackerel-developers@hatena.ne.jp> - 0.9.7-1
 - check lower-case driver letters (by mattn)
 
