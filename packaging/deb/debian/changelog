@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.10.0-1) stable; urgency=low
+
+  * bump go to 1.8 (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/159>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 06 Apr 2017 02:38:42 +0000
+
 mackerel-check-plugins (0.9.7-1) stable; urgency=low
 
   * check lower-case driver letters (by mattn)

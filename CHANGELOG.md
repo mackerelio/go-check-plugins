@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.0 (2017-04-06)
+
+* bump go to 1.8 #159 (astj)
+
+
 ## 0.9.7 (2017-03-27)
 
 * check lower-case driver letters #156 (mattn)
