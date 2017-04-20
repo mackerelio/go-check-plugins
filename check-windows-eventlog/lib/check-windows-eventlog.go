@@ -22,6 +22,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 	"github.com/mackerelio/go-check-plugins/check-windows-eventlog/lib/internal/eventlog"
+	"github.com/mackerelio/golib/pluginutil"
 )
 
 const (
@@ -167,10 +168,7 @@ func parseArgs(args []string) (*logOpts, error) {
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
 	if opts.StateDir == "" {
-		workdir := os.Getenv("MACKEREL_PLUGIN_WORKDIR")
-		if workdir == "" {
-			workdir = os.TempDir()
-		}
+		workdir := pluginutil.PluginWorkDir()
 		opts.StateDir = filepath.Join(workdir, "check-windows-eventlog")
 	}
 	opts.origArgs = origArgs
