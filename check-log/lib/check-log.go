@@ -15,6 +15,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
+	"github.com/mackerelio/golib/pluginutil"
 	"github.com/mattn/go-encoding"
 	"github.com/mattn/go-zglob"
 	enc "golang.org/x/text/encoding"
@@ -127,10 +128,7 @@ func parseArgs(args []string) (*logOpts, error) {
 	_, err := flags.ParseArgs(opts, args)
 	opts.origArgs = origArgs
 	if opts.StateDir == "" {
-		workdir := os.Getenv("MACKEREL_PLUGIN_WORKDIR")
-		if workdir == "" {
-			workdir = os.TempDir()
-		}
+		workdir := pluginutil.PluginWorkDir()
 		opts.StateDir = filepath.Join(workdir, "check-log")
 	}
 	return opts, err
