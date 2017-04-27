@@ -45,6 +45,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Apr 27 2017 <mackerel-developers@hatena.ne.jp> - 0.10.1-1
+- use wmi query instead of running wmic command (by mattn)
+- Use golib/pluginutil.PluginWorkDir() (by astj)
+
 * Thu Apr 06 2017 <mackerel-developers@hatena.ne.jp> - 0.10.0-1
 - bump go to 1.8 (by astj)
 

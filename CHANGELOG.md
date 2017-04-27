@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.1 (2017-04-27)
+
+* use wmi query instead of running wmic command #157 (mattn)
+* Use golib/pluginutil.PluginWorkDir() #163 (astj)
+
+
 ## 0.10.0 (2017-04-06)
 
 * bump go to 1.8 #159 (astj)

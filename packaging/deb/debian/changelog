@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.10.1-1) stable; urgency=low
+
+  * use wmi query instead of running wmic command (by mattn)
+    <https://github.com/mackerelio/go-check-plugins/pull/157>
+  * Use golib/pluginutil.PluginWorkDir() (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/163>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 27 Apr 2017 02:41:07 +0000
+
 mackerel-check-plugins (0.10.0-1) stable; urgency=low
 
   * bump go to 1.8 (by astj)
