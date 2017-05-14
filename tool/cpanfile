@@ -1,3 +1,2 @@
-requires 'HTTP::Tinyish';
 requires 'Path::Tiny';
 requires 'Mackerel::ReleaseUtils';

@@ -55,7 +55,7 @@ sub update_readme {
 
 sub update_packaging_specs {
     my @plugins = @_;
-    my $for_in = 'for i in ' . join(' ', @plugins) . ';do';
+    my $for_in = 'for i in ' . join(' ', @plugins) . '; do';
 
     my $replace_sub = sub {
         my $content = shift;
