@@ -13,7 +13,6 @@ addons:
     - rpm
     - devscripts
     - debhelper
-    - jq
 install:
 - go get github.com/mitchellh/gox
 - mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
