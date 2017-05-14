@@ -59,6 +59,10 @@ deb: deps
 	cp build/check-* packaging/deb/debian/
 	cd packaging/deb && debuild --no-tgz-check -rfakeroot -uc -us
 
+release:
+	(cd tool && cpanm -qn --installdeps .)
+	perl tool/create-release-pullrequest
+
 clean:
 	if [ -d build ]; then \
 	  rm -f build/check-*; \
