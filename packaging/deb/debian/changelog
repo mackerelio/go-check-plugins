@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.10.2-1) stable; urgency=low
+
+  * [experimental] update release scripts (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/168>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Mon, 15 May 2017 01:29:22 +0900
+
 mackerel-check-plugins (0.10.1-1) stable; urgency=low
 
   * use wmi query instead of running wmic command (by mattn)

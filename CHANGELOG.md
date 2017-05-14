@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.2 (2017-05-15)
+
+* [experimental] update release scripts #168 (Songmu)
+
+
 ## 0.10.1 (2017-04-27)
 
 * use wmi query instead of running wmic command #157 (mattn)
