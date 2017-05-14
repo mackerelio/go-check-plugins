@@ -26,7 +26,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in aws-sqs-queue-size cert-file elasticsearch file-age file-size http jmx-jolokia load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime; do \
+for i in aws-sqs-queue-size cert-file elasticsearch file-age file-size http jmx-jolokia load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime;do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -46,6 +46,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Mon May 15 2017 <mackerel-developers@hatena.ne.jp> - 0.10.2
+- [experimental] update release scripts (by Songmu)
+
 * Thu Apr 27 2017 <mackerel-developers@hatena.ne.jp> - 0.10.1-1
 - use wmi query instead of running wmic command (by mattn)
 - Use golib/pluginutil.PluginWorkDir() (by astj)

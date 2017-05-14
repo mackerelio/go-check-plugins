@@ -16,15 +16,19 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-load](./check-load/README.md)
 * [check-log](./check-log/README.md)
 * [check-mailq](./check-mailq/README.md)
+* [check-masterha](./check-masterha/README.md)
 * [check-memcached](./check-memcached/README.md)
 * [check-mysql](./check-mysql/README.md)
 * [check-ntpoffset](./check-ntpoffset/README.md)
+* [check-ntservice](./check-ntservice/README.md)
 * [check-postgresql](./check-postgresql/README.md)
 * [check-procs](./check-procs/README.md)
 * [check-redis](./check-redis/README.md)
 * [check-solr](./check-solr/README.md)
+* [check-ssh](./check-ssh/README.md)
 * [check-tcp](./check-tcp/README.md)
 * [check-uptime](./check-uptime/README.md)
+* [check-windows-eventlog](./check-windows-eventlog/README.md)
 
 Specification
 -------------
