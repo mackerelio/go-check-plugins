@@ -6,11 +6,11 @@ releng script for mackerel-check-plugins
 
 =head SYNOPSIS
 
-    % tool/releng
+    % tool/create-release-pullrequest
 
 =head DEPENDENCY
 
-`git` command and `hub` or `gh` command are required.
+`git`, `hub` and `gobump` command are required.
 
 =cut
 
