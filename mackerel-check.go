@@ -60,7 +60,9 @@ func run(args []string) int {
 	return exitOK
 }
 
-var version, gitcommit string
+const version = "0.10.1"
+
+var gitcommit string
 
 func printHelp() {
 	fmt.Printf(`mackerel-check %s (rev %s) [%s %s %s]

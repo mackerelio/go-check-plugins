@@ -8,12 +8,13 @@ package=mackerel-check-plugins
 override_dh_auto_install:
 	dh_auto_install
 	install -d -m 755 debian/tmp/usr/bin
-	for i in `cat ../config.json | /usr/local/bin/jq -r '.plugins[]'`; do \
+	for i in aws-sqs-queue-size cert-file elasticsearch file-age file-size http jmx-jolokia load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime; do \
 	    install -m755 debian/check-$$i debian/tmp/usr/bin; \
 	done
 	install -d -m 755 debian/tmp/usr/local/bin
 	# put symlinks to /usr/local/bin for backward compatibility of following plugins
-	for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime; do \
+	for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime; \
+	do \
 	    ln -s ../../bin/check-$$i debian/tmp/usr/local/bin/check-$$i; \
 	done
 

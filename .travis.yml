@@ -13,7 +13,6 @@ addons:
     - rpm
     - devscripts
     - debhelper
-    - jq
 install:
 - go get github.com/mitchellh/gox
 - mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
@@ -24,28 +23,14 @@ script:
 after_script:
 - goveralls -coverprofile=.profile.cov
 before_deploy:
-- go get github.com/aktau/github-release
-- mkdir -p ~/bin
-- git clone https://github.com/github/hub.git && cd hub && script/build -o ~/bin/hub && cd ..
-- echo $TRAVIS_BRANCH
-- git config --add remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
-- git fetch
-- git checkout master || git checkout -b master origin/master
-- git checkout $TRAVIS_BRANCH
-- git fetch --depth=100 || true
-- git fetch --tags --depth=100 || true
+- go get github.com/motemen/gobump/cmd/gobump
+- go get github.com/mackerelio/golib/cmd/mackerel-github-release
 deploy:
 - provider: script
-  script: tool/releng --task=upload-to-github-release && tool/releng --task=upload-master-to-github-release
+  script: mackerel-github-release && mackerel-github-release -staging
   skip_cleanup: true
   on:
     branch: master
-- provider: script
-  script: tool/releng --task=create-pullrequest --current-branch=$TRAVIS_BRANCH --package-name=mackerel-check-plugins
-  skip_cleanup: true
-  on:
-    all_branches: true
-    condition: "$TRAVIS_BRANCH =~ ^bump-version-.*$"
 notifications:
   slack:
     secure: W4637ZIl5Gbwm93btsfysyvZpVw3GVMni1y7ea8lj4XFEyNV9aoW0OIkCjWIL9MrkxnkCcnhTKfOAPuFoqFYXXRJFkYCU9GYRsENqwvk9ev2xNyQ9OPIdNqVFcgzA4qiX97JwiuvkaDauRLsWKpdZUtMugrMEsnt1hH6E6uJ5CyVtuun9O5SyICet9tzyLyFpefrhKT8LJiwYDzT9PX6vaL2FCxDgservpPon4YkIkbaZcfURbkd0Gkm3IW5HSVAzAesEspDPAAbMp0ZKF6YPXk1kCuAttNcXoNfRyxIWD02qYTVvVLMVI9DbcDGzAeBPYaZ0vLFtCTwPWx342GqAVDy1sZ5xqYwwqpeVwPA7GdCARl3PgP1q04j4Dd6ZUMn5vM+HdMGtbKcT2vks/t9D8ozrX2F/SyTAVCVqt4xEBSVus4U8a7oK+JQXphnV++8ltDfyXoSdv4oQjHDmpZurcbEgmzWBFuenQK8CKM71voEZZSxhu4/7TksoXuo0zzxhopR9u9B/Y+/74azGBv3VW/JfzJ5gzi08Y56YA80pLHjbxJeykKzv4lR+c+WAWGxVhBD9xN4OKcer3ohDbTfhs0rDf270DOSYx3bstnvQ87NcNbJ1sPRwRhK8rbzvwtLnGUjMNK1kNRcr2rQmmJYlR3DH/hfHHEvAQPeseN90Ek=
