@@ -104,7 +104,7 @@ func (opts *sshOpts) makeClientConfig() (*ssh.ClientConfig, error) {
 		authenticities = append(authenticities, ssh.PublicKeys(signer))
 	}
 
-	config := &ssh.ClientConfig{User: opts.User, Auth: authenticities}
+	config := &ssh.ClientConfig{User: opts.User, Auth: authenticities, HostKeyCallback: ssh.InsecureIgnoreHostKey()}
 	return config, nil
 }
 
