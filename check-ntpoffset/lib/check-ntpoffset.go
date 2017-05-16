@@ -1,7 +1,6 @@
 package checkntpoffset
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -14,8 +13,8 @@ import (
 )
 
 var opts struct {
-	Crit float64 `short:"c" long:"critical" default:"100" description:"critical if the ntpoffset is over"`
-	Warn float64 `short:"w" long:"warning" default:"50" description:"warning if the ntpoffset is over"`
+	Crit float64 `short:"c" long:"critical" default:"100" description:"Critical threshold of ntp offset(ms)"`
+	Warn float64 `short:"w" long:"warning" default:"50" description:"Warning threshold of ntp offset(ms)"`
 }
 
 // Do the plugin
@@ -52,13 +51,20 @@ func run(args []string) *checkers.Checker {
 	return checkers.NewChecker(chkSt, msg)
 }
 
-func getNtpOffset() (float64, error) {
-	var offset float64
-	var err error
+func getNtpOffset() (offset float64, err error) {
+	psout, err := exec.Command("ps", "-eo", "comm").Output()
+	if err != nil {
+		return
+	}
+	for _, line := range strings.Split(string(psout), "\n") {
+		if strings.HasSuffix(line, "chronyd") {
+			return getChronyNtpOffset()
+		}
+	}
 
 	output, err := exec.Command("ntpq", "-c", "rv 0 offset").Output()
 	if err != nil {
-		return offset, err
+		return
 	}
 
 	var line string
@@ -71,25 +77,49 @@ func getNtpOffset() (float64, error) {
 		   assID=0 status=06f4 leap_none, sync_ntp, 15 events, event_peer/strat_chg,
 		   offset=0.180
 		*/
-
 		if strings.Index(lines[0], `assID=0`) == 0 {
 			line = lines[1]
 			break
 		}
 		fallthrough
 	default:
-		return offset, errors.New("couldn't get ntp offset. ntpd process may be down")
+		return offset, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
 	}
 
 	o := strings.Split(string(line), "=")
 	if len(o) != 2 {
-		return offset, errors.New("couldn't get ntp offset. ntpd process may be down")
+		return offset, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
 	}
+	return strconv.ParseFloat(strings.Trim(o[1], "\n"), 64)
+}
 
-	offset, err = strconv.ParseFloat(strings.Trim(o[1], "\n"), 64)
-	if err != nil {
-		return offset, err
+func getChronyNtpOffset() (offset float64, err error) {
+	output, err := exec.Command("chronyc", "tracking").Output()
+	// Reference ID    : 160.16.75.242 (sv01.azsx.net)
+	// Stratum         : 3
+	// Ref time (UTC)  : Thu May  4 11:51:30 2017
+	// System time     : 0.000033190 seconds slow of NTP time
+	// Last offset     : +0.000003614 seconds
+	// RMS offset      : 0.000017540 seconds
+	// Frequency       : 10.880 ppm fast
+	// Residual freq   : -0.000 ppm
+	// Skew            : 0.003 ppm
+	// Root delay      : 0.003541 seconds
+	// Root dispersion : 0.000849 seconds
+	// Update interval : 1030.4 seconds
+	// Leap status     : Normal
+	for _, line := range strings.Split(string(output), "\n") {
+		if strings.HasPrefix(line, "Last offset") {
+			flds := strings.Fields(line)
+			if len(flds) != 5 {
+				return 0.0, fmt.Errorf("failed to get ntp offset")
+			}
+			offset, err := strconv.ParseFloat(flds[3], 64)
+			if err != nil {
+				return 0.0, err
+			}
+			return offset * 1000, nil
+		}
 	}
-
-	return offset, nil
+	return 0.0, fmt.Errorf("failed to get ntp offset")
 }
