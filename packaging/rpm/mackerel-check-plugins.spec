@@ -46,6 +46,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Tue May 16 2017 <mackerel-developers@hatena.ne.jp> - 0.10.3
+- [ntpoffset] support chronyd (by Songmu)
+- [check-ssh] fix the problem that check-ssh cannot invoke SSH connection (by astj)
+
 * Mon May 15 2017 <mackerel-developers@hatena.ne.jp> - 0.10.2
 - [experimental] update release scripts (by Songmu)
 
