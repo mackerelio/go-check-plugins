@@ -13,8 +13,8 @@ import (
 )
 
 var opts struct {
-	Crit float64 `short:"c" long:"critical" default:"100" description:"critical if the ntpoffset is over"`
-	Warn float64 `short:"w" long:"warning" default:"50" description:"warning if the ntpoffset is over"`
+	Crit float64 `short:"c" long:"critical" default:"100" description:"Critical threshold of ntp offset(ms)"`
+	Warn float64 `short:"w" long:"warning" default:"50" description:"Warning threshold of ntp offset(ms)"`
 }
 
 // Do the plugin
