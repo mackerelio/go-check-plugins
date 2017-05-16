@@ -20,6 +20,16 @@ devel-deps: deps
 	go get github.com/pierrre/gotestcover
 	go get github.com/mattn/goveralls
 
+check-release-deps:
+	@have_error=0; \
+	for command in cpanm hub ghch gobump; do \
+	  if ! command -v $$command > /dev/null; then \
+	    have_error=1; \
+	    echo "\`$$command\` command is required for releasing"; \
+	  fi; \
+	done; \
+	test $$have_error = 0
+
 lint: devel-deps
 	go vet ./...
 	golint -set_exit_status ./...
@@ -55,7 +65,7 @@ deb: deps
 	cp build/check-* packaging/deb/debian/
 	cd packaging/deb && debuild --no-tgz-check -rfakeroot -uc -us
 
-release:
+release: check-release-deps
 	(cd tool && cpanm -qn --installdeps .)
 	perl tool/create-release-pullrequest
 
@@ -66,4 +76,4 @@ clean:
 	fi
 	go clean
 
-.PHONY: all test testconvention deps devel-deps lint cover build rpm deb clean release
+.PHONY: all test testconvention deps devel-deps lint cover build rpm deb clean release check-release-deps
