@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.3 (2017-05-16)
+
+* [ntpoffset] support chronyd #166 (Songmu)
+* [check-ssh] fix the problem that check-ssh cannot invoke SSH connection #171 (astj)
+
+
 ## 0.10.2 (2017-05-15)
 
 * [experimental] update release scripts #168 (Songmu)
