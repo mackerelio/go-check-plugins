@@ -669,7 +669,7 @@ func TestRunMultiplePattern(t *testing.T) {
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--warning-level", "12"}
 		ckr := run(params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
-		msg := "When multiple patterns specified, --warning-level --critical-level can not be used."
+		msg := "When multiple patterns specified, --warning-level --critical-level can not be used"
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
 	}
 	testWithLevel()

@@ -54,13 +54,12 @@ func (opts *logOpts) prepare() error {
 	for _, ptn := range opts.Pattern {
 		if reg, err = regCompileWithCase(ptn, opts.CaseInsensitive); err != nil {
 			return fmt.Errorf("pattern is invalid")
-		} else {
-			opts.patternReg = append(opts.patternReg, reg)
 		}
+		opts.patternReg = append(opts.patternReg, reg)
 	}
 
 	if len(opts.patternReg) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
-		return fmt.Errorf("When multiple patterns specified, --warning-level --critical-level can not be used.")
+		return fmt.Errorf("When multiple patterns specified, --warning-level --critical-level can not be used")
 	}
 
 	if opts.Exclude != "" {
