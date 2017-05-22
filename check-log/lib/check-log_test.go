@@ -673,4 +673,15 @@ func TestRunMultiplePattern(t *testing.T) {
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
 	}
 	testWithLevel()
+
+	testInvalidPattern := func() {
+		fh.WriteString(l3)
+		ptn3 := "+"
+		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn3}
+		ckr := run(params)
+		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
+		msg := "pattern is invalid"
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+	}
+	testInvalidPattern()
 }
