@@ -59,6 +59,10 @@ func (opts *logOpts) prepare() error {
 		}
 	}
 
+	if len(opts.patternReg) > 1 && (opts.WarnLevel > 0 || opts.CritLevel > 0) {
+		return fmt.Errorf("When multiple patterns specified, --warning-level --critical-level can not be used.")
+	}
+
 	if opts.Exclude != "" {
 		opts.excludeReg, err = regCompileWithCase(opts.Exclude, opts.CaseInsensitive)
 		if err != nil {

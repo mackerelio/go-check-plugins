@@ -662,4 +662,15 @@ func TestRunMultiplePattern(t *testing.T) {
 		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
 	}
 	testAndCondition()
+
+	l3 := "OK\n"
+	testWithLevel := func() {
+		fh.WriteString(l3)
+		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--warning-level", "12"}
+		ckr := run(params)
+		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
+		msg := "When multiple patterns specified, --warning-level --critical-level can not be used."
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+	}
+	testWithLevel()
 }
