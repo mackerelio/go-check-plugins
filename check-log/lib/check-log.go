@@ -22,21 +22,21 @@ import (
 )
 
 type logOpts struct {
-	LogFile             string  `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
-	Pattern             string  `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
-	Exclude             string  `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
-	WarnOver            int64   `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
-	CritOver            int64   `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
-	WarnLevel           float64 `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
-	CritLevel           float64 `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
-	ReturnContent       bool    `short:"r" long:"return" description:"Return matched line"`
-	FilePattern         string  `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
-	CaseInsensitive     bool    `short:"i" long:"icase" description:"Run a case insensitive match"`
-	StateDir            string  `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
-	NoState             bool    `long:"no-state" description:"Don't use state file and read whole logs"`
-	Encoding            string  `long:"encoding" description:"Encoding of log file"`
-	Missing             string  `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
-	patternReg          *regexp.Regexp
+	LogFile             string   `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
+	Pattern             []string `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for"`
+	Exclude             string   `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
+	WarnOver            int64    `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
+	CritOver            int64    `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
+	WarnLevel           float64  `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
+	CritLevel           float64  `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
+	ReturnContent       bool     `short:"r" long:"return" description:"Return matched line"`
+	FilePattern         string   `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
+	CaseInsensitive     bool     `short:"i" long:"icase" description:"Run a case insensitive match"`
+	StateDir            string   `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
+	NoState             bool     `long:"no-state" description:"Don't use state file and read whole logs"`
+	Encoding            string   `long:"encoding" description:"Encoding of log file"`
+	Missing             string   `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
+	patternReg          []*regexp.Regexp
 	excludeReg          *regexp.Regexp
 	fileListFromGlob    []string
 	fileListFromPattern []string
@@ -50,8 +50,13 @@ func (opts *logOpts) prepare() error {
 	}
 
 	var err error
-	if opts.patternReg, err = regCompileWithCase(opts.Pattern, opts.CaseInsensitive); err != nil {
-		return fmt.Errorf("pattern is invalid")
+	var reg *regexp.Regexp
+	for _, ptn := range opts.Pattern {
+		if reg, err = regCompileWithCase(ptn, opts.CaseInsensitive); err != nil {
+			return fmt.Errorf("pattern is invalid")
+		} else {
+			opts.patternReg = append(opts.patternReg, reg)
+		}
 	}
 
 	if opts.Exclude != "" {
@@ -171,7 +176,11 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 
-	msg := fmt.Sprintf("%d warnings, %d criticals for pattern /%s/.", warnNum, critNum, opts.Pattern)
+	var patterns []string
+	for _, ptn := range opts.Pattern {
+		patterns = append(patterns, fmt.Sprintf("/%s/", ptn))
+	}
+	msg := fmt.Sprintf("%d warnings, %d criticals for pattern %s.", warnNum, critNum, strings.Join(patterns, " and "))
 	if errorOverall != "" {
 		msg += "\n" + errorOverall
 	}
@@ -309,11 +318,16 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 }
 
 func (opts *logOpts) match(line string) (bool, []string) {
-	pReg := opts.patternReg
-	eReg := opts.excludeReg
+	matched := true
+	var matches []string
+	for _, pReg := range opts.patternReg {
+		if matched {
+			eReg := opts.excludeReg
 
-	matches := pReg.FindStringSubmatch(line)
-	matched := len(matches) > 0 && (eReg == nil || !eReg.MatchString(line))
+			matches = pReg.FindStringSubmatch(line)
+			matched = len(matches) > 0 && (eReg == nil || !eReg.MatchString(line))
+		}
+	}
 	return matched, matches
 }
 
