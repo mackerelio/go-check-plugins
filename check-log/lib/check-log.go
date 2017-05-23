@@ -321,17 +321,16 @@ func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes in
 }
 
 func (opts *logOpts) match(line string) (bool, []string) {
-	matched := true
 	var matches []string
 	for _, pReg := range opts.patternReg {
-		if matched {
-			eReg := opts.excludeReg
+		eReg := opts.excludeReg
 
-			matches = pReg.FindStringSubmatch(line)
-			matched = len(matches) > 0 && (eReg == nil || !eReg.MatchString(line))
+		matches = pReg.FindStringSubmatch(line)
+		if len(matches) == 0 || (eReg != nil && eReg.MatchString(line)) {
+			return false, nil
 		}
 	}
-	return matched, matches
+	return true, matches
 }
 
 var stateRe = regexp.MustCompile(`^([a-zA-Z]):[/\\]`)
