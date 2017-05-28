@@ -25,8 +25,11 @@ use File::Copy qw/move/;
 use JSON::PP qw/decode_json/;
 use Path::Tiny qw/path/;
 
+my $PLUGIN_PREFIX = 'check-';
+my $PACKAGE_NAME = 'mackerel-check-plugins';
+
 sub retrieve_plugins {
-    sort map {s/^check-//; $_} <check-*>;
+    sort map {s/^$PLUGIN_PREFIX//; $_} <$PLUGIN_PREFIX*>;
 }
 
 sub update_readme {
@@ -34,11 +37,11 @@ sub update_readme {
 
     my $doc_links = '';
     for my $plug (@plugins) {
-        $doc_links .= "* [check-$plug](./check-$plug/README.md)\n"
+        $doc_links .= "* [$PLUGIN_PREFIX$plug](./$PLUGIN_PREFIX$plug/README.md)\n"
     }
     replace 'README.md' => sub {
         my $readme = shift;
-        my $plu_reg = qr/check-[-0-9a-zA-Z_]+/;
+        my $plu_reg = qr/$PLUGIN_PREFIX[-0-9a-zA-Z_]+/;
         $readme =~ s!(?:\* \[$plu_reg\]\(\./$plu_reg/README\.md\)\n)+!$doc_links!ms;
         $readme;
     };
@@ -53,21 +56,21 @@ sub update_packaging_specs {
         $content =~ s/for i in.*?;\s*do/$for_in/ms;
         $content;
     };
-    replace $_, $replace_sub for qw(packaging/rpm/mackerel-check-plugins.spec packaging/deb/debian/rules);
+    replace $_, $replace_sub for ("packaging/rpm/$PACKAGE_NAME*.spec", "packaging/deb*/debian/rules");
 
-    path('packaging/deb/debian/source/include-binaries')->spew(join("\n", map { "debian/check-$_" } @plugins) . "\n");
+    path('packaging/deb/debian/source/include-binaries')->spew(join("\n", map { "debian/$PLUGIN_PREFIX$_" } @plugins) . "\n");
 }
 
 sub load_packaging_confg {
     decode_json path('packaging/config.json')->slurp;
 }
 
-create_release_pull_request 'mackerel-check-plugins' => sub {
+create_release_pull_request $PACKAGE_NAME => sub {
     my ($current_version, $next_version, $releases) = @_;
 
     move
-        "packaging/mackerel-check-plugins_$current_version.orig.tar.gz",
-        "packaging/mackerel-check-plugins_$next_version.orig.tar.gz";
+        "packaging/${PACKAGE_NAME}_$current_version.orig.tar.gz",
+        "packaging/${PACKAGE_NAME}_$next_version.orig.tar.gz";
     my @plugins = retrieve_plugins;
     update_readme(@plugins);
     my $config = load_packaging_confg;
