@@ -60,7 +60,9 @@ rpm: build
 
 deb: deps
 	make build GOOS=linux GOARCH=386
-	cp build/check-* packaging/deb/debian/
+	for i in `cat packaging/deb/debian/source/include-binaries`; do \
+	  cp build/`basename $$i` packaging/deb/debian/; \
+	done
 	cd packaging/deb && debuild --no-tgz-check -rfakeroot -uc -us
 
 release: check-release-deps

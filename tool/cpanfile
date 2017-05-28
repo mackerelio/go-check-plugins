@@ -1,2 +1,2 @@
 requires 'Path::Tiny';
-requires 'Mackerel::ReleaseUtils';
+requires 'Mackerel::ReleaseUtils', 'v0.2.0';

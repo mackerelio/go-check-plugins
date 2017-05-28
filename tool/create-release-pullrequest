@@ -21,18 +21,9 @@ use utf8;
 
 use Mackerel::ReleaseUtils qw/replace create_release_pull_request/;
 
+use File::Copy qw/move/;
 use JSON::PP qw/decode_json/;
 use Path::Tiny qw/path/;
-
-sub update_makefile {
-    my ($current_version, $next_version) = @_;
-    replace 'Makefile' => sub {
-        my $content = shift;
-        my $cur_reg = '_version ' . quotemeta $current_version;
-        $content =~ s/$cur_reg/_version $next_version/g;
-        $content;
-    };
-}
 
 sub retrieve_plugins {
     sort map {s/^check-//; $_} <check-*>;
@@ -63,6 +54,8 @@ sub update_packaging_specs {
         $content;
     };
     replace $_, $replace_sub for qw(packaging/rpm/mackerel-check-plugins.spec packaging/deb/debian/rules);
+
+    path('packaging/deb/debian/source/include-binaries')->spew(join("\n", map { "debian/check-$_" } @plugins) . "\n");
 }
 
 sub load_packaging_confg {
@@ -81,7 +74,9 @@ sub main {
     create_release_pull_request 'mackerel-check-plugins' => sub {
         my ($current_version, $next_version, $releases) = @_;
 
-        update_makefile $current_version, $next_version;
+        move
+            "packaging/mackerel-check-plugins_$current_version.orig.tar.gz",
+            "packaging/mackerel-check-plugins_$next_version.orig.tar.gz";
         my @plugins = retrieve_plugins;
         update_readme(@plugins);
         my $config = load_packaging_confg;
