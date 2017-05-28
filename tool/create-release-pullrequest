@@ -62,41 +62,14 @@ sub load_packaging_confg {
     decode_json path('packaging/config.json')->slurp;
 }
 
-### main process
-if (!$ENV{HARNESS_ACTIVE}) {
-    main() unless caller;
-} else {
-    # When called via `prove`, tests will run.
-    run_tests();
-}
+create_release_pull_request 'mackerel-check-plugins' => sub {
+    my ($current_version, $next_version, $releases) = @_;
 
-sub main {
-    create_release_pull_request 'mackerel-check-plugins' => sub {
-        my ($current_version, $next_version, $releases) = @_;
-
-        move
-            "packaging/mackerel-check-plugins_$current_version.orig.tar.gz",
-            "packaging/mackerel-check-plugins_$next_version.orig.tar.gz";
-        my @plugins = retrieve_plugins;
-        update_readme(@plugins);
-        my $config = load_packaging_confg;
-        update_packaging_specs(@{ $config->{plugins} });
-    };
-}
-
-sub run_tests {
-    require Test::More;
-    Test::More->import;
-
+    move
+        "packaging/mackerel-check-plugins_$current_version.orig.tar.gz",
+        "packaging/mackerel-check-plugins_$next_version.orig.tar.gz";
+    my @plugins = retrieve_plugins;
+    update_readme(@plugins);
     my $config = load_packaging_confg;
-    ok($config->{description});
-
-    my $plugins_to_be_packaged = $config->{plugins};
-    isa_ok($plugins_to_be_packaged, 'ARRAY');
-
-    my %plugins = map { $_ => 1, } retrieve_plugins;
-    for my $plug (@$plugins_to_be_packaged) {
-        ok($plugins{$plug}, "$plug ok");
-    }
-    done_testing();
-}
+    update_packaging_specs(@{ $config->{plugins} });
+};
