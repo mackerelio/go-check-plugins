@@ -66,12 +66,19 @@ rpm-v2:
 	  --define "buildarch x86_64" --define "dist .el7.centos" \
 	  -bb packaging/rpm/mackerel-check-plugins-v2.spec
 
-deb:
+deb: deb-v1 deb-v2
+
+deb-v1:
 	make build GOOS=linux GOARCH=386
 	for i in `cat packaging/deb/debian/source/include-binaries`; do \
 	  cp build/`basename $$i` packaging/deb/debian/; \
 	done
 	cd packaging/deb && debuild --no-tgz-check -rfakeroot -uc -us
+
+deb-v2:
+	make build/mackerel-check GOOS=linux GOARCH=amd64
+	cp build/mackerel-check packaging/deb-v2/debian/
+	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us
 
 release: check-release-deps
 	(cd tool && cpanm -qn --installdeps .)
@@ -84,4 +91,4 @@ clean:
 	fi
 	go clean
 
-.PHONY: all test testconvention deps devel-deps lint cover build rpm rpm-v1 rpm-v2 deb clean release check-release-deps
+.PHONY: all test testconvention deps devel-deps lint cover build rpm rpm-v1 rpm-v2 deb deb-v1 deb-v2 clean release check-release-deps
