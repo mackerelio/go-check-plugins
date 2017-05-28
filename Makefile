@@ -1,8 +1,7 @@
-TARGET_OSARCH="linux/amd64"
+VERSION = 0.10.3
 CURRENT_REVISION = $(shell git rev-parse --short HEAD)
 ifeq ($(OS),Windows_NT)
 GOPATH_ROOT:=$(shell cygpath ${GOPATH})
-TARGET_OSARCH="windows/amd64"
 else
 GOPATH_ROOT:=${GOPATH}
 endif
@@ -36,7 +35,7 @@ lint: devel-deps
 
 testconvention:
 	prove -r t/
-	@go generate ./... && git diff --exit-code || (echo 'please `go generate ./...` and commit them' && exit 1)
+	@go generate ./... && git diff --exit-code || (echo 'please `go generate ./...` and commit them' && false)
 
 cover: devel-deps
 	gotestcover -v -short -covermode=count -coverprofile=.profile.cov -parallelpackages=4 ./...
@@ -44,9 +43,8 @@ cover: devel-deps
 build: deps
 	mkdir -p build
 	for i in $(filter-out check-windows-%, $(wildcard check-*)); do \
-	  gox -ldflags "-s -w" \
-	    -osarch=$(TARGET_OSARCH) -output build/$$i \
-	    `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
+	  go build -ldflags "-s -w" -o build/$$i \
+	  `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
 	done
 
 build/mackerel-check: deps
@@ -55,13 +53,13 @@ build/mackerel-check: deps
 	  -o build/mackerel-check
 
 rpm: build
-	make build TARGET_OSARCH="linux/386"
-	rpmbuild --define "_sourcedir `pwd`"  --define "_version 0.10.3" --define "buildarch noarch" -bb packaging/rpm/mackerel-check-plugins.spec
-	make build TARGET_OSARCH="linux/amd64"
-	rpmbuild --define "_sourcedir `pwd`"  --define "_version 0.10.3" --define "buildarch x86_64" -bb packaging/rpm/mackerel-check-plugins.spec
+	make build GOOS=linux GOARCH=386
+	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch noarch" -bb packaging/rpm/mackerel-check-plugins.spec
+	make build GOOS=linux GOARCH=amd64
+	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch x86_64" -bb packaging/rpm/mackerel-check-plugins.spec
 
 deb: deps
-	TARGET_OSARCH="linux/386" make build
+	make build GOOS=linux GOARCH=386
 	cp build/check-* packaging/deb/debian/
 	cd packaging/deb && debuild --no-tgz-check -rfakeroot -uc -us
 
