@@ -52,13 +52,21 @@ build/mackerel-check: deps
 	go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
 	  -o build/mackerel-check
 
-rpm: build
+rpm: rpm-v1 rpm-v2
+
+rpm-v1:
 	make build GOOS=linux GOARCH=386
 	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch noarch" -bb packaging/rpm/mackerel-check-plugins.spec
 	make build GOOS=linux GOARCH=amd64
 	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch x86_64" -bb packaging/rpm/mackerel-check-plugins.spec
 
-deb: deps
+rpm-v2:
+	make build/mackerel-check GOOS=linux GOARCH=amd64
+	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" \
+	  --define "buildarch x86_64" --define "dist .el7.centos" \
+	  -bb packaging/rpm/mackerel-check-plugins-v2.spec
+
+deb:
 	make build GOOS=linux GOARCH=386
 	for i in `cat packaging/deb/debian/source/include-binaries`; do \
 	  cp build/`basename $$i` packaging/deb/debian/; \
@@ -76,4 +84,4 @@ clean:
 	fi
 	go clean
 
-.PHONY: all test testconvention deps devel-deps lint cover build rpm deb clean release check-release-deps
+.PHONY: all test testconvention deps devel-deps lint cover build rpm rpm-v1 rpm-v2 deb clean release check-release-deps
