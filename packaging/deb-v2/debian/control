@@ -2,8 +2,8 @@ Source: mackerel-check-plugins
 Maintainer: Mackerel Developers <mackerel-developers@hatena.ne.jp>
 Section: misc
 Priority: optional
-Build-Depends: debhelper (>= 9)
-Standards-Version: 3.9.2
+Build-Depends: debhelper
+Standards-Version: 3.9.3
 
 Package: mackerel-check-plugins
 Architecture: amd64

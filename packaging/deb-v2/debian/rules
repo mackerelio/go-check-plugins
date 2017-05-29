@@ -3,6 +3,7 @@
 %:
 	dh $@
 
+# This variable must be the same as the value of the `Package:` field in the control file.
 package=mackerel-check-plugins
 
 override_dh_auto_install:

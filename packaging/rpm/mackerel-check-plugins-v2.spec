@@ -3,7 +3,7 @@
 Name:      mackerel-check-plugins
 Version:   %{_version}
 Release:   1%{?dist}
-License:   Apache-2
+License:   ASL 2.0
 Summary:   macekrel.io check plugins
 URL:       https://mackerel.io
 Group:     Applications/System
