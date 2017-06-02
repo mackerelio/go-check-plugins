@@ -1,8 +1,7 @@
-TARGET_OSARCH="linux/amd64"
+VERSION = 0.10.3
 CURRENT_REVISION = $(shell git rev-parse --short HEAD)
 ifeq ($(OS),Windows_NT)
 GOPATH_ROOT:=$(shell cygpath ${GOPATH})
-TARGET_OSARCH="windows/amd64"
 else
 GOPATH_ROOT:=${GOPATH}
 endif
@@ -36,7 +35,7 @@ lint: devel-deps
 
 testconvention:
 	prove -r t/
-	@go generate ./... && git diff --exit-code || (echo 'please `go generate ./...` and commit them' && exit 1)
+	@go generate ./... && git diff --exit-code || (echo 'please `go generate ./...` and commit them' && false)
 
 cover: devel-deps
 	gotestcover -v -short -covermode=count -coverprofile=.profile.cov -parallelpackages=4 ./...
@@ -44,9 +43,8 @@ cover: devel-deps
 build: deps
 	mkdir -p build
 	for i in $(filter-out check-windows-%, $(wildcard check-*)); do \
-	  gox -ldflags "-s -w" \
-	    -osarch=$(TARGET_OSARCH) -output build/$$i \
-	    `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
+	  go build -ldflags "-s -w" -o build/$$i \
+	  `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
 	done
 
 build/mackerel-check: deps
@@ -54,16 +52,33 @@ build/mackerel-check: deps
 	go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
 	  -o build/mackerel-check
 
-rpm: build
-	make build TARGET_OSARCH="linux/386"
-	rpmbuild --define "_sourcedir `pwd`"  --define "_version 0.10.3" --define "buildarch noarch" -bb packaging/rpm/mackerel-check-plugins.spec
-	make build TARGET_OSARCH="linux/amd64"
-	rpmbuild --define "_sourcedir `pwd`"  --define "_version 0.10.3" --define "buildarch x86_64" -bb packaging/rpm/mackerel-check-plugins.spec
+rpm: rpm-v1 rpm-v2
 
-deb: deps
-	TARGET_OSARCH="linux/386" make build
-	cp build/check-* packaging/deb/debian/
+rpm-v1:
+	make build GOOS=linux GOARCH=386
+	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch noarch" -bb packaging/rpm/mackerel-check-plugins.spec
+	make build GOOS=linux GOARCH=amd64
+	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch x86_64" -bb packaging/rpm/mackerel-check-plugins.spec
+
+rpm-v2:
+	make build/mackerel-check GOOS=linux GOARCH=amd64
+	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" \
+	  --define "buildarch x86_64" --define "dist .el7.centos" \
+	  -bb packaging/rpm/mackerel-check-plugins-v2.spec
+
+deb: deb-v1 deb-v2
+
+deb-v1:
+	make build GOOS=linux GOARCH=386
+	for i in `cat packaging/deb/debian/source/include-binaries`; do \
+	  cp build/`basename $$i` packaging/deb/debian/; \
+	done
 	cd packaging/deb && debuild --no-tgz-check -rfakeroot -uc -us
+
+deb-v2:
+	make build/mackerel-check GOOS=linux GOARCH=amd64
+	cp build/mackerel-check packaging/deb-v2/debian/
+	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us
 
 release: check-release-deps
 	(cd tool && cpanm -qn --installdeps .)
@@ -76,4 +91,4 @@ clean:
 	fi
 	go clean
 
-.PHONY: all test testconvention deps devel-deps lint cover build rpm deb clean release check-release-deps
+.PHONY: all test testconvention deps devel-deps lint cover build rpm rpm-v1 rpm-v2 deb deb-v1 deb-v2 clean release check-release-deps

@@ -21,21 +21,15 @@ use utf8;
 
 use Mackerel::ReleaseUtils qw/replace create_release_pull_request/;
 
+use File::Copy qw/move/;
 use JSON::PP qw/decode_json/;
 use Path::Tiny qw/path/;
 
-sub update_makefile {
-    my ($current_version, $next_version) = @_;
-    replace 'Makefile' => sub {
-        my $content = shift;
-        my $cur_reg = '_version ' . quotemeta $current_version;
-        $content =~ s/$cur_reg/_version $next_version/g;
-        $content;
-    };
-}
+my $PLUGIN_PREFIX = 'check-';
+my $PACKAGE_NAME = 'mackerel-check-plugins';
 
 sub retrieve_plugins {
-    sort map {s/^check-//; $_} <check-*>;
+    sort map {s/^$PLUGIN_PREFIX//; $_} <$PLUGIN_PREFIX*>;
 }
 
 sub update_readme {
@@ -43,11 +37,11 @@ sub update_readme {
 
     my $doc_links = '';
     for my $plug (@plugins) {
-        $doc_links .= "* [check-$plug](./check-$plug/README.md)\n"
+        $doc_links .= "* [$PLUGIN_PREFIX$plug](./$PLUGIN_PREFIX$plug/README.md)\n"
     }
     replace 'README.md' => sub {
         my $readme = shift;
-        my $plu_reg = qr/check-[-0-9a-zA-Z_]+/;
+        my $plu_reg = qr/$PLUGIN_PREFIX[-0-9a-zA-Z_]+/;
         $readme =~ s!(?:\* \[$plu_reg\]\(\./$plu_reg/README\.md\)\n)+!$doc_links!ms;
         $readme;
     };
@@ -62,46 +56,23 @@ sub update_packaging_specs {
         $content =~ s/for i in.*?;\s*do/$for_in/ms;
         $content;
     };
-    replace $_, $replace_sub for qw(packaging/rpm/mackerel-check-plugins.spec packaging/deb/debian/rules);
+    replace $_, $replace_sub for ("packaging/rpm/$PACKAGE_NAME*.spec", "packaging/deb*/debian/rules");
+
+    path('packaging/deb/debian/source/include-binaries')->spew(join("\n", map { "debian/$PLUGIN_PREFIX$_" } @plugins) . "\n");
 }
 
 sub load_packaging_confg {
     decode_json path('packaging/config.json')->slurp;
 }
 
-### main process
-if (!$ENV{HARNESS_ACTIVE}) {
-    main() unless caller;
-} else {
-    # When called via `prove`, tests will run.
-    run_tests();
-}
+create_release_pull_request $PACKAGE_NAME => sub {
+    my ($current_version, $next_version, $releases) = @_;
 
-sub main {
-    create_release_pull_request 'mackerel-check-plugins' => sub {
-        my ($current_version, $next_version, $releases) = @_;
-
-        update_makefile $current_version, $next_version;
-        my @plugins = retrieve_plugins;
-        update_readme(@plugins);
-        my $config = load_packaging_confg;
-        update_packaging_specs(@{ $config->{plugins} });
-    };
-}
-
-sub run_tests {
-    require Test::More;
-    Test::More->import;
-
+    move
+        "packaging/${PACKAGE_NAME}_$current_version.orig.tar.gz",
+        "packaging/${PACKAGE_NAME}_$next_version.orig.tar.gz";
+    my @plugins = retrieve_plugins;
+    update_readme(@plugins);
     my $config = load_packaging_confg;
-    ok($config->{description});
-
-    my $plugins_to_be_packaged = $config->{plugins};
-    isa_ok($plugins_to_be_packaged, 'ARRAY');
-
-    my %plugins = map { $_ => 1, } retrieve_plugins;
-    for my $plug (@$plugins_to_be_packaged) {
-        ok($plugins{$plug}, "$plug ok");
-    }
-    done_testing();
-}
+    update_packaging_specs(@{ $config->{plugins} });
+};
