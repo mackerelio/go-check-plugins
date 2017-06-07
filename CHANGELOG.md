@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.4 (2017-06-07)
+
+* v2 packages (rpm and deb) #175 (Songmu)
+* [check-log]  When specified multiple pattern, perform search that satisfies all conditions #174 (a-know)
+
+
 ## 0.10.3 (2017-05-16)
 
 * [ntpoffset] support chronyd #166 (Songmu)

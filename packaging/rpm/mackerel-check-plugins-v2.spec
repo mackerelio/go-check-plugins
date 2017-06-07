@@ -37,6 +37,10 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Jun 07 2017 <mackerel-developers@hatena.ne.jp> - 0.10.4
+- v2 packages (rpm and deb) (by Songmu)
+- [check-log]  When specified multiple pattern, perform search that satisfies all conditions (by a-know)
+
 * Tue May 16 2017 <mackerel-developers@hatena.ne.jp> - 0.10.3
 - [ntpoffset] support chronyd (by Songmu)
 - [check-ssh] fix the problem that check-ssh cannot invoke SSH connection (by astj)

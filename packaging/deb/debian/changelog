@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.10.4-1) stable; urgency=low
+
+  * v2 packages (rpm and deb) (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/175>
+  * [check-log]  When specified multiple pattern, perform search that satisfies all conditions (by a-know)
+    <https://github.com/mackerelio/go-check-plugins/pull/174>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 07 Jun 2017 11:40:55 +0900
+
 mackerel-check-plugins (0.10.3-1) stable; urgency=low
 
   * [ntpoffset] support chronyd (by Songmu)
