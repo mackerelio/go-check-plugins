@@ -133,7 +133,10 @@ func parseArgs(args []string) (*logOpts, error) {
 	origArgs := make([]string, len(args))
 	copy(origArgs, args)
 	opts := &logOpts{}
-	_, err := flags.ParseArgs(opts, args)
+	remains, err := flags.ParseArgs(opts, args)
+	if err == nil && len(remains) != 0 {
+		fmt.Fprintln(os.Stderr, "[Warning] unexpected arguments. they will be ignored: ", remains)
+	}
 	opts.origArgs = origArgs
 	if opts.StateDir == "" {
 		workdir := pluginutil.PluginWorkDir()
