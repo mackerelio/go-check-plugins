@@ -13,7 +13,7 @@ command = "/path/to/check-log --file=/path/to/file --pattern=REGEXP --warning-ov
 
 ### Using glob
 
-You can check multiple files by using globs (and zsh extented globs by [mattn/go-zglob](github.com/mattn/go-zglob)) in `--file` option.
+You can check multiple files by using globs (and zsh extented globs by [mattn/go-zglob](https://github.com/mattn/go-zglob)) in `--file` option.
 For example, `--file=/tmp/some.log_*` will check all of `/tmp/some.log_1`, `/tmp/some.log_2`, and so on.
 
 And since `command` in mackerel-agent.conf will be parsed by shell (in *nix `/bin/sh -c`, in Windows `cmd /c`),
