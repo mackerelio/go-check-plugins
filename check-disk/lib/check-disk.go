@@ -17,10 +17,17 @@ type diskStatus struct {
 }
 
 var opts struct {
-	Warning  *float64 `short:"w" long:"warning" value-name:"N" description:"Exit with WARNING status if less than INTEGER GB of disk are free"`
-	Critical *float64 `short:"c" long:"critical" value-name:"N" description:"Exit with CRITICAL status if less than INTEGER GB of disk are free"`
+	Warning  *float64 `short:"w" long:"warning" value-name:"N" description:"Exit with WARNING status if less than N GB of disk are free"`
+	Critical *float64 `short:"c" long:"critical" value-name:"N" description:"Exit with CRITICAL status if less than N GB of disk are free"`
 	Path     *string  `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
 }
+
+const (
+	B  = 1
+	KB = 1024 * B
+	MB = 1024 * KB
+	GB = 1024 * MB
+)
 
 func getDiskUsage(path string) (*diskStatus, error) {
 	fs := syscall.Statfs_t{}
@@ -37,13 +44,6 @@ func getDiskUsage(path string) (*diskStatus, error) {
 
 	return disk, nil
 }
-
-const (
-	B  = 1
-	KB = 1024 * B
-	MB = 1024 * KB
-	GB = 1024 * MB
-)
 
 // Do the plugin
 func Do() {
