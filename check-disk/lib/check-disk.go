@@ -26,10 +26,10 @@ var opts struct {
 }
 
 const (
-	B  = 1
-	KB = 1024 * B
-	MB = 1024 * KB
-	GB = 1024 * MB
+	b  = 1
+	kb = 1024 * b
+	mb = 1024 * kb
+	gb = 1024 * mb
 )
 
 func getDiskUsage(path string) (*diskStatus, error) {
@@ -73,10 +73,10 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown(fmt.Sprintf("Faild to fetch disk usage: %s", err))
 	}
 
-	all := float64(disk.All) / float64(GB)
-	used := float64(disk.Used) / float64(GB)
-	free := float64(disk.Free) / float64(GB)
-	avail := float64(disk.Avail) / float64(GB)
+	all := float64(disk.All) / float64(gb)
+	used := float64(disk.Used) / float64(gb)
+	free := float64(disk.Free) / float64(gb)
+	avail := float64(disk.Avail) / float64(gb)
 	freeRate := float64(disk.FreeRate)
 
 	checkSt := checkers.OK
