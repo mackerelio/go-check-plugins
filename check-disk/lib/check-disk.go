@@ -10,11 +10,10 @@ import (
 )
 
 type diskStatus struct {
-	All      uint64 `json:"all"`
-	Used     uint64 `json:"used"`
-	Free     uint64 `json:"free"`
-	Avail    uint64 `json:"available"`
-	FreeRate uint64 `json:"free_rate"`
+	All   uint64 `json:"all"`
+	Used  uint64 `json:"used"`
+	Free  uint64 `json:"free"`
+	Avail uint64 `json:"available"`
 }
 
 var opts struct {
@@ -44,7 +43,6 @@ func getDiskUsage(path string) (*diskStatus, error) {
 	disk.Free = fs.Bfree * uint64(fs.Bsize)
 	disk.Used = disk.All - disk.Free
 	disk.Avail = fs.Bavail * uint64(fs.Bsize)
-	disk.FreeRate = (disk.Free / disk.All) * 100
 
 	return disk, nil
 }
@@ -77,7 +75,7 @@ func run(args []string) *checkers.Checker {
 	used := float64(disk.Used) / float64(gb)
 	free := float64(disk.Free) / float64(gb)
 	avail := float64(disk.Avail) / float64(gb)
-	freeRate := float64(disk.FreeRate)
+	freeRate := float64(disk.Free) / float64(disk.All) * 100
 
 	checkSt := checkers.OK
 	if opts.Warning != nil && *opts.Warning > free {
