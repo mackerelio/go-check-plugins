@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.5 (2017-06-28)
+
+* [check-log] Add description for using globs #177 (astj)
+
+
 ## 0.10.4 (2017-06-07)
 
 * v2 packages (rpm and deb) #175 (Songmu)

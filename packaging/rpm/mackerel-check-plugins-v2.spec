@@ -37,6 +37,9 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Jun 28 2017 <mackerel-developers@hatena.ne.jp> - 0.10.5
+- [check-log] Add description for using globs (by astj)
+
 * Wed Jun 07 2017 <mackerel-developers@hatena.ne.jp> - 0.10.4
 - v2 packages (rpm and deb) (by Songmu)
 - [check-log]  When specified multiple pattern, perform search that satisfies all conditions (by a-know)
