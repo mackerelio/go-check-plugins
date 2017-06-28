@@ -17,11 +17,12 @@ type diskStatus struct {
 }
 
 var opts struct {
-	Warning      *float64 `short:"W" long:"warning" value-name:"N" description:"Exit with WARNING status if less than N GB of disk are free"`
-	Critical     *float64 `short:"C" long:"critical" value-name:"N" description:"Exit with CRITICAL status if less than N GB of disk are free"`
+	Warning      *float64 `short:"W" long:"warning" value-name:"N" description:"Exit with WARNING status if less than N units of disk are free"`
+	Critical     *float64 `short:"C" long:"critical" value-name:"N" description:"Exit with CRITICAL status if less than N units of disk are free"`
 	WarningRate  *float64 `short:"w" long:"warning-rate" value-name:"N" description:"Exit with WARNING status if less than N % of disk are free"`
 	CriticalRate *float64 `short:"c" long:"critical-rate" value-name:"N" description:"Exit with CRITICAL status if less than N % of disk are free"`
 	Path         *string  `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
+	Units        *string  `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
 }
 
 const (
@@ -29,6 +30,7 @@ const (
 	kb = 1024 * b
 	mb = 1024 * kb
 	gb = 1024 * mb
+	tb = 1024 * gb
 )
 
 func getDiskUsage(path string) (*diskStatus, error) {
@@ -71,10 +73,28 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown(fmt.Sprintf("Faild to fetch disk usage: %s", err))
 	}
 
-	all := float64(disk.All) / float64(gb)
-	used := float64(disk.Used) / float64(gb)
-	free := float64(disk.Free) / float64(gb)
-	avail := float64(disk.Avail) / float64(gb)
+	units := mb
+	if opts.Units != nil {
+		switch {
+		case *opts.Units == "bytes":
+			units = b
+		case *opts.Units == "kB":
+			units = kb
+		case *opts.Units == "MB":
+			units = mb
+		case *opts.Units == "GB":
+			units = gb
+		case *opts.Units == "TB":
+			units = tb
+		default:
+			units = mb
+		}
+	}
+
+	all := float64(disk.All) / float64(units)
+	used := float64(disk.Used) / float64(units)
+	free := float64(disk.Free) / float64(units)
+	avail := float64(disk.Avail) / float64(units)
 	freeRate := float64(disk.Free) / float64(disk.All) * 100
 
 	checkSt := checkers.OK
