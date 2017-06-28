@@ -59,7 +59,6 @@ func Do() {
 func run(args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
-		fmt.Printf("%v\n", err)
 		os.Exit(1)
 	}
 
@@ -95,7 +94,7 @@ func run(args []string) *checkers.Checker {
 	used := float64(disk.Used) / float64(units)
 	free := float64(disk.Free) / float64(units)
 	avail := float64(disk.Avail) / float64(units)
-	freeRate := float64(disk.Avail) / float64(disk.All) * 100
+	freeRate := (float64(disk.Avail) * float64(100)) / float64(disk.All)
 
 	checkSt := checkers.OK
 	if opts.Warning != nil && *opts.Warning > avail {
