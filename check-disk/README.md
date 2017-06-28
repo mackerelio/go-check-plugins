@@ -8,7 +8,7 @@ Check free space of disk.
 
 ```
 [plugin.checks.disk]
-command = "/path/to/check-disk --warning=20 --critical=10 --path=/"
+command = "/path/to/check-disk --warning=10 --critical=5 --path=/"
 ```
 
 ## Options

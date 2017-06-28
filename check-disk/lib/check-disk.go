@@ -95,13 +95,13 @@ func run(args []string) *checkers.Checker {
 	used := float64(disk.Used) / float64(units)
 	free := float64(disk.Free) / float64(units)
 	avail := float64(disk.Avail) / float64(units)
-	freeRate := float64(disk.Free) / float64(disk.All) * 100
+	freeRate := float64(disk.Avail) / float64(disk.All) * 100
 
 	checkSt := checkers.OK
-	if opts.Warning != nil && *opts.Warning > free {
+	if opts.Warning != nil && *opts.Warning > avail {
 		checkSt = checkers.WARNING
 	}
-	if opts.Critical != nil && *opts.Critical > free {
+	if opts.Critical != nil && *opts.Critical > avail {
 		checkSt = checkers.CRITICAL
 	}
 	if opts.WarningRate != nil && *opts.WarningRate > freeRate {
@@ -111,7 +111,12 @@ func run(args []string) *checkers.Checker {
 		checkSt = checkers.CRITICAL
 	}
 
-	msg := fmt.Sprintf("All: %.2f GB, Used: %.2f GB, Free: %.2f GB, Available: %.2f GB, Free percentage: %.2f\n", all, used, free, avail, freeRate)
+	u := "MB"
+	if opts.Units != nil {
+		u = *opts.Units
+	}
+
+	msg := fmt.Sprintf("All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Available: %.2f %v, Free percentage: %.2f\n", all, u, used, u, free, u, avail, u, freeRate)
 
 	return checkers.NewChecker(checkSt, msg)
 }
