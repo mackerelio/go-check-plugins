@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.10.5-1) stable; urgency=low
+
+  * [check-log] Add description for using globs (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/177>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 28 Jun 2017 14:06:23 +0900
+
 mackerel-check-plugins (0.10.4-1) stable; urgency=low
 
   * v2 packages (rpm and deb) (by Songmu)
