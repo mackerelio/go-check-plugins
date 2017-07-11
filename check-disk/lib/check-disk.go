@@ -55,23 +55,22 @@ func checkStatus(val string, units float64, disk *diskStatus) (checkers.Status, 
 	freePct := (float64(disk.Avail) * float64(100)) / float64(disk.All)
 
 	checkSt := checkers.OK
-
 	if strings.HasSuffix(val, "%") {
-		w, err := strconv.Atoi(strings.TrimRight(val, "%"))
+		v, err := strconv.Atoi(strings.TrimRight(val, "%"))
 		if err != nil {
 			return checkers.UNKNOWN, err
 		}
 
-		if float64(w) > freePct {
+		if float64(v) > freePct {
 			checkSt = checkers.WARNING
 		}
 	} else {
-		w, err := strconv.Atoi(val)
+		v, err := strconv.Atoi(val)
 		if err != nil {
 			return checkers.UNKNOWN, err
 		}
 
-		if float64(w) > avail {
+		if float64(v) > avail {
 			checkSt = checkers.WARNING
 		}
 	}
