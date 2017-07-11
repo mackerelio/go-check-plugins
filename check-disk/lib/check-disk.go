@@ -1,8 +1,11 @@
 package checkdisk
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 	"syscall"
 
 	"github.com/jessevdk/go-flags"
@@ -17,20 +20,18 @@ type diskStatus struct {
 }
 
 var opts struct {
-	Warning      *float64 `short:"W" long:"warning" value-name:"N" description:"Exit with WARNING status if less than N units of disk are free"`
-	Critical     *float64 `short:"C" long:"critical" value-name:"N" description:"Exit with CRITICAL status if less than N units of disk are free"`
-	WarningRate  *float64 `short:"w" long:"warning-rate" value-name:"N" description:"Exit with WARNING status if less than N % of disk are free"`
-	CriticalRate *float64 `short:"c" long:"critical-rate" value-name:"N" description:"Exit with CRITICAL status if less than N % of disk are free"`
-	Path         *string  `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
-	Units        *string  `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
+	Warning  *string `short:"w" long:"warning" value-name:"N, N%" description:"Exit with WARNING status if less than N units or N% of disk are free"`
+	Critical *string `short:"c" long:"critical" value-name:"N, N%" description:"Exit with CRITICAL status if less than N units or N% of disk are free"`
+	Path     *string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
+	Units    *string `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
 }
 
 const (
-	b  = 1
-	kb = 1024 * b
-	mb = 1024 * kb
-	gb = 1024 * mb
-	tb = 1024 * gb
+	b  = float64(1)
+	kb = float64(1024) * b
+	mb = float64(1024) * kb
+	gb = float64(1024) * mb
+	tb = float64(1024) * gb
 )
 
 func getDiskUsage(path string) (*diskStatus, error) {
@@ -47,6 +48,35 @@ func getDiskUsage(path string) (*diskStatus, error) {
 	disk.Avail = fs.Bavail * uint64(fs.Bsize)
 
 	return disk, nil
+}
+
+func checkStatus(val string, units float64, disk *diskStatus) (checkers.Status, error) {
+	avail := float64(disk.Avail) / float64(units)
+	freePct := (float64(disk.Avail) * float64(100)) / float64(disk.All)
+
+	checkSt := checkers.OK
+
+	if strings.HasSuffix(val, "%") {
+		w, err := strconv.Atoi(strings.TrimRight(val, "%"))
+		if err != nil {
+			return checkers.UNKNOWN, err
+		}
+
+		if float64(w) > freePct {
+			checkSt = checkers.WARNING
+		}
+	} else {
+		w, err := strconv.Atoi(val)
+		if err != nil {
+			return checkers.UNKNOWN, err
+		}
+
+		if float64(w) > avail {
+			checkSt = checkers.WARNING
+		}
+	}
+
+	return checkSt, nil
 }
 
 // Do the plugin
@@ -74,48 +104,46 @@ func run(args []string) *checkers.Checker {
 
 	units := mb
 	if opts.Units != nil {
-		switch {
-		case *opts.Units == "bytes":
+		u := strings.ToLower(*opts.Units)
+		if u == "bytes" {
 			units = b
-		case *opts.Units == "kB":
+		} else if u == "kb" {
 			units = kb
-		case *opts.Units == "MB":
-			units = mb
-		case *opts.Units == "GB":
+		} else if u == "gb" {
 			units = gb
-		case *opts.Units == "TB":
+		} else if u == "tb" {
 			units = tb
-		default:
-			units = mb
+		} else {
+			return checkers.Unknown(fmt.Sprintf("Faild to fetch disk usage: %s", errors.New("Invalid argument flag '-u, --units'")))
 		}
+	}
+
+	checkSt := checkers.OK
+	if opts.Warning != nil {
+		checkSt, err = checkStatus(*opts.Warning, units, disk)
+		if err != nil {
+			return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+		}
+	}
+
+	if opts.Critical != nil {
+		checkSt, err = checkStatus(*opts.Critical, units, disk)
+		if err != nil {
+			return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+		}
+	}
+
+	us := "MB"
+	if opts.Units != nil {
+		us = *opts.Units
 	}
 
 	all := float64(disk.All) / float64(units)
 	used := float64(disk.Used) / float64(units)
 	free := float64(disk.Free) / float64(units)
 	avail := float64(disk.Avail) / float64(units)
-	freeRate := (float64(disk.Avail) * float64(100)) / float64(disk.All)
-
-	checkSt := checkers.OK
-	if opts.Warning != nil && *opts.Warning > avail {
-		checkSt = checkers.WARNING
-	}
-	if opts.Critical != nil && *opts.Critical > avail {
-		checkSt = checkers.CRITICAL
-	}
-	if opts.WarningRate != nil && *opts.WarningRate > freeRate {
-		checkSt = checkers.WARNING
-	}
-	if opts.CriticalRate != nil && *opts.CriticalRate > freeRate {
-		checkSt = checkers.CRITICAL
-	}
-
-	u := "MB"
-	if opts.Units != nil {
-		u = *opts.Units
-	}
-
-	msg := fmt.Sprintf("All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Available: %.2f %v, Free percentage: %.2f\n", all, u, used, u, free, u, avail, u, freeRate)
+	freePct := (float64(disk.Avail) * float64(100)) / float64(disk.All)
+	msg := fmt.Sprintf("All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Available: %.2f %v, Free percentage: %.2f\n", all, us, used, us, free, us, avail, us, freePct)
 
 	return checkers.NewChecker(checkSt, msg)
 }
