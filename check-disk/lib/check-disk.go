@@ -13,10 +13,10 @@ import (
 )
 
 type diskStatus struct {
-	All   uint64 `json:"all"`
-	Used  uint64 `json:"used"`
-	Free  uint64 `json:"free"`
-	Avail uint64 `json:"available"`
+	All   uint64
+	Used  uint64
+	Free  uint64
+	Avail uint64
 }
 
 var opts struct {
@@ -50,28 +50,28 @@ func getDiskUsage(path string) (*diskStatus, error) {
 	return disk, nil
 }
 
-func checkStatus(val string, units float64, disk *diskStatus) (checkers.Status, error) {
+func checkStatus(threshold string, units float64, disk *diskStatus, status checkers.Status) (checkers.Status, error) {
 	avail := float64(disk.Avail) / float64(units)
 	freePct := (float64(disk.Avail) * float64(100)) / float64(disk.All)
 
 	checkSt := checkers.OK
-	if strings.HasSuffix(val, "%") {
-		v, err := strconv.Atoi(strings.TrimRight(val, "%"))
+	if strings.HasSuffix(threshold, "%") {
+		v, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
 		if err != nil {
 			return checkers.UNKNOWN, err
 		}
 
-		if float64(v) > freePct {
-			checkSt = checkers.WARNING
+		if v > freePct {
+			checkSt = status
 		}
 	} else {
-		v, err := strconv.Atoi(val)
+		v, err := strconv.ParseFloat(threshold, 64)
 		if err != nil {
 			return checkers.UNKNOWN, err
 		}
 
-		if float64(v) > avail {
-			checkSt = checkers.WARNING
+		if v > avail {
+			checkSt = status
 		}
 	}
 
@@ -113,20 +113,20 @@ func run(args []string) *checkers.Checker {
 		} else if u == "tb" {
 			units = tb
 		} else {
-			return checkers.Unknown(fmt.Sprintf("Faild to fetch disk usage: %s", errors.New("Invalid argument flag '-u, --units'")))
+			return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", errors.New("Invalid argument flag '-u, --units'")))
 		}
 	}
 
 	checkSt := checkers.OK
 	if opts.Warning != nil {
-		checkSt, err = checkStatus(*opts.Warning, units, disk)
+		checkSt, err = checkStatus(*opts.Warning, units, disk, checkers.WARNING)
 		if err != nil {
 			return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
 		}
 	}
 
 	if opts.Critical != nil {
-		checkSt, err = checkStatus(*opts.Critical, units, disk)
+		checkSt, err = checkStatus(*opts.Critical, units, disk, checkers.CRITICAL)
 		if err != nil {
 			return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
 		}
