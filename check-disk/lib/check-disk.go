@@ -25,6 +25,7 @@ var opts struct {
 	Warning  *string `short:"w" long:"warning" value-name:"N, N%" description:"Exit with WARNING status if less than N units or N% of disk are free"`
 	Critical *string `short:"c" long:"critical" value-name:"N, N%" description:"Exit with CRITICAL status if less than N units or N% of disk are free"`
 	Path     *string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
+	Exclude  *string `short:"x" long:"exclude_device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
 	Units    *string `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
 }
 
@@ -114,18 +115,28 @@ func run(args []string) *checkers.Checker {
 	}
 
 	if opts.Path != nil {
-		contains := false
+		exist := false
 		for _, partition := range partitions {
 			if *opts.Path == partition.Mountpoint {
 				partitions = make([]gpud.PartitionStat, 0)
 				partitions = append(partitions, partition)
-				contains = true
-			}
-
-			if contains == false {
-				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoint: %s", errors.New("Invalid argument flag '-p, --path'")))
+				exist = true
 			}
 		}
+
+		if exist == false {
+			return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoint: %s", errors.New("Invalid argument flag '-p, --path'")))
+		}
+	}
+
+	if opts.Path == nil && opts.Exclude != nil {
+		var tmp []gpud.PartitionStat
+		for _, partition := range partitions {
+			if *opts.Exclude != partition.Mountpoint {
+				tmp = append(tmp, partition)
+			}
+		}
+		partitions = tmp
 	}
 
 	var disks []*diskStatus
