@@ -10,9 +10,11 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
+	gpud "github.com/shirou/gopsutil/disk"
 )
 
 type diskStatus struct {
+	Dev   string
 	All   uint64
 	Used  uint64
 	Free  uint64
@@ -34,14 +36,20 @@ const (
 	tb = float64(1024) * gb
 )
 
-func getDiskUsage(path string) (*diskStatus, error) {
+type unit struct {
+	Name string
+	Size float64
+}
+
+func getDiskUsage(partition gpud.PartitionStat) (*diskStatus, error) {
 	fs := syscall.Statfs_t{}
-	err := syscall.Statfs(path, &fs)
+	err := syscall.Statfs(partition.Mountpoint, &fs)
 	if err != nil {
 		return nil, err
 	}
 
 	disk := &diskStatus{}
+	disk.Dev = partition.Device
 	disk.All = fs.Blocks * uint64(fs.Bsize)
 	disk.Free = fs.Bfree * uint64(fs.Bsize)
 	disk.Used = disk.All - disk.Free
@@ -50,11 +58,10 @@ func getDiskUsage(path string) (*diskStatus, error) {
 	return disk, nil
 }
 
-func checkStatus(threshold string, units float64, disk *diskStatus, status checkers.Status) (checkers.Status, error) {
+func checkStatus(current checkers.Status, threshold string, units float64, disk *diskStatus, status checkers.Status) (checkers.Status, error) {
 	avail := float64(disk.Avail) / float64(units)
 	freePct := (float64(disk.Avail) * float64(100)) / float64(disk.All)
 
-	checkSt := checkers.OK
 	if strings.HasSuffix(threshold, "%") {
 		v, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
 		if err != nil {
@@ -62,7 +69,7 @@ func checkStatus(threshold string, units float64, disk *diskStatus, status check
 		}
 
 		if v > freePct {
-			checkSt = status
+			current = status
 		}
 	} else {
 		v, err := strconv.ParseFloat(threshold, 64)
@@ -71,11 +78,21 @@ func checkStatus(threshold string, units float64, disk *diskStatus, status check
 		}
 
 		if v > avail {
-			checkSt = status
+			current = status
 		}
 	}
 
-	return checkSt, nil
+	return current, nil
+}
+
+func genMessage(disk *diskStatus, u unit) string {
+	all := float64(disk.All) / u.Size
+	used := float64(disk.Used) / u.Size
+	free := float64(disk.Free) / u.Size
+	avail := float64(disk.Avail) / u.Size
+	freePct := (float64(disk.Avail) * float64(100)) / float64(disk.All)
+
+	return fmt.Sprintf("Dev: %v, All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Available: %.2f %v, Free percentage: %.2f", disk.Dev, all, u.Name, used, u.Name, free, u.Name, avail, u.Name, freePct)
 }
 
 // Do the plugin
@@ -91,27 +108,48 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	path := "/"
-	if opts.Path != nil {
-		path = *opts.Path
-	}
-
-	disk, err := getDiskUsage(path)
+	partitions, err := gpud.Partitions(true)
 	if err != nil {
-		return checkers.Unknown(fmt.Sprintf("Faild to fetch disk usage: %s", err))
+		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
 	}
 
-	units := mb
+	if opts.Path != nil {
+		contains := false
+		for _, partition := range partitions {
+			if *opts.Path == partition.Mountpoint {
+				partitions = make([]gpud.PartitionStat, 0)
+				partitions = append(partitions, partition)
+				contains = true
+			}
+
+			if contains == false {
+				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoint: %s", errors.New("Invalid argument flag '-p, --path'")))
+			}
+		}
+	}
+
+	var disks []*diskStatus
+
+	for _, partition := range partitions {
+		disk, err := getDiskUsage(partition)
+		if err != nil {
+			return checkers.Unknown(fmt.Sprintf("Faild to fetch disk usage: %s", err))
+		}
+
+		disks = append(disks, disk)
+	}
+
+	u := unit{"MB", mb}
 	if opts.Units != nil {
-		u := strings.ToLower(*opts.Units)
-		if u == "bytes" {
-			units = b
-		} else if u == "kb" {
-			units = kb
-		} else if u == "gb" {
-			units = gb
-		} else if u == "tb" {
-			units = tb
+		us := strings.ToLower(*opts.Units)
+		if us == "bytes" {
+			u = unit{us, b}
+		} else if us == "kb" {
+			u = unit{us, mb}
+		} else if us == "gb" {
+			u = unit{us, gb}
+		} else if us == "tb" {
+			u = unit{us, tb}
 		} else {
 			return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", errors.New("Invalid argument flag '-u, --units'")))
 		}
@@ -119,30 +157,37 @@ func run(args []string) *checkers.Checker {
 
 	checkSt := checkers.OK
 	if opts.Warning != nil {
-		checkSt, err = checkStatus(*opts.Warning, units, disk, checkers.WARNING)
-		if err != nil {
-			return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+		for _, disk := range disks {
+			checkSt, err = checkStatus(checkSt, *opts.Warning, u.Size, disk, checkers.WARNING)
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+			}
+
+			if checkSt == checkers.WARNING {
+				break
+			}
 		}
 	}
 
 	if opts.Critical != nil {
-		checkSt, err = checkStatus(*opts.Critical, units, disk, checkers.CRITICAL)
-		if err != nil {
-			return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+		for _, disk := range disks {
+			checkSt, err = checkStatus(checkSt, *opts.Critical, u.Size, disk, checkers.CRITICAL)
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+			}
+
+			if checkSt == checkers.CRITICAL {
+				break
+			}
 		}
 	}
 
-	us := "MB"
-	if opts.Units != nil {
-		us = *opts.Units
+	var msgs []string
+	for _, disk := range disks {
+		msg := genMessage(disk, u)
+		msgs = append(msgs, msg)
 	}
+	msgss := strings.Join(msgs, ";\n")
 
-	all := float64(disk.All) / float64(units)
-	used := float64(disk.Used) / float64(units)
-	free := float64(disk.Free) / float64(units)
-	avail := float64(disk.Avail) / float64(units)
-	freePct := (float64(disk.Avail) * float64(100)) / float64(disk.All)
-	msg := fmt.Sprintf("All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Available: %.2f %v, Free percentage: %.2f\n", all, us, used, us, free, us, avail, us, freePct)
-
-	return checkers.NewChecker(checkSt, msg)
+	return checkers.NewChecker(checkSt, msgss)
 }
