@@ -6,20 +6,11 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 	gpud "github.com/shirou/gopsutil/disk"
 )
-
-type diskStatus struct {
-	Dev   string
-	All   uint64
-	Used  uint64
-	Free  uint64
-	Avail uint64
-}
 
 var opts struct {
 	Warning  *string `short:"w" long:"warning" value-name:"N, N%" description:"Exit with WARNING status if less than N units or N% of disk are free"`
@@ -42,34 +33,17 @@ type unit struct {
 	Size float64
 }
 
-func getDiskUsage(partition gpud.PartitionStat) (*diskStatus, error) {
-	fs := syscall.Statfs_t{}
-	err := syscall.Statfs(partition.Mountpoint, &fs)
-	if err != nil {
-		return nil, err
-	}
-
-	disk := &diskStatus{}
-	disk.Dev = partition.Device
-	disk.All = fs.Blocks * uint64(fs.Bsize)
-	disk.Free = fs.Bfree * uint64(fs.Bsize)
-	disk.Used = disk.All - disk.Free
-	disk.Avail = fs.Bavail * uint64(fs.Bsize)
-
-	return disk, nil
-}
-
-func checkStatus(current checkers.Status, threshold string, units float64, disk *diskStatus, status checkers.Status) (checkers.Status, error) {
-	avail := float64(disk.Avail) / float64(units)
-	freePct := (float64(disk.Avail) * float64(100)) / float64(disk.All)
-
+func checkStatus(current checkers.Status, threshold string, units float64, disk *gpud.UsageStat, status checkers.Status) (checkers.Status, error) {
 	if strings.HasSuffix(threshold, "%") {
 		v, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
 		if err != nil {
 			return checkers.UNKNOWN, err
 		}
 
-		if v > freePct {
+		freePct := float64(100) - disk.UsedPercent
+		inodesFreePct := float64(100) - disk.InodesUsedPercent
+
+		if v > freePct || v > inodesFreePct {
 			current = status
 		}
 	} else {
@@ -78,7 +52,7 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 			return checkers.UNKNOWN, err
 		}
 
-		if v > avail {
+		if v > float64(disk.Free) {
 			current = status
 		}
 	}
@@ -86,14 +60,14 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 	return current, nil
 }
 
-func genMessage(disk *diskStatus, u unit) string {
-	all := float64(disk.All) / u.Size
+func genMessage(disk *gpud.UsageStat, u unit) string {
+	all := float64(disk.Total) / u.Size
 	used := float64(disk.Used) / u.Size
 	free := float64(disk.Free) / u.Size
-	avail := float64(disk.Avail) / u.Size
-	freePct := (float64(disk.Avail) * float64(100)) / float64(disk.All)
+	freePct := float64(100) - disk.UsedPercent
+	inodesFreePct := float64(100) - disk.InodesUsedPercent
 
-	return fmt.Sprintf("Dev: %v, All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Available: %.2f %v, Free percentage: %.2f", disk.Dev, all, u.Name, used, u.Name, free, u.Name, avail, u.Name, freePct)
+	return fmt.Sprintf("Path: %v, All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Free percentage: %.2f (inodes: %.2f)", disk.Path, all, u.Name, used, u.Name, free, u.Name, freePct, inodesFreePct)
 }
 
 // Do the plugin
@@ -139,10 +113,10 @@ func run(args []string) *checkers.Checker {
 		partitions = tmp
 	}
 
-	var disks []*diskStatus
+	var disks []*gpud.UsageStat
 
 	for _, partition := range partitions {
-		disk, err := getDiskUsage(partition)
+		disk, err := gpud.Usage(partition.Mountpoint)
 		if err != nil {
 			return checkers.Unknown(fmt.Sprintf("Faild to fetch disk usage: %s", err))
 		}
