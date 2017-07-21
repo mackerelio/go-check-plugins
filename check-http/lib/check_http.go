@@ -64,6 +64,9 @@ func parseStatusRanges() ([]statusRange, error) {
 			if err != nil {
 				return nil, fmt.Errorf(invalidMapping, s)
 			}
+			if r.min > r.max {
+				return nil, fmt.Errorf(invalidMapping, s)
+			}
 		default:
 			return nil, fmt.Errorf(invalidMapping, s)
 		}

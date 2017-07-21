@@ -58,6 +58,10 @@ func TestStatusRange(t *testing.T) {
 			args: []string{"-s", "=ok", "-s", "404=ok", "-u", "https://mackerel.io/404"},
 			want: checkers.UNKNOWN,
 		},
+		{
+			args: []string{"-s", "=ok", "-s", "404-200=ok", "-u", "https://mackerel.io/404"},
+			want: checkers.UNKNOWN,
+		},
 	}
 	for _, tt := range tests {
 		ckr := run(tt.args)
