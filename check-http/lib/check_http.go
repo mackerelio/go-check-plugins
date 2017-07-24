@@ -108,13 +108,12 @@ func run(args []string) *checkers.Checker {
 		Proxy: http.ProxyFromEnvironment,
 	}
 	if opts.SourceIP != "" {
-		d := net.Dialer{
+		tr.Dial = (&net.Dialer{
+			LocalAddr: &net.TCPAddr{IP: net.ParseIP(opts.SourceIP)},
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
 			DualStack: true,
-		}
-		d.LocalAddr = &net.TCPAddr{IP: net.ParseIP(opts.SourceIP)}
-		tr.Dial = d.Dial
+		}).Dial
 	}
 	client := &http.Client{Transport: tr}
 
