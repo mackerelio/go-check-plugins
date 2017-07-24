@@ -83,7 +83,7 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	partitions, err := gpud.Partitions(true)
+	partitions, err := listPartitions()
 	if err != nil {
 		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
 	}
@@ -175,4 +175,38 @@ func run(args []string) *checkers.Checker {
 	msgss := strings.Join(msgs, ";\n")
 
 	return checkers.NewChecker(checkSt, msgss)
+}
+
+// ref: mountlist.c in gnulib
+// https://github.com/coreutils/gnulib/blob/a742bdb3/lib/mountlist.c#L168
+func listPartitions() ([]gpud.PartitionStat, error) {
+	allPartitions, err := gpud.Partitions(true)
+	if err != nil {
+		return nil, err
+	}
+	partitions := make([]gpud.PartitionStat, 0, len(allPartitions))
+	for _, p := range allPartitions {
+		switch p.Fstype {
+		case "autofs":
+		case "proc":
+		case "subfs":
+		case "debugfs":
+		case "devpts":
+		case "fusectl":
+		case "mqueue":
+		case "rpc_pipefs":
+		case "sysfs":
+		case "devfs":
+		case "kernfs":
+		case "ignore":
+			continue
+		case "none":
+			if !strings.Contains(p.Opts, "bind") {
+				partitions = append(partitions, p)
+			}
+		default:
+			partitions = append(partitions, p)
+		}
+	}
+	return partitions, nil
 }
