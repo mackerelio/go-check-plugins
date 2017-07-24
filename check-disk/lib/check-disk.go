@@ -95,10 +95,11 @@ func run(args []string) *checkers.Checker {
 				partitions = make([]gpud.PartitionStat, 0)
 				partitions = append(partitions, partition)
 				exist = true
+				break
 			}
 		}
 
-		if exist == false {
+		if !exist {
 			return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoint: %s", errors.New("Invalid argument flag '-p, --path'")))
 		}
 	}
