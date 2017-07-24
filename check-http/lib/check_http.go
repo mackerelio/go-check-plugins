@@ -1,11 +1,13 @@
 package checkhttp
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"crypto/tls"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jessevdk/go-flags"
@@ -14,8 +16,9 @@ import (
 
 // XXX more options
 var opts struct {
-	URL string `short:"u" long:"url" required:"true" description:"A URL to connect to"`
-	NoCheckCertificate bool `long:"no-check-certificate" description:"Do not check certificate"`
+	URL                string   `short:"u" long:"url" required:"true" description:"A URL to connect to"`
+	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
+	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
 }
 
 // Do the plugin
@@ -25,18 +28,84 @@ func Do() {
 	ckr.Exit()
 }
 
+type statusRange struct {
+	min     int
+	max     int
+	checkSt checkers.Status
+}
+
+const invalidMapping = "Invalid mapping of status: %s"
+
+func parseStatusRanges() ([]statusRange, error) {
+	var statuses []statusRange
+	for _, s := range opts.Statuses {
+		token := strings.SplitN(s, "=", 2)
+		if len(token) != 2 {
+			return nil, fmt.Errorf(invalidMapping, s)
+		}
+		values := strings.Split(token[0], "-")
+
+		var r statusRange
+		var err error
+
+		switch len(values) {
+		case 1:
+			r.min, err = strconv.Atoi(values[0])
+			if err != nil {
+				return nil, fmt.Errorf(invalidMapping, s)
+			}
+			r.max = r.min
+		case 2:
+			r.min, err = strconv.Atoi(values[0])
+			if err != nil {
+				return nil, fmt.Errorf(invalidMapping, s)
+			}
+			r.max, err = strconv.Atoi(values[1])
+			if err != nil {
+				return nil, fmt.Errorf(invalidMapping, s)
+			}
+			if r.min > r.max {
+				return nil, fmt.Errorf(invalidMapping, s)
+			}
+		default:
+			return nil, fmt.Errorf(invalidMapping, s)
+		}
+
+		switch strings.ToUpper(token[1]) {
+		case "OK":
+			r.checkSt = checkers.OK
+		case "WARNING":
+			r.checkSt = checkers.WARNING
+		case "CRITICAL":
+			r.checkSt = checkers.CRITICAL
+		case "UNKNOWN":
+			r.checkSt = checkers.UNKNOWN
+		default:
+			return nil, fmt.Errorf(invalidMapping, s)
+		}
+		statuses = append(statuses, r)
+	}
+	return statuses, nil
+}
+
 func run(args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
 		os.Exit(1)
 	}
 
-	tr := &http.Transport {
+	statusRanges, err := parseStatusRanges()
+	if err != nil {
+		return checkers.Unknown(err.Error())
+	}
+
+	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: opts.NoCheckCertificate,
 		},
+		Proxy: http.ProxyFromEnvironment,
 	}
-	client := &http.Client{ Transport: tr }
+	client := &http.Client{Transport: tr}
 
 	stTime := time.Now()
 	resp, err := client.Get(opts.URL)
@@ -53,13 +122,25 @@ func run(args []string) *checkers.Checker {
 	}
 
 	checkSt := checkers.UNKNOWN
-	switch st := resp.StatusCode; true {
-	case st < 400:
-		checkSt = checkers.OK
-	case st < 500:
-		checkSt = checkers.WARNING
-	default:
-		checkSt = checkers.CRITICAL
+
+	found := false
+	for _, st := range statusRanges {
+		if st.min <= resp.StatusCode && resp.StatusCode <= st.max {
+			checkSt = st.checkSt
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		switch st := resp.StatusCode; true {
+		case st < 400:
+			checkSt = checkers.OK
+		case st < 500:
+			checkSt = checkers.WARNING
+		default:
+			checkSt = checkers.CRITICAL
+		}
 	}
 
 	msg := fmt.Sprintf("%s %s - %d bytes in %f second respons time",
