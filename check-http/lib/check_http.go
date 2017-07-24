@@ -108,8 +108,12 @@ func run(args []string) *checkers.Checker {
 		Proxy: http.ProxyFromEnvironment,
 	}
 	if opts.SourceIP != "" {
+		ip := net.ParseIP(opts.SourceIP)
+		if ip == nil {
+			return checkers.Unknown(fmt.Sprintf("Invalid source IP address: %v", opts.SourceIP))
+		}
 		tr.Dial = (&net.Dialer{
-			LocalAddr: &net.TCPAddr{IP: net.ParseIP(opts.SourceIP)},
+			LocalAddr: &net.TCPAddr{IP: ip},
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
 			DualStack: true,

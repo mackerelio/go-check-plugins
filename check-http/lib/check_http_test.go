@@ -68,3 +68,8 @@ func TestStatusRange(t *testing.T) {
 		assert.Equal(t, ckr.Status, tt.want, fmt.Sprintf("chr.Status wrong: %v", ckr.Status))
 	}
 }
+
+func TestSourceIP(t *testing.T) {
+	ckr := run([]string{"-u", "hoge", "-i", "1.2.3"})
+	assert.Equal(t, ckr.Status, checkers.UNKNOWN, "chr.Status should be UNKNOWN")
+}
