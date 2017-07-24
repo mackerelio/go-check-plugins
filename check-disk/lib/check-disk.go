@@ -187,18 +187,18 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 	partitions := make([]gpud.PartitionStat, 0, len(allPartitions))
 	for _, p := range allPartitions {
 		switch p.Fstype {
-		case "autofs":
-		case "proc":
-		case "subfs":
-		case "debugfs":
-		case "devpts":
-		case "fusectl":
-		case "mqueue":
-		case "rpc_pipefs":
-		case "sysfs":
-		case "devfs":
-		case "kernfs":
-		case "ignore":
+		case "autofs",
+			"proc",
+			"subfs",
+			"debugfs",
+			"devpts",
+			"fusectl",
+			"mqueue",
+			"rpc_pipefs",
+			"sysfs",
+			"devfs",
+			"kernfs",
+			"ignore":
 			continue
 		case "none":
 			if !strings.Contains(p.Opts, "bind") {
