@@ -92,8 +92,7 @@ func run(args []string) *checkers.Checker {
 		exist := false
 		for _, partition := range partitions {
 			if *opts.Path == partition.Mountpoint {
-				partitions = make([]gpud.PartitionStat, 0)
-				partitions = append(partitions, partition)
+				partitions = []gpud.PartitionStat{partition}
 				exist = true
 				break
 			}
