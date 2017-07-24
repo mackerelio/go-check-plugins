@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -19,6 +20,7 @@ var opts struct {
 	URL                string   `short:"u" long:"url" required:"true" description:"A URL to connect to"`
 	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
 	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
+	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
 }
 
 // Do the plugin
@@ -104,6 +106,18 @@ func run(args []string) *checkers.Checker {
 			InsecureSkipVerify: opts.NoCheckCertificate,
 		},
 		Proxy: http.ProxyFromEnvironment,
+	}
+	if opts.SourceIP != "" {
+		ip := net.ParseIP(opts.SourceIP)
+		if ip == nil {
+			return checkers.Unknown(fmt.Sprintf("Invalid source IP address: %v", opts.SourceIP))
+		}
+		tr.Dial = (&net.Dialer{
+			LocalAddr: &net.TCPAddr{IP: ip},
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).Dial
 	}
 	client := &http.Client{Transport: tr}
 
