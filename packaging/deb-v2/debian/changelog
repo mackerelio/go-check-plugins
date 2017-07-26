@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.11.0-1.v2) stable; urgency=low
+
+  * [check-http] Add -i flag to specify source IP (by mattn)
+    <https://github.com/mackerelio/go-check-plugins/pull/184>
+  * [check-http] Add -s option to map HTTP status (by mattn)
+    <https://github.com/mackerelio/go-check-plugins/pull/183>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 26 Jul 2017 14:17:09 +0900
+
 mackerel-check-plugins (0.10.4-1.v2) stable; urgency=low
 
   * v2 packages (rpm and deb) (by Songmu)

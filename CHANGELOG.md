@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.0 (2017-07-26)
+
+* [check-http] Add -i flag to specify source IP #184 (mattn)
+* [check-http] Add -s option to map HTTP status #183 (mattn)
+
+
 ## 0.10.4 (2017-06-07)
 
 * v2 packages (rpm and deb) #175 (Songmu)
