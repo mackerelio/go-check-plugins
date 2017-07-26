@@ -37,6 +37,10 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Jul 26 2017 <mackerel-developers@hatena.ne.jp> - 0.11.0
+- [check-http] Add -i flag to specify source IP (by mattn)
+- [check-http] Add -s option to map HTTP status (by mattn)
+
 * Wed Jun 07 2017 <mackerel-developers@hatena.ne.jp> - 0.10.4
 - v2 packages (rpm and deb) (by Songmu)
 - [check-log]  When specified multiple pattern, perform search that satisfies all conditions (by a-know)
