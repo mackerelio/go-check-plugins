@@ -16,7 +16,7 @@ var opts struct {
 	Warning  *string `short:"w" long:"warning" value-name:"N, N%" description:"Exit with WARNING status if less than N units or N% of disk are free"`
 	Critical *string `short:"c" long:"critical" value-name:"N, N%" description:"Exit with CRITICAL status if less than N units or N% of disk are free"`
 	Path     *string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
-	Exclude  *string `short:"x" long:"exclude_device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
+	Exclude  *string `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
 	Units    *string `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
 }
 
@@ -89,6 +89,10 @@ func run(args []string) *checkers.Checker {
 	}
 
 	if opts.Path != nil {
+		if opts.Exclude != nil {
+			return checkers.Unknown(fmt.Sprintf("Invalid arguments: %s", errors.New("-x does not work with -p")))
+		}
+
 		exist := false
 		for _, partition := range partitions {
 			if *opts.Path == partition.Mountpoint {
@@ -141,19 +145,6 @@ func run(args []string) *checkers.Checker {
 	}
 
 	checkSt := checkers.OK
-	if opts.Warning != nil {
-		for _, disk := range disks {
-			checkSt, err = checkStatus(checkSt, *opts.Warning, u.Size, disk, checkers.WARNING)
-			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
-			}
-
-			if checkSt == checkers.WARNING {
-				break
-			}
-		}
-	}
-
 	if opts.Critical != nil {
 		for _, disk := range disks {
 			checkSt, err = checkStatus(checkSt, *opts.Critical, u.Size, disk, checkers.CRITICAL)
@@ -162,6 +153,19 @@ func run(args []string) *checkers.Checker {
 			}
 
 			if checkSt == checkers.CRITICAL {
+				break
+			}
+		}
+	}
+
+	if checkSt != checkers.CRITICAL && opts.Warning != nil {
+		for _, disk := range disks {
+			checkSt, err = checkStatus(checkSt, *opts.Warning, u.Size, disk, checkers.WARNING)
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+			}
+
+			if checkSt == checkers.WARNING {
 				break
 			}
 		}
