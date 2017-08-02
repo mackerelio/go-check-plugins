@@ -54,6 +54,10 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 			current = status
 		}
 	} else {
+		if chkInode {
+			return checkers.UNKNOWN, errors.New("-W, -K value should be N%")
+		}
+
 		v, err := strconv.ParseFloat(threshold, 64)
 		if err != nil {
 			return checkers.UNKNOWN, err
