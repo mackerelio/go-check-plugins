@@ -46,6 +46,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Aug 02 2017 <mackerel-developers@hatena.ne.jp> - 0.11.1
+- Remove check-ssh binary (by astj)
+
 * Wed Jul 26 2017 <mackerel-developers@hatena.ne.jp> - 0.11.0
 - [check-http] Add -i flag to specify source IP (by mattn)
 - [check-http] Add -s option to map HTTP status (by mattn)
