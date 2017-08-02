@@ -13,12 +13,14 @@ import (
 )
 
 var opts struct {
-	Warning  *string `short:"w" long:"warning" value-name:"N, N%" description:"Exit with WARNING status if less than N units or N% of disk are free"`
-	Critical *string `short:"c" long:"critical" value-name:"N, N%" description:"Exit with CRITICAL status if less than N units or N% of disk are free"`
-	Path     *string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
-	Exclude  *string `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
-	All      bool    `short:"A" long:"all" description:"Explicitly select all paths."`
-	Units    *string `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
+	Warning       *string `short:"w" long:"warning" value-name:"N, N%" description:"Exit with WARNING status if less than N units or N% of disk are free"`
+	Critical      *string `short:"c" long:"critical" value-name:"N, N%" description:"Exit with CRITICAL status if less than N units or N% of disk are free"`
+	InodeWarning  *string `short:"W" long:"iwarning" value-name:"N%" description:"Exit with WARNING status if less than PERCENT of inode space is free"`
+	InodeCritical *string `short:"K" long:"icritical" value-name:"N%" description:"Exit with CRITICAL status if less than PERCENT of inode space is free"`
+	Path          *string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
+	Exclude       *string `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
+	All           bool    `short:"A" long:"all" description:"Explicitly select all paths."`
+	Units         *string `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
 }
 
 const (
@@ -34,7 +36,7 @@ type unit struct {
 	Size float64
 }
 
-func checkStatus(current checkers.Status, threshold string, units float64, disk *gpud.UsageStat, status checkers.Status) (checkers.Status, error) {
+func checkStatus(current checkers.Status, threshold string, units float64, disk *gpud.UsageStat, chkInode bool, status checkers.Status) (checkers.Status, error) {
 	if strings.HasSuffix(threshold, "%") {
 		v, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
 		if err != nil {
@@ -44,7 +46,11 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 		freePct := float64(100) - disk.UsedPercent
 		inodesFreePct := float64(100) - disk.InodesUsedPercent
 
-		if v > freePct || v > inodesFreePct {
+		if chkInode && v > inodesFreePct {
+			current = status
+		}
+
+		if !chkInode && (v > freePct || v > inodesFreePct) {
 			current = status
 		}
 	} else {
@@ -149,9 +155,9 @@ func run(args []string) *checkers.Checker {
 	}
 
 	checkSt := checkers.OK
-	if opts.Critical != nil {
+	if opts.InodeCritical != nil {
 		for _, disk := range disks {
-			checkSt, err = checkStatus(checkSt, *opts.Critical, u.Size, disk, checkers.CRITICAL)
+			checkSt, err = checkStatus(checkSt, *opts.InodeCritical, u.Size, disk, true, checkers.CRITICAL)
 			if err != nil {
 				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
 			}
@@ -162,9 +168,35 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 
-	if checkSt != checkers.CRITICAL && opts.Warning != nil {
+	if checkSt != checkers.CRITICAL && opts.Critical != nil {
 		for _, disk := range disks {
-			checkSt, err = checkStatus(checkSt, *opts.Warning, u.Size, disk, checkers.WARNING)
+			checkSt, err = checkStatus(checkSt, *opts.Critical, u.Size, disk, false, checkers.CRITICAL)
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+			}
+
+			if checkSt == checkers.CRITICAL {
+				break
+			}
+		}
+	}
+
+	if checkSt != checkers.CRITICAL && opts.InodeWarning != nil {
+		for _, disk := range disks {
+			checkSt, err = checkStatus(checkSt, *opts.InodeWarning, u.Size, disk, true, checkers.WARNING)
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+			}
+
+			if checkSt == checkers.WARNING {
+				break
+			}
+		}
+	}
+
+	if checkSt == checkers.OK && opts.Warning != nil {
+		for _, disk := range disks {
+			checkSt, err = checkStatus(checkSt, *opts.Warning, u.Size, disk, false, checkers.WARNING)
 			if err != nil {
 				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
 			}
