@@ -118,7 +118,7 @@ func run(args []string) *checkers.Checker {
 			}
 
 			if !exist {
-				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoint: %s", errors.New("Invalid argument flag '-p, --path'")))
+				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoint: %s", errors.New("No device found for the specified path")))
 			}
 		}
 
