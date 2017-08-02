@@ -17,6 +17,7 @@ var opts struct {
 	Critical *string `short:"c" long:"critical" value-name:"N, N%" description:"Exit with CRITICAL status if less than N units or N% of disk are free"`
 	Path     *string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
 	Exclude  *string `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
+	All      bool    `short:"A" long:"all" description:"Explicitly select all paths."`
 	Units    *string `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
 }
 
@@ -88,33 +89,35 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
 	}
 
-	if opts.Path != nil {
-		if opts.Exclude != nil {
-			return checkers.Unknown(fmt.Sprintf("Invalid arguments: %s", errors.New("-x does not work with -p")))
-		}
+	if !opts.All {
+		if opts.Path != nil {
+			if opts.Exclude != nil {
+				return checkers.Unknown(fmt.Sprintf("Invalid arguments: %s", errors.New("-x does not work with -p")))
+			}
 
-		exist := false
-		for _, partition := range partitions {
-			if *opts.Path == partition.Mountpoint {
-				partitions = []gpud.PartitionStat{partition}
-				exist = true
-				break
+			exist := false
+			for _, partition := range partitions {
+				if *opts.Path == partition.Mountpoint {
+					partitions = []gpud.PartitionStat{partition}
+					exist = true
+					break
+				}
+			}
+
+			if !exist {
+				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoint: %s", errors.New("Invalid argument flag '-p, --path'")))
 			}
 		}
 
-		if !exist {
-			return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoint: %s", errors.New("Invalid argument flag '-p, --path'")))
-		}
-	}
-
-	if opts.Path == nil && opts.Exclude != nil {
-		var tmp []gpud.PartitionStat
-		for _, partition := range partitions {
-			if *opts.Exclude != partition.Mountpoint {
-				tmp = append(tmp, partition)
+		if opts.Path == nil && opts.Exclude != nil {
+			var tmp []gpud.PartitionStat
+			for _, partition := range partitions {
+				if *opts.Exclude != partition.Mountpoint {
+					tmp = append(tmp, partition)
+				}
 			}
+			partitions = tmp
 		}
-		partitions = tmp
 	}
 
 	var disks []*gpud.UsageStat
