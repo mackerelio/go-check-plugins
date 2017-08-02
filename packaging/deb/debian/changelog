@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.11.1-1) stable; urgency=low
+
+  * Remove check-ssh binary (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/186>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 02 Aug 2017 11:08:02 +0900
+
 mackerel-check-plugins (0.11.0-1) stable; urgency=low
 
   * [check-http] Add -i flag to specify source IP (by mattn)

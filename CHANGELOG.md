@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.1 (2017-08-02)
+
+* Remove check-ssh binary #186 (astj)
+
+
 ## 0.11.0 (2017-07-26)
 
 * [check-http] Add -i flag to specify source IP #184 (mattn)
