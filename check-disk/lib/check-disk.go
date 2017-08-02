@@ -13,16 +13,16 @@ import (
 )
 
 var opts struct {
-	Warning       *string `short:"w" long:"warning" value-name:"N, N%" description:"Exit with WARNING status if less than N units or N% of disk are free"`
-	Critical      *string `short:"c" long:"critical" value-name:"N, N%" description:"Exit with CRITICAL status if less than N units or N% of disk are free"`
-	InodeWarning  *string `short:"W" long:"iwarning" value-name:"N%" description:"Exit with WARNING status if less than PERCENT of inode space is free"`
-	InodeCritical *string `short:"K" long:"icritical" value-name:"N%" description:"Exit with CRITICAL status if less than PERCENT of inode space is free"`
-	Path          *string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
-	Exclude       *string `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
-	All           bool    `short:"A" long:"all" description:"Explicitly select all paths."`
-	ExcludeType   *string `short:"X" long:"exclude-type" value-name:"TYPE" description:"Ignore all filesystems of indicated type"`
-	IncludeType   *string `short:"N" long:"include-type" value-name:"TYPE" description:"Check only filesystems of indicated type"`
-	Units         *string `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
+	Warning       *string   `short:"w" long:"warning" value-name:"N, N%" description:"Exit with WARNING status if less than N units or N% of disk are free"`
+	Critical      *string   `short:"c" long:"critical" value-name:"N, N%" description:"Exit with CRITICAL status if less than N units or N% of disk are free"`
+	InodeWarning  *string   `short:"W" long:"iwarning" value-name:"N%" description:"Exit with WARNING status if less than PERCENT of inode space is free"`
+	InodeCritical *string   `short:"K" long:"icritical" value-name:"N%" description:"Exit with CRITICAL status if less than PERCENT of inode space is free"`
+	Path          *string   `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
+	Exclude       *string   `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
+	All           bool      `short:"A" long:"all" description:"Explicitly select all paths."`
+	ExcludeType   *[]string `short:"X" long:"exclude-type" value-name:"TYPE" description:"Ignore all filesystems of indicated type"`
+	IncludeType   *[]string `short:"N" long:"include-type" value-name:"TYPE" description:"Check only filesystems of indicated type"`
+	Units         *string   `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
 }
 
 const (
@@ -104,9 +104,13 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	partitions, err := listPartitions(opts.IncludeType, opts.ExcludeType)
+	partitions, err := listPartitions()
 	if err != nil {
 		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
+	}
+
+	if opts.IncludeType != nil || opts.ExcludeType != nil {
+		partitions = filterPartitions(partitions, opts.IncludeType, opts.ExcludeType)
 	}
 
 	if !opts.All {
@@ -232,26 +236,13 @@ func run(args []string) *checkers.Checker {
 
 // ref: mountlist.c in gnulib
 // https://github.com/coreutils/gnulib/blob/a742bdb3/lib/mountlist.c#L168
-func listPartitions(includeType *string, excludeType *string) ([]gpud.PartitionStat, error) {
+func listPartitions() ([]gpud.PartitionStat, error) {
 	allPartitions, err := gpud.Partitions(true)
 	if err != nil {
 		return nil, err
 	}
 	partitions := make([]gpud.PartitionStat, 0, len(allPartitions))
 	for _, p := range allPartitions {
-		if includeType != nil {
-			if p.Fstype == *includeType {
-				partitions = append(partitions, p)
-				continue
-			}
-		}
-
-		if excludeType != nil {
-			if p.Fstype == *excludeType {
-				continue
-			}
-		}
-
 		switch p.Fstype {
 		case "autofs",
 			"proc",
@@ -274,5 +265,31 @@ func listPartitions(includeType *string, excludeType *string) ([]gpud.PartitionS
 			partitions = append(partitions, p)
 		}
 	}
+
 	return partitions, nil
+}
+
+func filterPartitions(partitions []gpud.PartitionStat, includeType *[]string, excludeType *[]string) []gpud.PartitionStat {
+	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
+	if excludeType != nil {
+		for _, ex := range *excludeType {
+			for _, p := range partitions {
+				if p.Fstype != ex {
+					newPartitions = append(newPartitions, p)
+				}
+			}
+		}
+	}
+
+	if includeType != nil {
+		for _, in := range *includeType {
+			for _, p := range partitions {
+				if p.Fstype != in {
+					newPartitions = append(newPartitions, p)
+				}
+			}
+		}
+	}
+
+	return newPartitions
 }
