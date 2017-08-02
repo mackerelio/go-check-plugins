@@ -46,7 +46,14 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 		}
 
 		freePct := float64(100) - disk.UsedPercent
+		if float64(disk.Total) == float64(0) {
+			freePct = float64(0)
+		}
+
 		inodesFreePct := float64(100) - disk.InodesUsedPercent
+		if float64(disk.InodesTotal) == float64(0) {
+			inodesFreePct = float64(0)
+		}
 
 		if chkInode && v > inodesFreePct {
 			current = status
