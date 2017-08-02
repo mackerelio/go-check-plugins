@@ -53,7 +53,8 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 			return checkers.UNKNOWN, err
 		}
 
-		if v > float64(disk.Free) {
+		free := float64(disk.Free) / units
+		if v > free {
 			current = status
 		}
 	}
