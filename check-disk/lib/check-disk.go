@@ -109,11 +109,11 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
 	}
 
-	if opts.IncludeType != nil || opts.ExcludeType != nil {
-		partitions = filterPartitions(partitions, opts.IncludeType, opts.ExcludeType)
-	}
-
 	if !opts.All {
+		if opts.IncludeType != nil || opts.ExcludeType != nil {
+			partitions = filterPartitions(partitions, opts.IncludeType, opts.ExcludeType)
+		}
+
 		if opts.Path != nil {
 			if opts.Exclude != nil {
 				return checkers.Unknown(fmt.Sprintf("Invalid arguments: %s", errors.New("-x does not work with -p")))
