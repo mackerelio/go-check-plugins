@@ -284,7 +284,7 @@ func filterPartitions(partitions []gpud.PartitionStat, includeType *[]string, ex
 	if includeType != nil {
 		for _, in := range *includeType {
 			for _, p := range partitions {
-				if p.Fstype != in {
+				if p.Fstype == in {
 					newPartitions = append(newPartitions, p)
 				}
 			}
