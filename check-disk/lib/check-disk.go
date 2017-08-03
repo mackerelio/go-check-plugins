@@ -17,11 +17,11 @@ var opts struct {
 	Critical      *string   `short:"c" long:"critical" value-name:"N, N%" description:"Exit with CRITICAL status if less than N units or N% of disk are free"`
 	InodeWarning  *string   `short:"W" long:"iwarning" value-name:"N%" description:"Exit with WARNING status if less than PERCENT of inode space is free"`
 	InodeCritical *string   `short:"K" long:"icritical" value-name:"N%" description:"Exit with CRITICAL status if less than PERCENT of inode space is free"`
-	Path          *string   `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command"`
+	Path          *[]string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command (may be repeated)"`
 	Exclude       *string   `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
 	All           bool      `short:"A" long:"all" description:"Explicitly select all paths."`
-	ExcludeType   *[]string `short:"X" long:"exclude-type" value-name:"TYPE" description:"Ignore all filesystems of indicated type"`
-	IncludeType   *[]string `short:"N" long:"include-type" value-name:"TYPE" description:"Check only filesystems of indicated type"`
+	ExcludeType   *[]string `short:"X" long:"exclude-type" value-name:"TYPE" description:"Ignore all filesystems of indicated type (may be repeated)"`
+	IncludeType   *[]string `short:"N" long:"include-type" value-name:"TYPE" description:"Check only filesystems of indicated type (may be repeated)"`
 	Units         *string   `short:"u" long:"units" value-name:"STRING" description:"Choose bytes, kB, MB, GB, TB (default: MB)"`
 }
 
@@ -110,38 +110,44 @@ func run(args []string) *checkers.Checker {
 	}
 
 	if !opts.All {
-		if opts.IncludeType != nil || opts.ExcludeType != nil {
-			partitions = filterPartitions(partitions, opts.IncludeType, opts.ExcludeType)
+		// Filtering partitions by Fstype
+		if opts.IncludeType != nil {
+			partitions, err = filterPartitions(partitions, *opts.IncludeType, "Fstype", true)
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
+			}
 		}
 
+		if opts.ExcludeType != nil {
+			partitions, err = filterPartitions(partitions, *opts.ExcludeType, "Fstype", false)
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
+			}
+		}
+
+		// Filtering partions by Mountpoint
 		if opts.Path != nil {
 			if opts.Exclude != nil {
 				return checkers.Unknown(fmt.Sprintf("Invalid arguments: %s", errors.New("-x does not work with -p")))
 			}
 
-			exist := false
-			for _, partition := range partitions {
-				if *opts.Path == partition.Mountpoint {
-					partitions = []gpud.PartitionStat{partition}
-					exist = true
-					break
-				}
-			}
-
-			if !exist {
-				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoint: %s", errors.New("No device found for the specified path")))
+			partitions, err = filterPartitions(partitions, *opts.Path, "Mountpoint", true)
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoints: %s", err))
 			}
 		}
 
 		if opts.Path == nil && opts.Exclude != nil {
-			var tmp []gpud.PartitionStat
-			for _, partition := range partitions {
-				if *opts.Exclude != partition.Mountpoint {
-					tmp = append(tmp, partition)
-				}
+			excludes := []string{*opts.Exclude}
+			partitions, err = filterPartitions(partitions, excludes, "Mountpoint", false)
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoints: %s", err))
 			}
-			partitions = tmp
 		}
+	}
+
+	if len(partitions) == 0 {
+		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified path")))
 	}
 
 	var disks []*gpud.UsageStat
@@ -269,27 +275,28 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 	return partitions, nil
 }
 
-func filterPartitions(partitions []gpud.PartitionStat, includeType *[]string, excludeType *[]string) []gpud.PartitionStat {
+func filterPartitions(partitions []gpud.PartitionStat, list []string, filterby string, include bool) ([]gpud.PartitionStat, error) {
+	exist := false
 	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
-	if excludeType != nil {
-		for _, ex := range *excludeType {
-			for _, p := range partitions {
-				if p.Fstype != ex {
-					newPartitions = append(newPartitions, p)
+	for _, partition := range partitions {
+		for _, l := range list {
+			if filterby == "Fstype" {
+				if (!include && l != partition.Fstype) || (include && l == partition.Fstype) {
+					newPartitions = append(newPartitions, partition)
+					exist = true
+				}
+			} else if filterby == "Mountpoint" {
+				if (!include && l != partition.Mountpoint) || (include && l == partition.Mountpoint) {
+					newPartitions = append(newPartitions, partition)
+					exist = true
 				}
 			}
 		}
 	}
 
-	if includeType != nil {
-		for _, in := range *includeType {
-			for _, p := range partitions {
-				if p.Fstype == in {
-					newPartitions = append(newPartitions, p)
-				}
-			}
-		}
+	if include && !exist {
+		return nil, errors.New("No device found for the specified path")
 	}
 
-	return newPartitions
+	return newPartitions, nil
 }
