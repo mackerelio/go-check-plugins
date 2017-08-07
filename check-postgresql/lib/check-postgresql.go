@@ -19,13 +19,17 @@ type postgresqlSetting struct {
 	Port     string `short:"p" long:"port" default:"5432" description:"Port"`
 	User     string `short:"u" long:"user" default:"postgres" description:"Username"`
 	Password string `short:"P" long:"password" default:"" description:"Password"`
-	Database string `short:"d" long:"dbname" default:"postgres" description:"DBname"`
+	Database string `short:"d" long:"dbname" description:"DBname"`
 	SSLmode  string `short:"s" long:"sslmode" default:"disable" description:"SSLmode"`
 	Timeout  int    `short:"t" long:"timeout" default:"5" description:"Maximum wait for connection, in seconds."`
 }
 
 func (p postgresqlSetting) getDriverAndDataSourceName() (string, string) {
-	dataSourceName := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=%s connect_timeout=%d", p.User, p.Password, p.Host, p.Port, p.Database, p.SSLmode, p.Timeout)
+	dbName := p.User
+	if p.Database != "" {
+		dbName = p.Database
+	}
+	dataSourceName := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=%s connect_timeout=%d", p.User, p.Password, p.Host, p.Port, dbName, p.SSLmode, p.Timeout)
 	return "postgres", dataSourceName
 }
 
