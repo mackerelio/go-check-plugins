@@ -16,5 +16,5 @@ Checks the number of PostgreSQL connections.
 
 ```
 [plugin.checks.postgresql_connection]
-command = "/path/to/check-postgresql connection --host=127.0.0.1 --port=5432 --user=USER --password=PASSWORD --warning=70 --critical=90
+command = "/path/to/check-postgresql connection --host=127.0.0.1 --port=5432 --user=USER --password=PASSWORD --database=DBNAME --warning=70 --critical=90
 ```
