@@ -46,14 +46,8 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 		}
 
 		freePct := float64(100) - disk.UsedPercent
-		if float64(disk.Total) == float64(0) {
-			freePct = float64(0)
-		}
 
 		inodesFreePct := float64(100) - disk.InodesUsedPercent
-		if float64(disk.InodesTotal) == float64(0) {
-			inodesFreePct = float64(0)
-		}
 
 		if chkInode && v > inodesFreePct {
 			current = status
@@ -112,17 +106,14 @@ func run(args []string) *checkers.Checker {
 	if !opts.All {
 		// Filtering partitions by Fstype
 		if opts.IncludeType != nil {
-			partitions, err = filterPartitions(partitions, *opts.IncludeType, "Fstype", true)
-			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
+			partitions = filterPartitionsByFstype(partitions, *opts.IncludeType, true)
+			if len(partitions) == 0 {
+				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified *FsType*")))
 			}
 		}
 
 		if opts.ExcludeType != nil {
-			partitions, err = filterPartitions(partitions, *opts.ExcludeType, "Fstype", false)
-			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
-			}
+			partitions = filterPartitionsByFstype(partitions, *opts.ExcludeType, false)
 		}
 
 		// Filtering partions by Mountpoint
@@ -131,23 +122,20 @@ func run(args []string) *checkers.Checker {
 				return checkers.Unknown(fmt.Sprintf("Invalid arguments: %s", errors.New("-x does not work with -p")))
 			}
 
-			partitions, err = filterPartitions(partitions, *opts.Path, "Mountpoint", true)
-			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoints: %s", err))
+			partitions = filterPartitionsByMountpoint(partitions, *opts.Path, true)
+			if len(partitions) == 0 {
+				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified *Mountpoint*")))
 			}
 		}
 
 		if opts.Path == nil && opts.Exclude != nil {
 			excludes := []string{*opts.Exclude}
-			partitions, err = filterPartitions(partitions, excludes, "Mountpoint", false)
-			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Faild to fetch mountpoints: %s", err))
-			}
+			partitions = filterPartitionsByMountpoint(partitions, excludes, false)
 		}
 	}
 
 	if len(partitions) == 0 {
-		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified path")))
+		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found")))
 	}
 
 	var disks []*gpud.UsageStat
@@ -158,7 +146,9 @@ func run(args []string) *checkers.Checker {
 			return checkers.Unknown(fmt.Sprintf("Faild to fetch disk usage: %s", err))
 		}
 
-		disks = append(disks, disk)
+		if disk.Total != 0 {
+			disks = append(disks, disk)
+		}
 	}
 
 	u := unit{"MB", mb}
@@ -275,28 +265,28 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 	return partitions, nil
 }
 
-func filterPartitions(partitions []gpud.PartitionStat, list []string, filterby string, include bool) ([]gpud.PartitionStat, error) {
-	exist := false
+func filterPartitionsByFstype(partitions []gpud.PartitionStat, list []string, include bool) []gpud.PartitionStat {
 	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
 	for _, partition := range partitions {
 		for _, l := range list {
-			if filterby == "Fstype" {
-				if (!include && l != partition.Fstype) || (include && l == partition.Fstype) {
-					newPartitions = append(newPartitions, partition)
-					exist = true
-				}
-			} else if filterby == "Mountpoint" {
-				if (!include && l != partition.Mountpoint) || (include && l == partition.Mountpoint) {
-					newPartitions = append(newPartitions, partition)
-					exist = true
-				}
+			if (!include && l != partition.Fstype) || (include && l == partition.Fstype) {
+				newPartitions = append(newPartitions, partition)
 			}
 		}
 	}
 
-	if include && !exist {
-		return nil, errors.New("No device found for the specified path")
+	return newPartitions
+}
+
+func filterPartitionsByMountpoint(partitions []gpud.PartitionStat, list []string, include bool) []gpud.PartitionStat {
+	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
+	for _, partition := range partitions {
+		for _, l := range list {
+			if (!include && l != partition.Mountpoint) || (include && l == partition.Mountpoint) {
+				newPartitions = append(newPartitions, partition)
+			}
+		}
 	}
 
-	return newPartitions, nil
+	return newPartitions
 }
