@@ -69,19 +69,19 @@ func (t *jsonTime) UnmarshalJSON(s []byte) (err error) {
 
 func (t jsonTime) String() string { return t.toTime().String() }
 
-type Build struct {
+type build struct {
 	Number    int      `json:"number"`
 	Result    *string  `json:"result"`
 	Timestamp jsonTime `json:"timestamp"`
 }
 
 
-func (b Build) isUnfinished() bool {
+func (b build) isUnfinished() bool {
 	return b.Result == nil
 }
 
-type Builds struct {
-	Builds []Build `json:"builds"`
+type builds struct {
+	Builds []build `json:"builds"`
 }
 
 func main() {
@@ -90,9 +90,9 @@ func main() {
 	ckr.Exit()
 }
 
-func filterUnfinishedTooLongBuilds(builds []Build, threshold time.Duration) []Build {
+func filterUnfinishedTooLongBuilds(builds []build, threshold time.Duration) []build {
 	now := time.Now()
-	ret := make([]Build, 0)
+	ret := make([]build, 0)
 
 	for _, b := range builds {
 		if b.isUnfinished() && now.Sub(b.Timestamp.toTime()) > threshold {
@@ -117,7 +117,7 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown(fmt.Sprintf("Faild to fetch jenkins metrics: %s", err))
 	}
 	defer resp.Body.Close()
-	var builds Builds
+	var builds builds
 
 	json.NewDecoder(resp.Body).Decode(&builds)
 
