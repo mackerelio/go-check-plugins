@@ -26,8 +26,9 @@ var opts struct {
 
 type jsonTime time.Time
 
+func (t jsonTime) toTime() time.Time { return time.Time(t) }
 func (t jsonTime) MarshalJSON() ([]byte, error) {
-	return []byte(strconv.FormatInt(time.Time(t).Unix(), 10)), nil
+	return []byte(strconv.FormatInt(t.toTime().Unix(), 10)), nil
 }
 
 func (t *jsonTime) UnmarshalJSON(s []byte) (err error) {
@@ -41,8 +42,7 @@ func (t *jsonTime) UnmarshalJSON(s []byte) (err error) {
 	return
 }
 
-func (t jsonTime) String() string    { return time.Time(t).String() }
-func (t jsonTime) toTime() time.Time { return time.Time(t) }
+func (t jsonTime) String() string { return t.toTime().String() }
 
 type Build struct {
 	Number    int      `json:"number"`
