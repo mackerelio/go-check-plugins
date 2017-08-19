@@ -75,6 +75,11 @@ type Build struct {
 	Timestamp jsonTime `json:"timestamp"`
 }
 
+
+func (b Build) isUnfinished() bool {
+	return b.Result == nil
+}
+
 type Builds struct {
 	Builds []Build `json:"builds"`
 }
@@ -90,7 +95,7 @@ func filterUnfinishedTooLongBuilds(builds []Build, threshold time.Duration) []Bu
 	ret := make([]Build, 0)
 
 	for _, b := range builds {
-		if b.Result == nil && now.Sub(b.Timestamp.toTime()) > threshold {
+		if b.isUnfinished() && now.Sub(b.Timestamp.toTime()) > threshold {
 			ret = append(ret, b)
 		}
 	}
