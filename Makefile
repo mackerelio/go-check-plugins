@@ -1,16 +1,12 @@
-TARGET_OSARCH="linux/amd64"
-CURRENT_VERSION = $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $$1;exit}')
+VERSION = 0.11.1
+CURRENT_REVISION = $(shell git rev-parse --short HEAD)
 ifeq ($(OS),Windows_NT)
 GOPATH_ROOT:=$(shell cygpath ${GOPATH})
-TARGET_OSARCH="windows/amd64"
 else
 GOPATH_ROOT:=${GOPATH}
 endif
 
-check-variables:
-	echo "CURRENT_VERSION: ${CURRENT_VERSION}"
-
-all: clean test build rpm deb
+all: clean testconvention test build rpm deb
 
 test: lint
 	go test $(TESTFLAGS) ./...
@@ -23,34 +19,70 @@ devel-deps: deps
 	go get github.com/pierrre/gotestcover
 	go get github.com/mattn/goveralls
 
-LINT_RET = .golint.txt
+check-release-deps:
+	@have_error=0; \
+	for command in cpanm hub ghch gobump; do \
+	  if ! command -v $$command > /dev/null; then \
+	    have_error=1; \
+	    echo "\`$$command\` command is required for releasing"; \
+	  fi; \
+	done; \
+	test $$have_error = 0
+
 lint: devel-deps
 	go vet ./...
-	rm -f $(LINT_RET)
-	golint ./... | tee -a $(LINT_RET)
-	test ! -s $(LINT_RET)
+	golint -set_exit_status ./...
+
+testconvention:
+	prove -r t/
+	@go generate ./... && git diff --exit-code || (echo 'please `go generate ./...` and commit them' && false)
 
 cover: devel-deps
 	gotestcover -v -short -covermode=count -coverprofile=.profile.cov -parallelpackages=4 ./...
 
 build: deps
 	mkdir -p build
-	for i in check-*; do \
-	  gox -ldflags "-s -w" \
-	    -osarch=$(TARGET_OSARCH) -output build/$$i \
-	    `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
+	for i in $(filter-out check-windows-%, $(wildcard check-*)); do \
+	  go build -ldflags "-s -w" -o build/$$i \
+	  `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
 	done
 
-rpm: build
-	make build TARGET_OSARCH="linux/386"
-	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${CURRENT_VERSION}" --define "buildarch noarch" -bb packaging/rpm/mackerel-check-plugins.spec
-	make build TARGET_OSARCH="linux/amd64"
-	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${CURRENT_VERSION}" --define "buildarch x86_64" -bb packaging/rpm/mackerel-check-plugins.spec
+build/mackerel-check: deps
+	mkdir -p build
+	go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
+	  -o build/mackerel-check
 
-deb: deps
-	TARGET_OSARCH="linux/386" make build
-	cp build/check-* packaging/deb/debian/
+rpm: rpm-v1 rpm-v2
+
+rpm-v1:
+	make build GOOS=linux GOARCH=386
+	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch noarch" -bb packaging/rpm/mackerel-check-plugins.spec
+	make build GOOS=linux GOARCH=amd64
+	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch x86_64" -bb packaging/rpm/mackerel-check-plugins.spec
+
+rpm-v2:
+	make build/mackerel-check GOOS=linux GOARCH=amd64
+	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" \
+	  --define "buildarch x86_64" --define "dist .el7.centos" \
+	  -bb packaging/rpm/mackerel-check-plugins-v2.spec
+
+deb: deb-v1 deb-v2
+
+deb-v1:
+	make build GOOS=linux GOARCH=386
+	for i in `cat packaging/deb/debian/source/include-binaries`; do \
+	  cp build/`basename $$i` packaging/deb/debian/; \
+	done
 	cd packaging/deb && debuild --no-tgz-check -rfakeroot -uc -us
+
+deb-v2:
+	make build/mackerel-check GOOS=linux GOARCH=amd64
+	cp build/mackerel-check packaging/deb-v2/debian/
+	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us
+
+release: check-release-deps
+	(cd tool && cpanm -qn --installdeps .)
+	perl tool/create-release-pullrequest
 
 clean:
 	if [ -d build ]; then \
@@ -59,4 +91,4 @@ clean:
 	fi
 	go clean
 
-.PHONY: all test deps devel-deps lint cover build rpm deb clean release
+.PHONY: all test testconvention deps devel-deps lint cover build rpm rpm-v1 rpm-v2 deb deb-v1 deb-v2 clean release check-release-deps

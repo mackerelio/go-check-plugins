@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+
+=head DESCRIPTION
+
+releng script for mackerel-check-plugins
+
+=head SYNOPSIS
+
+    % tool/create-release-pullrequest
+
+=head DEPENDENCY
+
+`git`, `hub` and `gobump` command are required.
+
+=cut
+
+use 5.014;
+use strict;
+use warnings;
+use utf8;
+
+use Mackerel::ReleaseUtils qw/replace create_release_pull_request/;
+
+use File::Copy qw/move/;
+use JSON::PP qw/decode_json/;
+use Path::Tiny qw/path/;
+
+my $PLUGIN_PREFIX = 'check-';
+my $PACKAGE_NAME = 'mackerel-check-plugins';
+
+sub retrieve_plugins {
+    sort map {s/^$PLUGIN_PREFIX//; $_} <$PLUGIN_PREFIX*>;
+}
+
+sub update_readme {
+    my @plugins = @_;
+
+    my $doc_links = '';
+    for my $plug (@plugins) {
+        $doc_links .= "* [$PLUGIN_PREFIX$plug](./$PLUGIN_PREFIX$plug/README.md)\n"
+    }
+    replace 'README.md' => sub {
+        my $readme = shift;
+        my $plu_reg = qr/$PLUGIN_PREFIX[-0-9a-zA-Z_]+/;
+        $readme =~ s!(?:\* \[$plu_reg\]\(\./$plu_reg/README\.md\)\n)+!$doc_links!ms;
+        $readme;
+    };
+}
+
+sub update_packaging_specs {
+    my @plugins = @_;
+    my $for_in = 'for i in ' . join(' ', @plugins) . '; do';
+
+    my $replace_sub = sub {
+        my $content = shift;
+        $content =~ s/for i in.*?;\s*do/$for_in/ms;
+        $content;
+    };
+    replace $_, $replace_sub for ("packaging/rpm/$PACKAGE_NAME*.spec", "packaging/deb*/debian/rules");
+
+    path('packaging/deb/debian/source/include-binaries')->spew(join("\n", map { "debian/$PLUGIN_PREFIX$_" } @plugins) . "\n");
+}
+
+sub load_packaging_confg {
+    decode_json path('packaging/config.json')->slurp;
+}
+
+create_release_pull_request $PACKAGE_NAME => sub {
+    my ($current_version, $next_version, $releases) = @_;
+
+    move
+        "packaging/${PACKAGE_NAME}_$current_version.orig.tar.gz",
+        "packaging/${PACKAGE_NAME}_$next_version.orig.tar.gz";
+    my @plugins = retrieve_plugins;
+    update_readme(@plugins);
+    my $config = load_packaging_confg;
+    update_packaging_specs(@{ $config->{plugins} });
+};

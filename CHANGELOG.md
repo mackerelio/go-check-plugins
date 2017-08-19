@@ -1,5 +1,99 @@
 # Changelog
 
+## 0.11.1 (2017-08-02)
+
+* Remove check-ssh binary #186 (astj)
+
+
+## 0.11.0 (2017-07-26)
+
+* [check-http] Add -i flag to specify source IP #184 (mattn)
+* [check-http] Add -s option to map HTTP status #183 (mattn)
+
+
+## 0.10.4 (2017-06-07)
+
+* v2 packages (rpm and deb) #175 (Songmu)
+* [check-log]  When specified multiple pattern, perform search that satisfies all conditions #174 (a-know)
+
+
+## 0.10.3 (2017-05-16)
+
+* [ntpoffset] support chronyd #166 (Songmu)
+* [check-ssh] fix the problem that check-ssh cannot invoke SSH connection #171 (astj)
+
+
+## 0.10.2 (2017-05-15)
+
+* [experimental] update release scripts #168 (Songmu)
+
+
+## 0.10.1 (2017-04-27)
+
+* use wmi query instead of running wmic command #157 (mattn)
+* Use golib/pluginutil.PluginWorkDir() #163 (astj)
+
+
+## 0.10.0 (2017-04-06)
+
+* bump go to 1.8 #159 (astj)
+
+
+## 0.9.7 (2017-03-27)
+
+* check lower-case driver letters #156 (mattn)
+
+
+## 0.9.6 (2017-03-22)
+
+* Change directory structure convention of each plugin #144 (Songmu)
+* run tests under ./check-XXX/lib #152 (astj)
+* fix test for AppVayor #154 (daiksy)
+
+
+## 0.9.5 (2017-03-09)
+
+* add appveyor.yml and fix failing tests on windows #145 (Songmu)
+* [check-tcp] connect timeout #146 (Songmu)
+* [check-tcp] [bugfix] fix decimal threshold value handling #147 (Songmu)
+
+
+## 0.9.4 (2017-02-22)
+
+* ensure close temporary file in writeFileAtomically #141 (itchyny)
+* Write the file in same directory #142 (mattn)
+
+
+## 0.9.3 (2017-02-08)
+
+* fix matching for 'Audit Success' and 'Audit Failure' #139 (mattn)
+
+
+## 0.9.2 (2017-01-25)
+
+* [check-windows-eventlog] add --source-exclude, --message-exclude and --event-id #136 (mattn, daiksy)
+* [check-windows-eventlog] remove --event-id and add --event-id-pattern, --event-id-exclude #137 (mattn)
+
+
+## 0.9.1 (2017-01-11)
+
+* [check-log] support glob in --file option #133 (astj)
+
+
+## 0.9.0 (2017-01-04)
+
+* add check-windows-eventlog #129 (daiksy)
+* [check-log]fix encoding option #131 (daiksy)
+
+
+## 0.8.1 (2016-11-29)
+
+* Fix state in check-procs #124 (itchyny)
+* Fix the links to the document #125 (itchyny)
+* remove checking Ignore #126 (mattn)
+* [check-log] fix state file path (fix wrong slice copy) #127 (Songmu)
+
+
 ## 0.8.0 (2016-10-27)
 
 * [check-log] improve Windows support #122 (daiksy)

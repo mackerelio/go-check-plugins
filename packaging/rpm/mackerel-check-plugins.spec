@@ -26,13 +26,14 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in `cat %{_sourcedir}/packaging/config.json | jq -r '.plugins[]'`; do \
+for i in aws-sqs-queue-size cert-file elasticsearch file-age file-size http jmx-jolokia load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime; do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
 # put symlinks to /usr/local/bin for backward compatibility of following plugins
 %{__install} -d -m755 %{buildroot}%{__oldtargetdir}
-for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime; do
+for i in elasticsearch file-age file-size http jmx-jolokia load log mailq memcached mysql ntpoffset postgresql procs redis solr tcp uptime; \
+do
     ln -s ../../bin/check-$i %{buildroot}%{__oldtargetdir}/check-$i; \
 done
 
@@ -45,6 +46,68 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Aug 02 2017 <mackerel-developers@hatena.ne.jp> - 0.11.1
+- Remove check-ssh binary (by astj)
+
+* Wed Jul 26 2017 <mackerel-developers@hatena.ne.jp> - 0.11.0
+- [check-http] Add -i flag to specify source IP (by mattn)
+- [check-http] Add -s option to map HTTP status (by mattn)
+
+* Wed Jun 07 2017 <mackerel-developers@hatena.ne.jp> - 0.10.4
+- v2 packages (rpm and deb) (by Songmu)
+- [check-log]  When specified multiple pattern, perform search that satisfies all conditions (by a-know)
+
+* Tue May 16 2017 <mackerel-developers@hatena.ne.jp> - 0.10.3
+- [ntpoffset] support chronyd (by Songmu)
+- [check-ssh] fix the problem that check-ssh cannot invoke SSH connection (by astj)
+
+* Mon May 15 2017 <mackerel-developers@hatena.ne.jp> - 0.10.2
+- [experimental] update release scripts (by Songmu)
+
+* Thu Apr 27 2017 <mackerel-developers@hatena.ne.jp> - 0.10.1-1
+- use wmi query instead of running wmic command (by mattn)
+- Use golib/pluginutil.PluginWorkDir() (by astj)
+
+* Thu Apr 06 2017 <mackerel-developers@hatena.ne.jp> - 0.10.0-1
+- bump go to 1.8 (by astj)
+
+* Mon Mar 27 2017 <mackerel-developers@hatena.ne.jp> - 0.9.7-1
+- check lower-case driver letters (by mattn)
+
+* Wed Mar 22 2017 <mackerel-developers@hatena.ne.jp> - 0.9.6-1
+- Change directory structure convention of each plugin (by Songmu)
+- run tests under ./check-XXX/lib (by astj)
+- fix test for AppVayor (by daiksy)
+
+* Thu Mar 09 2017 <mackerel-developers@hatena.ne.jp> - 0.9.5-1
+- add appveyor.yml and fix failing tests on windows (by Songmu)
+- [check-tcp] connect timeout (by Songmu)
+- [check-tcp] [bugfix] fix decimal threshold value handling (by Songmu)
+
+* Wed Feb 22 2017 <mackerel-developers@hatena.ne.jp> - 0.9.4-1
+- ensure close temporary file in writeFileAtomically (by itchyny)
+- Write the file in same directory (by mattn)
+
+* Wed Feb 08 2017 <mackerel-developers@hatena.ne.jp> - 0.9.3-1
+- fix matching for 'Audit Success' and 'Audit Failure' (by mattn)
+
+* Wed Jan 25 2017 <mackerel-developers@hatena.ne.jp> - 0.9.2-1
+- [check-windows-eventlog] add --source-exclude, --message-exclude and --event-id (by mattn, daiksy)
+- [check-windows-eventlog] remove --event-id and add --event-id-pattern, --event-id-exclude (by mattn)
+
+* Wed Jan 11 2017 <mackerel-developers@hatena.ne.jp> - 0.9.1-1
+- [check-log] support glob in --file option (by astj)
+
+* Wed Jan 04 2017 <mackerel-developers@hatena.ne.jp> - 0.9.0-1
+- add check-windows-eventlog (by daiksy)
+- [check-log]fix encoding option (by daiksy)
+
+* Tue Nov 29 2016 <mackerel-developers@hatena.ne.jp> - 0.8.1-1
+- Fix state in check-procs (by itchyny)
+- Fix the links to the document (by itchyny)
+- remove checking Ignore (by mattn)
+- [check-log] fix state file path (fix wrong slice copy) (by Songmu)
+
 * Thu Oct 27 2016 <mackerel-developers@hatena.ne.jp> - 0.8.0-1
 - [check-log] improve Windows support (by daiksy)
 

@@ -3,3 +3,4 @@
 !.goxc.json
 !.travis.yml
 /build
+check-*/check-*

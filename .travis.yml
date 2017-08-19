@@ -1,11 +1,11 @@
 language: go
 go:
-- 1.6.2
+- 1.8
 env:
   global:
   - PATH=~/gopath/bin:$PATH
   - DEBIAN_FRONTEND=noninteractive
-  - secure: "A7F4DYfPLjDwh/B0CWAX2y9cChZtGENRF9dJy5l35gK6pc0a4oVzm2GuzZFYubp1ByWIW+No+iXnw2CGYCS2jMdYMeNLjrfN4orEENVrsXIaq+itF7+Ub/O3WaM9ukpfeXZKzFS/EyxvyRYMPmpc2pwqA1HGQ5qTDVzlFE+zCnD4rAAQdCf5KbNuZEcXyOOWKUX8d0ZmmvVYjJM8CKqfxNwWXsVaNBzXww8isa9FaRMiWlei2ca1ORvzVg4xkvcd66xgdj6n07a8oMMaOdmqG4I3qAeh92ruEpWLT4uVzzobDpVUezJ3vH8IXoBizu0Xg9aijFHqlZ6PBDT+jISI2cpfzMgRHORvHk+Qha5AxWkVLinvo/FBGHYEZzkvNOSAqbi+RdesKnDKf4Lktx9LRSRr7Q4fhFUIY2ya33GHS4RjpNtYPrpSZ+QRAVkoRCkPJFhmfgaPYmyC94tTv2c8QDY2p1aXFC10wY5FF/Z2P0Mbcy/q92GSKxxHMM523UVBvgItAdEZEBqLSvFIuM5rf3UcOtJlgoIiiLJ9hskDEOw10Kl0uIuq/tlBp71SuFpYxFPB8lumTzaa8TQQO4pCoyq3zhe0PlbZk621pJRcxnF5pIEen6/7xmwr8+DASE/4yiV+vfhYz9/mUAbwR31k/5lVgvr/tBJLgvY9vyfM0eE="
+  - secure: "HB9I+UY4i/WGNuWu+tBCqYAGUj5eDDRGiHU46TEqyKIaaNiyaa7VCwN8ncWN+1MOsY/tQlz+S+PdAwnUWaehvTdhhDVXleGjgtNtZPYFOiziT0+WhcfiWQf73aj1nz0r8gNIEVqIt2m7+FQjCfNNzOFG5DmgP5odiRf2qe5Gm50zsUZUWTPoEbb1nI2eG+juqzijaa17WJbLuVoIkV4/3oywzAJ8Oe8b8SZoilwKFM3e8s12fUI6AMkHGCjGul/Ch4y37xC8lYCShlGJgaOuvgS3DY/cfgt4BzUt9LDmqeJd49S2LfxAHbbjX7gtjvrZelapOZ9lQbEGbAOEUc2yMbYQThDnaaUOeCgBCOeXdM0HdgQJxKLA8smxhorzOna+8Oey77JuuqzmYPvICPt42cKO673dZxnHdy+qDUrgcHIIhEIPanCOAgs939gpRkNlKOkCrLG8jI2nuWQng60MQw5dCxWYDImkmcFY2UUeMKKC9oEBELOMa41mfWJPtsAWEKUSfoaqV91Zw8kD9ubgO6TwqXXbGK8SJiq+nJImEBjiMFdouU5SBEdvE0rbBspC20oqsum+e1UgrCkLAUsA7D1XRhRxFQ/5JgLZ/ZooI10qBAAMppkWC6WSRDIo/9DcL8QmJYelNIjHfT9z6wBzC8rUnaYekp4+RZ+Z8VlhHAk="
 sudo: false
 addons:
   apt:
@@ -13,9 +13,8 @@ addons:
     - rpm
     - devscripts
     - debhelper
-    - jq
+    - fakeroot
 install:
-- go get github.com/mitchellh/gox
 - mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 script:
 - make lint
@@ -24,28 +23,14 @@ script:
 after_script:
 - goveralls -coverprofile=.profile.cov
 before_deploy:
-- go get github.com/aktau/github-release
-- mkdir -p ~/bin
-- git clone https://github.com/github/hub.git && cd hub && script/build -o ~/bin/hub && cd ..
-- echo $TRAVIS_BRANCH
-- git config --add remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
-- git fetch
-- git checkout master || git checkout -b master origin/master
-- git checkout $TRAVIS_BRANCH
-- git fetch --depth=100 || true
-- git fetch --tags --depth=100 || true
+- go get github.com/motemen/gobump/cmd/gobump
+- go get github.com/mackerelio/golib/cmd/mackerel-github-release
 deploy:
 - provider: script
-  script: tool/releng --task=upload-to-github-release -v && tool/releng --task=upload-master-to-github-release -v
+  script: mackerel-github-release && mackerel-github-release -staging
   skip_cleanup: true
   on:
     branch: master
-- provider: script
-  script: tool/releng --task=create-pullrequest --current-branch=$TRAVIS_BRANCH --package-name=mackerel-check-plugins -v
-  skip_cleanup: true
-  on:
-    all_branches: true
-    condition: "$TRAVIS_BRANCH =~ ^bump-version-.*$"
 notifications:
   slack:
     secure: W4637ZIl5Gbwm93btsfysyvZpVw3GVMni1y7ea8lj4XFEyNV9aoW0OIkCjWIL9MrkxnkCcnhTKfOAPuFoqFYXXRJFkYCU9GYRsENqwvk9ev2xNyQ9OPIdNqVFcgzA4qiX97JwiuvkaDauRLsWKpdZUtMugrMEsnt1hH6E6uJ5CyVtuun9O5SyICet9tzyLyFpefrhKT8LJiwYDzT9PX6vaL2FCxDgservpPon4YkIkbaZcfURbkd0Gkm3IW5HSVAzAesEspDPAAbMp0ZKF6YPXk1kCuAttNcXoNfRyxIWD02qYTVvVLMVI9DbcDGzAeBPYaZ0vLFtCTwPWx342GqAVDy1sZ5xqYwwqpeVwPA7GdCARl3PgP1q04j4Dd6ZUMn5vM+HdMGtbKcT2vks/t9D8ozrX2F/SyTAVCVqt4xEBSVus4U8a7oK+JQXphnV++8ltDfyXoSdv4oQjHDmpZurcbEgmzWBFuenQK8CKM71voEZZSxhu4/7TksoXuo0zzxhopR9u9B/Y+/74azGBv3VW/JfzJ5gzi08Y56YA80pLHjbxJeykKzv4lR+c+WAWGxVhBD9xN4OKcer3ohDbTfhs0rDf270DOSYx3bstnvQ87NcNbJ1sPRwRhK8rbzvwtLnGUjMNK1kNRcr2rQmmJYlR3DH/hfHHEvAQPeseN90Ek=

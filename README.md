@@ -16,15 +16,19 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-load](./check-load/README.md)
 * [check-log](./check-log/README.md)
 * [check-mailq](./check-mailq/README.md)
+* [check-masterha](./check-masterha/README.md)
 * [check-memcached](./check-memcached/README.md)
 * [check-mysql](./check-mysql/README.md)
 * [check-ntpoffset](./check-ntpoffset/README.md)
+* [check-ntservice](./check-ntservice/README.md)
 * [check-postgresql](./check-postgresql/README.md)
 * [check-procs](./check-procs/README.md)
 * [check-redis](./check-redis/README.md)
 * [check-solr](./check-solr/README.md)
+* [check-ssh](./check-ssh/README.md)
 * [check-tcp](./check-tcp/README.md)
 * [check-uptime](./check-uptime/README.md)
+* [check-windows-eventlog](./check-windows-eventlog/README.md)
 
 Specification
 -------------
@@ -44,21 +48,21 @@ Installation
 ------------
 
 Install the plugin package from either the yum or the apt repository.
+To setup these package repositories, see the documentation regarding the installation of mackerel-agent ([rpm](https://mackerel.io/docs/entry/howto/install-agent/rpm) / [deb](https://mackerel.io/docs/entry/howto/install-agent/deb)).
 
-### CentOS 5/6
+mackerel-check-plugins will be installed to ```/usr/local/bin/check-*```.
+
+### yum
 
 ```shell
 yum install mackerel-check-plugins
 ```
 
-### Debian 6/7
+### apt
 
 ```shell
 apt-get install mackerel-check-plugins
 ```
-
-mackerel-check-plugins will be installed to ```/usr/local/bin/check-*```.
-
 
 Use check plugins in Mackerel
 -----------------------------
