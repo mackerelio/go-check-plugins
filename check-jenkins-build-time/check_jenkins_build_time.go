@@ -33,9 +33,9 @@ Jenkins api result contains build millisecond timestamp like this.
   "builds": [
     {
       "_class": "hudson.model.FreeStyleBuild",
-      "number": 52,
-      "result": "SUCCESS",
-      "timestamp": 1503144162219
+      "number": 57,
+      "result": null,
+      "timestamp": 1503146442652
     },
     {
       "_class": "hudson.model.FreeStyleBuild",
