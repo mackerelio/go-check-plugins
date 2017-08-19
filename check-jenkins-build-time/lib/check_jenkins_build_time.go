@@ -1,14 +1,13 @@
-package main
+package checkjenkinsbuildtime
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-	"time"
-
-	"encoding/json"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -75,7 +74,6 @@ type build struct {
 	Timestamp jsonTime `json:"timestamp"`
 }
 
-
 func (b build) isUnfinished() bool {
 	return b.Result == nil
 }
@@ -84,7 +82,8 @@ type builds struct {
 	Builds []build `json:"builds"`
 }
 
-func main() {
+// Do the plugin
+func Do() {
 	ckr := run(os.Args[1:])
 	ckr.Name = "JenkinsBuildTime"
 	ckr.Exit()
