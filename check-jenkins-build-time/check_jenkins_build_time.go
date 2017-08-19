@@ -78,6 +78,8 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
+	// Jenkins does not provide api to get recent builds that does not finished yet.
+	// Instead, we check recent `MaxJobNumber` jobs, and filter unfinished and taking too long time jobs
 	url := fmt.Sprintf("%s://%s:%d/job/%s/api/json?tree=builds[result,number,timestamp]{,%d}", opts.Scheme, opts.Host, opts.Port, opts.JobName, opts.MaxJobNumber)
 	resp, err := http.Get(url)
 
