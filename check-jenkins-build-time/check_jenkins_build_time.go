@@ -24,6 +24,31 @@ var opts struct {
 	CritSecond    int64  `short:"c" long:"critical-second" default:"300" description:"Trigger a critical if over the seconds"`
 }
 
+/*
+Jenkins api result contains build millisecond timestamp like this.
+
+% curl -s --globoff "http://localhost:8080/job/sleep30/api/json?tree=builds[result,number,timestamp,status]{,2}" | jq .
+{
+  "_class": "hudson.model.FreeStyleProject",
+  "builds": [
+    {
+      "_class": "hudson.model.FreeStyleBuild",
+      "number": 52,
+      "result": "SUCCESS",
+      "timestamp": 1503144162219
+    },
+    {
+      "_class": "hudson.model.FreeStyleBuild",
+      "number": 51,
+      "result": "SUCCESS",
+      "timestamp": 1503144132413
+    }
+  ]
+}
+
+To decode the above format json, we define `jsonTime`.
+*/
+
 type jsonTime time.Time
 
 func (t jsonTime) toTime() time.Time { return time.Time(t) }
