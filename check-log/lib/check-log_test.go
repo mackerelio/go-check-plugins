@@ -378,6 +378,44 @@ func TestRunWithNoState(t *testing.T) {
 	test1LineAgain()
 }
 
+func TestRunWithSkipFirst(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	ptn := `FATAL`
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--skip-first"})
+	opts.prepare()
+
+	fatal := "FATAL\n"
+	test2Line := func() {
+		fh.WriteString(fatal)
+		fh.WriteString(fatal)
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+	}
+	test2Line()
+
+	test1LineAgain := func() {
+		fh.WriteString(fatal)
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
+		assert.Equal(t, strings.Repeat(fatal, 1), errLines, "something went wrong")
+	}
+	test1LineAgain()
+}
+
 func TestSearchReaderWithLevel(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-log-test")
 	if err != nil {
