@@ -6,6 +6,7 @@ import (
 
 	"github.com/mackerelio/go-check-plugins/check-aws-sqs-queue-size/lib"
 	"github.com/mackerelio/go-check-plugins/check-cert-file/lib"
+	"github.com/mackerelio/go-check-plugins/check-disk/lib"
 	"github.com/mackerelio/go-check-plugins/check-elasticsearch/lib"
 	"github.com/mackerelio/go-check-plugins/check-file-age/lib"
 	"github.com/mackerelio/go-check-plugins/check-file-size/lib"
@@ -33,6 +34,8 @@ func runPlugin(plug string) error {
 		checkawssqsqueuesize.Do()
 	case "cert-file":
 		checkcertfile.Do()
+	case "disk":
+		checkdisk.Do()
 	case "elasticsearch":
 		checkelasticsearch.Do()
 	case "file-age":
@@ -80,6 +83,7 @@ func runPlugin(plug string) error {
 var plugins = []string{
 	"aws-sqs-queue-size",
 	"cert-file",
+	"disk",
 	"elasticsearch",
 	"file-age",
 	"file-size",
