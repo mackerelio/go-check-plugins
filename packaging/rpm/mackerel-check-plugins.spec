@@ -26,7 +26,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in aws-sqs-queue-size cert-file elasticsearch file-age file-size http jmx-jolokia load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime; do \
+for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime; do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -46,6 +46,11 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Aug 23 2017 <mackerel-developers@hatena.ne.jp> - 0.12.0
+- add check-disk to package (by astj)
+- add check-disk (by edangelion)
+- [check-postgresql] Add dbname to postgresql-setting (by edangelion)
+
 * Wed Aug 02 2017 <mackerel-developers@hatena.ne.jp> - 0.11.1
 - Remove check-ssh binary (by astj)
 

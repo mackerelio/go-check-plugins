@@ -1,3 +1,14 @@
+mackerel-check-plugins (0.12.0-1.v2) stable; urgency=low
+
+  * add check-disk to package (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/192>
+  * add check-disk (by edangelion)
+    <https://github.com/mackerelio/go-check-plugins/pull/178>
+  * [check-postgresql] Add dbname to postgresql-setting (by edangelion)
+    <https://github.com/mackerelio/go-check-plugins/pull/189>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 23 Aug 2017 12:29:40 +0900
+
 mackerel-check-plugins (0.11.1-1.v2) stable; urgency=low
 
   * Remove check-ssh binary (by astj)
