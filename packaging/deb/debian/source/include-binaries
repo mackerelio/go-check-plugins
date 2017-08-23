@@ -1,5 +1,6 @@
 debian/check-aws-sqs-queue-size
 debian/check-cert-file
+debian/check-disk
 debian/check-elasticsearch
 debian/check-file-age
 debian/check-file-size

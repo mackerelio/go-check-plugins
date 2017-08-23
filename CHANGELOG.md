@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.12.0 (2017-08-23)
+
+* add check-disk to package #192 (astj)
+* add check-disk #178 (edangelion)
+* [check-postgresql] Add dbname to postgresql-setting #189 (edangelion)
+
+
 ## 0.11.1 (2017-08-02)
 
 * Remove check-ssh binary #186 (astj)
