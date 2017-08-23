@@ -3,6 +3,7 @@
     "plugins": [
        "aws-sqs-queue-size",
        "cert-file",
+       "disk",
        "elasticsearch",
        "file-age",
        "file-size",
