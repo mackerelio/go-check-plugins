@@ -94,21 +94,9 @@ func TestRun(t *testing.T) {
 	}
 	testEmpty()
 
-	l1 := "FATAL\nFATAL\n"
+	lFirst := "FATAL\nFATAL\n"
 	test2Line := func() {
-		fh.WriteString(l1)
-		w, c, errLines, err := opts.searchLog(logf)
-		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(2), w, "something went wrong")
-		assert.Equal(t, int64(2), c, "something went wrong")
-		assert.Equal(t, l1, errLines, "something went wrong")
-
-		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
-	}
-	test2Line()
-
-	testReadAgain := func() {
+		fh.WriteString(lFirst)
 		w, c, errLines, err := opts.searchLog(logf)
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(0), w, "something went wrong")
@@ -116,7 +104,21 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, "", errLines, "something went wrong")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
+		assert.Equal(t, int64(len(lFirst)), bytes, "something went wrong")
+	}
+	test2Line()
+
+	l1 := "FATAL\nFATAL\nFATAL\n"
+	testReadAgain := func() {
+		fh.WriteString(l1)
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(3), w, "something went wrong")
+		assert.Equal(t, int64(3), c, "something went wrong")
+		assert.Equal(t, l1, errLines, "something went wrong")
+
+		bytes, _ = getBytesToSkip(stateFile)
+		assert.Equal(t, int64(len(lFirst+l1)), bytes, "something went wrong")
 	}
 	testReadAgain()
 
@@ -130,7 +132,7 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, "", errLines, "something went wrong")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
+		assert.Equal(t, int64(len(lFirst)+len(l1)+len(l2)), bytes, "something went wrong")
 	}
 	testRecover()
 
@@ -142,7 +144,7 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, "", errLines, "something went wrong")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
+		assert.Equal(t, int64(len(lFirst)+len(l1)+len(l2)), bytes, "something went wrong")
 	}
 	testSuccessAgain()
 
@@ -150,12 +152,12 @@ func TestRun(t *testing.T) {
 		fh.WriteString(l1)
 		w, c, errLines, err := opts.searchLog(logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(2), w, "something went wrong")
-		assert.Equal(t, int64(2), c, "something went wrong")
+		assert.Equal(t, int64(3), w, "something went wrong")
+		assert.Equal(t, int64(3), c, "something went wrong")
 		assert.Equal(t, l1, errLines, "something went wrong")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)*2+len(l2)), bytes, "something went wrong")
+		assert.Equal(t, int64(len(lFirst)+len(l1)*2+len(l2)), bytes, "something went wrong")
 	}
 	testErrorAgain()
 
@@ -168,7 +170,7 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, "", errLines, "something went wrong")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)*2+len(l2)*2), bytes, "something went wrong")
+		assert.Equal(t, int64(len(lFirst)+len(l1)*2+len(l2)*2), bytes, "something went wrong")
 	}
 	testRecoverAgain()
 
@@ -206,7 +208,7 @@ func TestRunWithGlob(t *testing.T) {
 	defer fh2.Close()
 
 	ptn := `FATAL`
-	params := []string{dir, "-f", filepath.Join(dir, "dummy*"), "-p", ptn}
+	params := []string{dir, "-f", filepath.Join(dir, "dummy*"), "-p", ptn, "--check-first"}
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
@@ -260,7 +262,7 @@ func TestRunWithZGlob(t *testing.T) {
 	defer fh2.Close()
 
 	ptn := `FATAL`
-	params := []string{dir, "-f", filepath.Join(dir, "**/dummy*"), "-p", ptn}
+	params := []string{dir, "-f", filepath.Join(dir, "**/dummy*"), "-p", ptn, "--check-first"}
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
@@ -305,7 +307,7 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	defer fh.Close()
 
 	ptn := `FATAL`
-	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--check-first"})
 	opts.prepare()
 
 	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
@@ -430,7 +432,7 @@ func TestRunWithEncoding(t *testing.T) {
 	fh, _ := os.Create(logf)
 	defer fh.Close()
 
-	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--encoding", "euc-jp"})
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--encoding", "euc-jp", "--check-first"})
 	opts.prepare()
 
 	testEncoding := func() {
@@ -469,7 +471,7 @@ func TestRunWithoutEncoding(t *testing.T) {
 	fh, _ := os.Create(logf)
 	defer fh.Close()
 
-	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`})
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--check-first"})
 	opts.prepare()
 
 	fatal := "\xa5\xa8\xa5\xe9\xa1\xbc\nエラー\n" // エラー
