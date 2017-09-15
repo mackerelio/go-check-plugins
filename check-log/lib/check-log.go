@@ -36,7 +36,7 @@ type logOpts struct {
 	NoState             bool     `long:"no-state" description:"Don't use state file and read whole logs"`
 	Encoding            string   `long:"encoding" description:"Encoding of log file"`
 	Missing             string   `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
-	SkipFirst           bool     `long:"skip-first" description:"Ignore logs before the plugin starts"`
+	CheckFirst          bool     `long:"check-first" description:"Check logs before the plugin starts"`
 	patternReg          []*regexp.Regexp
 	excludeReg          *regexp.Regexp
 	fileListFromGlob    []string
@@ -235,7 +235,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		return 0, 0, "", err
 	}
 
-	if !opts.NoState && opts.SkipFirst && skipBytes == 0 {
+	if !opts.NoState && !opts.CheckFirst && skipBytes == 0 {
 		skipBytes = stat.Size()
 	}
 
