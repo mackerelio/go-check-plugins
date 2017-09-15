@@ -36,7 +36,7 @@ type logOpts struct {
 	NoState             bool     `long:"no-state" description:"Don't use state file and read whole logs"`
 	Encoding            string   `long:"encoding" description:"Encoding of log file"`
 	Missing             string   `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
-	CheckFirst          bool     `long:"check-first" description:"Check logs before the plugin starts"`
+	CheckFirst          bool     `long:"check-first" description:"Check the log on the first run"`
 	patternReg          []*regexp.Regexp
 	excludeReg          *regexp.Regexp
 	fileListFromGlob    []string
