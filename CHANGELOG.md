@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.0 (2017-09-27)
+
+* build with Go 1.9 #195 (astj)
+* [check-log] Add check-first option and skip the log file on the first run on default #190 (edangelion)
+
+
 ## 0.12.0 (2017-08-23)
 
 * add check-disk to package #192 (astj)

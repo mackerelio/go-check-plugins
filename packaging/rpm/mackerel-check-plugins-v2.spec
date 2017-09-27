@@ -37,6 +37,10 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Sep 27 2017 <mackerel-developers@hatena.ne.jp> - 0.13.0
+- build with Go 1.9 (by astj)
+- [check-log] Add check-first option and skip the log file on the first run on default (by edangelion)
+
 * Wed Aug 23 2017 <mackerel-developers@hatena.ne.jp> - 0.12.0
 - add check-disk to package (by astj)
 - add check-disk (by edangelion)
