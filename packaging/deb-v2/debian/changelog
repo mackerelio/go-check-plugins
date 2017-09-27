@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.13.0-1.v2) stable; urgency=low
+
+  * build with Go 1.9 (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/195>
+  * [check-log] Add check-first option and skip the log file on the first run on default (by edangelion)
+    <https://github.com/mackerelio/go-check-plugins/pull/190>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 27 Sep 2017 12:11:06 +0900
+
 mackerel-check-plugins (0.12.0-1.v2) stable; urgency=low
 
   * add check-disk to package (by astj)
