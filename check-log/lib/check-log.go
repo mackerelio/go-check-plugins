@@ -176,7 +176,7 @@ func run(args []string) *checkers.Checker {
 		}
 		warnNum += w
 		critNum += c
-		if opts.ReturnFileNames {
+		if opts.ReturnFileNames && errLines != "" {
 			errorOverall += "[" + f + "]\n"
 		}
 		if opts.ReturnContent {
