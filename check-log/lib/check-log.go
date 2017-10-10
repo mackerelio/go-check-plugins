@@ -30,7 +30,6 @@ type logOpts struct {
 	WarnLevel           float64  `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
 	CritLevel           float64  `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
 	ReturnContent       bool     `short:"r" long:"return" description:"Return matched line"`
-	ReturnFileNames     bool     `long:"return-filenames" description:"Return matched file names"`
 	FilePattern         string   `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	CaseInsensitive     bool     `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir            string   `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
@@ -176,11 +175,8 @@ func run(args []string) *checkers.Checker {
 		}
 		warnNum += w
 		critNum += c
-		if opts.ReturnFileNames && errLines != "" {
-			errorOverall += "[" + f + "]\n"
-		}
-		if opts.ReturnContent {
-			errorOverall += errLines
+		if opts.ReturnContent && errLines != "" {
+			errorOverall += "[" + f + "]\n" + errLines
 		}
 	}
 
