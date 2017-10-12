@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.14.0-1) stable; urgency=low
+
+  * [check-log]Show matched filenames when we use `--return` option (by syou6162)
+    <https://github.com/mackerelio/go-check-plugins/pull/197>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 12 Oct 2017 15:21:52 +0900
+
 mackerel-check-plugins (0.13.0-1) stable; urgency=low
 
   * build with Go 1.9 (by astj)
