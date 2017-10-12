@@ -37,6 +37,7 @@ type logOpts struct {
 	Encoding            string   `long:"encoding" description:"Encoding of log file"`
 	Missing             string   `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
 	CheckFirst          bool     `long:"check-first" description:"Check the log on the first run"`
+	InvertMatch         bool     `short:"v" long:"invert-match" description:"Run invert-match"`
 	patternReg          []*regexp.Regexp
 	excludeReg          *regexp.Regexp
 	fileListFromGlob    []string
@@ -332,8 +333,14 @@ func (opts *logOpts) match(line string) (bool, []string) {
 
 		matches = pReg.FindStringSubmatch(line)
 		if len(matches) == 0 || (eReg != nil && eReg.MatchString(line)) {
+			if opts.InvertMatch {
+				return true, []string{line}
+			}
 			return false, nil
 		}
+	}
+	if opts.InvertMatch {
+		return false, nil
 	}
 	return true, matches
 }
