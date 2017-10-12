@@ -46,6 +46,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Oct 12 2017 <mackerel-developers@hatena.ne.jp> - 0.14.0
+- [check-log]Show matched filenames when we use `--return` option (by syou6162)
+
 * Wed Sep 27 2017 <mackerel-developers@hatena.ne.jp> - 0.13.0
 - build with Go 1.9 (by astj)
 - [check-log] Add check-first option and skip the log file on the first run on default (by edangelion)

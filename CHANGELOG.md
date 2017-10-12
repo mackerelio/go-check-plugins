@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.0 (2017-10-12)
+
+* [check-log]Show matched filenames when we use `--return` option #197 (syou6162)
+
+
 ## 0.13.0 (2017-09-27)
 
 * build with Go 1.9 #195 (astj)
