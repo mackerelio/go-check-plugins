@@ -18,7 +18,7 @@ var opts struct {
 	InodeWarning  *string   `short:"W" long:"iwarning" value-name:"N%" description:"Exit with WARNING status if less than PERCENT of inode space is free"`
 	InodeCritical *string   `short:"K" long:"icritical" value-name:"N%" description:"Exit with CRITICAL status if less than PERCENT of inode space is free"`
 	Path          *[]string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command (may be repeated)"`
-	Exclude       *string   `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
+	Exclude       *[]string `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (may be repeated; only works if -p unspecified)"`
 	All           bool      `short:"A" long:"all" description:"Explicitly select all paths."`
 	ExcludeType   *[]string `short:"X" long:"exclude-type" value-name:"TYPE" description:"Ignore all filesystems of indicated type (may be repeated)"`
 	IncludeType   *[]string `short:"N" long:"include-type" value-name:"TYPE" description:"Check only filesystems of indicated type (may be repeated)"`
@@ -132,8 +132,7 @@ func run(args []string) *checkers.Checker {
 		}
 
 		if opts.Path == nil && opts.Exclude != nil {
-			excludes := []string{*opts.Exclude}
-			partitions = filterPartitionsByExclusion(partitions, excludes, mountpointOfPartition)
+			partitions = filterPartitionsByExclusion(partitions, *opts.Exclude, mountpointOfPartition)
 		}
 	}
 
