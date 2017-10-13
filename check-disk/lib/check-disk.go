@@ -109,14 +109,14 @@ func run(args []string) *checkers.Checker {
 	if !opts.All {
 		// Filtering partitions by Fstype
 		if opts.IncludeType != nil {
-			partitions = filterPartitionsByFstype(partitions, *opts.IncludeType, true)
+			partitions = filterPartitionsByInclusion(partitions, *opts.IncludeType, fstypeOfPartition)
 			if len(partitions) == 0 {
 				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified *FsType*")))
 			}
 		}
 
 		if opts.ExcludeType != nil {
-			partitions = filterPartitionsByFstype(partitions, *opts.ExcludeType, false)
+			partitions = filterPartitionsByExclusion(partitions, *opts.ExcludeType, fstypeOfPartition)
 		}
 
 		// Filtering partions by Mountpoint
@@ -125,7 +125,7 @@ func run(args []string) *checkers.Checker {
 				return checkers.Unknown(fmt.Sprintf("Invalid arguments: %s", errors.New("-x does not work with -p")))
 			}
 
-			partitions = filterPartitionsByMountpoint(partitions, *opts.Path, true)
+			partitions = filterPartitionsByInclusion(partitions, *opts.Path, mountpointOfPartition)
 			if len(partitions) == 0 {
 				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified *Mountpoint*")))
 			}
@@ -133,7 +133,7 @@ func run(args []string) *checkers.Checker {
 
 		if opts.Path == nil && opts.Exclude != nil {
 			excludes := []string{*opts.Exclude}
-			partitions = filterPartitionsByMountpoint(partitions, excludes, false)
+			partitions = filterPartitionsByExclusion(partitions, excludes, mountpointOfPartition)
 		}
 	}
 
@@ -268,26 +268,44 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 	return partitions, nil
 }
 
-func filterPartitionsByFstype(partitions []gpud.PartitionStat, list []string, include bool) []gpud.PartitionStat {
+func mountpointOfPartition(partition gpud.PartitionStat) string {
+	return partition.Mountpoint
+}
+
+func fstypeOfPartition(partition gpud.PartitionStat) string {
+	return partition.Fstype
+}
+
+func filterPartitionsByInclusion(partitions []gpud.PartitionStat, list []string, key func(_ gpud.PartitionStat) string) []gpud.PartitionStat {
 	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
 	for _, partition := range partitions {
+		var ok = false
 		for _, l := range list {
-			if (!include && l != partition.Fstype) || (include && l == partition.Fstype) {
-				newPartitions = append(newPartitions, partition)
+			if (l == key(partition)) {
+				ok = true
+				break
 			}
+		}
+		if (ok) {
+			newPartitions = append(newPartitions, partition)
 		}
 	}
 
 	return newPartitions
 }
 
-func filterPartitionsByMountpoint(partitions []gpud.PartitionStat, list []string, include bool) []gpud.PartitionStat {
+func filterPartitionsByExclusion(partitions []gpud.PartitionStat, list []string, key func(_ gpud.PartitionStat) string) []gpud.PartitionStat {
 	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
 	for _, partition := range partitions {
+		var ok = true
 		for _, l := range list {
-			if (!include && l != partition.Mountpoint) || (include && l == partition.Mountpoint) {
-				newPartitions = append(newPartitions, partition)
+			if (l == key(partition)) {
+				ok = false
+				break
 			}
+		}
+		if (ok) {
+			newPartitions = append(newPartitions, partition)
 		}
 	}
 
