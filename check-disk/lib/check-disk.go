@@ -18,7 +18,7 @@ var opts struct {
 	InodeWarning  *string   `short:"W" long:"iwarning" value-name:"N%" description:"Exit with WARNING status if less than PERCENT of inode space is free"`
 	InodeCritical *string   `short:"K" long:"icritical" value-name:"N%" description:"Exit with CRITICAL status if less than PERCENT of inode space is free"`
 	Path          *[]string `short:"p" long:"path" value-name:"PATH" description:"Mount point or block device as emitted by the mount(8) command (may be repeated)"`
-	Exclude       *string   `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (only works if -p unspecified)"`
+	Exclude       *[]string `short:"x" long:"exclude-device" value-name:"EXCLUDE PATH" description:"Ignore device (may be repeated; only works if -p unspecified)"`
 	All           bool      `short:"A" long:"all" description:"Explicitly select all paths."`
 	ExcludeType   *[]string `short:"X" long:"exclude-type" value-name:"TYPE" description:"Ignore all filesystems of indicated type (may be repeated)"`
 	IncludeType   *[]string `short:"N" long:"include-type" value-name:"TYPE" description:"Check only filesystems of indicated type (may be repeated)"`
@@ -109,14 +109,14 @@ func run(args []string) *checkers.Checker {
 	if !opts.All {
 		// Filtering partitions by Fstype
 		if opts.IncludeType != nil {
-			partitions = filterPartitionsByFstype(partitions, *opts.IncludeType, true)
+			partitions = filterPartitionsByInclusion(partitions, *opts.IncludeType, fstypeOfPartition)
 			if len(partitions) == 0 {
 				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified *FsType*")))
 			}
 		}
 
 		if opts.ExcludeType != nil {
-			partitions = filterPartitionsByFstype(partitions, *opts.ExcludeType, false)
+			partitions = filterPartitionsByExclusion(partitions, *opts.ExcludeType, fstypeOfPartition)
 		}
 
 		// Filtering partions by Mountpoint
@@ -125,15 +125,14 @@ func run(args []string) *checkers.Checker {
 				return checkers.Unknown(fmt.Sprintf("Invalid arguments: %s", errors.New("-x does not work with -p")))
 			}
 
-			partitions = filterPartitionsByMountpoint(partitions, *opts.Path, true)
+			partitions = filterPartitionsByInclusion(partitions, *opts.Path, mountpointOfPartition)
 			if len(partitions) == 0 {
 				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified *Mountpoint*")))
 			}
 		}
 
 		if opts.Path == nil && opts.Exclude != nil {
-			excludes := []string{*opts.Exclude}
-			partitions = filterPartitionsByMountpoint(partitions, excludes, false)
+			partitions = filterPartitionsByExclusion(partitions, *opts.Exclude, mountpointOfPartition)
 		}
 	}
 
@@ -268,26 +267,44 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 	return partitions, nil
 }
 
-func filterPartitionsByFstype(partitions []gpud.PartitionStat, list []string, include bool) []gpud.PartitionStat {
+func mountpointOfPartition(partition gpud.PartitionStat) string {
+	return partition.Mountpoint
+}
+
+func fstypeOfPartition(partition gpud.PartitionStat) string {
+	return partition.Fstype
+}
+
+func filterPartitionsByInclusion(partitions []gpud.PartitionStat, list []string, key func(_ gpud.PartitionStat) string) []gpud.PartitionStat {
 	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
 	for _, partition := range partitions {
+		var ok = false
 		for _, l := range list {
-			if (!include && l != partition.Fstype) || (include && l == partition.Fstype) {
-				newPartitions = append(newPartitions, partition)
+			if (l == key(partition)) {
+				ok = true
+				break
 			}
+		}
+		if (ok) {
+			newPartitions = append(newPartitions, partition)
 		}
 	}
 
 	return newPartitions
 }
 
-func filterPartitionsByMountpoint(partitions []gpud.PartitionStat, list []string, include bool) []gpud.PartitionStat {
+func filterPartitionsByExclusion(partitions []gpud.PartitionStat, list []string, key func(_ gpud.PartitionStat) string) []gpud.PartitionStat {
 	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
 	for _, partition := range partitions {
+		var ok = true
 		for _, l := range list {
-			if (!include && l != partition.Mountpoint) || (include && l == partition.Mountpoint) {
-				newPartitions = append(newPartitions, partition)
+			if (l == key(partition)) {
+				ok = false
+				break
 			}
+		}
+		if (ok) {
+			newPartitions = append(newPartitions, partition)
 		}
 	}
 
