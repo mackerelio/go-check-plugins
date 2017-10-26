@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.14.1-1) stable; urgency=low
+
+  * fix check-disk options: -x, -X, -p, -N (by plaster)
+    <https://github.com/mackerelio/go-check-plugins/pull/200>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 26 Oct 2017 11:12:55 +0900
+
 mackerel-check-plugins (0.14.0-1) stable; urgency=low
 
   * [check-log]Show matched filenames when we use `--return` option (by syou6162)
