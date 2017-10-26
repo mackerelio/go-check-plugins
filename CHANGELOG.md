@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.1 (2017-10-26)
+
+* fix check-disk options: -x, -X, -p, -N #200 (plaster)
+
+
 ## 0.14.0 (2017-10-12)
 
 * [check-log]Show matched filenames when we use `--return` option #197 (syou6162)

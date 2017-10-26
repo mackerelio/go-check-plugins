@@ -37,6 +37,9 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu Oct 26 2017 <mackerel-developers@hatena.ne.jp> - 0.14.1
+- fix check-disk options: -x, -X, -p, -N (by plaster)
+
 * Thu Oct 12 2017 <mackerel-developers@hatena.ne.jp> - 0.14.0
 - [check-log]Show matched filenames when we use `--return` option (by syou6162)
 
