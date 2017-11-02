@@ -263,6 +263,9 @@ func TestHTTPIPv6(t *testing.T) {
 
 	l, err := net.Listen("tcp", "[::1]:0")
 	if err != nil {
+		if os.Getenv("TRAVIS") != "" {
+			t.Skip("Skip: in Travis, ipv6 networking seems not working.")
+		}
 		t.Error(err)
 	}
 	defer l.Close()
