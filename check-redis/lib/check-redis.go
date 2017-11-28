@@ -126,11 +126,11 @@ func checkReachable(args []string) *checkers.Checker {
 	}
 	defer c.Close()
 
-	if version, ok := (*info)["redis_version"]; !ok {
+	version, ok := (*info)["redis_version"];
+	if !ok {
 		return checkers.Unknown("couldn't get redis_version")
-	} else {
-		return checkers.Ok(fmt.Sprintf("version: %s", version))
 	}
+	return checkers.Ok(fmt.Sprintf("version: %s", version))
 }
 
 func checkSlave(args []string) *checkers.Checker {
