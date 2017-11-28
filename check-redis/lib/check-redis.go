@@ -126,13 +126,11 @@ func checkReachable(args []string) *checkers.Checker {
 	}
 	defer c.Close()
 
-	if _, ok := (*info)["redis_version"]; !ok {
+	if version, ok := (*info)["redis_version"]; !ok {
 		return checkers.Unknown("couldn't get redis_version")
+	} else {
+		return checkers.Ok(fmt.Sprintf("version: %s", version))
 	}
-
-	return checkers.Ok(
-		fmt.Sprintf("version: %s", (*info)["redis_version"]),
-	)
 }
 
 func checkSlave(args []string) *checkers.Checker {
@@ -150,6 +148,12 @@ func checkSlave(args []string) *checkers.Checker {
 		return checkers.Unknown(err.Error())
 	}
 	defer c.Close()
+
+	if role, ok := (*info)["role"]; !ok {
+		return checkers.Unknown("couldn't get role")
+	} else if role == "master" {
+		return checkers.Ok("redis is not slave")
+	}
 
 	if status, ok := (*info)["master_link_status"]; ok {
 		msg := fmt.Sprintf("master_link_status: %s", status)
