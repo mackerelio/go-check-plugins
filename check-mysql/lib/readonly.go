@@ -9,6 +9,11 @@ import (
 
 type readOnlyOpts struct {
 	mysqlSetting
+	NoReadOnly bool `short:"n" long:"no-readonly" description:"expect that it is not read_only with the MySQL parameter"`
+}
+
+func isReadOnly(v string) bool {
+	return v == "ON"
 }
 
 func checkReadOnly(args []string) *checkers.Checker {
@@ -34,9 +39,9 @@ func checkReadOnly(args []string) *checkers.Checker {
 	idxReadOnly := res.Map("Value")
 	readOnlyStatus := rows[0].Str(idxReadOnly)
 
-	if readOnlyStatus == "OFF" {
-		return checkers.Critical("MySQL is not read_only")
+	if isReadOnly(readOnlyStatus) == opts.NoReadOnly {
+		return checkers.Critical("the expected value of read_only is different")
 	}
 
-	return checkers.Ok("MySQL is read_only")
+	return checkers.Ok("read_only is the expected value")
 }
