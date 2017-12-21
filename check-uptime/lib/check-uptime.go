@@ -7,7 +7,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
-	"github.com/mackerelio/golib/uptime"
+	"github.com/mackerelio/go-osstat/uptime"
 )
 
 var opts struct {
@@ -31,10 +31,11 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		os.Exit(1)
 	}
-	ut, err := uptime.Get()
+	utDur, err := uptime.Get()
 	if err != nil {
 		return checkers.Unknown(fmt.Sprintf("Faild to fetch uptime metrics: %s", err))
 	}
+	ut := utDur.Seconds()
 
 	// for backward compatibility
 	if opts.WarnUnder != nil && opts.WarningUnder == nil {
