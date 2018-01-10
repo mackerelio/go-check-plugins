@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.0 (2018-01-10)
+
+* [check-mysql] add readonly subcommand #205 (ichirin2501)
+* [uptime] use go-osstat/uptime instead of golib/uptime for getting more accurate uptime #206 (Songmu)
+
+
 ## 0.14.1 (2017-10-26)
 
 * fix check-disk options: -x, -X, -p, -N #200 (plaster)

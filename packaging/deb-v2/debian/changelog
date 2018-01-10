@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.15.0-1.v2) stable; urgency=low
+
+  * [check-mysql] add readonly subcommand (by ichirin2501)
+    <https://github.com/mackerelio/go-check-plugins/pull/205>
+  * [uptime] use go-osstat/uptime instead of golib/uptime for getting more accurate uptime (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/206>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 10 Jan 2018 16:17:59 +0900
+
 mackerel-check-plugins (0.14.1-1.v2) stable; urgency=low
 
   * fix check-disk options: -x, -X, -p, -N (by plaster)

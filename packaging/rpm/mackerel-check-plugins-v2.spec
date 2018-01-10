@@ -37,6 +37,10 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Jan 10 2018 <mackerel-developers@hatena.ne.jp> - 0.15.0
+- [check-mysql] add readonly subcommand (by ichirin2501)
+- [uptime] use go-osstat/uptime instead of golib/uptime for getting more accurate uptime (by Songmu)
+
 * Thu Oct 26 2017 <mackerel-developers@hatena.ne.jp> - 0.14.1
 - fix check-disk options: -x, -X, -p, -N (by plaster)
 
