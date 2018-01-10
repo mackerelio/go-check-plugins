@@ -1,6 +1,7 @@
 package checkmysql
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/jessevdk/go-flags"
@@ -9,21 +10,22 @@ import (
 
 type readOnlyOpts struct {
 	mysqlSetting
-	NoReadOnly bool `short:"n" long:"no-readonly" description:"expect that it is not read_only with the MySQL parameter"`
-}
-
-func isReadOnly(v string) bool {
-	return v == "ON"
 }
 
 func checkReadOnly(args []string) *checkers.Checker {
 	opts := readOnlyOpts{}
 	psr := flags.NewParser(&opts, flags.Default)
-	psr.Usage = "readonly [OPTIONS]"
-	_, err := psr.ParseArgs(args)
+	psr.Usage = "readonly [OPTIONS] [ON|OFF]"
+	args, err := psr.ParseArgs(args)
 	if err != nil {
 		os.Exit(1)
 	}
+	if len(args) != 1 {
+		fmt.Println("wrong number of arguments")
+		os.Exit(1)
+	}
+	argStatus := args[0]
+
 	db := newMySQL(opts.mysqlSetting)
 	err = db.Connect()
 	if err != nil {
@@ -39,8 +41,9 @@ func checkReadOnly(args []string) *checkers.Checker {
 	idxReadOnly := res.Map("Value")
 	readOnlyStatus := rows[0].Str(idxReadOnly)
 
-	if isReadOnly(readOnlyStatus) == opts.NoReadOnly {
-		return checkers.Critical("the expected value of read_only is different")
+	if readOnlyStatus != argStatus {
+		msg := fmt.Sprintf("the expected value of read_only is different. readOnlyStatus:%s", readOnlyStatus)
+		return checkers.Critical(msg)
 	}
 
 	return checkers.Ok("read_only is the expected value")
