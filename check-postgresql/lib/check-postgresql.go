@@ -18,7 +18,7 @@ type postgresqlSetting struct {
 	Host     string `short:"H" long:"host" default:"localhost" description:"Hostname"`
 	Port     string `short:"p" long:"port" default:"5432" description:"Port"`
 	User     string `short:"u" long:"user" default:"postgres" description:"Username"`
-	Password string `short:"P" long:"password" default:"" description:"Password"`
+	Password string `short:"P" long:"password" default:"" description:"Password" env:"PGPASSWORD"`
 	Database string `short:"d" long:"database" description:"DBname"`
 	SSLmode  string `short:"s" long:"sslmode" default:"disable" description:"SSLmode"`
 	Timeout  int    `short:"t" long:"timeout" default:"5" description:"Maximum wait for connection, in seconds."`
