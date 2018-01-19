@@ -23,7 +23,7 @@ type sshOpts struct {
 	Warning      float64 `short:"w" long:"warning" description:"Response time to result in warning status (seconds)"`
 	Critical     float64 `short:"c" long:"critical" description:"Response time to result in critical status (seconds)"`
 	User         string  `short:"u" long:"user" description:"Login user name" env:"USER"`
-	Password     string  `short:"p" long:"password" description:"Login password"`
+	Password     string  `short:"p" long:"password" description:"Login password" env:"LOGIN_PASSWORD"`
 	IdentityFile string  `short:"i" long:"identity" description:"Identity file (ssh private key)"`
 	PassPhrase   string  `long:"passphrase" description:"Identity passphrase" env:"CHECK_SSH_IDENTITY_PASSPHRASE"`
 }
