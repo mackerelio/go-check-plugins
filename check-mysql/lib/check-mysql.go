@@ -15,7 +15,7 @@ type mysqlSetting struct {
 	Host string `short:"H" long:"host" default:"localhost" description:"Hostname"`
 	Port string `short:"p" long:"port" default:"3306" description:"Port"`
 	User string `short:"u" long:"user" default:"root" description:"Username"`
-	Pass string `short:"P" long:"password" default:"" description:"Password"`
+	Pass string `short:"P" long:"password" default:"" description:"Password" env:"MYSQL_PASSWORD"`
 }
 
 var commands = map[string](func([]string) *checkers.Checker){
