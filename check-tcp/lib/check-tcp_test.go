@@ -149,6 +149,16 @@ func TestHTTP(t *testing.T) {
 	}
 	testOk()
 
+	testOkWithErrWarn := func() {
+		opts, err := parseArgs([]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOK", "-W"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.OK, ckr.Status, "should be OK")
+		assert.Regexp(t, `seconds response time on`, ckr.Message, "Unexpected response")
+	}
+	testOkWithErrWarn()
+
 	testUnexpected := func() {
 		opts, err := parseArgs(
 			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOKOK"})
@@ -158,6 +168,16 @@ func TestHTTP(t *testing.T) {
 		assert.Regexp(t, `Unexpected response from`, ckr.Message, "Unexpected response")
 	}
 	testUnexpected()
+
+	testUnexpectedWithErrWarn := func() {
+		opts, err := parseArgs(
+			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOKOK", "-W"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		assert.Equal(t, checkers.WARNING, ckr.Status, "should be Warning")
+		assert.Regexp(t, `Unexpected response from`, ckr.Message, "Unexpected response")
+	}
+	testUnexpectedWithErrWarn()
 
 	testOverWarn := func() {
 		opts, err := parseArgs(
@@ -169,6 +189,16 @@ func TestHTTP(t *testing.T) {
 	}
 	testOverWarn()
 
+	testOverWarnWithErrWarn := func() {
+		opts, err := parseArgs(
+			[]string{"-H", host, "-p", port, "--send", `GET / HTTP/1.0\r\n\r\n`, "-E", "-e", "OKOK", "-w", "0.1", "-W"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		assert.Equal(t, checkers.WARNING, ckr.Status, "should be Warning")
+		assert.Regexp(t, `seconds response time on`, ckr.Message, "Unexpected response")
+	}
+	testOverWarnWithErrWarn()
+
 	testOverCrit := func() {
 		opts, err := parseArgs(
 			[]string{"-H", host, "-p", port, "--send", "GET / HTTP/1.0\r\n\r\n", "-e", "OKOK", "-c", "0.1"})
@@ -178,6 +208,16 @@ func TestHTTP(t *testing.T) {
 		assert.Regexp(t, `seconds response time on`, ckr.Message, "Unexpected response")
 	}
 	testOverCrit()
+
+	testOverCritWithErrWarn := func() {
+		opts, err := parseArgs(
+			[]string{"-H", host, "-p", port, "--send", "GET / HTTP/1.0\r\n\r\n", "-e", "OKOK", "-c", "0.1", "-W"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		assert.Equal(t, checkers.CRITICAL, ckr.Status, "should be Critical")
+		assert.Regexp(t, `seconds response time on`, ckr.Message, "Unexpected response")
+	}
+	testOverCritWithErrWarn()
 }
 
 func TestUnixDomainSocket(t *testing.T) {
