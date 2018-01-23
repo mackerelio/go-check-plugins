@@ -62,7 +62,7 @@ func run(args []string) *checkers.Checker {
 		checkSt = checkers.UNKNOWN
 	}
 
-	msg := fmt.Sprintf("%s (cluster: %s) - %f second respons time",
+	msg := fmt.Sprintf("%s (cluster: %s) - %f second response time",
 		health.Status, health.ClusterName, elapsed.Seconds())
 
 	return checkers.NewChecker(checkSt, msg)
