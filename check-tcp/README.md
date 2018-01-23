@@ -30,6 +30,8 @@ command = "/path/to/check-tcp -H localhost -p 4224 -w 3 -c 5"
 -c, --critical=            Response time to result in critical status (seconds)
 -E, --escape               Can use \n, \r, \t or \ in send or quit string. Must come before send or quit option. By
                            default, nothing added to send, \r\n added to end of quit
+-W, --err-warning          Set the error level to warning when exiting with unexpected error (default: critical).
+                           In the case of request succeeded, evaluation result of -c option eval takes priority.
 ```
 
 ## Other
