@@ -158,7 +158,7 @@ func Run(args []string) *checkers.Checker {
 		}
 	}
 
-	msg := fmt.Sprintf("%s %s - %d bytes in %f second respons time",
+	msg := fmt.Sprintf("%s %s - %d bytes in %f second response time",
 		resp.Proto, resp.Status, cLength, elapsed.Seconds())
 
 	return checkers.NewChecker(checkSt, msg)
