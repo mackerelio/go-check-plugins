@@ -161,7 +161,6 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
-
 	// prevent changing output of some commands
 	os.Setenv("LANG", "C")
 	os.Setenv("LC_ALL", "C")
