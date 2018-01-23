@@ -46,6 +46,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Tue Jan 23 2018 <mackerel-developers@hatena.ne.jp> - 0.16.0
+- Setting password via environment variable (by hayajo)
+- update rpm-v2 task for building Amazon Linux 2 package (by hayajo)
+
 * Wed Jan 10 2018 <mackerel-developers@hatena.ne.jp> - 0.15.0
 - [check-mysql] add readonly subcommand (by ichirin2501)
 - [uptime] use go-osstat/uptime instead of golib/uptime for getting more accurate uptime (by Songmu)

@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.16.0-1.v2) stable; urgency=low
+
+  * Setting password via environment variable (by hayajo)
+    <https://github.com/mackerelio/go-check-plugins/pull/209>
+  * update rpm-v2 task for building Amazon Linux 2 package (by hayajo)
+    <https://github.com/mackerelio/go-check-plugins/pull/208>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 23 Jan 2018 11:25:23 +0900
+
 mackerel-check-plugins (0.15.0-1.v2) stable; urgency=low
 
   * [check-mysql] add readonly subcommand (by ichirin2501)
