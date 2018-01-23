@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.0 (2018-01-23)
+
+* Setting password via environment variable #209 (hayajo)
+* update rpm-v2 task for building Amazon Linux 2 package #208 (hayajo)
+
+
 ## 0.15.0 (2018-01-10)
 
 * [check-mysql] add readonly subcommand #205 (ichirin2501)
