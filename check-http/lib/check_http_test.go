@@ -9,13 +9,13 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	ckr := run([]string{"-u", "hoge"})
+	ckr := Run([]string{"-u", "hoge"})
 	assert.Equal(t, ckr.Status, checkers.CRITICAL, "chr.Status should be CRITICAL")
 	assert.Equal(t, ckr.Message, `Get hoge: unsupported protocol scheme ""`, "something went wrong")
 }
 
 func TestNoCheckCertificate(t *testing.T) {
-	ckr := run([]string{"--no-check-certificate", "-u", "hoge"})
+	ckr := Run([]string{"--no-check-certificate", "-u", "hoge"})
 	assert.Equal(t, ckr.Status, checkers.CRITICAL, "chr.Status should be CRITICAL")
 	assert.Equal(t, ckr.Message, `Get hoge: unsupported protocol scheme ""`, "something went wrong")
 }
@@ -64,12 +64,12 @@ func TestStatusRange(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		ckr := run(tt.args)
+		ckr := Run(tt.args)
 		assert.Equal(t, ckr.Status, tt.want, fmt.Sprintf("chr.Status wrong: %v", ckr.Status))
 	}
 }
 
 func TestSourceIP(t *testing.T) {
-	ckr := run([]string{"-u", "hoge", "-i", "1.2.3"})
+	ckr := Run([]string{"-u", "hoge", "-i", "1.2.3"})
 	assert.Equal(t, ckr.Status, checkers.UNKNOWN, "chr.Status should be UNKNOWN")
 }

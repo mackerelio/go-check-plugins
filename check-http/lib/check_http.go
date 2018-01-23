@@ -25,7 +25,7 @@ var opts struct {
 
 // Do the plugin
 func Do() {
-	ckr := run(os.Args[1:])
+	ckr := Run(os.Args[1:])
 	ckr.Name = "HTTP"
 	ckr.Exit()
 }
@@ -90,7 +90,8 @@ func parseStatusRanges() ([]statusRange, error) {
 	return statuses, nil
 }
 
-func run(args []string) *checkers.Checker {
+// Run do external monitoring via HTTP
+func Run(args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
 		os.Exit(1)
