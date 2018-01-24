@@ -16,7 +16,7 @@ import (
 )
 
 // XXX more options
-var opts struct {
+type checkHTTPOpts struct {
 	URL                string   `short:"u" long:"url" required:"true" description:"A URL to connect to"`
 	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
 	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
@@ -38,7 +38,7 @@ type statusRange struct {
 
 const invalidMapping = "Invalid mapping of status: %s"
 
-func parseStatusRanges() ([]statusRange, error) {
+func parseStatusRanges(opts *checkHTTPOpts) ([]statusRange, error) {
 	var statuses []statusRange
 	for _, s := range opts.Statuses {
 		token := strings.SplitN(s, "=", 2)
@@ -92,12 +92,13 @@ func parseStatusRanges() ([]statusRange, error) {
 
 // Run do external monitoring via HTTP
 func Run(args []string) *checkers.Checker {
+	opts := checkHTTPOpts{}
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
 		os.Exit(1)
 	}
 
-	statusRanges, err := parseStatusRanges()
+	statusRanges, err := parseStatusRanges(&opts)
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
