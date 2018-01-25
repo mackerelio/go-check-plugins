@@ -18,12 +18,13 @@ type tcpOpts struct {
 	Service  string `long:"service" description:"Service name. e.g. ftp, smtp, pop, imap and so on"`
 	Hostname string `short:"H" long:"hostname" description:"Host name or IP Address"`
 	exchange
-	Timeout  float64 `short:"t" long:"timeout" default:"10" description:"Seconds before connection times out"`
-	MaxBytes int     `short:"m" long:"maxbytes" description:"Close connection once more than this number of bytes are received"`
-	Delay    float64 `short:"d" long:"delay" description:"Seconds to wait between sending string and polling for response"`
-	Warning  float64 `short:"w" long:"warning" description:"Response time to result in warning status (seconds)"`
-	Critical float64 `short:"c" long:"critical" description:"Response time to result in critical status (seconds)"`
-	Escape   bool    `short:"E" long:"escape" description:"Can use \\n, \\r, \\t or \\ in send or quit string. Must come before send or quit option. By default, nothing added to send, \\r\\n added to end of quit"`
+	Timeout    float64 `short:"t" long:"timeout" default:"10" description:"Seconds before connection times out"`
+	MaxBytes   int     `short:"m" long:"maxbytes" description:"Close connection once more than this number of bytes are received"`
+	Delay      float64 `short:"d" long:"delay" description:"Seconds to wait between sending string and polling for response"`
+	Warning    float64 `short:"w" long:"warning" description:"Response time to result in warning status (seconds)"`
+	Critical   float64 `short:"c" long:"critical" description:"Response time to result in critical status (seconds)"`
+	Escape     bool    `short:"E" long:"escape" description:"Can use \\n, \\r, \\t or \\ in send or quit string. Must come before send or quit option. By default, nothing added to send, \\r\\n added to end of quit"`
+	ErrWarning bool    `short:"W" long:"error-warning" description:"Set the error level to warning when exiting with unexpected error (default: critical). In the case of request succeeded, evaluation result of -c option eval takes priority."`
 }
 
 type exchange struct {
@@ -178,6 +179,9 @@ func (opts *tcpOpts) run() *checkers.Checker {
 
 	conn, err := dial(proto, addr, opts.SSL, opts.NoCheckCertificate, timeout)
 	if err != nil {
+		if opts.ErrWarning {
+			return checkers.Warning(err.Error())
+		}
 		return checkers.Critical(err.Error())
 	}
 	defer conn.Close()
@@ -185,6 +189,9 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	if opts.Send != "" {
 		err := write(conn, []byte(opts.Send), timeout)
 		if err != nil {
+			if opts.ErrWarning {
+				return checkers.Warning(err.Error())
+			}
 			return checkers.Critical(err.Error())
 		}
 	}
@@ -193,10 +200,16 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	if opts.expectReg != nil {
 		buf, err := slurp(conn, opts.MaxBytes, timeout)
 		if err != nil {
+			if opts.ErrWarning {
+				return checkers.Warning(err.Error())
+			}
 			return checkers.Critical(err.Error())
 		}
 		res = string(buf)
 		if !opts.expectReg.MatchString(res) {
+			if opts.ErrWarning {
+				return checkers.Warning("Unexpected response from host/socket: " + res)
+			}
 			return checkers.Critical("Unexpected response from host/socket: " + res)
 		}
 	}
@@ -204,6 +217,9 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	if opts.Quit != "" {
 		err := write(conn, []byte(opts.Quit), timeout)
 		if err != nil {
+			if opts.ErrWarning {
+				return checkers.Warning(err.Error())
+			}
 			return checkers.Critical(err.Error())
 		}
 	}
