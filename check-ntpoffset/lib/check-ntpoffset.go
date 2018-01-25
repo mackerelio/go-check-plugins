@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -30,7 +31,7 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	offset, err := getNtpOffset()
+	offset, err := getNTPOffset()
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
@@ -51,18 +52,55 @@ func run(args []string) *checkers.Checker {
 	return checkers.NewChecker(chkSt, msg)
 }
 
-func getNtpOffset() (offset float64, err error) {
+const (
+	ntpNTPD    = "ntpd"
+	ntpChronyd = "chronyd"
+
+	cmdNTPq    = "ntpq"
+	cmdChronyc = "chronyc"
+)
+
+func hasCommand(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
+}
+
+func detectNTPDname() (string, error) {
 	psout, err := exec.Command("ps", "-eo", "comm").Output()
 	if err != nil {
-		return
+		return "", err
 	}
 	for _, line := range strings.Split(string(psout), "\n") {
-		if strings.HasSuffix(line, "chronyd") {
-			return getChronyNtpOffset()
+		switch filepath.Base(line) {
+		case ntpChronyd:
+			if hasCommand(cmdChronyc) {
+				return ntpChronyd, nil
+			}
+		case ntpNTPD:
+			if hasCommand(cmdNTPq) {
+				return ntpNTPD, nil
+			}
 		}
 	}
+	return "", fmt.Errorf("no ntp daemons detected")
+}
 
-	output, err := exec.Command("ntpq", "-c", "rv 0 offset").Output()
+func getNTPOffset() (float64, error) {
+	ntpdName, err := detectNTPDname()
+	if err != nil {
+		return 0.0, err
+	}
+	switch ntpdName {
+	case ntpNTPD:
+		return getNTPOffsetFromNTPD()
+	case ntpChronyd:
+		return getNTPOffsetFromChrony()
+	}
+	return 0.0, fmt.Errorf("unsupported ntp daemon %q", ntpdName)
+}
+
+func getNTPOffsetFromNTPD() (offset float64, err error) {
+	output, err := exec.Command(cmdNTPq, "-c", "rv 0 offset").Output()
 	if err != nil {
 		return
 	}
@@ -93,8 +131,8 @@ func getNtpOffset() (offset float64, err error) {
 	return strconv.ParseFloat(strings.Trim(o[1], "\n"), 64)
 }
 
-func getChronyNtpOffset() (offset float64, err error) {
-	output, err := exec.Command("chronyc", "tracking").Output()
+func getNTPOffsetFromChrony() (offset float64, err error) {
+	output, err := exec.Command(cmdChronyc, "tracking").Output()
 	// Reference ID    : 160.16.75.242 (sv01.azsx.net)
 	// Stratum         : 3
 	// Ref time (UTC)  : Thu May  4 11:51:30 2017
