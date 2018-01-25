@@ -74,7 +74,7 @@ func getPreviousUptime(f string) (float64, error) {
 	return pUt, nil
 }
 
-func writePreviousUptime(f string, pUt float64) error {
+func writeUptime(f string, pUt float64) error {
 	err := os.MkdirAll(filepath.Dir(f), 0755)
 	if err != nil {
 		return err
@@ -132,7 +132,9 @@ func run(args []string) *checkers.Checker {
 		if opts.CritRewind && pUt > ut {
 			checkSt = checkers.CRITICAL
 		}
-		writePreviousUptime(stateFile, ut)
+		if err := writeUptime(stateFile, ut); err != nil {
+			return checkers.Unknown(fmt.Sprintf("Failed to write uptime: %s", err))
+		}
 	}
 	if opts.WarningUnder != nil && *opts.WarningUnder > ut {
 		checkSt = checkers.WARNING
