@@ -51,17 +51,34 @@ func run(args []string) *checkers.Checker {
 	return checkers.NewChecker(chkSt, msg)
 }
 
-func getNtpOffset() (offset float64, err error) {
+func detectNTPDname() (string, error) {
 	psout, err := exec.Command("ps", "-eo", "comm").Output()
 	if err != nil {
-		return
+		return "", err
 	}
 	for _, line := range strings.Split(string(psout), "\n") {
 		if strings.HasSuffix(line, "chronyd") {
-			return getChronyNtpOffset()
+			return "chronyd", nil
 		}
 	}
+	return "ntpd", nil
+}
 
+func getNtpOffset() (offset float64, err error) {
+	ntpdName, err := detectNTPDname()
+	if err != nil {
+		return 0.0, err
+	}
+	switch ntpdName {
+	case "ntpd":
+		return getNTPOffsetFromNTPD()
+	case "chronyd":
+		return getNTPOffsetFromChrony()
+	}
+	return 0.0, fmt.Errorf("no ntp daemon detected")
+}
+
+func getNTPOffsetFromNTPD() (offset float64, err error) {
 	output, err := exec.Command("ntpq", "-c", "rv 0 offset").Output()
 	if err != nil {
 		return
@@ -93,7 +110,7 @@ func getNtpOffset() (offset float64, err error) {
 	return strconv.ParseFloat(strings.Trim(o[1], "\n"), 64)
 }
 
-func getChronyNtpOffset() (offset float64, err error) {
+func getNTPOffsetFromChrony() (offset float64, err error) {
 	output, err := exec.Command("chronyc", "tracking").Output()
 	// Reference ID    : 160.16.75.242 (sv01.azsx.net)
 	// Stratum         : 3
