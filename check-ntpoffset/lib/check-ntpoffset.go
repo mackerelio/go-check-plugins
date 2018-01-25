@@ -5,8 +5,10 @@ import (
 	"math"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -52,6 +54,25 @@ func run(args []string) *checkers.Checker {
 }
 
 func detectNTPDname() (string, error) {
+	if syscall.Getuid() == 0 { // is root
+		lsofout, err := exec.Command("lsof", "-i:123").Output()
+		if err != nil {
+			return "", err
+		}
+		i := 0
+		for _, line := range strings.Split(string(lsofout), "\n") {
+			if line == "" {
+				break
+			}
+			if i == 1 {
+				fields := strings.Fields(line)
+				return filepath.Base(fields[0]), nil
+			}
+			i++
+		}
+		return "", fmt.Errorf("it seems no ntp daemon is running")
+	}
+
 	psout, err := exec.Command("ps", "-eo", "comm").Output()
 	if err != nil {
 		return "", err
@@ -75,7 +96,7 @@ func getNtpOffset() (offset float64, err error) {
 	case "chronyd":
 		return getNTPOffsetFromChrony()
 	}
-	return 0.0, fmt.Errorf("no ntp daemon detected")
+	return 0.0, fmt.Errorf("unsupported ntp daemon %q", ntpdName)
 }
 
 func getNTPOffsetFromNTPD() (offset float64, err error) {
