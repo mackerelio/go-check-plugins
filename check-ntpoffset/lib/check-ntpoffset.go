@@ -44,7 +44,7 @@ func run(args []string) *checkers.Checker {
 		msg = fmt.Sprintf("ntp offset is over %f(actual) > %f(threshold)", math.Abs(offset), opts.Warn)
 		chkSt = checkers.WARNING
 	} else {
-		msg = fmt.Sprintf("ntp offset is %f(actual) < %f(warning threshold), %f(critial threshold)", offset, opts.Warn, opts.Crit)
+		msg = fmt.Sprintf("ntp offset is %f(actual) < %f(warning threshold), %f(critial threshold)", math.Abs(offset), opts.Warn, opts.Crit)
 		chkSt = checkers.OK
 	}
 
