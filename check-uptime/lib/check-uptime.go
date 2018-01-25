@@ -110,6 +110,14 @@ func run(args []string) *checkers.Checker {
 	}
 	ut := utDur.Seconds()
 
+	// for backward compatibility
+	if opts.WarnUnder != nil && opts.WarningUnder == nil {
+		opts.WarningUnder = opts.WarnUnder
+	}
+	if opts.WarnOver != nil && opts.WarningOver == nil {
+		opts.WarningOver = opts.WarnOver
+	}
+
 	checkSt := checkers.OK
 	if opts.WarningRewind || opts.CritRewind {
 		stateFile := getStateFile(opts.StateDir, opts.origArgs)
@@ -126,15 +134,6 @@ func run(args []string) *checkers.Checker {
 		}
 		writePreviousUptime(stateFile, ut)
 	}
-
-	// for backward compatibility
-	if opts.WarnUnder != nil && opts.WarningUnder == nil {
-		opts.WarningUnder = opts.WarnUnder
-	}
-	if opts.WarnOver != nil && opts.WarningOver == nil {
-		opts.WarningOver = opts.WarnOver
-	}
-
 	if opts.WarningUnder != nil && *opts.WarningUnder > ut {
 		checkSt = checkers.WARNING
 	}
@@ -147,7 +146,6 @@ func run(args []string) *checkers.Checker {
 	if opts.CritOver != nil && *opts.CritOver < ut {
 		checkSt = checkers.CRITICAL
 	}
-
 	dur := time.Duration(ut * float64(time.Second))
 	hours := int64(dur.Hours())
 	days := hours / 24
