@@ -19,7 +19,10 @@ func getProcs() (proc []procState, err error) {
 	if threadsUnknown {
 		psformat = "user,ppid,pid,vsz,rss,pcpu,state,etime,time,command"
 	}
-	output, _ := exec.Command("ps", "axwwo", psformat).Output()
+	output, err := exec.Command("ps", "axwwo", psformat).Output()
+	if err != nil {
+		return procs, nil
+	}
 	for _, line := range strings.Split(string(output), "\n")[1:] {
 		proc, err := parseProcState(line)
 		if err != nil {

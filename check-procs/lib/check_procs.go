@@ -61,7 +61,7 @@ func Do() {
 func run(args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
-		os.Exit(1)
+		return checkers.NewChecker(checkers.UNKNOWN, err.Error())
 	}
 
 	// for backward compatibility
@@ -73,11 +73,14 @@ func run(args []string) *checkers.Checker {
 	}
 
 	procs, err := getProcs()
+	if err != nil {
+		return checkers.NewChecker(checkers.UNKNOWN, err.Error())
+	}
 	cmdPatRegexp := regexp.MustCompile(".*")
 	if opts.CmdPat != "" {
 		r, err := regexp.Compile(opts.CmdPat)
 		if err != nil {
-			os.Exit(1)
+			return checkers.NewChecker(checkers.UNKNOWN, err.Error())
 		}
 		cmdPatRegexp = r
 	}
@@ -85,7 +88,7 @@ func run(args []string) *checkers.Checker {
 	if opts.CmdExcludePat != "" {
 		r, err := regexp.Compile(opts.CmdExcludePat)
 		if err != nil {
-			os.Exit(1)
+			return checkers.NewChecker(checkers.UNKNOWN, err.Error())
 		}
 		cmdExcludePatRegexp = r
 	}
