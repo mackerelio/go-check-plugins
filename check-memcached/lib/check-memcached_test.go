@@ -35,7 +35,7 @@ func TestMemd(t *testing.T) {
 	argv := []string{"-p", fmt.Sprintf("%d", server.Port()), "-k", "test"}
 	ckr := run(argv)
 	if ckr.Status.String() != "OK" {
-		t.Errorf("faild to check memcache:%s", ckr)
+		t.Errorf("failed to check memcache:%s", ckr)
 	}
 	cmd.Process.Signal(syscall.SIGTERM)
 	server.Wait()
