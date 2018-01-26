@@ -33,7 +33,7 @@ func run(args []string) *checkers.Checker {
 	}
 	utDur, err := uptime.Get()
 	if err != nil {
-		return checkers.Unknown(fmt.Sprintf("Faild to fetch uptime metrics: %s", err))
+		return checkers.Unknown(fmt.Sprintf("Failed to fetch uptime metrics: %s", err))
 	}
 	ut := utDur.Seconds()
 

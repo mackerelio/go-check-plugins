@@ -103,7 +103,7 @@ func run(args []string) *checkers.Checker {
 
 	partitions, err := listPartitions()
 	if err != nil {
-		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", err))
+		return checkers.Unknown(fmt.Sprintf("Failed to fetch partitions: %s", err))
 	}
 
 	if !opts.All {
@@ -111,7 +111,7 @@ func run(args []string) *checkers.Checker {
 		if opts.IncludeType != nil {
 			partitions = filterPartitionsByInclusion(partitions, *opts.IncludeType, fstypeOfPartition)
 			if len(partitions) == 0 {
-				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified *FsType*")))
+				return checkers.Unknown(fmt.Sprintf("Failed to fetch partitions: %s", errors.New("No device found for the specified *FsType*")))
 			}
 		}
 
@@ -127,7 +127,7 @@ func run(args []string) *checkers.Checker {
 
 			partitions = filterPartitionsByInclusion(partitions, *opts.Path, mountpointOfPartition)
 			if len(partitions) == 0 {
-				return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found for the specified *Mountpoint*")))
+				return checkers.Unknown(fmt.Sprintf("Failed to fetch partitions: %s", errors.New("No device found for the specified *Mountpoint*")))
 			}
 		}
 
@@ -137,7 +137,7 @@ func run(args []string) *checkers.Checker {
 	}
 
 	if len(partitions) == 0 {
-		return checkers.Unknown(fmt.Sprintf("Faild to fetch partitions: %s", errors.New("No device found")))
+		return checkers.Unknown(fmt.Sprintf("Failed to fetch partitions: %s", errors.New("No device found")))
 	}
 
 	var disks []*gpud.UsageStat
@@ -145,7 +145,7 @@ func run(args []string) *checkers.Checker {
 	for _, partition := range partitions {
 		disk, err := gpud.Usage(partition.Mountpoint)
 		if err != nil {
-			return checkers.Unknown(fmt.Sprintf("Faild to fetch disk usage: %s", err))
+			return checkers.Unknown(fmt.Sprintf("Failed to fetch disk usage: %s", err))
 		}
 
 		if disk.Total != 0 {
@@ -165,7 +165,7 @@ func run(args []string) *checkers.Checker {
 		} else if us == "tb" {
 			u = unit{us, tb}
 		} else {
-			return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", errors.New("Invalid argument flag '-u, --units'")))
+			return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", errors.New("Invalid argument flag '-u, --units'")))
 		}
 	}
 
@@ -174,7 +174,7 @@ func run(args []string) *checkers.Checker {
 		for _, disk := range disks {
 			checkSt, err = checkStatus(checkSt, *opts.InodeCritical, u.Size, disk, true, checkers.CRITICAL)
 			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
 			}
 
 			if checkSt == checkers.CRITICAL {
@@ -187,7 +187,7 @@ func run(args []string) *checkers.Checker {
 		for _, disk := range disks {
 			checkSt, err = checkStatus(checkSt, *opts.Critical, u.Size, disk, false, checkers.CRITICAL)
 			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
 			}
 
 			if checkSt == checkers.CRITICAL {
@@ -200,7 +200,7 @@ func run(args []string) *checkers.Checker {
 		for _, disk := range disks {
 			checkSt, err = checkStatus(checkSt, *opts.InodeWarning, u.Size, disk, true, checkers.WARNING)
 			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
 			}
 
 			if checkSt == checkers.WARNING {
@@ -213,7 +213,7 @@ func run(args []string) *checkers.Checker {
 		for _, disk := range disks {
 			checkSt, err = checkStatus(checkSt, *opts.Warning, u.Size, disk, false, checkers.WARNING)
 			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Faild to check disk status: %s", err))
+				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
 			}
 
 			if checkSt == checkers.WARNING {
