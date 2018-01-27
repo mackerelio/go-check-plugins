@@ -158,36 +158,27 @@ func getNTPOffsetFromNTPD() (offset float64, err error) {
 
 func getNTPOffsetFromChrony() (offset float64, err error) {
 	err = withCmd(exec.Command("chronyc", "tracking"), func(out io.Reader) error {
-		// Reference ID    : 160.16.75.242 (sv01.azsx.net)
-		// Stratum         : 3
-		// Ref time (UTC)  : Thu May  4 11:51:30 2017
-		// System time     : 0.000033190 seconds slow of NTP time
-		// Last offset     : +0.000003614 seconds
-		// RMS offset      : 0.000017540 seconds
-		// Frequency       : 10.880 ppm fast
-		// Residual freq   : -0.000 ppm
-		// Skew            : 0.003 ppm
-		// Root delay      : 0.003541 seconds
-		// Root dispersion : 0.000849 seconds
-		// Update interval : 1030.4 seconds
-		// Leap status     : Normal
-		scr := bufio.NewScanner(out)
-		for scr.Scan() {
-			line := scr.Text()
-			if strings.HasPrefix(line, "Last offset") {
-				flds := strings.Fields(line)
-				if len(flds) != 5 {
-					return fmt.Errorf("failed to get ntp offset")
-				}
-				offset, err = strconv.ParseFloat(flds[3], 64)
-				if err != nil {
-					return err
-				}
-				offset *= 1000
-				return nil
-			}
-		}
-		return fmt.Errorf("failed to get ntp offset")
+		offset, err = parseNTPOffsetFromChrony(out)
+		return err
 	})
 	return offset, err
+}
+
+func parseNTPOffsetFromChrony(out io.Reader) (offset float64, err error) {
+	scr := bufio.NewScanner(out)
+	for scr.Scan() {
+		line := scr.Text()
+		if strings.HasPrefix(line, "Last offset") {
+			flds := strings.Fields(line)
+			if len(flds) != 5 {
+				return 0.0, fmt.Errorf("failed to get ntp offset")
+			}
+			offset, err = strconv.ParseFloat(flds[3], 64)
+			if err != nil {
+				return 0.0, err
+			}
+			return offset * 1000, nil
+		}
+	}
+	return 0.0, fmt.Errorf("failed to get ntp offset")
 }
