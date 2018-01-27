@@ -70,25 +70,6 @@ func withCmd(cmd *exec.Cmd, fn func(io.Reader) error) error {
 }
 
 func detectNTPDname() (ntpdName string, err error) {
-	if syscall.Getuid() == 0 { // is root
-		err = withCmd(exec.Command("lsof", "-i:123"), func(out io.Reader) error {
-			scr := bufio.NewScanner(out)
-			noNtpErr := fmt.Errorf("it seems no ntp daemon is running")
-			scr.Scan() // skip first line
-			if scr.Scan() {
-				line := scr.Text()
-				if line == "" {
-					return noNtpErr
-				}
-				fields := strings.Fields(line)
-				ntpdName = filepath.Base(fields[0])
-				return nil
-			}
-			return noNtpErr
-		})
-		return ntpdName, err
-	}
-
 	err = withCmd(exec.Command("ps", "-eo", "comm"), func(out io.Reader) error {
 		scr := bufio.NewScanner(out)
 		ntpdName = "ntpd"
