@@ -71,23 +71,34 @@ func withCmd(cmd *exec.Cmd, fn func(io.Reader) error) error {
 const (
 	ntpNTPD    = "ntpd"
 	ntpChronyd = "chronyd"
+
+	cmdNTPq    = "ntpq"
+	cmdChronyc = "chronyc"
 )
+
+func hasCommand(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
+}
 
 func detectNTPDname() (ntpdName string, err error) {
 	err = withCmd(exec.Command("ps", "-eo", "comm"), func(out io.Reader) error {
 		scr := bufio.NewScanner(out)
-		ntpdName = ntpNTPD
 		for scr.Scan() {
-			if filepath.Base(scr.Text()) == ntpChronyd {
-				_, pathErr := exec.LookPath("chronyc")
-				if pathErr != nil {
+			switch filepath.Base(scr.Text()) {
+			case ntpChronyd:
+				if hasCommand(cmdChronyc) {
+					ntpdName = ntpChronyd
 					return nil
 				}
-				ntpdName = ntpChronyd
-				return nil
+			case ntpNTPD:
+				if hasCommand(cmdNTPq) {
+					ntpdName = ntpNTPD
+					return nil
+				}
 			}
 		}
-		return nil
+		return fmt.Errorf("no ntp daemons detected")
 	})
 	return ntpdName, err
 }
@@ -107,7 +118,7 @@ func getNtpOffset() (float64, error) {
 }
 
 func getNTPOffsetFromNTPD() (offset float64, err error) {
-	err = withCmd(exec.Command("ntpq", "-c", "rv 0 offset"), func(out io.Reader) error {
+	err = withCmd(exec.Command(cmdNTPq, "-c", "rv 0 offset"), func(out io.Reader) error {
 		offset, err = parseNTPOffsetFromNTPD(out)
 		return err
 	})
@@ -127,7 +138,7 @@ func parseNTPOffsetFromNTPD(out io.Reader) (float64, error) {
 }
 
 func getNTPOffsetFromChrony() (offset float64, err error) {
-	err = withCmd(exec.Command("chronyc", "tracking"), func(out io.Reader) error {
+	err = withCmd(exec.Command(cmdChronyc, "tracking"), func(out io.Reader) error {
 		offset, err = parseNTPOffsetFromChrony(out)
 		return err
 	})
