@@ -95,6 +95,10 @@ func detectNTPDname() (ntpdName string, err error) {
 		ntpdName = "ntpd"
 		for scr.Scan() {
 			if strings.HasSuffix(scr.Text(), "chronyd") {
+				_, pathErr := exec.LookPath("chronyc")
+				if pathErr != nil {
+					return nil
+				}
 				ntpdName = "chronyd"
 				return nil
 			}
