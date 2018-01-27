@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -69,17 +68,22 @@ func withCmd(cmd *exec.Cmd, fn func(io.Reader) error) error {
 	return cmd.Wait()
 }
 
+const (
+	ntpNTPD    = "ntpd"
+	ntpChronyd = "chronyd"
+)
+
 func detectNTPDname() (ntpdName string, err error) {
 	err = withCmd(exec.Command("ps", "-eo", "comm"), func(out io.Reader) error {
 		scr := bufio.NewScanner(out)
-		ntpdName = "ntpd"
+		ntpdName = ntpNTPD
 		for scr.Scan() {
-			if strings.HasSuffix(scr.Text(), "chronyd") {
+			if filepath.Base(scr.Text()) == ntpChronyd {
 				_, pathErr := exec.LookPath("chronyc")
 				if pathErr != nil {
 					return nil
 				}
-				ntpdName = "chronyd"
+				ntpdName = ntpChronyd
 				return nil
 			}
 		}
@@ -94,9 +98,9 @@ func getNtpOffset() (float64, error) {
 		return 0.0, err
 	}
 	switch ntpdName {
-	case "ntpd":
+	case ntpNTPD:
 		return getNTPOffsetFromNTPD()
-	case "chronyd":
+	case ntpChronyd:
 		return getNTPOffsetFromChrony()
 	}
 	return 0.0, fmt.Errorf("unsupported ntp daemon %q", ntpdName)
