@@ -88,7 +88,7 @@ func detectNTPDname() (ntpdName string, err error) {
 	return ntpdName, err
 }
 
-func getNtpOffset() (offset float64, err error) {
+func getNtpOffset() (float64, error) {
 	ntpdName, err := detectNTPDname()
 	if err != nil {
 		return 0.0, err
