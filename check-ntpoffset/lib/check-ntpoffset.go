@@ -120,36 +120,40 @@ func getNTPOffset() (float64, error) {
 
 func getNTPOffsetFromNTPD() (offset float64, err error) {
 	err = withCmd(exec.Command(cmdNTPq, "-c", "rv 0 offset"), func(out io.Reader) error {
-		output, err := ioutil.ReadAll(out)
-		if err != nil {
-			return err
-		}
-		var line string
-		lines := strings.Split(string(output), "\n")
-		switch len(lines) {
-		case 2:
-			line = lines[0]
-		case 3:
-			/* example on ntp 4.2.2p1-18.el5.centos
-			   assID=0 status=06f4 leap_none, sync_ntp, 15 events, event_peer/strat_chg,
-			   offset=0.180
-			*/
-			if strings.Index(lines[0], `assID=0`) == 0 {
-				line = lines[1]
-				break
-			}
-			fallthrough
-		default:
-			return fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
-		}
-		o := strings.Split(string(line), "=")
-		if len(o) != 2 {
-			return fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
-		}
-		offset, err = strconv.ParseFloat(strings.Trim(o[1], "\n"), 64)
+		offset, err = parseNTPOffsetFromNTPD(out)
 		return err
 	})
 	return offset, err
+}
+
+func parseNTPOffsetFromNTPD(out io.Reader) (float64, error) {
+	output, err := ioutil.ReadAll(out)
+	if err != nil {
+		return 0.0, err
+	}
+	var line string
+	lines := strings.Split(string(output), "\n")
+	switch len(lines) {
+	case 2:
+		line = lines[0]
+	case 3:
+		/* example on ntp 4.2.2p1-18.el5.centos
+		   assID=0 status=06f4 leap_none, sync_ntp, 15 events, event_peer/strat_chg,
+		   offset=0.180
+		*/
+		if strings.Index(lines[0], `assID=0`) == 0 {
+			line = lines[1]
+			break
+		}
+		fallthrough
+	default:
+		return 0.0, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
+	}
+	o := strings.Split(string(line), "=")
+	if len(o) != 2 {
+		return 0.0, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
+	}
+	return strconv.ParseFloat(strings.Trim(o[1], "\n"), 64)
 }
 
 func getNTPOffsetFromChrony() (offset float64, err error) {

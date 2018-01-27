@@ -29,3 +29,36 @@ Leap status     : Normal
 		t.Errorf("invalid offset: %f (expected: %f)", offset, expect)
 	}
 }
+
+func TestParseNTPOffsetFromNTPD(t *testing.T) {
+	testCases := []struct {
+		name   string
+		input  string
+		expect float64
+	}{
+		{
+			name:   "normal",
+			input:  "offset=0.504\n",
+			expect: 0.504,
+		},
+		{
+			name: "ntp on 4.2.2p1-18.el5.centos",
+			input: `assID=0 status=06f4 leap_none, sync_ntp, 15 events, event_peer/strat_chg,
+offset=0.180
+`,
+			expect: 0.18,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			offset, err := parseNTPOffsetFromNTPD(strings.NewReader(tc.input))
+			if err != nil {
+				t.Fatalf("error should be nil but got: %v", err)
+			}
+			if offset != tc.expect {
+				t.Errorf("%s: invalid offset: %f (expected: %f)", tc.name, offset, tc.expect)
+			}
+		})
+	}
+}
