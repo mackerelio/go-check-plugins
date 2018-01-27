@@ -2,6 +2,7 @@ package checkntpoffset
 
 import (
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"os/exec"
@@ -50,6 +51,20 @@ func run(args []string) *checkers.Checker {
 	}
 
 	return checkers.NewChecker(chkSt, msg)
+}
+
+func withCmd(cmd *exec.Cmd, fn func(io.Reader) error) error {
+	out, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	if err := fn(out); err != nil {
+		return err
+	}
+	return cmd.Wait()
 }
 
 const (
