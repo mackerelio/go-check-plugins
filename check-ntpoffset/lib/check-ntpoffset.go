@@ -1,8 +1,10 @@
 package checkntpoffset
 
 import (
+	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math"
 	"os"
 	"os/exec"
@@ -80,24 +82,26 @@ func hasCommand(cmd string) bool {
 	return err == nil
 }
 
-func detectNTPDname() (string, error) {
-	psout, err := exec.Command("ps", "-eo", "comm").Output()
-	if err != nil {
-		return "", err
-	}
-	for _, line := range strings.Split(string(psout), "\n") {
-		switch filepath.Base(line) {
-		case ntpChronyd:
-			if hasCommand(cmdChronyc) {
-				return ntpChronyd, nil
-			}
-		case ntpNTPD:
-			if hasCommand(cmdNTPq) {
-				return ntpNTPD, nil
+func detectNTPDname() (ntpdName string, err error) {
+	err = withCmd(exec.Command("ps", "-eo", "comm"), func(out io.Reader) error {
+		scr := bufio.NewScanner(out)
+		for scr.Scan() {
+			switch filepath.Base(scr.Text()) {
+			case ntpChronyd:
+				if hasCommand(cmdChronyc) {
+					ntpdName = ntpChronyd
+					return nil
+				}
+			case ntpNTPD:
+				if hasCommand(cmdNTPq) {
+					ntpdName = ntpNTPD
+					return nil
+				}
 			}
 		}
-	}
-	return "", fmt.Errorf("no ntp daemons detected")
+		return fmt.Errorf("no ntp daemons detected")
+	})
+	return ntpdName, err
 }
 
 func getNTPOffset() (float64, error) {
@@ -115,64 +119,71 @@ func getNTPOffset() (float64, error) {
 }
 
 func getNTPOffsetFromNTPD() (offset float64, err error) {
-	output, err := exec.Command(cmdNTPq, "-c", "rv 0 offset").Output()
-	if err != nil {
-		return
-	}
-
-	var line string
-	lines := strings.Split(string(output), "\n")
-	switch len(lines) {
-	case 2:
-		line = lines[0]
-	case 3:
-		/* example on ntp 4.2.2p1-18.el5.centos
-		   assID=0 status=06f4 leap_none, sync_ntp, 15 events, event_peer/strat_chg,
-		   offset=0.180
-		*/
-		if strings.Index(lines[0], `assID=0`) == 0 {
-			line = lines[1]
-			break
+	err = withCmd(exec.Command(cmdNTPq, "-c", "rv 0 offset"), func(out io.Reader) error {
+		output, err := ioutil.ReadAll(out)
+		if err != nil {
+			return err
 		}
-		fallthrough
-	default:
-		return offset, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
-	}
-
-	o := strings.Split(string(line), "=")
-	if len(o) != 2 {
-		return offset, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
-	}
-	return strconv.ParseFloat(strings.Trim(o[1], "\n"), 64)
+		var line string
+		lines := strings.Split(string(output), "\n")
+		switch len(lines) {
+		case 2:
+			line = lines[0]
+		case 3:
+			/* example on ntp 4.2.2p1-18.el5.centos
+			   assID=0 status=06f4 leap_none, sync_ntp, 15 events, event_peer/strat_chg,
+			   offset=0.180
+			*/
+			if strings.Index(lines[0], `assID=0`) == 0 {
+				line = lines[1]
+				break
+			}
+			fallthrough
+		default:
+			return fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
+		}
+		o := strings.Split(string(line), "=")
+		if len(o) != 2 {
+			return fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
+		}
+		offset, err = strconv.ParseFloat(strings.Trim(o[1], "\n"), 64)
+		return err
+	})
+	return offset, err
 }
 
 func getNTPOffsetFromChrony() (offset float64, err error) {
-	output, err := exec.Command(cmdChronyc, "tracking").Output()
-	// Reference ID    : 160.16.75.242 (sv01.azsx.net)
-	// Stratum         : 3
-	// Ref time (UTC)  : Thu May  4 11:51:30 2017
-	// System time     : 0.000033190 seconds slow of NTP time
-	// Last offset     : +0.000003614 seconds
-	// RMS offset      : 0.000017540 seconds
-	// Frequency       : 10.880 ppm fast
-	// Residual freq   : -0.000 ppm
-	// Skew            : 0.003 ppm
-	// Root delay      : 0.003541 seconds
-	// Root dispersion : 0.000849 seconds
-	// Update interval : 1030.4 seconds
-	// Leap status     : Normal
-	for _, line := range strings.Split(string(output), "\n") {
-		if strings.HasPrefix(line, "Last offset") {
-			flds := strings.Fields(line)
-			if len(flds) != 5 {
-				return 0.0, fmt.Errorf("failed to get ntp offset")
+	err = withCmd(exec.Command(cmdChronyc, "tracking"), func(out io.Reader) error {
+		// Reference ID    : 160.16.75.242 (sv01.azsx.net)
+		// Stratum         : 3
+		// Ref time (UTC)  : Thu May  4 11:51:30 2017
+		// System time     : 0.000033190 seconds slow of NTP time
+		// Last offset     : +0.000003614 seconds
+		// RMS offset      : 0.000017540 seconds
+		// Frequency       : 10.880 ppm fast
+		// Residual freq   : -0.000 ppm
+		// Skew            : 0.003 ppm
+		// Root delay      : 0.003541 seconds
+		// Root dispersion : 0.000849 seconds
+		// Update interval : 1030.4 seconds
+		// Leap status     : Normal
+		scr := bufio.NewScanner(out)
+		for scr.Scan() {
+			line := scr.Text()
+			if strings.HasPrefix(line, "Last offset") {
+				flds := strings.Fields(line)
+				if len(flds) != 5 {
+					return fmt.Errorf("failed to get ntp offset")
+				}
+				offset, err = strconv.ParseFloat(flds[3], 64)
+				if err != nil {
+					return err
+				}
+				offset *= 1000
+				return nil
 			}
-			offset, err := strconv.ParseFloat(flds[3], 64)
-			if err != nil {
-				return 0.0, err
-			}
-			return offset * 1000, nil
 		}
-	}
-	return 0.0, fmt.Errorf("failed to get ntp offset")
+		return fmt.Errorf("failed to get ntp offset")
+	})
+	return offset, err
 }
