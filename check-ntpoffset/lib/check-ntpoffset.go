@@ -127,11 +127,11 @@ func getNTPOffsetFromNTPD() (offset float64, err error) {
 
 func parseNTPOffsetFromNTPD(out io.Reader) (float64, error) {
 	scr := bufio.NewScanner(out)
-	prefix := "offset="
+	const offsetPrefix = "offset="
 	for scr.Scan() {
 		line := scr.Text()
-		if strings.HasPrefix(line, prefix) {
-			return strconv.ParseFloat(strings.TrimPrefix(line, prefix), 64)
+		if strings.HasPrefix(line, offsetPrefix) {
+			return strconv.ParseFloat(strings.TrimPrefix(line, offsetPrefix), 64)
 		}
 	}
 	return 0.0, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
