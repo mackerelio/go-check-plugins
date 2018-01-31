@@ -21,7 +21,7 @@ func getProcs() (proc []procState, err error) {
 	}
 	output, err := exec.Command("ps", "axwwo", psformat).Output()
 	if err != nil {
-		return procs, nil
+		return nil, err
 	}
 	for _, line := range strings.Split(string(output), "\n")[1:] {
 		proc, err := parseProcState(line)
