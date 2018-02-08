@@ -46,6 +46,14 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Feb 08 2018 <mackerel-developers@hatena.ne.jp> - 0.17.0
+- [check-procs] fix `getProcs` error handling (by mechairoi)
+- [ntpoffset] Refine NTP daemon detection and add tests (by Songmu)
+- [check-tcp] add -W option (by dozen)
+- [check-procs] Error handling is required (by mechairoi)
+- Avoid race condition in checkhttp.Run() (by astj)
+- [check-http] Expose checkhttp.Run due for using check-http as a library (by aereal)
+
 * Tue Jan 23 2018 <mackerel-developers@hatena.ne.jp> - 0.16.0
 - Setting password via environment variable (by hayajo)
 - update rpm-v2 task for building Amazon Linux 2 package (by hayajo)
