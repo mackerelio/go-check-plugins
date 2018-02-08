@@ -4,7 +4,6 @@
 
 * [check-procs] fix `getProcs` error handling #216 (mechairoi)
 * [ntpoffset] Refine NTP daemon detection and add tests #219 (Songmu)
-* fix typo faild -> failed #218 (dozen)
 * [check-tcp] add -W option #212 (dozen)
 * [check-procs] Error handling is required #204 (mechairoi)
 * Avoid race condition in checkhttp.Run() #214 (astj)

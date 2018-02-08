@@ -4,8 +4,6 @@ mackerel-check-plugins (0.17.0-1) stable; urgency=low
     <https://github.com/mackerelio/go-check-plugins/pull/216>
   * [ntpoffset] Refine NTP daemon detection and add tests (by Songmu)
     <https://github.com/mackerelio/go-check-plugins/pull/219>
-  * fix typo faild -> failed (by dozen)
-    <https://github.com/mackerelio/go-check-plugins/pull/218>
   * [check-tcp] add -W option (by dozen)
     <https://github.com/mackerelio/go-check-plugins/pull/212>
   * [check-procs] Error handling is required (by mechairoi)

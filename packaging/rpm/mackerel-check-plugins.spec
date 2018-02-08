@@ -49,7 +49,6 @@ done
 * Thu Feb 08 2018 <mackerel-developers@hatena.ne.jp> - 0.17.0
 - [check-procs] fix `getProcs` error handling (by mechairoi)
 - [ntpoffset] Refine NTP daemon detection and add tests (by Songmu)
-- fix typo faild -> failed (by dozen)
 - [check-tcp] add -W option (by dozen)
 - [check-procs] Error handling is required (by mechairoi)
 - Avoid race condition in checkhttp.Run() (by astj)
