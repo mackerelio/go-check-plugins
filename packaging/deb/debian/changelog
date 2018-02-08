@@ -1,3 +1,22 @@
+mackerel-check-plugins (0.17.0-1) stable; urgency=low
+
+  * [check-procs] fix `getProcs` error handling (by mechairoi)
+    <https://github.com/mackerelio/go-check-plugins/pull/216>
+  * [ntpoffset] Refine NTP daemon detection and add tests (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/219>
+  * fix typo faild -> failed (by dozen)
+    <https://github.com/mackerelio/go-check-plugins/pull/218>
+  * [check-tcp] add -W option (by dozen)
+    <https://github.com/mackerelio/go-check-plugins/pull/212>
+  * [check-procs] Error handling is required (by mechairoi)
+    <https://github.com/mackerelio/go-check-plugins/pull/204>
+  * Avoid race condition in checkhttp.Run() (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/214>
+  * [check-http] Expose checkhttp.Run due for using check-http as a library (by aereal)
+    <https://github.com/mackerelio/go-check-plugins/pull/210>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 08 Feb 2018 10:50:03 +0900
+
 mackerel-check-plugins (0.16.0-1) stable; urgency=low
 
   * Setting password via environment variable (by hayajo)

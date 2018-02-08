@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.17.0 (2018-02-08)
+
+* [check-procs] fix `getProcs` error handling #216 (mechairoi)
+* [ntpoffset] Refine NTP daemon detection and add tests #219 (Songmu)
+* fix typo faild -> failed #218 (dozen)
+* [check-tcp] add -W option #212 (dozen)
+* [check-procs] Error handling is required #204 (mechairoi)
+* Avoid race condition in checkhttp.Run() #214 (astj)
+* [check-http] Expose checkhttp.Run due for using check-http as a library #210 (aereal)
+
+
 ## 0.16.0 (2018-01-23)
 
 * Setting password via environment variable #209 (hayajo)
