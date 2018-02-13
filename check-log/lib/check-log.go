@@ -235,9 +235,10 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		return 0, 0, "", err
 	}
 
-	_, err = os.Stat(stateFile)
-	if !opts.NoState && !opts.CheckFirst && os.IsNotExist(err) {
-		skipBytes = stat.Size()
+	if !opts.NoState && !opts.CheckFirst {
+		if _, err = os.Stat(stateFile); os.IsNotExist(err) {
+			skipBytes = stat.Size()
+		}
 	}
 
 	rotated := false
