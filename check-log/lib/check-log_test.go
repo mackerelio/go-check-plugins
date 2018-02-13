@@ -99,9 +99,9 @@ func TestRun(t *testing.T) {
 		fh.WriteString(lFirst)
 		w, c, errLines, err := opts.searchLog(logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(2), w, "something went wrong")
+		assert.Equal(t, int64(2), c, "something went wrong")
+		assert.Equal(t, lFirst, errLines, "something went wrong")
 
 		bytes, _ = getBytesToSkip(stateFile)
 		assert.Equal(t, int64(len(lFirst)), bytes, "something went wrong")
