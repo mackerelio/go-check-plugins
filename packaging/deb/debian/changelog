@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.17.1-1) stable; urgency=low
+
+  * [check-log]improve skip bytes when file size is zero (by hayajo)
+    <https://github.com/mackerelio/go-check-plugins/pull/222>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 01 Mar 2018 14:14:59 +0900
+
 mackerel-check-plugins (0.17.0-1) stable; urgency=low
 
   * [check-procs] fix `getProcs` error handling (by mechairoi)
