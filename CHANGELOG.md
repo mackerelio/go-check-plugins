@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.17.1 (2018-03-01)
+
+* [check-log]improve skip bytes when file size is zero #222 (hayajo)
+
+
 ## 0.17.0 (2018-02-08)
 
 * [check-procs] fix `getProcs` error handling #216 (mechairoi)

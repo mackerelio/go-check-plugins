@@ -46,6 +46,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Mar 01 2018 <mackerel-developers@hatena.ne.jp> - 0.17.1
+- [check-log]improve skip bytes when file size is zero (by hayajo)
+
 * Thu Feb 08 2018 <mackerel-developers@hatena.ne.jp> - 0.17.0
 - [check-procs] fix `getProcs` error handling (by mechairoi)
 - [ntpoffset] Refine NTP daemon detection and add tests (by Songmu)
