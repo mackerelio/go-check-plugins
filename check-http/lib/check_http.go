@@ -1,11 +1,13 @@
 package checkhttp
 
 import (
+	"bufio"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/textproto"
 	"os"
 	"strconv"
 	"strings"
@@ -21,7 +23,7 @@ type checkHTTPOpts struct {
 	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
 	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
 	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
-	Host               string `short:"H" long:"host" description:"Host name for servers using host headers"`
+	Headers            []string `short:"H" description:"Host name for servers using host headers"`
 }
 
 // Do the plugin
@@ -91,6 +93,16 @@ func parseStatusRanges(opts *checkHTTPOpts) ([]statusRange, error) {
 	return statuses, nil
 }
 
+func parseHeader(opts *checkHTTPOpts) (http.Header, error) {
+	reader := bufio.NewReader(strings.NewReader(strings.Join(opts.Headers, "\r\n") + "\r\n\r\n"))
+	tp := textproto.NewReader(reader)
+	mimeheader, err := tp.ReadMIMEHeader()
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse header: %s", err)
+	}
+	return http.Header(mimeheader), nil
+}
+
 // Run do external monitoring via HTTP
 func Run(args []string) *checkers.Checker {
 	opts := checkHTTPOpts{}
@@ -129,8 +141,11 @@ func Run(args []string) *checkers.Checker {
 		return checkers.Critical(err.Error())
 	}
 
-	if opts.Host != "" {
-		req.Host = opts.Host
+	if len(opts.Headers) != 0 {
+		req.Header, err = parseHeader(&opts)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
 	}
 
 	stTime := time.Now()
