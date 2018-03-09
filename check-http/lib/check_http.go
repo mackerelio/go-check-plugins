@@ -21,6 +21,7 @@ type checkHTTPOpts struct {
 	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
 	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
 	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
+	Host               string `short:"H" long:"host" description:"Host name for servers using host headers"`
 }
 
 // Do the plugin
@@ -123,8 +124,17 @@ func Run(args []string) *checkers.Checker {
 	}
 	client := &http.Client{Transport: tr}
 
+	req, err := http.NewRequest("GET", opts.URL, nil)
+	if err != nil {
+		return checkers.Critical(err.Error())
+	}
+
+	if opts.Host != "" {
+		req.Host = opts.Host
+	}
+
 	stTime := time.Now()
-	resp, err := client.Get(opts.URL)
+	resp, err := client.Do(req)
 	if err != nil {
 		return checkers.Critical(err.Error())
 	}
