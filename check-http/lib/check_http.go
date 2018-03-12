@@ -167,7 +167,7 @@ func Run(args []string) *checkers.Checker {
 	if opts.ExpectedContent != "" {
 		expected := []byte(opts.ExpectedContent)
 		if !bytes.Contains(body, expected) {
-			fmt.Fprintf(respMsg, "'%s' not found in the content", opts.ExpectedContent)
+			fmt.Fprintf(respMsg, "'%s' not found in the content\n", opts.ExpectedContent)
 			checkSt = checkers.CRITICAL
 		}
 	}
