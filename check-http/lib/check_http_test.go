@@ -2,6 +2,8 @@ package checkhttp
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/mackerelio/checkers"
@@ -72,4 +74,17 @@ func TestStatusRange(t *testing.T) {
 func TestSourceIP(t *testing.T) {
 	ckr := Run([]string{"-u", "hoge", "-i", "1.2.3"})
 	assert.Equal(t, ckr.Status, checkers.UNKNOWN, "chr.Status should be UNKNOWN")
+}
+
+func TestExpectedContent(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, client")
+	}))
+	defer ts.Close()
+
+	ckr := Run([]string{"-u", ts.URL, "-c", "Hello, client"})
+	assert.Equal(t, ckr.Status, checkers.OK, "chr.Status should be OK")
+
+	ckr = Run([]string{"-u", ts.URL, "-c", "Wrong response"})
+	assert.Equal(t, ckr.Status, checkers.CRITICAL, "chr.Status should be CRITICAL")
 }

@@ -1,6 +1,7 @@
 package checkhttp
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -21,6 +22,7 @@ type checkHTTPOpts struct {
 	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
 	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
 	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
+	ExpectedContent    string   `short:"c" long:"content" description:"Expected string in the content"`
 }
 
 // Do the plugin
@@ -131,10 +133,11 @@ func Run(args []string) *checkers.Checker {
 	elapsed := time.Since(stTime)
 	defer resp.Body.Close()
 
+	body, _ := ioutil.ReadAll(resp.Body)
+
 	cLength := resp.ContentLength
 	if cLength == -1 {
-		byt, _ := ioutil.ReadAll(resp.Body)
-		cLength = int64(len(byt))
+		cLength = int64(len(body))
 	}
 
 	checkSt := checkers.UNKNOWN
@@ -159,8 +162,18 @@ func Run(args []string) *checkers.Checker {
 		}
 	}
 
-	msg := fmt.Sprintf("%s %s - %d bytes in %f second response time",
+	respMsg := new(bytes.Buffer)
+
+	if opts.ExpectedContent != "" {
+		expected := []byte(opts.ExpectedContent)
+		if !bytes.Contains(body, expected) {
+			fmt.Fprintf(respMsg, "'%s' not found in the content", opts.ExpectedContent)
+			checkSt = checkers.CRITICAL
+		}
+	}
+
+	fmt.Fprintf(respMsg, "%s %s - %d bytes in %f second response time",
 		resp.Proto, resp.Status, cLength, elapsed.Seconds())
 
-	return checkers.NewChecker(checkSt, msg)
+	return checkers.NewChecker(checkSt, respMsg.String())
 }
