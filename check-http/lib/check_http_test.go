@@ -73,3 +73,8 @@ func TestSourceIP(t *testing.T) {
 	ckr := Run([]string{"-u", "hoge", "-i", "1.2.3"})
 	assert.Equal(t, ckr.Status, checkers.UNKNOWN, "chr.Status should be UNKNOWN")
 }
+
+func TestHost(t *testing.T) {
+	ckr := Run([]string{"-H", `"Host: mackerel.io"`, "-H", `"Accept-Encoding: gzip"`, "-u", "https://mackerel.io"})
+	assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
+}
