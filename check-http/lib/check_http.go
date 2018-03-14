@@ -2,11 +2,13 @@ package checkhttp
 
 import (
 	"bytes"
+	"bufio"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/textproto"
 	"os"
 	"strconv"
 	"strings"
@@ -22,6 +24,7 @@ type checkHTTPOpts struct {
 	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
 	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
 	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
+	Headers            []string `short:"H" description:"Host name for servers using host headers"`
 	ExpectedContent    string   `short:"c" long:"content" description:"Expected string in the content"`
 }
 
@@ -92,6 +95,16 @@ func parseStatusRanges(opts *checkHTTPOpts) ([]statusRange, error) {
 	return statuses, nil
 }
 
+func parseHeader(opts *checkHTTPOpts) (http.Header, error) {
+	reader := bufio.NewReader(strings.NewReader(strings.Join(opts.Headers, "\r\n") + "\r\n\r\n"))
+	tp := textproto.NewReader(reader)
+	mimeheader, err := tp.ReadMIMEHeader()
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse header: %s", err)
+	}
+	return http.Header(mimeheader), nil
+}
+
 // Run do external monitoring via HTTP
 func Run(args []string) *checkers.Checker {
 	opts := checkHTTPOpts{}
@@ -125,8 +138,20 @@ func Run(args []string) *checkers.Checker {
 	}
 	client := &http.Client{Transport: tr}
 
+	req, err := http.NewRequest("GET", opts.URL, nil)
+	if err != nil {
+		return checkers.Critical(err.Error())
+	}
+
+	if len(opts.Headers) != 0 {
+		req.Header, err = parseHeader(&opts)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
+	}
+
 	stTime := time.Now()
-	resp, err := client.Get(opts.URL)
+	resp, err := client.Do(req)
 	if err != nil {
 		return checkers.Critical(err.Error())
 	}
