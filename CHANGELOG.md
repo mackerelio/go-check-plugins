@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.18.0 (2018-03-15)
+
+* [check-http] add host header option #224 (taku-k)
+
+
 ## 0.17.1 (2018-03-01)
 
 * [check-log]improve skip bytes when file size is zero #222 (hayajo)

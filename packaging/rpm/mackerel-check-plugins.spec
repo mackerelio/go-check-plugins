@@ -46,6 +46,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Mar 15 2018 <mackerel-developers@hatena.ne.jp> - 0.18.0
+- [check-http] add host header option (by taku-k)
+
 * Thu Mar 01 2018 <mackerel-developers@hatena.ne.jp> - 0.17.1
 - [check-log]improve skip bytes when file size is zero (by hayajo)
 

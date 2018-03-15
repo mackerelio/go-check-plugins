@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.18.0-1) stable; urgency=low
+
+  * [check-http] add host header option (by taku-k)
+    <https://github.com/mackerelio/go-check-plugins/pull/224>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 15 Mar 2018 10:38:16 +0900
+
 mackerel-check-plugins (0.17.1-1) stable; urgency=low
 
   * [check-log]improve skip bytes when file size is zero (by hayajo)
