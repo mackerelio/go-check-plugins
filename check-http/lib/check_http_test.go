@@ -82,9 +82,40 @@ func TestExpectedContent(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	ckr := Run([]string{"-u", ts.URL, "-c", "Hello, client"})
-	assert.Equal(t, ckr.Status, checkers.OK, "chr.Status should be OK")
+	testCases := []struct {
+		regexp string
+		status checkers.Status
+	}{
+		{
+			regexp: "Hello, client",
+			status: checkers.OK,
+		},
+		{
+			regexp: "Wrong response",
+			status: checkers.CRITICAL,
+		},
+		{
+			regexp: "Hel.*",
+			status: checkers.OK,
+		},
+		{
+			regexp: "clientt?",
+			status: checkers.OK,
+		},
+		{
+			regexp: "???",
+			status: checkers.UNKNOWN,
+		},
+	}
 
-	ckr = Run([]string{"-u", ts.URL, "-c", "Wrong response"})
-	assert.Equal(t, ckr.Status, checkers.CRITICAL, "chr.Status should be CRITICAL")
+	for i, tc := range testCases {
+		ckr := Run([]string{"-u", ts.URL, "-p", tc.regexp})
+		assert.Equal(t, ckr.Status, tc.status, "#%d: Status should be %s", i, tc.status)
+	}
+
+	//ckr := Run([]string{"-u", ts.URL, "-p", "Hello, client"})
+	//assert.Equal(t, ckr.Status, checkers.OK, "chr.Status should be OK")
+
+	//ckr = Run([]string{"-u", ts.URL, "-p", "Wrong response"})
+	//assert.Equal(t, ckr.Status, checkers.CRITICAL, "chr.Status should be CRITICAL")
 }

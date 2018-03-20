@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -22,7 +23,7 @@ type checkHTTPOpts struct {
 	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
 	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
 	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
-	ExpectedContent    string   `short:"c" long:"content" description:"Expected string in the content"`
+	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
 }
 
 // Do the plugin
@@ -164,10 +165,16 @@ func Run(args []string) *checkers.Checker {
 
 	respMsg := new(bytes.Buffer)
 
-	if opts.ExpectedContent != "" {
-		expected := []byte(opts.ExpectedContent)
-		if !bytes.Contains(body, expected) {
-			fmt.Fprintf(respMsg, "'%s' not found in the content\n", opts.ExpectedContent)
+	if opts.Regexp != "" {
+		re, err := regexp.Compile(opts.Regexp)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
+
+		//expected := []byte(opts.ExpectedContent)
+		//if !bytes.Contains(body, expected) {
+		if !re.Match(body) {
+			fmt.Fprintf(respMsg, "'%s' not found in the content\n", opts.Regexp)
 			checkSt = checkers.CRITICAL
 		}
 	}
