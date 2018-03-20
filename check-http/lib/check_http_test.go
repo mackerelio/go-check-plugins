@@ -76,6 +76,11 @@ func TestSourceIP(t *testing.T) {
 	assert.Equal(t, ckr.Status, checkers.UNKNOWN, "chr.Status should be UNKNOWN")
 }
 
+func TestHost(t *testing.T) {
+	ckr := Run([]string{"-H", `"Host: mackerel.io"`, "-H", `"Accept-Encoding: gzip"`, "-u", "https://mackerel.io"})
+	assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
+}
+
 func TestExpectedContent(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello, client")
@@ -112,10 +117,4 @@ func TestExpectedContent(t *testing.T) {
 		ckr := Run([]string{"-u", ts.URL, "-p", tc.regexp})
 		assert.Equal(t, ckr.Status, tc.status, "#%d: Status should be %s", i, tc.status)
 	}
-
-	//ckr := Run([]string{"-u", ts.URL, "-p", "Hello, client"})
-	//assert.Equal(t, ckr.Status, checkers.OK, "chr.Status should be OK")
-
-	//ckr = Run([]string{"-u", ts.URL, "-p", "Wrong response"})
-	//assert.Equal(t, ckr.Status, checkers.CRITICAL, "chr.Status should be CRITICAL")
 }
