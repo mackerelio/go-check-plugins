@@ -2,6 +2,7 @@ package checkhttp
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"net/textproto"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -24,6 +26,7 @@ type checkHTTPOpts struct {
 	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
 	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
 	Headers            []string `short:"H" description:"Host name for servers using host headers"`
+	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
 }
 
 // Do the plugin
@@ -156,10 +159,11 @@ func Run(args []string) *checkers.Checker {
 	elapsed := time.Since(stTime)
 	defer resp.Body.Close()
 
+	body, _ := ioutil.ReadAll(resp.Body)
+
 	cLength := resp.ContentLength
 	if cLength == -1 {
-		byt, _ := ioutil.ReadAll(resp.Body)
-		cLength = int64(len(byt))
+		cLength = int64(len(body))
 	}
 
 	checkSt := checkers.UNKNOWN
@@ -184,8 +188,21 @@ func Run(args []string) *checkers.Checker {
 		}
 	}
 
-	msg := fmt.Sprintf("%s %s - %d bytes in %f second response time",
+	respMsg := new(bytes.Buffer)
+
+	if opts.Regexp != "" {
+		re, err := regexp.Compile(opts.Regexp)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
+		if !re.Match(body) {
+			fmt.Fprintf(respMsg, "'%s' not found in the content\n", opts.Regexp)
+			checkSt = checkers.CRITICAL
+		}
+	}
+
+	fmt.Fprintf(respMsg, "%s %s - %d bytes in %f second response time",
 		resp.Proto, resp.Status, cLength, elapsed.Seconds())
 
-	return checkers.NewChecker(checkSt, msg)
+	return checkers.NewChecker(checkSt, respMsg.String())
 }

@@ -2,6 +2,8 @@ package checkhttp
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/mackerelio/checkers"
@@ -77,4 +79,42 @@ func TestSourceIP(t *testing.T) {
 func TestHost(t *testing.T) {
 	ckr := Run([]string{"-H", `"Host: mackerel.io"`, "-H", `"Accept-Encoding: gzip"`, "-u", "https://mackerel.io"})
 	assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
+}
+
+func TestExpectedContent(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, client")
+	}))
+	defer ts.Close()
+
+	testCases := []struct {
+		regexp string
+		status checkers.Status
+	}{
+		{
+			regexp: "Hello, client",
+			status: checkers.OK,
+		},
+		{
+			regexp: "Wrong response",
+			status: checkers.CRITICAL,
+		},
+		{
+			regexp: "Hel.*",
+			status: checkers.OK,
+		},
+		{
+			regexp: "clientt?",
+			status: checkers.OK,
+		},
+		{
+			regexp: "???",
+			status: checkers.UNKNOWN,
+		},
+	}
+
+	for i, tc := range testCases {
+		ckr := Run([]string{"-u", ts.URL, "-p", tc.regexp})
+		assert.Equal(t, ckr.Status, tc.status, "#%d: Status should be %s", i, tc.status)
+	}
 }
