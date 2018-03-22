@@ -18,6 +18,8 @@ type checkLDAPOpts struct {
 	Port      string  `short:"p" long:"port" default:"389" description:"Port number"`
 	Base      string  `short:"b" long:"base" description:"LDAP base" required:"true"`
 	Attribute string  `short:"a" long:"attr" default:"(objectclass=*)" description:"LDAP attribute to search"`
+	BindDN    string  `short:"D" long:"bind" description:"LDAP bind DN"`
+	Password  string  `short:"P" long:"password" description:"LDAP password"`
 }
 
 // Do the plugin
@@ -36,9 +38,13 @@ func run(args []string) *checkers.Checker {
 
 	lconn, err := ldap.Dial("tcp", net.JoinHostPort(opts.Host, opts.Port))
 	if err != nil {
-		return checkers.Critical(err.Error())
+		return checkers.Unknown(err.Error())
 	}
 	defer lconn.Close()
+
+	if err := lconn.Bind(opts.BindDN, opts.Password); err != nil {
+		return checkers.Unknown(err.Error())
+	}
 
 	req := ldap.NewSearchRequest(
 		opts.Base,
@@ -54,7 +60,7 @@ func run(args []string) *checkers.Checker {
 
 	_, err = lconn.Search(req)
 	if err != nil {
-		return checkers.Critical(err.Error())
+		return checkers.Unknown(err.Error())
 	}
 
 	elapsed := time.Since(stTime)
