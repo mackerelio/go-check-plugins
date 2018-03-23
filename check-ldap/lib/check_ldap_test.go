@@ -10,10 +10,13 @@ import (
 	"github.com/mackerelio/checkers"
 )
 
+var imageRepository = "osixia/openldap"
+var imageTag = "1.2.0"
+
 func TestLDAP(t *testing.T) {
 	opts := docker.CreateContainerOptions{
 		Config: &docker.Config{
-			Image: "osixia/openldap:1.2.0",
+			Image: imageRepository + ":" + imageTag,
 			ExposedPorts: map[docker.Port]struct{}{
 				"389/tcp": {},
 			},
@@ -38,8 +41,8 @@ func TestLDAP(t *testing.T) {
 	_, err = cli.InspectImage(opts.Config.Image)
 	if err != nil {
 		err = cli.PullImage(docker.PullImageOptions{
-			Repository: "osixia/openldap",
-			Tag:        "latest",
+			Repository: imageRepository,
+			Tag:        imageTag,
 		}, docker.AuthConfiguration{})
 		if err != nil {
 			t.Fatal(err)
