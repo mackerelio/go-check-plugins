@@ -12,6 +12,7 @@ import (
 	"github.com/mackerelio/go-check-plugins/check-file-size/lib"
 	"github.com/mackerelio/go-check-plugins/check-http/lib"
 	"github.com/mackerelio/go-check-plugins/check-jmx-jolokia/lib"
+	"github.com/mackerelio/go-check-plugins/check-ldap/lib"
 	"github.com/mackerelio/go-check-plugins/check-load/lib"
 	"github.com/mackerelio/go-check-plugins/check-log/lib"
 	"github.com/mackerelio/go-check-plugins/check-mailq/lib"
@@ -46,6 +47,8 @@ func runPlugin(plug string) error {
 		checkhttp.Do()
 	case "jmx-jolokia":
 		checkjmxjolokia.Do()
+	case "ldap":
+		checkldap.Do()
 	case "load":
 		checkload.Do()
 	case "log":
@@ -89,6 +92,7 @@ var plugins = []string{
 	"file-size",
 	"http",
 	"jmx-jolokia",
+	"ldap",
 	"load",
 	"log",
 	"mailq",
