@@ -6,6 +6,7 @@ debian/check-file-age
 debian/check-file-size
 debian/check-http
 debian/check-jmx-jolokia
+debian/check-ldap
 debian/check-load
 debian/check-log
 debian/check-mailq
