@@ -26,7 +26,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime; do \
+for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime; do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -46,6 +46,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Mar 28 2018 <mackerel-developers@hatena.ne.jp> - 0.19.0
+- add check-ldap (by taku-k)
+- [check-http] add regexp pattern option (by taku-k)
+
 * Thu Mar 15 2018 <mackerel-developers@hatena.ne.jp> - 0.18.0
 - [check-http] add host header option (by taku-k)
 

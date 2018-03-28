@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.0 (2018-03-28)
+
+* add check-ldap #227 (taku-k)
+* [check-http] add regexp pattern option #225 (taku-k)
+
+
 ## 0.18.0 (2018-03-15)
 
 * [check-http] add host header option #224 (taku-k)

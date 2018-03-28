@@ -14,6 +14,7 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-file-size](./check-file-size/README.md)
 * [check-http](./check-http/README.md)
 * [check-jmx-jolokia](./check-jmx-jolokia/README.md)
+* [check-ldap](./check-ldap/README.md)
 * [check-load](./check-load/README.md)
 * [check-log](./check-log/README.md)
 * [check-mailq](./check-mailq/README.md)
