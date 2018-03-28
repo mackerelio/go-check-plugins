@@ -37,6 +37,10 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Mar 28 2018 <mackerel-developers@hatena.ne.jp> - 0.19.0
+- add check-ldap (by taku-k)
+- [check-http] add regexp pattern option (by taku-k)
+
 * Thu Mar 15 2018 <mackerel-developers@hatena.ne.jp> - 0.18.0
 - [check-http] add host header option (by taku-k)
 

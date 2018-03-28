@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.19.0-1.v2) stable; urgency=low
+
+  * add check-ldap (by taku-k)
+    <https://github.com/mackerelio/go-check-plugins/pull/227>
+  * [check-http] add regexp pattern option (by taku-k)
+    <https://github.com/mackerelio/go-check-plugins/pull/225>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 28 Mar 2018 15:38:16 +0900
+
 mackerel-check-plugins (0.18.0-1.v2) stable; urgency=low
 
   * [check-http] add host header option (by taku-k)
