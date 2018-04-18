@@ -4,11 +4,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/jessevdk/go-flags"
-	"github.com/mackerelio/checkers"
 	"io/ioutil"
 	"os"
 	"time"
+
+	"github.com/jessevdk/go-flags"
+	"github.com/mackerelio/checkers"
 )
 
 type certOpts struct {
@@ -29,7 +30,6 @@ func checkCertExpiration() *checkers.Checker {
 	psr := flags.NewParser(&opts, flags.Default)
 	_, err := psr.Parse()
 	if err != nil {
-		psr.WriteHelp(os.Stdout)
 		os.Exit(1)
 	}
 
