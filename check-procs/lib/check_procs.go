@@ -61,7 +61,7 @@ func Do() {
 func run(args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
-		return checkers.NewChecker(checkers.UNKNOWN, err.Error())
+		os.Exit(1)
 	}
 
 	// for backward compatibility
