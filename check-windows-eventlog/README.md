@@ -19,12 +19,15 @@ command = "/path/to/check-windows-eventlog --log=LOGTYPE --type=EVENTTYPE --sour
 
 ### EVENTTYPE
 
-* Success
 * Error
 * Audit Failure
+* Warning
+
+The following EVENTTYPE can not be detected as an alert.
+
+* Success
 * Audit Success
 * Information
-* Warning
 
 ## Tutorial
 
