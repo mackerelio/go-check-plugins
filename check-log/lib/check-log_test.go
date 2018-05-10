@@ -687,3 +687,74 @@ func TestRunMultiplePattern(t *testing.T) {
 	}
 	testInvalidPattern()
 }
+
+func TestRunWithSuppressOption(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	ptn1 := `FATAL`
+	ptn2 := `TESTAPPLICATION`
+	params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--suppress-pattern"}
+	opts, _ := parseArgs(params)
+	opts.prepare()
+
+	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
+
+	bytes, _ := getBytesToSkip(stateFile)
+	assert.Equal(t, int64(0), bytes, "something went wrong")
+
+	l1 := "FATAL\nTESTAPPLICATION\n"
+	test2line := func() {
+		fh.WriteString(l1)
+		ckr := run(params)
+		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
+		msg := "0 warnings, 0 criticals."
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+
+		bytes, _ = getBytesToSkip(stateFile)
+		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
+	}
+	test2line()
+
+	l2 := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
+	testAndCondition := func() {
+		fh.WriteString(l2)
+		ckr := run(params)
+		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
+		msg := "2 warnings, 2 criticals."
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+
+		bytes, _ = getBytesToSkip(stateFile)
+		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
+	}
+	testAndCondition()
+
+	l3 := "OK\n"
+	testWithLevel := func() {
+		fh.WriteString(l3)
+		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--warning-level", "12", "--suppress-pattern"}
+		ckr := run(params)
+		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
+		msg := "When multiple patterns specified, --warning-level --critical-level can not be used"
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+	}
+	testWithLevel()
+
+	testInvalidPattern := func() {
+		fh.WriteString(l3)
+		ptn3 := "+"
+		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn3, "--suppress-pattern"}
+		ckr := run(params)
+		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
+		msg := "pattern is invalid"
+		assert.Equal(t, ckr.Message, msg, "something went wrong")
+	}
+	testInvalidPattern()
+}

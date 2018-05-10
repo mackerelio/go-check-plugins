@@ -24,6 +24,7 @@ import (
 type logOpts struct {
 	LogFile             string   `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
 	Pattern             []string `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for. If specified multiple, they will be treated together with the AND operator"`
+	SuppressPattern     bool     `long:"suppress-pattern" description:"Suppress pattern display"`
 	Exclude             string   `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
 	WarnOver            int64    `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver            int64    `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
@@ -184,7 +185,12 @@ func run(args []string) *checkers.Checker {
 	for _, ptn := range opts.Pattern {
 		patterns = append(patterns, fmt.Sprintf("/%s/", ptn))
 	}
-	msg := fmt.Sprintf("%d warnings, %d criticals for pattern %s.", warnNum, critNum, strings.Join(patterns, " and "))
+	var msg string
+	if opts.SuppressPattern {
+		msg = fmt.Sprintf("%d warnings, %d criticals.", warnNum, critNum)
+	} else {
+		msg = fmt.Sprintf("%d warnings, %d criticals for pattern %s.", warnNum, critNum, strings.Join(patterns, " and "))
+	}
 	if errorOverall != "" {
 		msg += "\n" + errorOverall
 	}
