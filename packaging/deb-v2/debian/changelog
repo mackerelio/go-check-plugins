@@ -1,3 +1,14 @@
+mackerel-check-plugins (0.20.0-1.v2) stable; urgency=low
+
+  * [check-log] Add option to suppress pattern display (by k-hal)
+    <https://github.com/mackerelio/go-check-plugins/pull/234>
+  * [check-windows-eventlog] fix README - Some of the listed EVENTTYPEs can not be detected as alerts (by a-know)
+    <https://github.com/mackerelio/go-check-plugins/pull/233>
+  * [check-procs][check-cert-file] Fix duplicated output of usage with --help argument (by itchyny)
+    <https://github.com/mackerelio/go-check-plugins/pull/231>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 16 May 2018 23:23:23 +0900
+
 mackerel-check-plugins (0.19.0-1.v2) stable; urgency=low
 
   * add check-ldap (by taku-k)
