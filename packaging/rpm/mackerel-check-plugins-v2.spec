@@ -37,6 +37,11 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed May 16 2018 <mackerel-developers@hatena.ne.jp> - 0.20.0
+- [check-log] Add option to suppress pattern display (by k-hal)
+- [check-windows-eventlog] fix README - Some of the listed EVENTTYPEs can not be detected as alerts (by a-know)
+- [check-procs][check-cert-file] Fix duplicated output of usage with --help argument (by itchyny)
+
 * Wed Mar 28 2018 <mackerel-developers@hatena.ne.jp> - 0.19.0
 - add check-ldap (by taku-k)
 - [check-http] add regexp pattern option (by taku-k)

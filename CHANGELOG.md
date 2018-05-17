@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.20.0 (2018-05-16)
+
+* [check-log] Add option to suppress pattern display #234 (k-hal)
+* [check-windows-eventlog] fix README - Some of the listed EVENTTYPEs can not be detected as alerts #233 (a-know)
+* [check-procs][check-cert-file] Fix duplicated output of usage with --help argument #231 (itchyny)
+
+
 ## 0.19.0 (2018-03-28)
 
 * add check-ldap #227 (taku-k)
