@@ -12,10 +12,11 @@ import (
 )
 
 type mysqlSetting struct {
-	Host string `short:"H" long:"host" default:"localhost" description:"Hostname"`
-	Port string `short:"p" long:"port" default:"3306" description:"Port"`
-	User string `short:"u" long:"user" default:"root" description:"Username"`
-	Pass string `short:"P" long:"password" default:"" description:"Password" env:"MYSQL_PASSWORD"`
+	Host   string `short:"H" long:"host" default:"localhost" description:"Hostname"`
+	Port   string `short:"p" long:"port" default:"3306" description:"Port"`
+	Socket string `short:"S" long:"socket" default:"" description:"Path to unix socket"`
+	User   string `short:"u" long:"user" default:"root" description:"Username"`
+	Pass   string `short:"P" long:"password" default:"" description:"Password" env:"MYSQL_PASSWORD"`
 }
 
 var commands = map[string](func([]string) *checkers.Checker){
@@ -52,6 +53,11 @@ SubCommands:`)
 }
 
 func newMySQL(m mysqlSetting) mysql.Conn {
+	proto := "tcp"
 	target := fmt.Sprintf("%s:%s", m.Host, m.Port)
-	return mysql.New("tcp", "", target, m.User, m.Pass, "")
+	if m.Socket != "" {
+		proto = "unix"
+		target = m.Socket
+	}
+	return mysql.New(proto, "", target, m.User, m.Pass, "")
 }
