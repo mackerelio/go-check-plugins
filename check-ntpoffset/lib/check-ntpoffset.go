@@ -2,7 +2,6 @@ package checkntpoffset
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"io"
 	"math"
@@ -117,30 +116,7 @@ func detectNTPDname() (ntpdName string, err error) {
 
 func getNTPOffset(ntpServers string) (float64, error) {
 	if ntpServers != "" {
-		ctx := context.Background()
-		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-		defer cancel()
-		resultChan := make(chan float64)
-		for _, ntpServer := range strings.Split(ntpServers, ",") {
-			go func(ntpServer string) error {
-				ntpServer = strings.Trim(ntpServer, " ")
-				options := ntp.QueryOptions{Timeout: time.Duration(ntpTimeout) * time.Second}
-				response, err := ntp.QueryWithOptions(ntpServer, options)
-				if err != nil {
-					return err
-				}
-				resultChan <- float64(response.ClockOffset / time.Millisecond)
-				return nil
-			}(ntpServer)
-		}
-
-		select {
-		case <-ctx.Done():
-			return 0.0, fmt.Errorf("NTP offset cannot get from %q", ntpServers)
-		case offset := <-resultChan:
-			return offset, nil
-		}
-
+		return getNTPOffsetFromNTPServers(ntpServers)
 	}
 
 	ntpdName, err := detectNTPDname()
@@ -154,6 +130,33 @@ func getNTPOffset(ntpServers string) (float64, error) {
 		return getNTPOffsetFromChrony()
 	}
 	return 0.0, fmt.Errorf("unsupported ntp daemon %q", ntpdName)
+}
+
+// getNTPOffsetFromNTPServers ask time to ntp servers and return NTP Offset.
+// Use first response, ignore others
+//
+// FIXME need fluent cancel mechanism
+func getNTPOffsetFromNTPServers(ntpServers string) (offset float64, err error) {
+	resultChan := make(chan float64)
+	for _, ntpServer := range strings.Split(ntpServers, ",") {
+		go func(ntpServer string) error {
+			ntpServer = strings.Trim(ntpServer, " ")
+			options := ntp.QueryOptions{Timeout: time.Duration(ntpTimeout) * time.Second}
+			response, err := ntp.QueryWithOptions(ntpServer, options)
+			if err != nil {
+				return err
+			}
+			resultChan <- float64(response.ClockOffset / time.Millisecond)
+			return nil
+		}(ntpServer)
+	}
+
+	select {
+	case <-time.After(time.Duration(ntpTimeout) * time.Second):
+		return 0.0, fmt.Errorf("NTP offset cannot get from %q", ntpServers)
+	case offset = <-resultChan:
+		return offset, nil
+	}
 }
 
 func getNTPOffsetFromNTPD() (offset float64, err error) {
