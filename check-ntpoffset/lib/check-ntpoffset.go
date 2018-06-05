@@ -153,6 +153,7 @@ func getNTPOffsetFromNTPServers(ntpServers string) (offset float64, err error) {
 
 	select {
 	case <-time.After(time.Duration(ntpTimeout) * time.Second):
+		// return error only when all NTPServers are failed
 		return 0.0, fmt.Errorf("NTP offset cannot get from %q", ntpServers)
 	case offset = <-resultChan:
 		return offset, nil
