@@ -1,4 +1,4 @@
-package main
+package checksslcert
 
 import (
 	"crypto/tls"
@@ -24,7 +24,8 @@ func parseArgs(args []string) (*certOpts, error) {
 	return opts, err
 }
 
-func main() {
+// Do the plugin
+func Do() {
 	ckr := run(os.Args[1:])
 	ckr.Name = "SSL"
 	ckr.Exit()
