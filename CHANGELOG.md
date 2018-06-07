@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.21.0 (2018-06-07)
+
+* add check-ssl-cert #34 (Songmu)
+* Add feature use ntp server #237 (netmarkjp)
+* [check-mysql] add unix socket option #236 (sugy)
+
+
 ## 0.20.0 (2018-05-16)
 
 * [check-log] Add option to suppress pattern display #234 (k-hal)
