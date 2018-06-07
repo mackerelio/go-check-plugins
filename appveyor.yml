@@ -1,0 +1,20 @@
+version: 0.9.4-{build}
+clone_folder: c:\gopath\src\github.com\mackerelio\go-check-plugins
+environment:
+  GOPATH: c:\gopath
+install:
+  - set PATH=c:\go\bin;%GOPATH%\bin;%PATH%;C:\MinGW\bin
+  - echo %Path%
+  - rd c:\go /s /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go1.9.windows-386.zip
+  - 7z x go1.9.windows-386.zip -oC:\ >nul
+  - go version
+  - go env
+build_script:
+- go get -d -v -t ./...
+- go build -o check-log/check-log.exe ./check-log
+- go build -o check-procs/check-procs.exe ./check-procs
+- go build -o check-windows-eventlog/check-windows-evenglog.exe ./check-windows-eventlog
+test_script:
+- go tool vet -all .
+- go test ./check-log/... ./check-procs/... ./check-ntservice/... ./check-windows-eventlog/...

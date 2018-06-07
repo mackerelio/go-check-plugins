@@ -1,0 +1,136 @@
+mackerel-check-plugins (0.20.0-1.v2) stable; urgency=low
+
+  * [check-log] Add option to suppress pattern display (by k-hal)
+    <https://github.com/mackerelio/go-check-plugins/pull/234>
+  * [check-windows-eventlog] fix README - Some of the listed EVENTTYPEs can not be detected as alerts (by a-know)
+    <https://github.com/mackerelio/go-check-plugins/pull/233>
+  * [check-procs][check-cert-file] Fix duplicated output of usage with --help argument (by itchyny)
+    <https://github.com/mackerelio/go-check-plugins/pull/231>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 16 May 2018 23:23:23 +0900
+
+mackerel-check-plugins (0.19.0-1.v2) stable; urgency=low
+
+  * add check-ldap (by taku-k)
+    <https://github.com/mackerelio/go-check-plugins/pull/227>
+  * [check-http] add regexp pattern option (by taku-k)
+    <https://github.com/mackerelio/go-check-plugins/pull/225>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 28 Mar 2018 16:56:52 +0900
+
+mackerel-check-plugins (0.18.0-1.v2) stable; urgency=low
+
+  * [check-http] add host header option (by taku-k)
+    <https://github.com/mackerelio/go-check-plugins/pull/224>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 15 Mar 2018 10:38:16 +0900
+
+mackerel-check-plugins (0.17.1-1.v2) stable; urgency=low
+
+  * [check-log]improve skip bytes when file size is zero (by hayajo)
+    <https://github.com/mackerelio/go-check-plugins/pull/222>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 01 Mar 2018 14:14:59 +0900
+
+mackerel-check-plugins (0.17.0-1.v2) stable; urgency=low
+
+  * [check-procs] fix `getProcs` error handling (by mechairoi)
+    <https://github.com/mackerelio/go-check-plugins/pull/216>
+  * [ntpoffset] Refine NTP daemon detection and add tests (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/219>
+  * [check-tcp] add -W option (by dozen)
+    <https://github.com/mackerelio/go-check-plugins/pull/212>
+  * [check-procs] Error handling is required (by mechairoi)
+    <https://github.com/mackerelio/go-check-plugins/pull/204>
+  * Avoid race condition in checkhttp.Run() (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/214>
+  * [check-http] Expose checkhttp.Run due for using check-http as a library (by aereal)
+    <https://github.com/mackerelio/go-check-plugins/pull/210>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 08 Feb 2018 10:50:03 +0900
+
+mackerel-check-plugins (0.16.0-1.v2) stable; urgency=low
+
+  * Setting password via environment variable (by hayajo)
+    <https://github.com/mackerelio/go-check-plugins/pull/209>
+  * update rpm-v2 task for building Amazon Linux 2 package (by hayajo)
+    <https://github.com/mackerelio/go-check-plugins/pull/208>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 23 Jan 2018 11:25:23 +0900
+
+mackerel-check-plugins (0.15.0-1.v2) stable; urgency=low
+
+  * [check-mysql] add readonly subcommand (by ichirin2501)
+    <https://github.com/mackerelio/go-check-plugins/pull/205>
+  * [uptime] use go-osstat/uptime instead of golib/uptime for getting more accurate uptime (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/206>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 10 Jan 2018 16:17:59 +0900
+
+mackerel-check-plugins (0.14.1-1.v2) stable; urgency=low
+
+  * fix check-disk options: -x, -X, -p, -N (by plaster)
+    <https://github.com/mackerelio/go-check-plugins/pull/200>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 26 Oct 2017 11:12:55 +0900
+
+mackerel-check-plugins (0.14.0-1.v2) stable; urgency=low
+
+  * [check-log]Show matched filenames when we use `--return` option (by syou6162)
+    <https://github.com/mackerelio/go-check-plugins/pull/197>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 12 Oct 2017 15:21:52 +0900
+
+mackerel-check-plugins (0.13.0-1.v2) stable; urgency=low
+
+  * build with Go 1.9 (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/195>
+  * [check-log] Add check-first option and skip the log file on the first run on default (by edangelion)
+    <https://github.com/mackerelio/go-check-plugins/pull/190>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 27 Sep 2017 12:11:06 +0900
+
+mackerel-check-plugins (0.12.0-1.v2) stable; urgency=low
+
+  * add check-disk to package (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/192>
+  * add check-disk (by edangelion)
+    <https://github.com/mackerelio/go-check-plugins/pull/178>
+  * [check-postgresql] Add dbname to postgresql-setting (by edangelion)
+    <https://github.com/mackerelio/go-check-plugins/pull/189>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 23 Aug 2017 12:29:40 +0900
+
+mackerel-check-plugins (0.11.1-1.v2) stable; urgency=low
+
+  * Remove check-ssh binary (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/186>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 02 Aug 2017 11:08:02 +0900
+
+mackerel-check-plugins (0.11.0-1.v2) stable; urgency=low
+
+  * [check-http] Add -i flag to specify source IP (by mattn)
+    <https://github.com/mackerelio/go-check-plugins/pull/184>
+  * [check-http] Add -s option to map HTTP status (by mattn)
+    <https://github.com/mackerelio/go-check-plugins/pull/183>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 26 Jul 2017 14:17:09 +0900
+
+mackerel-check-plugins (0.10.4-1.v2) stable; urgency=low
+
+  * v2 packages (rpm and deb) (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/175>
+  * [check-log]  When specified multiple pattern, perform search that satisfies all conditions (by a-know)
+    <https://github.com/mackerelio/go-check-plugins/pull/174>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 07 Jun 2017 11:40:55 +0900
+
+mackerel-check-plugins (0.10.3-1.v2) stable; urgency=low
+
+  * [ntpoffset] support chronyd (by Songmu)
+    <https://github.com/mackerelio/go-check-plugins/pull/166>
+  * [check-ssh] fix the problem that check-ssh cannot invoke SSH connection (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/171>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 16 May 2017 18:01:28 +0900

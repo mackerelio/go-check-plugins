@@ -6,13 +6,31 @@ Check Plugins for monitoring written in golang.
 
 Documentation for each plugin is located in its respective sub directory.
 
+* [check-aws-sqs-queue-size](./check-aws-sqs-queue-size/README.md)
+* [check-cert-file](./check-cert-file/README.md)
+* [check-disk](./check-disk/README.md)
+* [check-elasticsearch](./check-elasticsearch/README.md)
 * [check-file-age](./check-file-age/README.md)
+* [check-file-size](./check-file-size/README.md)
 * [check-http](./check-http/README.md)
+* [check-jmx-jolokia](./check-jmx-jolokia/README.md)
+* [check-ldap](./check-ldap/README.md)
 * [check-load](./check-load/README.md)
 * [check-log](./check-log/README.md)
+* [check-mailq](./check-mailq/README.md)
+* [check-masterha](./check-masterha/README.md)
+* [check-memcached](./check-memcached/README.md)
 * [check-mysql](./check-mysql/README.md)
+* [check-ntpoffset](./check-ntpoffset/README.md)
+* [check-ntservice](./check-ntservice/README.md)
+* [check-postgresql](./check-postgresql/README.md)
 * [check-procs](./check-procs/README.md)
+* [check-redis](./check-redis/README.md)
+* [check-solr](./check-solr/README.md)
+* [check-ssh](./check-ssh/README.md)
 * [check-tcp](./check-tcp/README.md)
+* [check-uptime](./check-uptime/README.md)
+* [check-windows-eventlog](./check-windows-eventlog/README.md)
 
 Specification
 -------------
@@ -32,30 +50,30 @@ Installation
 ------------
 
 Install the plugin package from either the yum or the apt repository.
+To setup these package repositories, see the documentation regarding the installation of mackerel-agent ([rpm](https://mackerel.io/docs/entry/howto/install-agent/rpm) / [deb](https://mackerel.io/docs/entry/howto/install-agent/deb)).
 
-### CentOS 5/6
+mackerel-check-plugins will be installed to ```/usr/local/bin/check-*```.
+
+### yum
 
 ```shell
 yum install mackerel-check-plugins
 ```
 
-### Debian 6/7
+### apt
 
 ```shell
 apt-get install mackerel-check-plugins
 ```
-
-mackerel-check-plugins will be installed to ```/usr/local/bin/check-*```.
-
 
 Use check plugins in Mackerel
 -----------------------------
 
 See the following documentation.
 
-English: http://help.mackerel.io/entry/custom-checks
+English: https://mackerel.io/docs/entry/custom-checks
 
-Japanese: http://help-ja.mackerel.io/entry/custom-checks
+Japanese: https://mackerel.io/ja/docs/entry/custom-checks
 
 
 Contribution

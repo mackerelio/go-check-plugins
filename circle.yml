@@ -1,0 +1,14 @@
+machine:
+  timezone:
+    Asia/Tokyo
+
+dependencies:
+  override:
+    - mkdir -p $HOME/.go_workspace/src/github.com/mackerelio
+    - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_workspace/src/github.com/mackerelio/$CIRCLE_PROJECT_REPONAME
+
+test:
+  pre:
+    - go get github.com/mitchellh/gox
+  override:
+    - make test

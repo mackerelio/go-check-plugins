@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+# This variable must be the same as the value of the `Package:` field in the control file.
+package=mackerel-check-plugins
+
+override_dh_auto_install:
+	dh_auto_install
+	install -d -m 755 debian/${package}/usr/bin
+	install -m 755 debian/mackerel-check debian/${package}/usr/bin
+	for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime; do \
+	  ln -s ./mackerel-check debian/${package}/usr/bin/check-$$i; \
+	done

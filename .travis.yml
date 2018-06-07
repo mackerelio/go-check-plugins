@@ -1,12 +1,20 @@
 language: go
 go:
-- 1.4
-env: PATH=/home/travis/gopath/bin:$PATH
+- 1.9.x
+env:
+  global:
+  - PATH=~/gopath/bin:$PATH
+  - DEBIAN_FRONTEND=noninteractive
+  - secure: "HB9I+UY4i/WGNuWu+tBCqYAGUj5eDDRGiHU46TEqyKIaaNiyaa7VCwN8ncWN+1MOsY/tQlz+S+PdAwnUWaehvTdhhDVXleGjgtNtZPYFOiziT0+WhcfiWQf73aj1nz0r8gNIEVqIt2m7+FQjCfNNzOFG5DmgP5odiRf2qe5Gm50zsUZUWTPoEbb1nI2eG+juqzijaa17WJbLuVoIkV4/3oywzAJ8Oe8b8SZoilwKFM3e8s12fUI6AMkHGCjGul/Ch4y37xC8lYCShlGJgaOuvgS3DY/cfgt4BzUt9LDmqeJd49S2LfxAHbbjX7gtjvrZelapOZ9lQbEGbAOEUc2yMbYQThDnaaUOeCgBCOeXdM0HdgQJxKLA8smxhorzOna+8Oey77JuuqzmYPvICPt42cKO673dZxnHdy+qDUrgcHIIhEIPanCOAgs939gpRkNlKOkCrLG8jI2nuWQng60MQw5dCxWYDImkmcFY2UUeMKKC9oEBELOMa41mfWJPtsAWEKUSfoaqV91Zw8kD9ubgO6TwqXXbGK8SJiq+nJImEBjiMFdouU5SBEdvE0rbBspC20oqsum+e1UgrCkLAUsA7D1XRhRxFQ/5JgLZ/ZooI10qBAAMppkWC6WSRDIo/9DcL8QmJYelNIjHfT9z6wBzC8rUnaYekp4+RZ+Z8VlhHAk="
+sudo: false
+addons:
+  apt:
+    packages:
+    - rpm
+    - devscripts
+    - debhelper
+    - fakeroot
 install:
-- go get github.com/mitchellh/gox
-- gox -build-toolchain -osarch=linux/386
-- sudo apt-get update
-- DEBIAN_FRONTEND=noninteractive sudo apt-get install -y rpm devscripts debhelper
 - mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 script:
 - make lint
@@ -14,19 +22,15 @@ script:
 - make all
 after_script:
 - goveralls -coverprofile=.profile.cov
-after_success:
-- tool/travis/autotag.sh
+before_deploy:
+- go get github.com/motemen/gobump/cmd/gobump
+- go get github.com/mackerelio/golib/cmd/mackerel-github-release
 deploy:
-  provider: releases
-  api_key:
-    secure: vmMQz+IjJ/LUa9SHAlLKyg4raSqkEBIRzqnjS1LK7ZjtcAROo6Pn0lUcC4qMZ96/VvNMdLyGndCOBXsdE2VBCY5goTI7uIW1oxbLM3qOMNQQldG1bOY34bjkiiDU15WLUsKKPEC2RdgwG1aAAsqcUDAeyRABYVBANSn9jylQnBC2b2mQMYUtVA1O9jl3Qg64Cy6MUUirE/SuKp/cnE3AakcQt54pNVsnM54bIyrbGhqThLj7p7uLJEm58oRWR7TTUSgmk/Rbj4aJSC4k5lzN9iL/Fr5AgnpEQQUg3ishE+5yqSW7f/PRqXC6ZI9p6XS7bhS8N178ImzouIsoKWltblsgUhfvE6ONyMpi1+RG+6Lp3HlpLuq0Pz/efEpcaSDg6lXDIvMBC2sA5pbPok6Yx4tJOSv8adWu9t0yGVJezYaqbN/071K9m3cM4YTQK4L39b2FxQ2ZrUhee8HZy5rDO8iqx2vgM+NXATz2L5Tjjzd4aqfIDX8R3PVImBci7se/wmamDUpOrcfSjrI2dzEQGBzBfIFIhCaCQSuEjpZqBKdcOztkn1uev7a0AAUeZ7my+uQNpAMO7/AapM7LLugmkLM06FgrHKWDPQP/T92MPyvmC04nNraetAVijVYLQnlK5+TdEMvkKHuY5afLp5mEzX+7jTSmjyaUNrbANs8bH/8=
-  file:
-  - "/home/travis/rpmbuild/RPMS/noarch/mackerel-check-plugins-0.2.0-1.noarch.rpm"
-  - "/home/travis/gopath/src/github.com/mackerelio/go-check-plugins/packaging/mackerel-check-plugins_0.2.0-1_all.deb"
+- provider: script
+  script: mackerel-github-release && mackerel-github-release -staging
+  skip_cleanup: true
   on:
-    repo: mackerelio/go-check-plugins
-    all_branches: true
-    tags: true
+    branch: master
 notifications:
   slack:
-    secure: gsM+oW5k6hQnL16ubkj0Iu7b3kSeUUGCErwWa8AIBdfk6DUYBxfFNkJkHJ+N44YJPuk/ijaTk8fzQ0HqD9H+Fegkv/KPMnJ00QxOD4XWv4URFACuGQgC2xB4G8OBg7StHPN68KroQn1ryNNoAwiZih///PGJyxb4uU/FrpA8iLATBoGoaEv8OrGkkwIepvtuHeRzyMPAjNvNO6evI0d/+Xn0YLRLtufdznHG3UHc/FJ306QkMz5hbP4iZqyNFlj6sFlvvovsozTqgGYYqKz2QbMzvR3l7xuFWiV6qa6zegy6sWp9pBWykQMm528R3pVDSu/f775shORLS4DaSV7ZM3Gw963gIgfdmcqLi6KP8j+NqqyveUAq5C6JOaVDTKwJg+b2yL6TYYEQ4Lz7WiOLLmjj9V+9+i5oy852FfQEG/en9+jnPDuWDI0ILKTW8EqcQfCf46mtV0TiWY4if5iYAVUOl2O5Jam9LTX9YSeRA0qq9022tJ60GpIvX9vskO2SXTdAAQRRqM5dliOYblo0H3AmBQWTixH+AgcOP0nzAugIRX07Kpni9GfOL5bW3lBVJo1502DZWLdKoF1ulS/nHfWdz9TwuocX8hOko/H3yNH8Lt9DyodgXgWDwtYuHeuXxw7gTcaPX4K3wGgshnaBZXrryWH6u7UPT8hFePqsD58=
+    secure: W4637ZIl5Gbwm93btsfysyvZpVw3GVMni1y7ea8lj4XFEyNV9aoW0OIkCjWIL9MrkxnkCcnhTKfOAPuFoqFYXXRJFkYCU9GYRsENqwvk9ev2xNyQ9OPIdNqVFcgzA4qiX97JwiuvkaDauRLsWKpdZUtMugrMEsnt1hH6E6uJ5CyVtuun9O5SyICet9tzyLyFpefrhKT8LJiwYDzT9PX6vaL2FCxDgservpPon4YkIkbaZcfURbkd0Gkm3IW5HSVAzAesEspDPAAbMp0ZKF6YPXk1kCuAttNcXoNfRyxIWD02qYTVvVLMVI9DbcDGzAeBPYaZ0vLFtCTwPWx342GqAVDy1sZ5xqYwwqpeVwPA7GdCARl3PgP1q04j4Dd6ZUMn5vM+HdMGtbKcT2vks/t9D8ozrX2F/SyTAVCVqt4xEBSVus4U8a7oK+JQXphnV++8ltDfyXoSdv4oQjHDmpZurcbEgmzWBFuenQK8CKM71voEZZSxhu4/7TksoXuo0zzxhopR9u9B/Y+/74azGBv3VW/JfzJ5gzi08Y56YA80pLHjbxJeykKzv4lR+c+WAWGxVhBD9xN4OKcer3ohDbTfhs0rDf270DOSYx3bstnvQ87NcNbJ1sPRwRhK8rbzvwtLnGUjMNK1kNRcr2rQmmJYlR3DH/hfHHEvAQPeseN90Ek=
