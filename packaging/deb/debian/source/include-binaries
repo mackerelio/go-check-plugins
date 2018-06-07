@@ -19,5 +19,6 @@ debian/check-procs
 debian/check-redis
 debian/check-solr
 debian/check-ssh
+debian/check-ssl-cert
 debian/check-tcp
 debian/check-uptime

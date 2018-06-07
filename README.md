@@ -28,6 +28,7 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-redis](./check-redis/README.md)
 * [check-solr](./check-solr/README.md)
 * [check-ssh](./check-ssh/README.md)
+* [check-ssl-cert](./check-ssl-cert/README.md)
 * [check-tcp](./check-tcp/README.md)
 * [check-uptime](./check-uptime/README.md)
 * [check-windows-eventlog](./check-windows-eventlog/README.md)

@@ -25,7 +25,7 @@ mackerel.io check plugins
 
 %{__install} -m0755 %{_sourcedir}/build/mackerel-check %{buildroot}%{__targetdir}/
 
-for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh tcp uptime; do \
+for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh ssl-cert tcp uptime; do \
     ln -s ./mackerel-check %{buildroot}%{__targetdir}/check-$i; \
 done
 
@@ -37,6 +37,11 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu Jun 07 2018 <mackerel-developers@hatena.ne.jp> - 0.21.0
+- add check-ssl-cert (by Songmu)
+- Add feature use ntp server (by netmarkjp)
+- [check-mysql] add unix socket option (by sugy)
+
 * Wed May 16 2018 <mackerel-developers@hatena.ne.jp> - 0.20.0
 - [check-log] Add option to suppress pattern display (by k-hal)
 - [check-windows-eventlog] fix README - Some of the listed EVENTTYPEs can not be detected as alerts (by a-know)
