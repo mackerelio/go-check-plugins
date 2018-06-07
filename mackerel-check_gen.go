@@ -25,6 +25,7 @@ import (
 	"github.com/mackerelio/go-check-plugins/check-redis/lib"
 	"github.com/mackerelio/go-check-plugins/check-solr/lib"
 	"github.com/mackerelio/go-check-plugins/check-ssh/lib"
+	"github.com/mackerelio/go-check-plugins/check-ssl-cert/lib"
 	"github.com/mackerelio/go-check-plugins/check-tcp/lib"
 	"github.com/mackerelio/go-check-plugins/check-uptime/lib"
 )
@@ -73,6 +74,8 @@ func runPlugin(plug string) error {
 		checksolr.Do()
 	case "ssh":
 		checkssh.Do()
+	case "ssl-cert":
+		checksslcert.Do()
 	case "tcp":
 		checktcp.Do()
 	case "uptime":
@@ -105,6 +108,7 @@ var plugins = []string{
 	"redis",
 	"solr",
 	"ssh",
+	"ssl-cert",
 	"tcp",
 	"uptime",
 }
