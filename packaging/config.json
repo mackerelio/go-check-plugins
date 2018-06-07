@@ -22,6 +22,7 @@
        "redis",
        "solr",
        "ssh",
+       "ssl-cert",
        "tcp",
        "uptime"
     ]
