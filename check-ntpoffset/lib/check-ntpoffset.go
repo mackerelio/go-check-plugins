@@ -10,14 +10,24 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/beevik/ntp"
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 )
 
 var opts struct {
-	Crit float64 `short:"c" long:"critical" default:"100" description:"Critical threshold of ntp offset(ms)"`
-	Warn float64 `short:"w" long:"warning" default:"50" description:"Warning threshold of ntp offset(ms)"`
+	Crit       float64 `short:"c" long:"critical" default:"100" description:"Critical threshold of ntp offset(ms)"`
+	Warn       float64 `short:"w" long:"warning" default:"50" description:"Warning threshold of ntp offset(ms)"`
+	NTPServers string  `short:"s" long:"ntp-servers" default:"" description:"Use specified NTP Servers(plural servers can be set separated by ,). When set plural servers, use first response. If not set, use local command just like ntpd/chronyd."`
+	NTPTimeout int     `short:"t" long:"ntp-timeout" default:"15" description:"Timeout of NTP Server Querying(in seconds)."`
+}
+
+var ntpTimeout int
+
+func init() {
+	ntpTimeout = 15
 }
 
 // Do the plugin
@@ -32,8 +42,9 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		os.Exit(1)
 	}
+	ntpTimeout = opts.NTPTimeout
 
-	offset, err := getNTPOffset()
+	offset, err := getNTPOffset(opts.NTPServers)
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
@@ -103,7 +114,11 @@ func detectNTPDname() (ntpdName string, err error) {
 	return ntpdName, err
 }
 
-func getNTPOffset() (float64, error) {
+func getNTPOffset(ntpServers string) (float64, error) {
+	if ntpServers != "" {
+		return getNTPOffsetFromNTPServers(ntpServers)
+	}
+
 	ntpdName, err := detectNTPDname()
 	if err != nil {
 		return 0.0, err
@@ -115,6 +130,34 @@ func getNTPOffset() (float64, error) {
 		return getNTPOffsetFromChrony()
 	}
 	return 0.0, fmt.Errorf("unsupported ntp daemon %q", ntpdName)
+}
+
+// getNTPOffsetFromNTPServers ask time to ntp servers and return NTP Offset.
+// Use first response, ignore others
+//
+// FIXME need fluent cancel mechanism
+func getNTPOffsetFromNTPServers(ntpServers string) (offset float64, err error) {
+	resultChan := make(chan float64)
+	for _, ntpServer := range strings.Split(ntpServers, ",") {
+		go func(ntpServer string) error {
+			ntpServer = strings.Trim(ntpServer, " ")
+			options := ntp.QueryOptions{Timeout: time.Duration(ntpTimeout) * time.Second}
+			response, err := ntp.QueryWithOptions(ntpServer, options)
+			if err != nil {
+				return err
+			}
+			resultChan <- float64(response.ClockOffset / time.Millisecond)
+			return nil
+		}(ntpServer)
+	}
+
+	select {
+	case <-time.After(time.Duration(ntpTimeout) * time.Second):
+		// return error only when all NTPServers are failed
+		return 0.0, fmt.Errorf("NTP offset cannot get from %q", ntpServers)
+	case offset = <-resultChan:
+		return offset, nil
+	}
 }
 
 func getNTPOffsetFromNTPD() (offset float64, err error) {
