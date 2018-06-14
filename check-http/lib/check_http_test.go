@@ -77,7 +77,22 @@ func TestSourceIP(t *testing.T) {
 }
 
 func TestHost(t *testing.T) {
-	ckr := Run([]string{"-H", `"Host: mackerel.io"`, "-H", `"Accept-Encoding: gzip"`, "-u", "https://mackerel.io"})
+	testHost := "mackerel.io"
+	testHeader := "test"
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, testHost, r.Host)
+		header := r.Header
+		assert.Equal(t, testHeader, header.Get("TestHeader"))
+	}))
+	defer ts.Close()
+
+	ckr := Run([]string{
+		"-H", fmt.Sprintf("Host: %s", testHost),
+		"-H", fmt.Sprintf("TestHeader: %s", testHeader),
+		"-u", ts.URL,
+	})
+
 	assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
 }
 

@@ -25,7 +25,7 @@ type checkHTTPOpts struct {
 	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
 	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
 	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
-	Headers            []string `short:"H" description:"Host name for servers using host headers"`
+	Headers            []string `short:"H" description:"HTTP request headers"`
 	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
 }
 
@@ -145,10 +145,18 @@ func Run(args []string) *checkers.Checker {
 	}
 
 	if len(opts.Headers) != 0 {
-		req.Header, err = parseHeader(&opts)
+		header, err := parseHeader(&opts)
 		if err != nil {
 			return checkers.Unknown(err.Error())
 		}
+
+		// Host header must be set via req.Host
+		if host := header.Get("Host"); len(host) != 0 {
+			req.Host = host
+			header.Del("Host")
+		}
+
+		req.Header = header
 	}
 
 	stTime := time.Now()
