@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.21.1 (2018-06-20)
+
+* [check-http] Set Host header via req.Host #239 (nonylene)
+
+
 ## 0.21.0 (2018-06-07)
 
 * add check-ssl-cert #34 (Songmu)
