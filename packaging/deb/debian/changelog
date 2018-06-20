@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.21.1-1) stable; urgency=low
+
+  * [check-http] Set Host header via req.Host (by nonylene)
+    <https://github.com/mackerelio/go-check-plugins/pull/239>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 20 Jun 2018 10:59:32 +0900
+
 mackerel-check-plugins (0.21.0-1) stable; urgency=low
 
   * add check-ssl-cert (by Songmu)

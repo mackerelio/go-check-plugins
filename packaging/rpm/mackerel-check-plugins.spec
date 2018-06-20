@@ -46,6 +46,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jun 20 2018 <mackerel-developers@hatena.ne.jp> - 0.21.1
+- [check-http] Set Host header via req.Host (by nonylene)
+
 * Thu Jun 07 2018 <mackerel-developers@hatena.ne.jp> - 0.21.0
 - add check-ssl-cert (by Songmu)
 - Add feature use ntp server (by netmarkjp)
