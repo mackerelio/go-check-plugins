@@ -471,7 +471,7 @@ loop_events:
 
 		if opts.ReturnContent {
 			if message == "" {
-				message = "Because the message resource could not be found, the event log message could not be obtained by mackerel-agent. Please access the target server and check the event log directly."
+				message = "Because the message resource could not be found, the event log message could not be obtained. Please access the target server and check the event log directly."
 			}
 			errLines += sourceName + ":" + strings.Replace(message, "\n", "", -1) + "\n"
 		}
