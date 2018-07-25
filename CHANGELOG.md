@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.21.2 (2018-07-25)
+
+* modify message check-windows-eventlog #241 (daiksy)
+
+
 ## 0.21.1 (2018-06-20)
 
 * [check-http] Set Host header via req.Host #239 (nonylene)
