@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.21.2-1.v2) stable; urgency=low
+
+  * modify message check-windows-eventlog (by daiksy)
+    <https://github.com/mackerelio/go-check-plugins/pull/241>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 25 Jul 2018 12:49:55 +0900
+
 mackerel-check-plugins (0.21.1-1.v2) stable; urgency=low
 
   * [check-http] Set Host header via req.Host (by nonylene)

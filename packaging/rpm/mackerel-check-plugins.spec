@@ -46,6 +46,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jul 25 2018 <mackerel-developers@hatena.ne.jp> - 0.21.2
+- modify message check-windows-eventlog (by daiksy)
+
 * Wed Jun 20 2018 <mackerel-developers@hatena.ne.jp> - 0.21.1
 - [check-http] Set Host header via req.Host (by nonylene)
 
