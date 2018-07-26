@@ -84,6 +84,7 @@ func TestSMTP_Default(t *testing.T) {
 		{
 			name:      "timeout",
 			argv:      []string{"--timeout", "-1"},
+			delay:     1,
 			responses: responseDefault,
 			expected:  "CRITICAL",
 		},
@@ -101,7 +102,11 @@ func TestSMTP_Default(t *testing.T) {
 				responses: c.responses,
 				delay:     c.delay,
 			}
-			go s.runServe()
+			go func() {
+				if err := s.runServe(); err != nil {
+					t.Fatal(err.Error())
+				}
+			}()
 			port := strings.Split(ln.Addr().String(), ":")[1]
 			argv := []string{"--host", "127.0.0.1", "--port", port}
 			argv = append(argv, c.argv...)
