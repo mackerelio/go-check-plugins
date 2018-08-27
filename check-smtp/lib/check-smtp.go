@@ -26,8 +26,8 @@ var opts struct {
 	Auth     string  `short:"A" long:"authmech" description:"SMTP AUTH Authentication Mechanisms (only PLAIN supported)"`
 	User     string  `short:"U" long:"authuser" description:"SMTP AUTH username"`
 	Password string  `short:"P" long:"authpassword" description:"SMTP AUTH password"`
-	Warning  float64 `short:"w" long:"warning" default:"3" description:"Warning threshold (sec)"`
-	Critical float64 `short:"c" long:"critical" default:"5" description:"Critical threshold (sec)"`
+	Warning  float64 `short:"w" long:"warning" description:"Warning threshold (sec)"`
+	Critical float64 `short:"c" long:"critical" description:"Critical threshold (sec)"`
 	Timeout  int     `short:"t" long:"timeout" default:"10" description:"Timeout (sec)"`
 }
 
@@ -50,6 +50,10 @@ func run(args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
 		os.Exit(1)
+	}
+
+	if opts.Warning == 0 && opts.Critical == 0 {
+		return checkers.Unknown("require threshold option (warning or critical)")
 	}
 
 	if opts.Auth != "" && opts.Auth != "PLAIN" {
@@ -110,9 +114,9 @@ func run(args []string) *checkers.Checker {
 
 	msg := fmt.Sprintf("%.3f seconds response time", elapsed.Seconds())
 
-	if elapsed.Seconds() > opts.Critical {
+	if opts.Critical != 0 && elapsed.Seconds() > opts.Critical {
 		return checkers.Critical(msg)
-	} else if elapsed.Seconds() > opts.Warning {
+	} else if opts.Warning != 0 && elapsed.Seconds() > opts.Warning {
 		return checkers.Warning(msg)
 	} else {
 		return checkers.Ok(msg)
