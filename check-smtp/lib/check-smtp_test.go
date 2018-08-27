@@ -64,14 +64,14 @@ func TestSMTP_Default(t *testing.T) {
 		{
 			name:      "warning",
 			argv:      []string{"--warning", "1"},
-			delay:     1,
+			delay:     2,
 			responses: responseDefault,
 			expected:  "WARNING",
 		},
 		{
 			name:      "critical",
 			argv:      []string{"--critical", "1"},
-			delay:     1,
+			delay:     2,
 			responses: responseDefault,
 			expected:  "CRITICAL",
 		},
