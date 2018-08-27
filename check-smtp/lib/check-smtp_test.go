@@ -62,12 +62,6 @@ func TestSMTP_Default(t *testing.T) {
 		responses []string
 	}{
 		{
-			name:      "default",
-			argv:      []string{},
-			responses: responseDefault,
-			expected:  "OK",
-		},
-		{
 			name:      "warning",
 			argv:      []string{"--warning", "1"},
 			delay:     1,
@@ -83,7 +77,7 @@ func TestSMTP_Default(t *testing.T) {
 		},
 		{
 			name:      "timeout",
-			argv:      []string{"--timeout", "-1"},
+			argv:      []string{"--critical", "1", "--timeout", "-1"},
 			delay:     1,
 			responses: responseDefault,
 			expected:  "CRITICAL",
@@ -115,5 +109,12 @@ func TestSMTP_Default(t *testing.T) {
 				t.Errorf("%s: %s", ckr.Status.String(), ckr.Message)
 			}
 		})
+	}
+}
+
+func TestSMTP_NoThresholdOptions(t *testing.T) {
+	ckr := run([]string{})
+	if ckr.Status.String() != "UNKNOWN" {
+		t.Errorf("expected UNKNOWN to eq %s", ckr.Status.String())
 	}
 }
