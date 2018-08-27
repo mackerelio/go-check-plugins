@@ -17,7 +17,7 @@ import (
 	"github.com/mackerelio/checkers"
 )
 
-var opts struct {
+type options struct {
 	Host     string  `short:"H" long:"host" default:"localhost" description:"Hostname"`
 	Port     string  `short:"p" long:"port" default:"25" description:"Port"`
 	FQDN     string  `short:"F" long:"fqdn" description:"FQDN used for HELO"`
@@ -43,10 +43,11 @@ func makeConn(host, port string, timeout int, isSMTPS bool, tlsConfig *tls.Confi
 	if isSMTPS {
 		return tls.DialWithDialer(&d, "tcp", fmt.Sprintf("%s:%s", host, port), tlsConfig)
 	}
-	return d.Dial("tcp", fmt.Sprintf("%s:%s", opts.Host, opts.Port))
+	return d.Dial("tcp", fmt.Sprintf("%s:%s", host, port))
 }
 
 func run(args []string) *checkers.Checker {
+	var opts options
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
 		os.Exit(1)
