@@ -1,16 +1,11 @@
 package checksmtp
 
 import (
-	"os"
-
-	"net/smtp"
-
-	"fmt"
-
 	"crypto/tls"
-
+	"fmt"
 	"net"
-
+	"net/smtp"
+	"os"
 	"time"
 
 	"github.com/jessevdk/go-flags"
