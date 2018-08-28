@@ -20,6 +20,7 @@
        "postgresql",
        "procs",
        "redis",
+       "smtp",
        "solr",
        "ssh",
        "ssl-cert",
