@@ -23,6 +23,7 @@ import (
 	"github.com/mackerelio/go-check-plugins/check-postgresql/lib"
 	"github.com/mackerelio/go-check-plugins/check-procs/lib"
 	"github.com/mackerelio/go-check-plugins/check-redis/lib"
+	"github.com/mackerelio/go-check-plugins/check-smtp/lib"
 	"github.com/mackerelio/go-check-plugins/check-solr/lib"
 	"github.com/mackerelio/go-check-plugins/check-ssh/lib"
 	"github.com/mackerelio/go-check-plugins/check-ssl-cert/lib"
@@ -70,6 +71,8 @@ func runPlugin(plug string) error {
 		checkprocs.Do()
 	case "redis":
 		checkredis.Do()
+	case "smtp":
+		checksmtp.Do()
 	case "solr":
 		checksolr.Do()
 	case "ssh":
@@ -106,6 +109,7 @@ var plugins = []string{
 	"postgresql",
 	"procs",
 	"redis",
+	"smtp",
 	"solr",
 	"ssh",
 	"ssl-cert",
