@@ -114,7 +114,7 @@ func run(args []string) *checkers.Checker {
 		return checkers.Critical(msg)
 	} else if opts.Warning != 0 && elapsed.Seconds() > opts.Warning {
 		return checkers.Warning(msg)
-	} else {
-		return checkers.Ok(msg)
 	}
+
+	return checkers.Ok(msg)
 }
