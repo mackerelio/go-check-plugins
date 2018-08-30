@@ -10,6 +10,6 @@ override_dh_auto_install:
 	dh_auto_install
 	install -d -m 755 debian/${package}/usr/bin
 	install -m 755 debian/mackerel-check debian/${package}/usr/bin
-	for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh ssl-cert tcp uptime; do \
+	for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis smtp solr ssh ssl-cert tcp uptime; do \
 	  ln -s ./mackerel-check debian/${package}/usr/bin/check-$$i; \
 	done

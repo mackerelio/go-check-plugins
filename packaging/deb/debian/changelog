@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.22.0-1) stable; urgency=low
+
+  * Add check-smtp (by shiimaxx)
+    <https://github.com/mackerelio/go-check-plugins/pull/243>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 30 Aug 2018 10:49:16 +0900
+
 mackerel-check-plugins (0.21.2-1) stable; urgency=low
 
   * modify message check-windows-eventlog (by daiksy)

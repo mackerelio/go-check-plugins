@@ -26,6 +26,7 @@ Documentation for each plugin is located in its respective sub directory.
 * [check-postgresql](./check-postgresql/README.md)
 * [check-procs](./check-procs/README.md)
 * [check-redis](./check-redis/README.md)
+* [check-smtp](./check-smtp/README.md)
 * [check-solr](./check-solr/README.md)
 * [check-ssh](./check-ssh/README.md)
 * [check-ssl-cert](./check-ssl-cert/README.md)
