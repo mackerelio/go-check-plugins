@@ -25,7 +25,7 @@ mackerel.io check plugins
 
 %{__install} -m0755 %{_sourcedir}/build/mackerel-check %{buildroot}%{__targetdir}/
 
-for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis solr ssh ssl-cert tcp uptime; do \
+for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis smtp solr ssh ssl-cert tcp uptime; do \
     ln -s ./mackerel-check %{buildroot}%{__targetdir}/check-$i; \
 done
 
@@ -37,6 +37,9 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu Aug 30 2018 <mackerel-developers@hatena.ne.jp> - 0.22.0
+- Add check-smtp (by shiimaxx)
+
 * Wed Jul 25 2018 <mackerel-developers@hatena.ne.jp> - 0.21.2
 - modify message check-windows-eventlog (by daiksy)
 

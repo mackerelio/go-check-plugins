@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.22.0 (2018-08-30)
+
+* Add check-smtp #243 (shiimaxx)
+
+
 ## 0.21.2 (2018-07-25)
 
 * modify message check-windows-eventlog #241 (daiksy)
