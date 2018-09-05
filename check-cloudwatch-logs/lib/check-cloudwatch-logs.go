@@ -30,10 +30,8 @@ func Do() {
 }
 
 type cloudwatchLogsPlugin struct {
-	Region          string
-	AccessKeyID     string
-	SecretAccessKey string
-	LogGroupName    string
+	Service      *cloudwatchlogs.CloudWatchLogs
+	LogGroupName string
 }
 
 func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
@@ -42,27 +40,29 @@ func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
 	if err != nil {
 		return nil, err
 	}
+	service, err := createService(opts)
+	if err != nil {
+		return nil, err
+	}
 	return &cloudwatchLogsPlugin{
-		Region:          opts.Region,
-		AccessKeyID:     opts.AccessKeyID,
-		SecretAccessKey: opts.SecretAccessKey,
-		LogGroupName:    opts.LogGroupName,
+		Service:      service,
+		LogGroupName: opts.LogGroupName,
 	}, nil
 }
 
-func (p *cloudwatchLogsPlugin) getService() (*cloudwatchlogs.CloudWatchLogs, error) {
+func createService(opts *logOpts) (*cloudwatchlogs.CloudWatchLogs, error) {
 	sess, err := session.NewSession()
 	if err != nil {
 		return nil, err
 	}
 	config := aws.NewConfig()
-	if p.AccessKeyID != "" && p.SecretAccessKey != "" {
+	if opts.AccessKeyID != "" && opts.SecretAccessKey != "" {
 		config = config.WithCredentials(
-			credentials.NewStaticCredentials(p.AccessKeyID, p.SecretAccessKey, ""),
+			credentials.NewStaticCredentials(opts.AccessKeyID, opts.SecretAccessKey, ""),
 		)
 	}
-	if p.Region != "" {
-		config = config.WithRegion(p.Region)
+	if opts.Region != "" {
+		config = config.WithRegion(opts.Region)
 	}
 	return cloudwatchlogs.New(sess, config), nil
 }
@@ -71,14 +71,10 @@ func (p *cloudwatchLogsPlugin) run() error {
 	if p.LogGroupName == "" {
 		return errors.New("specify log group name")
 	}
-	service, err := p.getService()
-	if err != nil {
-		return err
-	}
 	var nextToken *string
 	for {
 		startTime := time.Now().Add(-5 * time.Minute)
-		output, err := service.FilterLogEvents(&cloudwatchlogs.FilterLogEventsInput{
+		output, err := p.Service.FilterLogEvents(&cloudwatchlogs.FilterLogEventsInput{
 			StartTime:    aws.Int64(startTime.Unix() * 1000),
 			LogGroupName: aws.String(p.LogGroupName),
 			NextToken:    nextToken,
