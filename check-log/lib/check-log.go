@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Songmu/postailer"
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 	"github.com/mackerelio/golib/pluginutil"
@@ -230,13 +231,15 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		skipBytes = s
 	}
 
-	f, err := os.Open(logFile)
+	// Trace old logfile after logrotate with the inode number of the logfile.
+	posfile := getPosPath(opts.StateDir, logFile, opts.origArgs)
+	f, err := postailer.Open(logFile, posfile)
 	if err != nil {
 		return 0, 0, "", err
 	}
 	defer f.Close()
 
-	stat, err := f.Stat()
+	stat, err := os.Stat(logFile)
 	if err != nil {
 		return 0, 0, "", err
 	}
@@ -354,6 +357,19 @@ func getStateFile(stateDir, f string, args []string) string {
 		fmt.Sprintf(
 			"%s-%x",
 			stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)),
+			md5.Sum([]byte(strings.Join(args, " "))),
+		),
+	)
+}
+
+var posRe = regexp.MustCompile(`^([a-zA-Z]):[/\\]`)
+
+func getPosPath(stateDir, f string, args []string) string {
+	return filepath.Join(
+		stateDir,
+		fmt.Sprintf(
+			"%s-%x.pos.json",
+			posRe.ReplaceAllString(f, `$1`+string(filepath.Separator)),
 			md5.Sum([]byte(strings.Join(args, " "))),
 		),
 	)
