@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go/service/cloudwatchlogs/cloudwatchlogsiface"
 	"github.com/jessevdk/go-flags"
 	"github.com/pkg/errors"
 
@@ -30,7 +31,7 @@ func Do() {
 }
 
 type cloudwatchLogsPlugin struct {
-	Service      *cloudwatchlogs.CloudWatchLogs
+	Service      cloudwatchlogsiface.CloudWatchLogsAPI
 	LogGroupName string
 }
 
