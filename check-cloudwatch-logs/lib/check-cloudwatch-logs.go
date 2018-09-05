@@ -75,16 +75,25 @@ func (p *cloudwatchLogsPlugin) run() error {
 	if err != nil {
 		return err
 	}
-	now := time.Now().Add(-3 * time.Minute)
-	events, err := service.FilterLogEvents(&cloudwatchlogs.FilterLogEventsInput{
-		StartTime:    aws.Int64(now.UnixNano()),
-		LogGroupName: aws.String(p.LogGroupName),
-	})
-	if err != nil {
-		return err
+	var nextToken *string
+	for {
+		startTime := time.Now().Add(-5 * time.Minute)
+		output, err := service.FilterLogEvents(&cloudwatchlogs.FilterLogEventsInput{
+			StartTime:    aws.Int64(startTime.Unix() * 1000),
+			LogGroupName: aws.String(p.LogGroupName),
+			NextToken:    nextToken,
+		})
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%#v\n", err)
+		fmt.Printf("%#v\n", output)
+		if output.NextToken == nil {
+			break
+		}
+		nextToken = output.NextToken
+		time.Sleep(200 * time.Millisecond)
 	}
-	fmt.Printf("%#v\n", err)
-	fmt.Printf("%#v\n", events)
 	return nil
 }
 
