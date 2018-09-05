@@ -231,13 +231,24 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		skipBytes = s
 	}
 
-	// Trace old logfile after logrotate with the inode number of the logfile.
-	posfile := getPosPath(opts.StateDir, logFile, opts.origArgs)
-	f, err := postailer.Open(logFile, posfile)
-	if err != nil {
-		return 0, 0, "", err
+	var r io.ReadSeeker
+	if opts.NoState {
+		f, err := os.Open(logFile)
+		if err != nil {
+			return 0, 0, "", err
+		}
+		defer f.Close()
+		r = f
+	} else {
+		// Trace old logfile after logrotate with the inode number of the logfile.
+		posfile := getPosPath(opts.StateDir, logFile, opts.origArgs)
+		f, err := postailer.Open(logFile, posfile)
+		if err != nil {
+			return 0, 0, "", err
+		}
+		defer f.Close()
+		r = f
 	}
-	defer f.Close()
 
 	stat, err := os.Stat(logFile)
 	if err != nil {
@@ -254,10 +265,9 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	if stat.Size() < skipBytes {
 		rotated = true
 	} else if skipBytes > 0 {
-		f.Seek(skipBytes, 0)
+		r.Seek(skipBytes, 0)
 	}
 
-	var r io.Reader = f
 	if opts.Encoding != "" {
 		e := encoding.GetEncoding(opts.Encoding)
 		if e == nil {
