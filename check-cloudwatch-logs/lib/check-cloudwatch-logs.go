@@ -22,7 +22,9 @@ type logOpts struct {
 	SecretAccessKey string `long:"secret-access-key" value-name:"SECRET-ACCESS-KEY" description:"AWS Secret Access Key"`
 	LogGroupName    string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name"`
 
-	Pattern string `long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs."`
+	Pattern      string `long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs."`
+	WarningOver  int    `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
+	CriticalOver int    `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 }
 
 // Do the plugin
@@ -36,8 +38,8 @@ type cloudwatchLogsPlugin struct {
 	Service      cloudwatchlogsiface.CloudWatchLogsAPI
 	LogGroupName string
 	Pattern      string
-	WarnOver     int
-	CritOver     int
+	WarningOver  int
+	CriticalOver int
 }
 
 func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
@@ -109,8 +111,14 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
 	}
+	status := checkers.OK
+	if len(messages) > p.CriticalOver {
+		status = checkers.CRITICAL
+	} else if len(messages) > p.WarningOver {
+		status = checkers.WARNING
+	}
 	if messages != nil {
-		return checkers.NewChecker(checkers.WARNING, strings.Join(messages, ""))
+		return checkers.NewChecker(status, strings.Join(messages, ""))
 	}
 	return checkers.NewChecker(checkers.OK, "ok")
 }
