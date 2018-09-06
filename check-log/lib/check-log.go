@@ -232,7 +232,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	}
 
 	var r io.ReadSeeker
-	if opts.NoState {
+	if opts.NoState || opts.CheckFirst {
 		f, err := os.Open(logFile)
 		if err != nil {
 			return 0, 0, "", err
