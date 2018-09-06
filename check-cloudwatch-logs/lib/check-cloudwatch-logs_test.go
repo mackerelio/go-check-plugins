@@ -76,6 +76,7 @@ func Test_cloudwatchLogsPlugin_run(t *testing.T) {
 		Service:      createMockService(),
 		LogGroupName: "test-group",
 	}
-	err := p.run()
+	messages, err := p.run()
 	assert.Equal(t, err, nil, "err should be nil")
+	assert.Equal(t, len(messages), 6)
 }

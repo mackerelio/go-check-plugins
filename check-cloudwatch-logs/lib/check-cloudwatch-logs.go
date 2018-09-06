@@ -3,6 +3,7 @@ package checkcloudwatchlogs
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -44,6 +45,9 @@ func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
 	if err != nil {
 		return nil, err
 	}
+	if opts.LogGroupName == "" {
+		return nil, errors.New("specify log group name")
+	}
 	service, err := createService(opts)
 	if err != nil {
 		return nil, err
@@ -72,11 +76,9 @@ func createService(opts *logOpts) (*cloudwatchlogs.CloudWatchLogs, error) {
 	return cloudwatchlogs.New(sess, config), nil
 }
 
-func (p *cloudwatchLogsPlugin) run() error {
-	if p.LogGroupName == "" {
-		return errors.New("specify log group name")
-	}
+func (p *cloudwatchLogsPlugin) run() ([]string, error) {
 	var nextToken *string
+	var messages []string
 	for {
 		startTime := time.Now().Add(-5 * time.Minute)
 		output, err := p.Service.FilterLogEvents(&cloudwatchlogs.FilterLogEventsInput{
@@ -86,17 +88,18 @@ func (p *cloudwatchLogsPlugin) run() error {
 			FilterPattern: aws.String(p.Pattern),
 		})
 		if err != nil {
-			return err
+			return nil, err
 		}
-		fmt.Printf("%#v\n", err)
-		fmt.Printf("%#v\n", output)
+		for _, ev := range output.Events {
+			messages = append(messages, *ev.Message)
+		}
 		if output.NextToken == nil {
 			break
 		}
 		nextToken = output.NextToken
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(250 * time.Millisecond)
 	}
-	return nil
+	return messages, nil
 }
 
 func run(args []string) *checkers.Checker {
@@ -104,9 +107,12 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
 	}
-	err = p.run()
+	messages, err := p.run()
 	if err != nil {
 		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
+	}
+	if messages != nil {
+		return checkers.NewChecker(checkers.WARNING, strings.Join(messages, ""))
 	}
 	return checkers.NewChecker(checkers.OK, "ok")
 }
