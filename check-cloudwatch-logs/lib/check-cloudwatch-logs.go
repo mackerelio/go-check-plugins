@@ -21,6 +21,8 @@ type logOpts struct {
 	AccessKeyID     string `long:"access-key-id" value-name:"ACCESS-KEY-ID" description:"AWS Access Key ID"`
 	SecretAccessKey string `long:"secret-access-key" value-name:"SECRET-ACCESS-KEY" description:"AWS Secret Access Key"`
 	LogGroupName    string `long:"log-group-name" value-name:"LOG-GROUP-NAME" description:"Log group name"`
+
+	Pattern string `long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs."`
 }
 
 // Do the plugin
@@ -33,6 +35,7 @@ func Do() {
 type cloudwatchLogsPlugin struct {
 	Service      cloudwatchlogsiface.CloudWatchLogsAPI
 	LogGroupName string
+	Pattern      string
 }
 
 func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
@@ -48,6 +51,7 @@ func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
 	return &cloudwatchLogsPlugin{
 		Service:      service,
 		LogGroupName: opts.LogGroupName,
+		Pattern:      opts.Pattern,
 	}, nil
 }
 
@@ -76,9 +80,10 @@ func (p *cloudwatchLogsPlugin) run() error {
 	for {
 		startTime := time.Now().Add(-5 * time.Minute)
 		output, err := p.Service.FilterLogEvents(&cloudwatchlogs.FilterLogEventsInput{
-			StartTime:    aws.Int64(startTime.Unix() * 1000),
-			LogGroupName: aws.String(p.LogGroupName),
-			NextToken:    nextToken,
+			StartTime:     aws.Int64(startTime.Unix() * 1000),
+			LogGroupName:  aws.String(p.LogGroupName),
+			NextToken:     nextToken,
+			FilterPattern: aws.String(p.Pattern),
 		})
 		if err != nil {
 			return err
