@@ -12,7 +12,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs/cloudwatchlogsiface"
 	"github.com/jessevdk/go-flags"
-	"github.com/pkg/errors"
 
 	"github.com/mackerelio/checkers"
 )
@@ -21,7 +20,7 @@ type logOpts struct {
 	Region          string `long:"region" value-name:"REGION" description:"AWS Region"`
 	AccessKeyID     string `long:"access-key-id" value-name:"ACCESS-KEY-ID" description:"AWS Access Key ID"`
 	SecretAccessKey string `long:"secret-access-key" value-name:"SECRET-ACCESS-KEY" description:"AWS Secret Access Key"`
-	LogGroupName    string `long:"log-group-name" value-name:"LOG-GROUP-NAME" description:"Log group name"`
+	LogGroupName    string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name"`
 
 	Pattern string `long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs."`
 }
@@ -37,16 +36,15 @@ type cloudwatchLogsPlugin struct {
 	Service      cloudwatchlogsiface.CloudWatchLogsAPI
 	LogGroupName string
 	Pattern      string
+	WarnOver     int
+	CritOver     int
 }
 
 func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
 	if err != nil {
-		return nil, err
-	}
-	if opts.LogGroupName == "" {
-		return nil, errors.New("specify log group name")
+		os.Exit(1)
 	}
 	service, err := createService(opts)
 	if err != nil {
