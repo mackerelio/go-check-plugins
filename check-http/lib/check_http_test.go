@@ -138,7 +138,7 @@ func TestMaxRedirects(t *testing.T) {
 	redirectedPath := "/redirected"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != redirectedPath {
-			http.Redirect(w, r, "/redirected", 301)
+			http.Redirect(w, r, redirectedPath, 301)
 		}
 	}))
 	defer ts.Close()
