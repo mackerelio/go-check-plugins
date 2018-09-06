@@ -190,13 +190,19 @@ func run(args []string) *checkers.Checker {
 		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
 	}
 	status := checkers.OK
+	msg := fmt.Sprint(len(messages))
 	if len(messages) > p.CriticalOver {
 		status = checkers.CRITICAL
+		msg += " > " + fmt.Sprint(p.CriticalOver) + " messages"
 	} else if len(messages) > p.WarningOver {
 		status = checkers.WARNING
+		msg += " > " + fmt.Sprint(p.WarningOver) + " messages"
+	} else {
+		msg += " messages"
 	}
+	msg += " for pattern /" + p.Pattern + "/"
 	if messages != nil {
-		return checkers.NewChecker(status, strings.Join(messages, ""))
+		return checkers.NewChecker(status, msg+"\n"+strings.Join(messages, ""))
 	}
-	return checkers.NewChecker(checkers.OK, "ok")
+	return checkers.NewChecker(checkers.OK, msg)
 }
