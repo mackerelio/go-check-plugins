@@ -10,14 +10,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jessevdk/go-flags"
-	"github.com/pkg/errors"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs/cloudwatchlogsiface"
+	"github.com/jessevdk/go-flags"
 
 	"github.com/mackerelio/checkers"
 	"github.com/mackerelio/golib/pluginutil"
@@ -103,24 +101,32 @@ func createService(opts *logOpts) (*cloudwatchlogs.CloudWatchLogs, error) {
 	return cloudwatchlogs.New(sess, config), nil
 }
 
+type logState struct {
+	NextToken *string
+	StartTime *int64
+}
+
 func (p *cloudwatchLogsPlugin) run() ([]string, error) {
 	var nextToken *string
-	token, err := p.loadNextToken()
-	if err != nil && !os.IsNotExist(err) {
-		return nil, err
+	var startTime *int64
+	s, err := p.loadState()
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return nil, err
+		}
+	} else {
+		if s.StartTime != nil && *s.StartTime > time.Now().Add(-time.Hour).Unix()*1000 {
+			nextToken = s.NextToken
+			startTime = s.StartTime
+		}
 	}
-	if token != "" {
-		nextToken = aws.String(token)
-	}
-	fmt.Printf("%#v\n", nextToken)
-	if nextToken != nil {
-		fmt.Printf("%#v\n", *nextToken)
+	if startTime == nil {
+		startTime = aws.Int64(time.Now().Add(-1*time.Minute).Unix() * 1000)
 	}
 	var messages []string
 	for {
-		startTime := time.Now().Add(-1 * time.Minute)
 		output, err := p.Service.FilterLogEvents(&cloudwatchlogs.FilterLogEventsInput{
-			StartTime:     aws.Int64(startTime.Unix() * 1000),
+			StartTime:     startTime,
 			LogGroupName:  aws.String(p.LogGroupName),
 			NextToken:     nextToken,
 			FilterPattern: aws.String(p.Pattern),
@@ -128,8 +134,9 @@ func (p *cloudwatchLogsPlugin) run() ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		for _, ev := range output.Events {
-			messages = append(messages, *ev.Message)
+		for _, event := range output.Events {
+			messages = append(messages, *event.Message)
+			startTime = aws.Int64(*event.Timestamp + 1)
 		}
 		if output.NextToken == nil {
 			break
@@ -138,7 +145,7 @@ func (p *cloudwatchLogsPlugin) run() ([]string, error) {
 		time.Sleep(250 * time.Millisecond)
 	}
 	if nextToken != nil {
-		err := p.saveNextToken(*nextToken)
+		err := p.saveState(&logState{nextToken, startTime})
 		if err != nil {
 			return nil, err
 		}
@@ -146,28 +153,21 @@ func (p *cloudwatchLogsPlugin) run() ([]string, error) {
 	return messages, nil
 }
 
-type stateFile struct {
-	NextToken string
-}
-
-func (p *cloudwatchLogsPlugin) loadNextToken() (string, error) {
+func (p *cloudwatchLogsPlugin) loadState() (*logState, error) {
 	f, err := os.Open(p.StateFile)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer f.Close()
-	var s stateFile
+	var s logState
 	err = json.NewDecoder(f).Decode(&s)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return s.NextToken, nil
+	return &s, nil
 }
 
-func (p *cloudwatchLogsPlugin) saveNextToken(token string) error {
-	if token == "" {
-		return errors.New("token should not be empty")
-	}
+func (p *cloudwatchLogsPlugin) saveState(s *logState) error {
 	err := os.MkdirAll(filepath.Dir(p.StateFile), 0755)
 	if err != nil {
 		return err
@@ -177,7 +177,7 @@ func (p *cloudwatchLogsPlugin) saveNextToken(token string) error {
 		return err
 	}
 	defer f.Close()
-	return json.NewEncoder(f).Encode(stateFile{NextToken: token})
+	return json.NewEncoder(f).Encode(s)
 }
 
 func run(args []string) *checkers.Checker {
@@ -185,7 +185,6 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
 	}
-	fmt.Printf("%#v\n", p)
 	messages, err := p.run()
 	if err != nil {
 		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
