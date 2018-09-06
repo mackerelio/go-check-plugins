@@ -264,7 +264,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	rotated := false
 	if stat.Size() < skipBytes {
 		rotated = true
-	} else if skipBytes > 0 {
+	} else if skipBytes >= 0 {
 		r.Seek(skipBytes, 0)
 	}
 
