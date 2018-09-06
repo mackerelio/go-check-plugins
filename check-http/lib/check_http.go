@@ -27,6 +27,7 @@ type checkHTTPOpts struct {
 	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
 	Headers            []string `short:"H" description:"HTTP request headers"`
 	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
+	MaxRedirects       int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
 }
 
 // Do the plugin
@@ -138,6 +139,12 @@ func Run(args []string) *checkers.Checker {
 		}).Dial
 	}
 	client := &http.Client{Transport: tr}
+	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if len(via) > opts.MaxRedirects {
+			return http.ErrUseLastResponse
+		}
+		return nil
+	}
 
 	req, err := http.NewRequest("GET", opts.URL, nil)
 	if err != nil {
