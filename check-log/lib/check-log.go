@@ -241,7 +241,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		r = f
 	} else {
 		// Trace old logfile after logrotate with the inode number of the logfile.
-		posfile := getPosPath(opts.StateDir, logFile, opts.origArgs)
+		posfile := stateFile + ".pos.json"
 		f, err := postailer.Open(logFile, posfile)
 		if err != nil {
 			return 0, 0, "", err
@@ -367,19 +367,6 @@ func getStateFile(stateDir, f string, args []string) string {
 		fmt.Sprintf(
 			"%s-%x",
 			stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)),
-			md5.Sum([]byte(strings.Join(args, " "))),
-		),
-	)
-}
-
-var posRe = regexp.MustCompile(`^([a-zA-Z]):[/\\]`)
-
-func getPosPath(stateDir, f string, args []string) string {
-	return filepath.Join(
-		stateDir,
-		fmt.Sprintf(
-			"%s-%x.pos.json",
-			posRe.ReplaceAllString(f, `$1`+string(filepath.Separator)),
 			md5.Sum([]byte(strings.Join(args, " "))),
 		),
 	)

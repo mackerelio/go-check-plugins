@@ -24,14 +24,6 @@ func TestGetStateFile(t *testing.T) {
 	assert.Equal(t, "/var/lib/linux/hoge-c508092e97c59149a8644827e066ca83", filepath.ToSlash(sPath), "arguments should be cared")
 }
 
-func TestGetPosPath(t *testing.T) {
-	pPath := getPosPath("/var/lib", "/linux/hoge", []string{})
-	assert.Equal(t, "/var/lib/linux/hoge-d41d8cd98f00b204e9800998ecf8427e.pos.json", filepath.ToSlash(pPath), "arguments should be cared")
-
-	pPath = getPosPath("/var/lib", "/linux/hoge", []string{"aa", "BB"})
-	assert.Equal(t, "/var/lib/linux/hoge-c508092e97c59149a8644827e066ca83.pos.json", filepath.ToSlash(pPath), "arguments should be cared")
-}
-
 func TestWriteBytesToSkip(t *testing.T) {
 	f := ".tmp/fuga/piyo"
 	err := writeBytesToSkip(f, 15)
