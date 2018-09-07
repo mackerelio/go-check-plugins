@@ -182,13 +182,10 @@ func (p *cloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
 		msg += " > " + fmt.Sprint(p.WarningOver)
 	}
 	msg += " messages for pattern /" + p.Pattern + "/"
-	if messages != nil {
-		if p.ReturnContent {
-			msg += "\n" + strings.Join(messages, "")
-		}
-		return checkers.NewChecker(status, msg)
+	if status != checkers.OK && p.ReturnContent {
+		msg += "\n" + strings.Join(messages, "")
 	}
-	return checkers.NewChecker(checkers.OK, msg)
+	return checkers.NewChecker(status, msg)
 }
 
 func run(args []string) *checkers.Checker {
