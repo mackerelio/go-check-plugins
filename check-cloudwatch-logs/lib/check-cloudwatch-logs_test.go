@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/mackerelio/checkers"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
@@ -99,4 +100,68 @@ func Test_cloudwatchLogsPlugin_run(t *testing.T) {
 	json.NewDecoder(bytes.NewReader(cnt)).Decode(&s)
 	assert.Equal(t, *s.NextToken, "2")
 	assert.Equal(t, *s.StartTime, int64(6))
+}
+
+func Test_cloudwatchLogsPlugin_check(t *testing.T) {
+	testCases := []struct {
+		CriticalOver, WarningOver int
+		Pattern                   string
+		ReturnContent             bool
+		Messages                  []string
+		Status                    checkers.Status
+		Message                   string
+	}{
+		{
+			CriticalOver: 5,
+			WarningOver:  3,
+			Pattern:      "Error",
+			Messages:     []string{},
+			Status:       checkers.OK,
+			Message:      "0 messages for pattern /Error/",
+		},
+		{
+			CriticalOver: 5,
+			WarningOver:  3,
+			Pattern:      "a",
+			Messages:     []string{"a0", "a1", "a2"},
+			Status:       checkers.OK,
+			Message:      "3 messages for pattern /a/",
+		},
+		{
+			CriticalOver: 5,
+			WarningOver:  3,
+			Pattern:      "a",
+			Messages:     []string{"a0", "a1", "a2", "a3", "a4"},
+			Status:       checkers.WARNING,
+			Message:      "5 > 3 messages for pattern /a/",
+		},
+		{
+			CriticalOver: 5,
+			WarningOver:  3,
+			Pattern:      "a",
+			Messages:     []string{"a0", "a1", "a2", "a3", "a4", "a5"},
+			Status:       checkers.CRITICAL,
+			Message:      "6 > 5 messages for pattern /a/",
+		},
+		{
+			CriticalOver:  5,
+			WarningOver:   3,
+			Pattern:       "a",
+			ReturnContent: true,
+			Messages:      []string{"a0\n", "a1\n", "a2\n", "a3\n", "a4\n", "a5\n"},
+			Status:        checkers.CRITICAL,
+			Message:       "6 > 5 messages for pattern /a/\na0\na1\na2\na3\na4\na5\n",
+		},
+	}
+	for _, testCase := range testCases {
+		p := &cloudwatchLogsPlugin{
+			CriticalOver:  testCase.CriticalOver,
+			WarningOver:   testCase.WarningOver,
+			Pattern:       testCase.Pattern,
+			ReturnContent: testCase.ReturnContent,
+		}
+		res := p.check(testCase.Messages)
+		assert.Equal(t, res.Status, testCase.Status)
+		assert.Equal(t, res.Message, testCase.Message)
+	}
 }
