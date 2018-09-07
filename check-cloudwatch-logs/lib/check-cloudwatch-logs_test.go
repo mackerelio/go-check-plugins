@@ -88,9 +88,11 @@ func Test_cloudwatchLogsPlugin_run(t *testing.T) {
 	file.Close()
 	defer os.Remove(file.Name())
 	p := &cloudwatchLogsPlugin{
-		Service:      createMockService(),
-		LogGroupName: "test-group",
-		StateFile:    file.Name(),
+		Service:   createMockService(),
+		StateFile: file.Name(),
+		logOpts: &logOpts{
+			LogGroupName: "test-group",
+		},
 	}
 	messages, err := p.run()
 	assert.Equal(t, err, nil, "err should be nil")
@@ -155,10 +157,12 @@ func Test_cloudwatchLogsPlugin_check(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		p := &cloudwatchLogsPlugin{
-			CriticalOver:  testCase.CriticalOver,
-			WarningOver:   testCase.WarningOver,
-			Pattern:       testCase.Pattern,
-			ReturnContent: testCase.ReturnContent,
+			logOpts: &logOpts{
+				CriticalOver:  testCase.CriticalOver,
+				WarningOver:   testCase.WarningOver,
+				Pattern:       testCase.Pattern,
+				ReturnContent: testCase.ReturnContent,
+			},
 		}
 		res := p.check(testCase.Messages)
 		assert.Equal(t, res.Status, testCase.Status)
