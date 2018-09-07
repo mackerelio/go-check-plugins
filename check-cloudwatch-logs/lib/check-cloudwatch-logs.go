@@ -42,13 +42,9 @@ func Do() {
 }
 
 type cloudwatchLogsPlugin struct {
-	Service       cloudwatchlogsiface.CloudWatchLogsAPI
-	LogGroupName  string
-	Pattern       string
-	WarningOver   int
-	CriticalOver  int
-	StateFile     string
-	ReturnContent bool
+	Service   cloudwatchlogsiface.CloudWatchLogsAPI
+	StateFile string
+	*logOpts
 }
 
 func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
@@ -57,23 +53,17 @@ func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
 	if err != nil {
 		os.Exit(1)
 	}
-	service, err := createService(opts)
+	p := &cloudwatchLogsPlugin{logOpts: opts}
+	p.Service, err = createService(opts)
 	if err != nil {
 		return nil, err
 	}
-	if opts.StateDir == "" {
+	if p.StateDir == "" {
 		workdir := pluginutil.PluginWorkDir()
-		opts.StateDir = filepath.Join(workdir, "check-cloudwatch-logs")
+		p.StateDir = filepath.Join(workdir, "check-cloudwatch-logs")
 	}
-	return &cloudwatchLogsPlugin{
-		Service:       service,
-		LogGroupName:  opts.LogGroupName,
-		Pattern:       opts.Pattern,
-		WarningOver:   opts.WarningOver,
-		CriticalOver:  opts.CriticalOver,
-		StateFile:     getStateFile(opts.StateDir, opts.LogGroupName, args),
-		ReturnContent: opts.ReturnContent,
-	}, nil
+	p.StateFile = getStateFile(p.StateDir, opts.LogGroupName, args)
+	return p, nil
 }
 
 var stateRe = regexp.MustCompile(`[^-a-zA-Z0-9_.]`)
