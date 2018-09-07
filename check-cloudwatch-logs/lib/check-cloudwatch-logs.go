@@ -196,11 +196,11 @@ func run(args []string) *checkers.Checker {
 	}
 	p, err := newCloudwatchLogsPlugin(opts, args)
 	if err != nil {
-		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
+		return checkers.Unknown(fmt.Sprint(err))
 	}
 	messages, err := p.run()
 	if err != nil {
-		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
+		return checkers.Unknown(fmt.Sprint(err))
 	}
 	return p.check(messages)
 }
