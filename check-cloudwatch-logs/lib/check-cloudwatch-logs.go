@@ -47,12 +47,8 @@ type cloudwatchLogsPlugin struct {
 	*logOpts
 }
 
-func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
-	opts := &logOpts{}
-	_, err := flags.ParseArgs(opts, args)
-	if err != nil {
-		os.Exit(1)
-	}
+func newCloudwatchLogsPlugin(opts *logOpts, args []string) (*cloudwatchLogsPlugin, error) {
+	var err error
 	p := &cloudwatchLogsPlugin{logOpts: opts}
 	p.Service, err = createService(opts)
 	if err != nil {
@@ -196,7 +192,12 @@ func (p *cloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
 }
 
 func run(args []string) *checkers.Checker {
-	p, err := newCloudwatchLogsPlugin(args)
+	opts := &logOpts{}
+	_, err := flags.ParseArgs(opts, args)
+	if err != nil {
+		os.Exit(1)
+	}
+	p, err := newCloudwatchLogsPlugin(opts, args)
 	if err != nil {
 		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
 	}
