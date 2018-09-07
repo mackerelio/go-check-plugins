@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Songmu/postailer"
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 	"github.com/mackerelio/golib/pluginutil"
@@ -231,26 +230,13 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		skipBytes = s
 	}
 
-	var r io.ReadSeeker
-	if opts.NoState {
-		f, err := os.Open(logFile)
-		if err != nil {
-			return 0, 0, "", err
-		}
-		defer f.Close()
-		r = f
-	} else {
-		// Trace old logfile after logrotate with the inode number of the logfile.
-		posfile := stateFile + ".pos.json"
-		f, err := postailer.Open(logFile, posfile)
-		if err != nil {
-			return 0, 0, "", err
-		}
-		defer f.Close()
-		r = f
+	f, err := os.Open(logFile)
+	if err != nil {
+		return 0, 0, "", err
 	}
+	defer f.Close()
 
-	stat, err := os.Stat(logFile)
+	stat, err := f.Stat()
 	if err != nil {
 		return 0, 0, "", err
 	}
@@ -264,10 +250,11 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	rotated := false
 	if stat.Size() < skipBytes {
 		rotated = true
-	} else if skipBytes >= 0 {
-		r.Seek(skipBytes, 0)
+	} else if skipBytes > 0 {
+		f.Seek(skipBytes, 0)
 	}
 
+	var r io.Reader = f
 	if opts.Encoding != "" {
 		e := encoding.GetEncoding(opts.Encoding)
 		if e == nil {
