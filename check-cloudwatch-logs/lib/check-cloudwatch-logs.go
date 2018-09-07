@@ -72,7 +72,7 @@ func getStateFile(stateDir, logGroupName string, args []string) string {
 	return filepath.Join(
 		stateDir,
 		fmt.Sprintf(
-			"%s-%x",
+			"%s-%x.json",
 			strings.TrimLeft(stateRe.ReplaceAllString(logGroupName, "_"), "_"),
 			md5.Sum([]byte(os.Getenv("AWS_PROFILE")+" "+strings.Join(args, " "))),
 		),
