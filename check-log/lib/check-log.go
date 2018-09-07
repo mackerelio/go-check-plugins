@@ -384,7 +384,7 @@ func getBytesToSkip(f string) (int64, error) {
 		return state.SkipBytes, err
 	}
 	// Fallback to read old style status file
-	// for backward compability.
+	// for backward compatibility.
 	// Once saved as new style file, the following will be unreachable.
 	oldf := strings.TrimSuffix(f, ".json")
 	return getBytesToSkipOld(oldf)

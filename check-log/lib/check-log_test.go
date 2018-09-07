@@ -35,7 +35,7 @@ func TestSaveState(t *testing.T) {
 }
 
 func TestGetBytesToSkip(t *testing.T) {
-	// fallback testing for backward compability
+	// fallback testing for backward compatibility
 	oldf := ".tmp/fuga/piyo"
 	newf := ".tmp/fuga/piyo.json"
 	state := &state{SkipBytes: 15}
