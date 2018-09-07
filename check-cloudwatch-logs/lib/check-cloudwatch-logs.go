@@ -185,6 +185,26 @@ func (p *cloudwatchLogsPlugin) saveState(s *logState) error {
 	return json.NewEncoder(f).Encode(s)
 }
 
+func (p *cloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
+	status := checkers.OK
+	msg := fmt.Sprint(len(messages))
+	if len(messages) > p.CriticalOver {
+		status = checkers.CRITICAL
+		msg += " > " + fmt.Sprint(p.CriticalOver)
+	} else if len(messages) > p.WarningOver {
+		status = checkers.WARNING
+		msg += " > " + fmt.Sprint(p.WarningOver)
+	}
+	msg += " messages for pattern /" + p.Pattern + "/"
+	if messages != nil {
+		if p.ReturnContent {
+			msg += "\n" + strings.Join(messages, "")
+		}
+		return checkers.NewChecker(status, msg)
+	}
+	return checkers.NewChecker(checkers.OK, msg)
+}
+
 func run(args []string) *checkers.Checker {
 	p, err := newCloudwatchLogsPlugin(args)
 	if err != nil {
@@ -194,23 +214,5 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		return checkers.NewChecker(checkers.UNKNOWN, fmt.Sprint(err))
 	}
-	status := checkers.OK
-	msg := fmt.Sprint(len(messages))
-	if len(messages) > p.CriticalOver {
-		status = checkers.CRITICAL
-		msg += " > " + fmt.Sprint(p.CriticalOver) + " messages"
-	} else if len(messages) > p.WarningOver {
-		status = checkers.WARNING
-		msg += " > " + fmt.Sprint(p.WarningOver) + " messages"
-	} else {
-		msg += " messages"
-	}
-	msg += " for pattern /" + p.Pattern + "/"
-	if messages != nil {
-		if p.ReturnContent {
-			msg += "\n" + strings.Join(messages, "")
-		}
-		return checkers.NewChecker(status, msg)
-	}
-	return checkers.NewChecker(checkers.OK, msg)
+	return p.check(messages)
 }
