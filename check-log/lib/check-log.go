@@ -3,6 +3,7 @@ package checklog
 import (
 	"bufio"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -275,7 +276,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	}
 
 	if !opts.NoState {
-		err = writeBytesToSkip(stateFile, skipBytes)
+		err = saveState(stateFile, &state{SkipBytes: skipBytes})
 		if err != nil {
 			log.Printf("writeByteToSkip failed: %s\n", err.Error())
 		}
@@ -346,13 +347,30 @@ func (opts *logOpts) match(line string) (bool, []string) {
 	return true, matches
 }
 
+type state struct {
+	SkipBytes int64 `json:"skip_bytes"`
+}
+
+func loadState(fname string) (*state, error) {
+	state := &state{}
+	_, err := os.Stat(fname)
+	if err == nil { // posfile exists
+		b, err := ioutil.ReadFile(fname)
+		if err == nil {
+			err = json.Unmarshal(b, state)
+		}
+		return state, err
+	}
+	return state, nil
+}
+
 var stateRe = regexp.MustCompile(`^([a-zA-Z]):[/\\]`)
 
 func getStateFile(stateDir, f string, args []string) string {
 	return filepath.Join(
 		stateDir,
 		fmt.Sprintf(
-			"%s-%x",
+			"%s-%x.json",
 			stateRe.ReplaceAllString(f, `$1`+string(filepath.Separator)),
 			md5.Sum([]byte(strings.Join(args, " "))),
 		),
@@ -360,6 +378,19 @@ func getStateFile(stateDir, f string, args []string) string {
 }
 
 func getBytesToSkip(f string) (int64, error) {
+	if _, err := os.Stat(f); err == nil {
+		// json file exists
+		state, err := loadState(f)
+		return state.SkipBytes, err
+	}
+	// Fallback to read old style status file
+	// for backward compability.
+	// Once saved as new style file, the following will be unreachable.
+	oldf := strings.TrimSuffix(f, ".json")
+	return getBytesToSkipOld(oldf)
+}
+
+func getBytesToSkipOld(f string) (int64, error) {
 	_, err := os.Stat(f)
 	if err != nil {
 		return 0, nil
@@ -368,6 +399,7 @@ func getBytesToSkip(f string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	i, err := strconv.ParseInt(strings.Trim(string(b), " \r\n"), 10, 64)
 	if err != nil {
 		log.Printf("failed to getBytesToSkip (ignoring): %s", err)
@@ -375,12 +407,12 @@ func getBytesToSkip(f string) (int64, error) {
 	return i, nil
 }
 
-func writeBytesToSkip(f string, num int64) error {
-	err := os.MkdirAll(filepath.Dir(f), 0755)
-	if err != nil {
+func saveState(f string, state *state) error {
+	b, _ := json.Marshal(state)
+	if err := os.MkdirAll(filepath.Dir(f), 0755); err != nil {
 		return err
 	}
-	return writeFileAtomically(f, []byte(fmt.Sprintf("%d", num)))
+	return writeFileAtomically(f, b)
 }
 
 func writeFileAtomically(f string, contents []byte) error {
