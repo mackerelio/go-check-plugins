@@ -27,10 +27,11 @@ type logOpts struct {
 	SecretAccessKey string `long:"secret-access-key" value-name:"SECRET-ACCESS-KEY" description:"AWS Secret Access Key"`
 	LogGroupName    string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name"`
 
-	Pattern      string `short:"p" long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs."`
-	WarningOver  int    `short:"w" long:"warning-over" value-name:"WARNING" description:"Trigger a warning if matched lines is over a number"`
-	CriticalOver int    `short:"c" long:"critical-over" value-name:"CRITICAL" description:"Trigger a critical if matched lines is over a number"`
-	StateDir     string `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
+	Pattern       string `short:"p" long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs."`
+	WarningOver   int    `short:"w" long:"warning-over" value-name:"WARNING" description:"Trigger a warning if matched lines is over a number"`
+	CriticalOver  int    `short:"c" long:"critical-over" value-name:"CRITICAL" description:"Trigger a critical if matched lines is over a number"`
+	StateDir      string `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
+	ReturnContent bool   `short:"r" long:"return" description:"Output matched lines"`
 }
 
 // Do the plugin
@@ -41,12 +42,13 @@ func Do() {
 }
 
 type cloudwatchLogsPlugin struct {
-	Service      cloudwatchlogsiface.CloudWatchLogsAPI
-	LogGroupName string
-	Pattern      string
-	WarningOver  int
-	CriticalOver int
-	StateFile    string
+	Service       cloudwatchlogsiface.CloudWatchLogsAPI
+	LogGroupName  string
+	Pattern       string
+	WarningOver   int
+	CriticalOver  int
+	StateFile     string
+	ReturnContent bool
 }
 
 func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
@@ -64,10 +66,13 @@ func newCloudwatchLogsPlugin(args []string) (*cloudwatchLogsPlugin, error) {
 		opts.StateDir = filepath.Join(workdir, "check-cloudwatch-logs")
 	}
 	return &cloudwatchLogsPlugin{
-		Service:      service,
-		LogGroupName: opts.LogGroupName,
-		Pattern:      opts.Pattern,
-		StateFile:    getStateFile(opts.StateDir, opts.LogGroupName, args),
+		Service:       service,
+		LogGroupName:  opts.LogGroupName,
+		Pattern:       opts.Pattern,
+		WarningOver:   opts.WarningOver,
+		CriticalOver:  opts.CriticalOver,
+		StateFile:     getStateFile(opts.StateDir, opts.LogGroupName, args),
+		ReturnContent: opts.ReturnContent,
 	}, nil
 }
 
@@ -202,7 +207,10 @@ func run(args []string) *checkers.Checker {
 	}
 	msg += " for pattern /" + p.Pattern + "/"
 	if messages != nil {
-		return checkers.NewChecker(status, msg+"\n"+strings.Join(messages, ""))
+		if p.ReturnContent {
+			msg += "\n" + strings.Join(messages, "")
+		}
+		return checkers.NewChecker(status, msg)
 	}
 	return checkers.NewChecker(checkers.OK, msg)
 }
