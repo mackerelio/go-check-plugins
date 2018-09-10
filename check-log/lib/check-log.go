@@ -354,14 +354,14 @@ type state struct {
 func loadState(fname string) (*state, error) {
 	state := &state{}
 	_, err := os.Stat(fname)
-	if err == nil { // posfile exists
+	if err == nil { // state file exists
 		b, err := ioutil.ReadFile(fname)
 		if err == nil {
 			err = json.Unmarshal(b, state)
 		}
 		return state, err
 	}
-	return state, nil
+	return nil, nil
 }
 
 var stateRe = regexp.MustCompile(`^([a-zA-Z]):[/\\]`)
@@ -378,10 +378,13 @@ func getStateFile(stateDir, f string, args []string) string {
 }
 
 func getBytesToSkip(f string) (int64, error) {
-	if _, err := os.Stat(f); err == nil {
+	state, err := loadState(f)
+	if err != nil {
+		return 0, err
+	}
+	if state != nil {
 		// json file exists
-		state, err := loadState(f)
-		return state.SkipBytes, err
+		return state.SkipBytes, nil
 	}
 	// Fallback to read old style status file
 	// for backward compatibility.
