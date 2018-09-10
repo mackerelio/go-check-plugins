@@ -4,7 +4,7 @@ environment:
   GOPATH: c:\gopath
   GOROOT: c:\go111-x86
 install:
-  - set PATH=c:\go\bin;%GOPATH%\bin;%PATH%;C:\MinGW\bin
+  - set PATH=%GOROOT%\bin;%GOPATH%\bin;%PATH%;C:\MinGW\bin
   - echo %Path%
   - go version
   - go env
