@@ -2,12 +2,10 @@ version: 0.9.4-{build}
 clone_folder: c:\gopath\src\github.com\mackerelio\go-check-plugins
 environment:
   GOPATH: c:\gopath
+  GOROOT: c:\go111-x86
 install:
   - set PATH=c:\go\bin;%GOPATH%\bin;%PATH%;C:\MinGW\bin
   - echo %Path%
-  - rd c:\go /s /q
-  - appveyor DownloadFile https://storage.googleapis.com/golang/go1.9.windows-386.zip
-  - 7z x go1.9.windows-386.zip -oC:\ >nul
   - go version
   - go env
 build_script:
