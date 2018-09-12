@@ -291,6 +291,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 			oldWarnNum, oldCritNum int64
 			oldErrLines            string
 		)
+		// ignore readBytes under the premise that the old file will never be updated.
 		oldWarnNum, oldCritNum, _, oldErrLines, err := opts.searchReader(oldr)
 		if err != nil {
 			return oldWarnNum, critNum, errLines, err
@@ -497,6 +498,7 @@ func openOldFile(f string, state *state) (*os.File, error) {
 		} else if err != errFileNotFoundByInode {
 			return nil, err
 		}
+		// just ignore the process of searching old file if errFileNotFoundByInode
 	}
 	return nil, nil
 }
