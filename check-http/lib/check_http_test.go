@@ -133,3 +133,39 @@ func TestExpectedContent(t *testing.T) {
 		assert.Equal(t, ckr.Status, tc.status, "#%d: Status should be %s", i, tc.status)
 	}
 }
+
+func TestMaxRedirects(t *testing.T) {
+	redirectedPath := "/redirected"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != redirectedPath {
+			http.Redirect(w, r, redirectedPath, 301)
+		}
+	}))
+	defer ts.Close()
+
+	testCases := []struct {
+		args []string
+		want checkers.Status
+	}{
+		{
+			args: []string{"-s", "301=ok", "-s", "100-300=warning", "-s", "302-599=warning",
+				"-u", ts.URL, "--max-redirects", "0"},
+			want: checkers.OK,
+		},
+		{
+			args: []string{"-s", "200=ok", "-s", "100-199=warning", "-s", "201-599=warning",
+				"-u", ts.URL, "--max-redirects", "1"},
+			want: checkers.OK,
+		},
+		{
+			args: []string{"-s", "200=ok", "-s", "100-199=warning", "-s", "201-599=warning",
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+	}
+
+	for i, tc := range testCases {
+		ckr := Run(tc.args)
+		assert.Equal(t, ckr.Status, tc.want, "#%d: Status should be %s", i, tc.want)
+	}
+}
