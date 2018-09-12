@@ -349,6 +349,7 @@ func (opts *logOpts) match(line string) (bool, []string) {
 
 type state struct {
 	SkipBytes int64 `json:"skip_bytes"`
+	Inode     uint  `json:"inode"`
 }
 
 func loadState(fname string) (*state, error) {
@@ -408,6 +409,18 @@ func getBytesToSkipOld(f string) (int64, error) {
 		log.Printf("failed to getBytesToSkip (ignoring): %s", err)
 	}
 	return i, nil
+}
+
+func getInode(f string) (uint, error) {
+	state, err := loadState(f)
+	if err != nil {
+		return 0, err
+	}
+	if state != nil {
+		// json file exists
+		return state.Inode, nil
+	}
+	return 0, nil
 }
 
 func saveState(f string, state *state) error {

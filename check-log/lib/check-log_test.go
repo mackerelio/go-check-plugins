@@ -26,12 +26,30 @@ func TestGetStateFile(t *testing.T) {
 
 func TestSaveState(t *testing.T) {
 	f := ".tmp/fuga/piyo.json"
-	err := saveState(f, &state{SkipBytes: 15})
+	err := saveState(f, &state{SkipBytes: 15, Inode: 150})
+	defer os.RemoveAll(".tmp")
 	assert.Equal(t, err, nil, "err should be nil")
 
 	state, err := loadState(f)
 	assert.Equal(t, err, nil, "err should be nil")
 	assert.Equal(t, state.SkipBytes, int64(15))
+	assert.Equal(t, state.Inode, uint(150))
+}
+
+func TestGetInode(t *testing.T) {
+	f := ".tmp/hoge/piyo.json"
+	state := &state{SkipBytes: 15, Inode: 150}
+	defer os.RemoveAll(".tmp")
+
+	i, err := getInode(f)
+	assert.Equal(t, err, nil, "err should be nil")
+	assert.Equal(t, i, uint(0), "inode should be empty")
+
+	saveState(f, state)
+
+	i, err = getInode(f)
+	assert.Equal(t, err, nil, "err should be nil")
+	assert.Equal(t, state.Inode, uint(150))
 }
 
 func TestGetBytesToSkip(t *testing.T) {
