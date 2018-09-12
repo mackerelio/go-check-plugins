@@ -285,7 +285,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		return warnNum, critNum, errLines, err
 	}
 
-	if !opts.NoState && oldf != nil {
+	if oldf != nil {
 		// search old file
 		var (
 			oldWarnNum, oldCritNum int64
