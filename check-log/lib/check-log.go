@@ -276,7 +276,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	}
 
 	if !opts.NoState {
-		err = saveState(stateFile, &state{SkipBytes: skipBytes})
+		err = saveState(stateFile, &state{SkipBytes: skipBytes, Inode: detectInode(stat)})
 		if err != nil {
 			log.Printf("writeByteToSkip failed: %s\n", err.Error())
 		}
