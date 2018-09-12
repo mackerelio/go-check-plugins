@@ -3,6 +3,7 @@
 package checklog
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -37,6 +38,68 @@ func TestFindFileByInode(t *testing.T) {
 		assert.Equal(t, "", f)
 	}
 	testFileNotExist()
+}
+
+func TestOpenOldFile(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Fatalf("TempDir failed: %s", err)
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	testFoundOldFile := func() {
+		ologf := filepath.Join(dir, "dummy.1")
+		ofh, _ := os.Create(ologf)
+		ofi, _ := ofh.Stat()
+		defer ofh.Close()
+
+		l1 := "FATAL\n"
+		ofh.WriteString(l1 + l1)
+
+		state := &state{SkipBytes: int64(len(l1)), Inode: detectInode(ofi)}
+		f, err := openOldFile(logf, state)
+		defer f.Close()
+		pos, _ := f.Seek(-1, io.SeekCurrent) // get current offset
+
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, ofh.Name(), f.Name(), "openOldFile should be return old file")
+		assert.Equal(t, len(l1)-1, int(pos))
+	}
+	testFoundOldFile()
+
+	testNotFoundOldFile := func() {
+		state := &state{SkipBytes: 0, Inode: 0}
+		f, err := openOldFile(logf, state)
+
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, f, (*os.File)(nil), "file should be nil")
+	}
+	testNotFoundOldFile()
+
+	testFoundOldFileByInode := func() {
+		// dir different from logf
+		dir, err := ioutil.TempDir("", "check-log-test")
+		if err != nil {
+			t.Fatalf("TempDir failed: %s", err)
+		}
+		defer os.RemoveAll(dir)
+		ologf := filepath.Join(dir, "dummy.1")
+
+		ofh, _ := os.Create(ologf)
+		ofi, _ := ofh.Stat()
+		defer ofh.Close()
+
+		state := &state{SkipBytes: 0, Inode: detectInode(ofi)}
+		f, err := openOldFile(logf, state)
+		defer f.Close()
+
+		assert.Equal(t, err, nil, "err should be nil")
+	}
+	testFoundOldFileByInode()
 }
 
 func TestRunTraceInode(t *testing.T) {
