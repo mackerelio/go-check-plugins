@@ -11,6 +11,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestFindFileByInode(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	testFileExist := func() {
+		logfi, err := os.Stat(logf)
+		inode := detectInode(logfi)
+		f, err := findFileByInode(inode, dir)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, logf, f)
+	}
+	testFileExist()
+
+	testFileNotExist := func() {
+		f, err := findFileByInode(100, dir)
+		assert.Equal(t, err, errFileNotFoundByInode, "err should be errFileNotFoundByInode")
+		assert.Equal(t, "", f)
+	}
+	testFileNotExist()
+}
+
 func TestRunTraceInode(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-log-test")
 	if err != nil {
@@ -57,7 +85,7 @@ func TestRunTraceInode(t *testing.T) {
 		assert.Equal(t, "FATAL\n", errLines, "something went wrong")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)+len(l3)), bytes, "something went wrong")
+		assert.Equal(t, int64(len(l3)), bytes, "should not include oldfile skip bytes")
 
 		os.Remove(rotatedLogf)
 	}
