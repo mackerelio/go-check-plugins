@@ -61,8 +61,6 @@ func TestGetBytesToSkip(t *testing.T) {
 	writeFileAtomically(oldf, []byte(fmt.Sprintf("%d", state.SkipBytes)))
 	defer os.RemoveAll(".tmp")
 
-	fi, _ := os.Stat(oldf)
-
 	n, err := getBytesToSkip(newf)
 	assert.Equal(t, err, nil, "err should be nil")
 	assert.Equal(t, state.SkipBytes, n)
