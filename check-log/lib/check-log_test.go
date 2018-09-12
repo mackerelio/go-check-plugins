@@ -15,23 +15,42 @@ import (
 
 func TestGetStateFile(t *testing.T) {
 	sPath := getStateFile("/var/lib", "C:/Windows/hoge", []string{})
-	assert.Equal(t, "/var/lib/C/Windows/hoge-d41d8cd98f00b204e9800998ecf8427e", filepath.ToSlash(sPath), "drive letter should be cared")
+	assert.Equal(t, "/var/lib/C/Windows/hoge-d41d8cd98f00b204e9800998ecf8427e.json", filepath.ToSlash(sPath), "drive letter should be cared")
 
 	sPath = getStateFile("/var/lib", "/linux/hoge", []string{})
-	assert.Equal(t, "/var/lib/linux/hoge-d41d8cd98f00b204e9800998ecf8427e", filepath.ToSlash(sPath), "arguments should be cared")
+	assert.Equal(t, "/var/lib/linux/hoge-d41d8cd98f00b204e9800998ecf8427e.json", filepath.ToSlash(sPath), "arguments should be cared")
 
 	sPath = getStateFile("/var/lib", "/linux/hoge", []string{"aa", "BB"})
-	assert.Equal(t, "/var/lib/linux/hoge-c508092e97c59149a8644827e066ca83", filepath.ToSlash(sPath), "arguments should be cared")
+	assert.Equal(t, "/var/lib/linux/hoge-c508092e97c59149a8644827e066ca83.json", filepath.ToSlash(sPath), "arguments should be cared")
 }
 
-func TestWriteBytesToSkip(t *testing.T) {
-	f := ".tmp/fuga/piyo"
-	err := writeBytesToSkip(f, 15)
+func TestSaveState(t *testing.T) {
+	f := ".tmp/fuga/piyo.json"
+	err := saveState(f, &state{SkipBytes: 15})
 	assert.Equal(t, err, nil, "err should be nil")
 
-	skipBytes, err := getBytesToSkip(f)
+	state, err := loadState(f)
 	assert.Equal(t, err, nil, "err should be nil")
-	assert.Equal(t, skipBytes, int64(15))
+	assert.Equal(t, state.SkipBytes, int64(15))
+}
+
+func TestGetBytesToSkip(t *testing.T) {
+	// fallback testing for backward compatibility
+	oldf := ".tmp/fuga/piyo"
+	newf := ".tmp/fuga/piyo.json"
+	state := &state{SkipBytes: 15}
+	writeFileAtomically(oldf, []byte(fmt.Sprintf("%d", state.SkipBytes)))
+	defer os.RemoveAll(".tmp")
+
+	n, err := getBytesToSkip(newf)
+	assert.Equal(t, err, nil, "err should be nil")
+	assert.Equal(t, state.SkipBytes, n)
+
+	saveState(newf, state)
+
+	n, err = getBytesToSkip(newf)
+	assert.Equal(t, err, nil, "err should be nil")
+	assert.Equal(t, state.SkipBytes, n)
 }
 
 func TestSearchReader(t *testing.T) {
