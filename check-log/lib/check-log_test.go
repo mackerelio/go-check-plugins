@@ -3,7 +3,6 @@ package checklog
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -63,7 +62,6 @@ func TestGetBytesToSkip(t *testing.T) {
 	defer os.RemoveAll(".tmp")
 
 	fi, _ := os.Stat(oldf)
-	log.Println(fi)
 
 	n, err := getBytesToSkip(newf)
 	assert.Equal(t, err, nil, "err should be nil")
