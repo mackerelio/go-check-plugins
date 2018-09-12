@@ -222,13 +222,19 @@ func run(args []string) *checkers.Checker {
 
 func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	stateFile := getStateFile(opts.StateDir, logFile, opts.origArgs)
-	skipBytes := int64(0)
+	skipBytes, inode := int64(0), uint(0)
 	if !opts.NoState {
 		s, err := getBytesToSkip(stateFile)
 		if err != nil {
 			return 0, 0, "", err
 		}
 		skipBytes = s
+
+		i, err := getInode(stateFile)
+		if err != nil {
+			return 0, 0, "", err
+		}
+		inode = i
 	}
 
 	f, err := os.Open(logFile)
@@ -236,6 +242,15 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		return 0, 0, "", err
 	}
 	defer f.Close()
+
+	var oldf *os.File
+	if !opts.NoState {
+		oldf, err = openOldFile(logFile, &state{SkipBytes: skipBytes, Inode: inode})
+		if err != nil {
+			return 0, 0, "", err
+		}
+		defer oldf.Close()
+	}
 
 	stat, err := f.Stat()
 	if err != nil {
@@ -256,6 +271,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	}
 
 	var r io.Reader = f
+	var oldr io.Reader = oldf
 	if opts.Encoding != "" {
 		e := encoding.GetEncoding(opts.Encoding)
 		if e == nil {
@@ -269,6 +285,22 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		return warnNum, critNum, errLines, err
 	}
 
+	if oldf != nil {
+		// search old file
+		var (
+			oldWarnNum, oldCritNum int64
+			oldErrLines            string
+		)
+		// ignore readBytes under the premise that the old file will never be updated.
+		oldWarnNum, oldCritNum, _, oldErrLines, err := opts.searchReader(oldr)
+		if err != nil {
+			return oldWarnNum, critNum, errLines, err
+		}
+		warnNum += oldWarnNum
+		critNum += oldCritNum
+		errLines += oldErrLines
+	}
+
 	if rotated {
 		skipBytes = readBytes
 	} else {
@@ -276,7 +308,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	}
 
 	if !opts.NoState {
-		err = saveState(stateFile, &state{SkipBytes: skipBytes})
+		err = saveState(stateFile, &state{SkipBytes: skipBytes, Inode: detectInode(stat)})
 		if err != nil {
 			log.Printf("writeByteToSkip failed: %s\n", err.Error())
 		}
@@ -349,6 +381,7 @@ func (opts *logOpts) match(line string) (bool, []string) {
 
 type state struct {
 	SkipBytes int64 `json:"skip_bytes"`
+	Inode     uint  `json:"inode"`
 }
 
 func loadState(fname string) (*state, error) {
@@ -410,12 +443,64 @@ func getBytesToSkipOld(f string) (int64, error) {
 	return i, nil
 }
 
+func getInode(f string) (uint, error) {
+	state, err := loadState(f)
+	if err != nil {
+		return 0, err
+	}
+	if state != nil {
+		// json file exists
+		return state.Inode, nil
+	}
+	return 0, nil
+}
+
 func saveState(f string, state *state) error {
 	b, _ := json.Marshal(state)
 	if err := os.MkdirAll(filepath.Dir(f), 0755); err != nil {
 		return err
 	}
 	return writeFileAtomically(f, b)
+}
+
+var errFileNotFoundByInode = fmt.Errorf("old file not found")
+
+func findFileByInode(inode uint, dir string) (string, error) {
+	fis, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return "", err
+	}
+	for _, fi := range fis {
+		if detectInode(fi) == inode {
+			return filepath.Join(dir, fi.Name()), nil
+		}
+	}
+	return "", errFileNotFoundByInode
+}
+
+func openOldFile(f string, state *state) (*os.File, error) {
+	fi, err := os.Stat(f)
+	if err != nil {
+		return nil, err
+	}
+	inode := detectInode(fi)
+	if state.Inode > 0 && state.Inode != inode {
+		if oldFile, err := findFileByInode(state.Inode, filepath.Dir(f)); err == nil {
+			oldf, err := os.Open(oldFile)
+			if err != nil {
+				return nil, err
+			}
+			oldfi, _ := oldf.Stat()
+			if oldfi.Size() > state.SkipBytes {
+				oldf.Seek(state.SkipBytes, io.SeekStart)
+				return oldf, nil
+			}
+		} else if err != errFileNotFoundByInode {
+			return nil, err
+		}
+		// just ignore the process of searching old file if errFileNotFoundByInode
+	}
+	return nil, nil
 }
 
 func writeFileAtomically(f string, contents []byte) error {
