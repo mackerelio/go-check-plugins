@@ -153,4 +153,37 @@ func TestRunTraceInode(t *testing.T) {
 		os.Remove(rotatedLogf)
 	}
 	testRotate()
+
+	// case of renaming to different directory
+	// from the directory of the target logfile
+	testRotateDifferentDir := func() {
+		// first check
+		fh.WriteString(l1)
+		opts.searchLog(logf)
+
+		// write FATAL
+		fh.WriteString(l2)
+		fh.Close()
+
+		// logrotate to <dir>/dummy/dummy.1
+		newDir := filepath.Join(dir, "dummy")
+		os.MkdirAll(newDir, 0755)
+		rotatedLogf := filepath.Join(newDir, "dummy.1")
+		os.Rename(logf, rotatedLogf)
+		fh, _ = os.Create(logf)
+
+		fh.WriteString(l3)
+		// second check
+		w, c, errLines, err := opts.searchLog(logf)
+		assert.Equal(t, err, nil, "err should be nil when the old file is not found")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+
+		bytes, _ = getBytesToSkip(stateFile)
+		assert.Equal(t, int64(len(l3)), bytes, "should not include oldfile skip bytes")
+
+		os.Remove(rotatedLogf)
+	}
+	testRotateDifferentDir()
 }
