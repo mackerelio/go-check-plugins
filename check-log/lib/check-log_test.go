@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -58,8 +59,12 @@ func TestGetBytesToSkip(t *testing.T) {
 	oldf := ".tmp/fuga/piyo"
 	newf := ".tmp/fuga/piyo.json"
 	state := &state{SkipBytes: 15}
+	os.MkdirAll(filepath.Dir(oldf), 0755)
 	writeFileAtomically(oldf, []byte(fmt.Sprintf("%d", state.SkipBytes)))
 	defer os.RemoveAll(".tmp")
+
+	fi, _ := os.Stat(oldf)
+	log.Println(fi)
 
 	n, err := getBytesToSkip(newf)
 	assert.Equal(t, err, nil, "err should be nil")
