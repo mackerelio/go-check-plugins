@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.22.1 (2018-09-13)
+
+* [check-log] Trace an old file after logrotation with the inode number  #250 (yuuki)
+* [check-log] Jsonize status file #252 (yuuki)
+* Use Go 1.11 #253 (astj)
+* [check-http] Add --max-redirects option #249 (nonylene)
+
+
 ## 0.22.0 (2018-08-30)
 
 * Add check-smtp #243 (shiimaxx)

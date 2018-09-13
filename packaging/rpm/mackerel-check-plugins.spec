@@ -46,6 +46,12 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Sep 13 2018 <mackerel-developers@hatena.ne.jp> - 0.22.1
+- [check-log] Trace an old file after logrotation with the inode number  (by yuuki)
+- [check-log] Jsonize status file (by yuuki)
+- Use Go 1.11 (by astj)
+- [check-http] Add --max-redirects option (by nonylene)
+
 * Thu Aug 30 2018 <mackerel-developers@hatena.ne.jp> - 0.22.0
 - Add check-smtp (by shiimaxx)
 

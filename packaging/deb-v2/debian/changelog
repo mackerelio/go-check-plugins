@@ -1,3 +1,16 @@
+mackerel-check-plugins (0.22.1-1.v2) stable; urgency=low
+
+  * [check-log] Trace an old file after logrotation with the inode number  (by yuuki)
+    <https://github.com/mackerelio/go-check-plugins/pull/250>
+  * [check-log] Jsonize status file (by yuuki)
+    <https://github.com/mackerelio/go-check-plugins/pull/252>
+  * Use Go 1.11 (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/253>
+  * [check-http] Add --max-redirects option (by nonylene)
+    <https://github.com/mackerelio/go-check-plugins/pull/249>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 13 Sep 2018 14:18:01 +0900
+
 mackerel-check-plugins (0.22.0-1.v2) stable; urgency=low
 
   * Add check-smtp (by shiimaxx)
