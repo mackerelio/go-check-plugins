@@ -129,17 +129,18 @@ func (p *cloudwatchLogsPlugin) run() ([]string, error) {
 			messages = append(messages, *event.Message)
 			startTime = aws.Int64(*event.Timestamp + 1)
 		}
+		if output.NextToken != nil {
+			nextToken = output.NextToken
+		}
+		if nextToken != nil {
+			if err := p.saveState(&logState{nextToken, startTime}); err != nil {
+				return nil, err
+			}
+		}
 		if output.NextToken == nil {
 			break
 		}
-		nextToken = output.NextToken
 		time.Sleep(150 * time.Millisecond)
-	}
-	if nextToken != nil {
-		err := p.saveState(&logState{nextToken, startTime})
-		if err != nil {
-			return nil, err
-		}
 	}
 	return messages, nil
 }
