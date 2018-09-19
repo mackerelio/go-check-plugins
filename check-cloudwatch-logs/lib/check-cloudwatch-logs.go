@@ -133,7 +133,7 @@ func (p *cloudwatchLogsPlugin) run() ([]string, error) {
 			break
 		}
 		nextToken = output.NextToken
-		time.Sleep(250 * time.Millisecond)
+		time.Sleep(150 * time.Millisecond)
 	}
 	if nextToken != nil {
 		err := p.saveState(&logState{nextToken, startTime})
