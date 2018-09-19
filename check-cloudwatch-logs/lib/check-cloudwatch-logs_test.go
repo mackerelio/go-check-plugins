@@ -82,8 +82,8 @@ func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 	}
 }
 
-func Test_cloudwatchLogsPlugin_run(t *testing.T) {
-	file, _ := ioutil.TempFile("", "check-cloudwatch-logs-test-run")
+func Test_cloudwatchLogsPlugin_collect(t *testing.T) {
+	file, _ := ioutil.TempFile("", "check-cloudwatch-logs-test-collect")
 	os.Remove(file.Name())
 	file.Close()
 	defer os.Remove(file.Name())
@@ -94,7 +94,7 @@ func Test_cloudwatchLogsPlugin_run(t *testing.T) {
 			LogGroupName: "test-group",
 		},
 	}
-	messages, err := p.run()
+	messages, err := p.collect()
 	assert.Equal(t, err, nil, "err should be nil")
 	assert.Equal(t, len(messages), 6)
 	cnt, _ := ioutil.ReadFile(file.Name())

@@ -97,7 +97,7 @@ type logState struct {
 	StartTime *int64
 }
 
-func (p *cloudwatchLogsPlugin) run() ([]string, error) {
+func (p *cloudwatchLogsPlugin) collect() ([]string, error) {
 	var nextToken *string
 	var startTime *int64
 	s, err := p.loadState()
@@ -189,6 +189,14 @@ func (p *cloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
 	return checkers.NewChecker(status, msg)
 }
 
+func (p *cloudwatchLogsPlugin) run() *checkers.Checker {
+	messages, err := p.collect()
+	if err != nil {
+		return checkers.Unknown(fmt.Sprint(err))
+	}
+	return p.check(messages)
+}
+
 func run(args []string) *checkers.Checker {
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
@@ -199,9 +207,5 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		return checkers.Unknown(fmt.Sprint(err))
 	}
-	messages, err := p.run()
-	if err != nil {
-		return checkers.Unknown(fmt.Sprint(err))
-	}
-	return p.check(messages)
+	return p.run()
 }
