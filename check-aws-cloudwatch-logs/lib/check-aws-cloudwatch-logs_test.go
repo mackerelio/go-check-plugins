@@ -101,7 +101,6 @@ func Test_cloudwatchLogsPlugin_collect(t *testing.T) {
 	var s logState
 	json.NewDecoder(bytes.NewReader(cnt)).Decode(&s)
 	assert.Equal(t, *s.NextToken, "2")
-	assert.Equal(t, *s.StartTime, int64(6))
 }
 
 func Test_cloudwatchLogsPlugin_check(t *testing.T) {

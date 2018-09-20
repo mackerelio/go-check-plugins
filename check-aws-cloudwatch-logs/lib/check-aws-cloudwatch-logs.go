@@ -123,7 +123,9 @@ func (p *awsCloudwatchLogsPlugin) collect() ([]string, error) {
 		}
 		for _, event := range output.Events {
 			messages = append(messages, *event.Message)
-			startTime = aws.Int64(*event.Timestamp + 1)
+			if startTime == nil || *startTime <= *event.Timestamp {
+				startTime = aws.Int64(*event.Timestamp + 1)
+			}
 		}
 		if output.NextToken != nil {
 			nextToken = output.NextToken
