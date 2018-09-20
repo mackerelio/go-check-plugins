@@ -97,8 +97,7 @@ type logState struct {
 func (p *awsCloudwatchLogsPlugin) collect() ([]string, error) {
 	var nextToken *string
 	var startTime *int64
-	s, err := p.loadState()
-	if err != nil {
+	if s, err := p.loadState(); err != nil {
 		if !os.IsNotExist(err) {
 			return nil, err
 		}
