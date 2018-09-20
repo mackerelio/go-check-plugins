@@ -77,7 +77,8 @@ func getStateFile(stateDir, logGroupName, logStreamNamePrefix string, args []str
 						strings.Join(args, " "),
 					},
 					" ",
-				))),
+				)),
+			),
 		),
 	)
 }
