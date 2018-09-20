@@ -1,4 +1,4 @@
-package checkcloudwatchlogs
+package checkawscloudwatchlogs
 
 import (
 	"bytes"
@@ -16,12 +16,12 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs/cloudwatchlogsiface"
 )
 
-type mockCloudWatchLogsClient struct {
+type mockAWSCloudWatchLogsClient struct {
 	cloudwatchlogsiface.CloudWatchLogsAPI
 	outputs map[string]*cloudwatchlogs.FilterLogEventsOutput
 }
 
-func (c *mockCloudWatchLogsClient) FilterLogEvents(input *cloudwatchlogs.FilterLogEventsInput) (*cloudwatchlogs.FilterLogEventsOutput, error) {
+func (c *mockAWSCloudWatchLogsClient) FilterLogEvents(input *cloudwatchlogs.FilterLogEventsInput) (*cloudwatchlogs.FilterLogEventsOutput, error) {
 	if input.NextToken == nil {
 		return c.outputs[""], nil
 	}
@@ -32,7 +32,7 @@ func (c *mockCloudWatchLogsClient) FilterLogEvents(input *cloudwatchlogs.FilterL
 }
 
 func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
-	return &mockCloudWatchLogsClient{
+	return &mockAWSCloudWatchLogsClient{
 		outputs: map[string]*cloudwatchlogs.FilterLogEventsOutput{
 			"": &cloudwatchlogs.FilterLogEventsOutput{
 				NextToken: aws.String("1"),
@@ -87,7 +87,7 @@ func Test_cloudwatchLogsPlugin_collect(t *testing.T) {
 	os.Remove(file.Name())
 	file.Close()
 	defer os.Remove(file.Name())
-	p := &cloudwatchLogsPlugin{
+	p := &awsCloudwatchLogsPlugin{
 		Service:   createMockService(),
 		StateFile: file.Name(),
 		logOpts: &logOpts{
@@ -156,7 +156,7 @@ func Test_cloudwatchLogsPlugin_check(t *testing.T) {
 		},
 	}
 	for _, testCase := range testCases {
-		p := &cloudwatchLogsPlugin{
+		p := &awsCloudwatchLogsPlugin{
 			logOpts: &logOpts{
 				CriticalOver:  testCase.CriticalOver,
 				WarningOver:   testCase.WarningOver,

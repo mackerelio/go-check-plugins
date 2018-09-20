@@ -1,4 +1,4 @@
-package checkcloudwatchlogs
+package checkawscloudwatchlogs
 
 import (
 	"crypto/md5"
@@ -37,15 +37,15 @@ func Do() {
 	ckr.Exit()
 }
 
-type cloudwatchLogsPlugin struct {
+type awsCloudwatchLogsPlugin struct {
 	Service   cloudwatchlogsiface.CloudWatchLogsAPI
 	StateFile string
 	*logOpts
 }
 
-func newCloudwatchLogsPlugin(opts *logOpts, args []string) (*cloudwatchLogsPlugin, error) {
+func newCloudwatchLogsPlugin(opts *logOpts, args []string) (*awsCloudwatchLogsPlugin, error) {
 	var err error
-	p := &cloudwatchLogsPlugin{logOpts: opts}
+	p := &awsCloudwatchLogsPlugin{logOpts: opts}
 	p.Service, err = createService(opts)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ type logState struct {
 	StartTime *int64
 }
 
-func (p *cloudwatchLogsPlugin) collect() ([]string, error) {
+func (p *awsCloudwatchLogsPlugin) collect() ([]string, error) {
 	var nextToken *string
 	var startTime *int64
 	s, err := p.loadState()
@@ -142,7 +142,7 @@ func (p *cloudwatchLogsPlugin) collect() ([]string, error) {
 	return messages, nil
 }
 
-func (p *cloudwatchLogsPlugin) loadState() (*logState, error) {
+func (p *awsCloudwatchLogsPlugin) loadState() (*logState, error) {
 	f, err := os.Open(p.StateFile)
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func (p *cloudwatchLogsPlugin) loadState() (*logState, error) {
 	return &s, nil
 }
 
-func (p *cloudwatchLogsPlugin) saveState(s *logState) error {
+func (p *awsCloudwatchLogsPlugin) saveState(s *logState) error {
 	err := os.MkdirAll(filepath.Dir(p.StateFile), 0755)
 	if err != nil {
 		return err
@@ -169,7 +169,7 @@ func (p *cloudwatchLogsPlugin) saveState(s *logState) error {
 	return json.NewEncoder(f).Encode(s)
 }
 
-func (p *cloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
+func (p *awsCloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
 	status := checkers.OK
 	msg := fmt.Sprint(len(messages))
 	if len(messages) > p.CriticalOver {
@@ -186,7 +186,7 @@ func (p *cloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
 	return checkers.NewChecker(status, msg)
 }
 
-func (p *cloudwatchLogsPlugin) run() *checkers.Checker {
+func (p *awsCloudwatchLogsPlugin) run() *checkers.Checker {
 	messages, err := p.collect()
 	if err != nil {
 		return checkers.Unknown(fmt.Sprint(err))
