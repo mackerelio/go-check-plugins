@@ -21,7 +21,8 @@ import (
 )
 
 type logOpts struct {
-	LogGroupName string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name"`
+	LogGroupName        string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name"`
+	LogStreamNamePrefix string `long:"log-stream-name-prefix" value-name:"LOG-STREAM-NAME-PREFIX" description:"Log stream name prefix"`
 
 	Pattern       string `short:"p" long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs."`
 	WarningOver   int    `short:"w" long:"warning-over" value-name:"WARNING" description:"Trigger a warning if matched lines is over a number"`
@@ -54,18 +55,18 @@ func newCloudwatchLogsPlugin(opts *logOpts, args []string) (*awsCloudwatchLogsPl
 		workdir := pluginutil.PluginWorkDir()
 		p.StateDir = filepath.Join(workdir, "check-cloudwatch-logs")
 	}
-	p.StateFile = getStateFile(p.StateDir, opts.LogGroupName, args)
+	p.StateFile = getStateFile(p.StateDir, opts.LogGroupName, opts.LogStreamNamePrefix, args)
 	return p, nil
 }
 
 var stateRe = regexp.MustCompile(`[^-a-zA-Z0-9_.]`)
 
-func getStateFile(stateDir, logGroupName string, args []string) string {
+func getStateFile(stateDir, logGroupName, logStreamNamePrefix string, args []string) string {
 	return filepath.Join(
 		stateDir,
 		fmt.Sprintf(
 			"%s-%x.json",
-			strings.TrimLeft(stateRe.ReplaceAllString(logGroupName, "_"), "_"),
+			strings.TrimLeft(stateRe.ReplaceAllString(logGroupName+"_"+logStreamNamePrefix, "_"), "_"),
 			md5.Sum([]byte(
 				strings.Join(
 					[]string{
@@ -112,12 +113,16 @@ func (p *awsCloudwatchLogsPlugin) collect() ([]string, error) {
 	}
 	var messages []string
 	for {
-		output, err := p.Service.FilterLogEvents(&cloudwatchlogs.FilterLogEventsInput{
+		input := &cloudwatchlogs.FilterLogEventsInput{
 			StartTime:     startTime,
 			LogGroupName:  aws.String(p.LogGroupName),
 			NextToken:     nextToken,
 			FilterPattern: aws.String(p.Pattern),
-		})
+		}
+		if p.LogStreamNamePrefix != "" {
+			input.LogStreamNamePrefix = aws.String(p.LogStreamNamePrefix)
+		}
+		output, err := p.Service.FilterLogEvents(input)
 		if err != nil {
 			return nil, err
 		}
