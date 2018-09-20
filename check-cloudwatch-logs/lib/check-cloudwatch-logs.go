@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs/cloudwatchlogsiface"
@@ -22,10 +21,7 @@ import (
 )
 
 type logOpts struct {
-	Region          string `long:"region" value-name:"REGION" description:"AWS Region"`
-	AccessKeyID     string `long:"access-key-id" value-name:"ACCESS-KEY-ID" description:"AWS Access Key ID"`
-	SecretAccessKey string `long:"secret-access-key" value-name:"SECRET-ACCESS-KEY" description:"AWS Secret Access Key"`
-	LogGroupName    string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name"`
+	LogGroupName string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name"`
 
 	Pattern       string `short:"p" long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs."`
 	WarningOver   int    `short:"w" long:"warning-over" value-name:"WARNING" description:"Trigger a warning if matched lines is over a number"`
@@ -70,7 +66,17 @@ func getStateFile(stateDir, logGroupName string, args []string) string {
 		fmt.Sprintf(
 			"%s-%x.json",
 			strings.TrimLeft(stateRe.ReplaceAllString(logGroupName, "_"), "_"),
-			md5.Sum([]byte(os.Getenv("AWS_PROFILE")+" "+strings.Join(args, " "))),
+			md5.Sum([]byte(
+				strings.Join(
+					[]string{
+						os.Getenv("AWS_PROFILE"),
+						os.Getenv("AWS_ACCESS_KEY_ID"),
+						os.Getenv("AWS_SECRET_ACCESS_KEY"),
+						os.Getenv("AWS_REGION"),
+						strings.Join(args, " "),
+					},
+					" ",
+				))),
 		),
 	)
 }
@@ -80,16 +86,7 @@ func createService(opts *logOpts) (*cloudwatchlogs.CloudWatchLogs, error) {
 	if err != nil {
 		return nil, err
 	}
-	config := aws.NewConfig()
-	if opts.AccessKeyID != "" && opts.SecretAccessKey != "" {
-		config = config.WithCredentials(
-			credentials.NewStaticCredentials(opts.AccessKeyID, opts.SecretAccessKey, ""),
-		)
-	}
-	if opts.Region != "" {
-		config = config.WithRegion(opts.Region)
-	}
-	return cloudwatchlogs.New(sess, config), nil
+	return cloudwatchlogs.New(sess, aws.NewConfig()), nil
 }
 
 type logState struct {
