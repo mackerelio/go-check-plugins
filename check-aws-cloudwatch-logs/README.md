@@ -23,3 +23,8 @@ env = { AWS_REGION = "ap-northeast-1" }
 Note that for `--pattern` argument, you can use the syntax described in [Filter and Pattern Syntax - Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html). This is not a regular expression.
 
 The plugin uses the instance profile if possible, or you can configure `AWS_PROFILE` or `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables in the `env` settings.
+
+## Required action
+Following action on the target log group is required to perform the monitoring.
+
+- `logs:FilterLogEvents`
