@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/mackerelio/go-check-plugins/check-aws-cloudwatch-logs/lib"
 	"github.com/mackerelio/go-check-plugins/check-aws-sqs-queue-size/lib"
 	"github.com/mackerelio/go-check-plugins/check-cert-file/lib"
 	"github.com/mackerelio/go-check-plugins/check-disk/lib"
@@ -33,6 +34,8 @@ import (
 
 func runPlugin(plug string) error {
 	switch plug {
+	case "aws-cloudwatch-logs":
+		checkawscloudwatchlogs.Do()
 	case "aws-sqs-queue-size":
 		checkawssqsqueuesize.Do()
 	case "cert-file":
@@ -90,6 +93,7 @@ func runPlugin(plug string) error {
 }
 
 var plugins = []string{
+	"aws-cloudwatch-logs",
 	"aws-sqs-queue-size",
 	"cert-file",
 	"disk",

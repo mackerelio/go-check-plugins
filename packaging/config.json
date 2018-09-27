@@ -1,6 +1,7 @@
 {
     "description": "configuration for packaging mackerel-check-plugins",
     "plugins": [
+       "aws-cloudwatch-logs",
        "aws-sqs-queue-size",
        "cert-file",
        "disk",
