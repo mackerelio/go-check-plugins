@@ -26,7 +26,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis smtp solr ssh ssl-cert tcp uptime; do \
+for i in aws-cloudwatch-logs aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis smtp solr ssh ssl-cert tcp uptime; do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -46,6 +46,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Sep 27 2018 <mackerel-developers@hatena.ne.jp> - 0.23.0
+- add aws-cloudwatch-logs (by syou6162)
+- Add CloudWatch Logs plugin (by itchyny)
+
 * Thu Sep 13 2018 <mackerel-developers@hatena.ne.jp> - 0.22.1
 - [check-log] Trace an old file after logrotation with the inode number  (by yuuki)
 - [check-log] Jsonize status file (by yuuki)
