@@ -1,3 +1,4 @@
+debian/check-aws-cloudwatch-logs
 debian/check-aws-sqs-queue-size
 debian/check-cert-file
 debian/check-disk

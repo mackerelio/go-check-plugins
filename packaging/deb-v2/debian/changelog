@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.23.0-1.v2) stable; urgency=low
+
+  * add aws-cloudwatch-logs (by syou6162)
+    <https://github.com/mackerelio/go-check-plugins/pull/255>
+  * Add CloudWatch Logs plugin (by itchyny)
+    <https://github.com/mackerelio/go-check-plugins/pull/248>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 27 Sep 2018 11:46:55 +0900
+
 mackerel-check-plugins (0.22.1-1.v2) stable; urgency=low
 
   * [check-log] Trace an old file after logrotation with the inode number  (by yuuki)

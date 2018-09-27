@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.23.0 (2018-09-27)
+
+* add aws-cloudwatch-logs #255 (syou6162)
+* Add CloudWatch Logs plugin #248 (itchyny)
+
+
 ## 0.22.1 (2018-09-13)
 
 * [check-log] Trace an old file after logrotation with the inode number  #250 (yuuki)
