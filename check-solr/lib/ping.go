@@ -13,7 +13,7 @@ func checkPing(opts solrOpts) *checkers.Checker {
 
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
-		return checkers.Critical(err.Error())
+		return checkers.Unknown(err.Error())
 	}
 	req.Header.Set("User-Agent", "check-solr")
 

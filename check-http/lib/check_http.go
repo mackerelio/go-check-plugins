@@ -148,7 +148,7 @@ func Run(args []string) *checkers.Checker {
 
 	req, err := http.NewRequest(http.MethodGet, opts.URL, nil)
 	if err != nil {
-		return checkers.Critical(err.Error())
+		return checkers.Unknown(err.Error())
 	}
 
 	if len(opts.Headers) != 0 {

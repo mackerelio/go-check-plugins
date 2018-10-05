@@ -57,7 +57,7 @@ func run(args []string) *checkers.Checker {
 	client := &http.Client{Timeout: time.Duration(opts.Timeout) * time.Second}
 	req, err := http.NewRequest(http.MethodGet, createURL(opts), nil)
 	if err != nil {
-		return checkers.Critical(err.Error())
+		return checkers.Unknown(err.Error())
 	}
 	req.Header.Set("User-Agent", "check-jmx-jolokia")
 
