@@ -10,7 +10,15 @@ import (
 
 func checkPing(opts solrOpts) *checkers.Checker {
 	uri := opts.createBaseURL() + "/admin/ping?wt=json"
-	resp, err := http.Get(uri)
+
+	req, err := http.NewRequest(http.MethodGet, uri, nil)
+	if err != nil {
+		return checkers.Critical(err.Error())
+	}
+	req.Header.Set("User-Agent", "check-solr")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return checkers.Unknown("couldn't get access to " + uri)
 	}

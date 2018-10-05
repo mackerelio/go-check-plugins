@@ -146,7 +146,7 @@ func Run(args []string) *checkers.Checker {
 		return nil
 	}
 
-	req, err := http.NewRequest("GET", opts.URL, nil)
+	req, err := http.NewRequest(http.MethodGet, opts.URL, nil)
 	if err != nil {
 		return checkers.Critical(err.Error())
 	}
@@ -164,6 +164,11 @@ func Run(args []string) *checkers.Checker {
 		}
 
 		req.Header = header
+	}
+
+	// set default User-Agent unless specified by `opts.Headers`
+	if _, ok := req.Header["User-Agent"]; !ok {
+		req.Header.Set("User-Agent", "check-http")
 	}
 
 	stTime := time.Now()
