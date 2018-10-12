@@ -15,9 +15,9 @@ deps:
 	go get -d -v -t ./...
 
 devel-deps: deps
-	go get github.com/golang/lint/golint
-	go get github.com/pierrre/gotestcover
-	go get github.com/mattn/goveralls
+	go get golang.org/x/lint/golint  \
+	  github.com/pierrre/gotestcover \
+	  github.com/mattn/goveralls
 
 check-release-deps:
 	@have_error=0; \
