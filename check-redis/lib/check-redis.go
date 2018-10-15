@@ -151,6 +151,14 @@ func checkSlave(args []string) *checkers.Checker {
 	}
 	defer c.Close()
 
+	if role, ok := (*info)["role"]; ok {
+		if role == "master" {
+			return checkers.Ok("role is master")
+		}
+	} else {
+		return checkers.Unknown("couldn't get role")
+	}
+
 	if status, ok := (*info)["master_link_status"]; ok {
 		msg := fmt.Sprintf("master_link_status: %s", status)
 
@@ -164,7 +172,6 @@ func checkSlave(args []string) *checkers.Checker {
 		}
 
 	} else {
-		// it may be a master!
 		return checkers.Unknown("couldn't get master_link_status")
 	}
 }
