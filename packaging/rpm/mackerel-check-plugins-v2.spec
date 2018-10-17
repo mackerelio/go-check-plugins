@@ -37,6 +37,9 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Oct 17 2018 <mackerel-developers@hatena.ne.jp> - 0.24.0
+- add User-Agent header to http check plugins (by astj)
+
 * Thu Sep 27 2018 <mackerel-developers@hatena.ne.jp> - 0.23.0
 - add aws-cloudwatch-logs (by syou6162)
 - Add CloudWatch Logs plugin (by itchyny)

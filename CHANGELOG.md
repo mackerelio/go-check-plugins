@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.24.0 (2018-10-17)
+
+* add User-Agent header to http check plugins #257 (astj)
+
+
 ## 0.23.0 (2018-09-27)
 
 * add aws-cloudwatch-logs #255 (syou6162)

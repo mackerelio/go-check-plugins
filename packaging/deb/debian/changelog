@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.24.0-1) stable; urgency=low
+
+  * add User-Agent header to http check plugins (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/257>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 17 Oct 2018 10:52:19 +0900
+
 mackerel-check-plugins (0.23.0-1) stable; urgency=low
 
   * add aws-cloudwatch-logs (by syou6162)
