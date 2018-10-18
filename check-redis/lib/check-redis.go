@@ -21,8 +21,9 @@ type redisSetting struct {
 }
 
 var commands = map[string](func([]string) *checkers.Checker){
-	"reachable": checkReachable,
-	"slave":     checkSlave,
+	"reachable":   checkReachable,
+	"replication": checkReplication,
+	"slave":       checkSlave,
 }
 
 func separateSub(argv []string) (string, []string) {
@@ -133,6 +134,47 @@ func checkReachable(args []string) *checkers.Checker {
 	return checkers.Ok(
 		fmt.Sprintf("version: %s", (*info)["redis_version"]),
 	)
+}
+
+func checkReplication(args []string) *checkers.Checker {
+	opts := redisSetting{}
+	psr := flags.NewParser(&opts, flags.Default)
+	psr.Usage = "replication [OPTIONS]"
+	_, err := psr.ParseArgs(args)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	c, info, err := connectRedisGetInfo(opts)
+	if err != nil {
+		return checkers.Unknown(err.Error())
+	}
+	defer c.Close()
+
+	if role, ok := (*info)["role"]; ok {
+		if role != "slave" {
+			return checkers.Ok("role is not slave")
+		}
+	} else {
+		return checkers.Unknown("couldn't get role")
+	}
+
+	if status, ok := (*info)["master_link_status"]; ok {
+		msg := fmt.Sprintf("master_link_status: %s", status)
+
+		switch status {
+		case "up":
+			return checkers.Ok(msg)
+		case "down":
+			return checkers.Critical(msg)
+		default:
+			return checkers.Unknown(msg)
+		}
+
+	} else {
+		return checkers.Unknown("couldn't get master_link_status")
+	}
 }
 
 func checkSlave(args []string) *checkers.Checker {
