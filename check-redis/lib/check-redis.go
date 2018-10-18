@@ -23,7 +23,7 @@ type redisSetting struct {
 var commands = map[string](func([]string) *checkers.Checker){
 	"reachable":   checkReachable,
 	"replication": checkReplication,
-	"slave":       checkSlave,
+	"slave":       checkSlave, // deprecated command
 }
 
 func separateSub(argv []string) (string, []string) {
@@ -177,10 +177,13 @@ func checkReplication(args []string) *checkers.Checker {
 	}
 }
 
+// Deprecated: For backward compatibility.
 func checkSlave(args []string) *checkers.Checker {
 	opts := redisSetting{}
 	psr := flags.NewParser(&opts, flags.Default)
-	psr.Usage = "slave [OPTIONS]"
+	psr.Usage = `slave [OPTIONS]
+
+DEPRECATED: For backward compatibility. Use 'replication' command.`
 	_, err := psr.ParseArgs(args)
 	if err != nil {
 		fmt.Println(err)
