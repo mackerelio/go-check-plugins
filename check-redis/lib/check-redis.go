@@ -136,8 +136,13 @@ func checkReachable(args []string) *checkers.Checker {
 	)
 }
 
+type replicationOpts struct {
+	redisSetting
+	SkipMaster bool `long:"skip-master" description:"return ok if redis role is master"`
+}
+
 func checkReplication(args []string) *checkers.Checker {
-	opts := redisSetting{}
+	opts := replicationOpts{}
 	psr := flags.NewParser(&opts, flags.Default)
 	psr.Usage = "replication [OPTIONS]"
 	_, err := psr.ParseArgs(args)
@@ -146,14 +151,14 @@ func checkReplication(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	c, info, err := connectRedisGetInfo(opts)
+	c, info, err := connectRedisGetInfo(opts.redisSetting)
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
 	defer c.Close()
 
 	if role, ok := (*info)["role"]; ok {
-		if role != "slave" {
+		if role != "slave" && opts.SkipMaster {
 			return checkers.Ok("role is not slave")
 		}
 	} else {
