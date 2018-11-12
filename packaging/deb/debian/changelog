@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.25.0-1) stable; urgency=low
+
+  * [check-redis] add replication subcommand (by yuuki)
+    <https://github.com/mackerelio/go-check-plugins/pull/261>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Mon, 12 Nov 2018 11:29:18 +0900
+
 mackerel-check-plugins (0.24.0-1) stable; urgency=low
 
   * add User-Agent header to http check plugins (by astj)

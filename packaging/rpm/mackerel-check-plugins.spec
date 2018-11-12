@@ -46,6 +46,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Mon Nov 12 2018 <mackerel-developers@hatena.ne.jp> - 0.25.0
+- [check-redis] add replication subcommand (by yuuki)
+
 * Wed Oct 17 2018 <mackerel-developers@hatena.ne.jp> - 0.24.0
 - add User-Agent header to http check plugins (by astj)
 
