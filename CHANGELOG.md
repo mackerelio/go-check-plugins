@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.25.0 (2018-11-12)
+
+* [check-redis] add replication subcommand #261 (yuuki)
+
+
 ## 0.24.0 (2018-10-17)
 
 * add User-Agent header to http check plugins #257 (astj)
