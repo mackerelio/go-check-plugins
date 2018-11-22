@@ -153,6 +153,9 @@ func parseConnectTo(opts *checkHTTPOpts) ([]resolveMapping, error) {
 	mappings := make([]resolveMapping, len(opts.ConnectTos))
 	for i, c := range opts.ConnectTos {
 		s := connectToRegexp.FindStringSubmatch(c)
+		if len(s) == 0 {
+			return nil, fmt.Errorf("Invalid --connect-to pattern: %s", c)
+		}
 		r := resolveMapping{}
 		if len(s) >= 2 {
 			r.srcHost = s[1]

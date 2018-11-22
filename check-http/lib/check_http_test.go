@@ -270,6 +270,12 @@ func TestConnectTos(t *testing.T) {
 				"-u", "http://hoge"},
 			want: checkers.OK,
 		},
+		{
+			// Invalid pattern
+			args: []string{"--connect-to", "foo:123:",
+				"-u", ts.URL},
+			want: checkers.UNKNOWN,
+		},
 	}
 
 	for i, tc := range testCases {
