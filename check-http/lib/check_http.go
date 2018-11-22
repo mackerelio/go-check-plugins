@@ -3,6 +3,7 @@ package checkhttp
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -28,6 +29,7 @@ type checkHTTPOpts struct {
 	Headers            []string `short:"H" description:"HTTP request headers"`
 	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
 	MaxRedirects       int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
+	ConnectTos         []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1. HOST1 and PORT1 can be empty, and in case they're treated as ANY"`
 }
 
 // Do the plugin
@@ -44,6 +46,35 @@ type statusRange struct {
 }
 
 const invalidMapping = "Invalid mapping of status: %s"
+
+// host, port maybe empty. in case that is treated as "any"
+type resolveMapping struct {
+	host     string
+	port     string
+	destHost string
+	destPort string
+}
+
+func newReplacableDial(dialer *net.Dialer, mappings []resolveMapping) func(ctx context.Context, network, addr string) (net.Conn, error) {
+	return func(ctx context.Context, network, hostport string) (net.Conn, error) {
+		host, port, err := net.SplitHostPort(hostport)
+		if err != nil {
+			return nil, err
+		}
+
+		addr := hostport
+		for _, m := range mappings {
+			if m.host != "" && m.host != host {
+				continue
+			}
+			if m.port != "" && m.port != port {
+				continue
+			}
+			addr = net.JoinHostPort(m.destHost, m.destPort)
+		}
+		return dialer.DialContext(ctx, network, addr)
+	}
+}
 
 func parseStatusRanges(opts *checkHTTPOpts) ([]statusRange, error) {
 	var statuses []statusRange
@@ -107,6 +138,22 @@ func parseHeader(opts *checkHTTPOpts) (http.Header, error) {
 	return http.Header(mimeheader), nil
 }
 
+var connectToRegexp = regexp.MustCompile(`^(\[.+\]|[^\[\]]+)?:(\d*):(\[.+\]|[^\[\]]+):(\d+)$`)
+
+func parseConnectTo(opts *checkHTTPOpts) ([]resolveMapping, error) {
+	mappings := make([]resolveMapping, len(opts.ConnectTos))
+	for i, c := range opts.ConnectTos {
+		s := connectToRegexp.FindStringSubmatch(c)
+		mappings[i] = resolveMapping{
+			host:     s[1],
+			port:     s[2],
+			destHost: s[3],
+			destPort: s[4],
+		}
+	}
+	return mappings, nil
+}
+
 // Run do external monitoring via HTTP
 func Run(args []string) *checkers.Checker {
 	opts := checkHTTPOpts{}
@@ -126,17 +173,26 @@ func Run(args []string) *checkers.Checker {
 		},
 		Proxy: http.ProxyFromEnvironment,
 	}
+	// same as http.Transport's default dialer
+	dialer := &net.Dialer{
+		Timeout:   30 * time.Second,
+		KeepAlive: 30 * time.Second,
+		DualStack: true,
+	}
 	if opts.SourceIP != "" {
 		ip := net.ParseIP(opts.SourceIP)
 		if ip == nil {
 			return checkers.Unknown(fmt.Sprintf("Invalid source IP address: %v", opts.SourceIP))
 		}
-		tr.Dial = (&net.Dialer{
-			LocalAddr: &net.TCPAddr{IP: ip},
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
-			DualStack: true,
-		}).Dial
+		dialer.LocalAddr = &net.TCPAddr{IP: ip}
+	}
+
+	if len(opts.ConnectTos) != 0 {
+		resolves, err := parseConnectTo(&opts)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
+		tr.DialContext = newReplacableDial(dialer, resolves)
 	}
 	client := &http.Client{Transport: tr}
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {

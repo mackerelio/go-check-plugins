@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/mackerelio/checkers"
@@ -167,5 +168,100 @@ func TestMaxRedirects(t *testing.T) {
 	for i, tc := range testCases {
 		ckr := Run(tc.args)
 		assert.Equal(t, ckr.Status, tc.want, "#%d: Status should be %s", i, tc.want)
+	}
+}
+
+func TestConnectTos(t *testing.T) {
+	// expected server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "this is %s\n", r.URL.Host)
+	}))
+	defer ts.Close()
+	// extract host and port
+	s := strings.SplitN(ts.URL, ":", 3)
+	addr := strings.TrimPrefix(s[1], "//")
+	port := s[2]
+
+	// NON-expected server
+	ts2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "wrong server!", 500)
+	}))
+	defer ts2.Close()
+	// extract host and port
+	s2 := strings.SplitN(ts.URL, ":", 3)
+	addr2 := strings.TrimPrefix(s2[1], "//")
+	port2 := s2[2]
+
+	testCases := []struct {
+		args []string
+		want checkers.Status
+	}{
+		{
+			// not affected at all
+			args: []string{"--connect-to", fmt.Sprintf("hoge:80:%s:%s", addr, port),
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+		{
+			// connected to target
+			args: []string{"--connect-to", fmt.Sprintf("hoge:80:%s:%s", addr, port),
+				"-u", "http://hoge"},
+			want: checkers.OK,
+		},
+		{
+			// empty host means ANY
+			args: []string{"--connect-to", fmt.Sprintf(":80:%s:%s", addr, port),
+				"-u", "http://hoge"},
+			want: checkers.OK,
+		},
+		{
+			// empty port means ANY
+			args: []string{"--connect-to", fmt.Sprintf("hoge::%s:%s", addr, port),
+				"-u", "http://hoge"},
+			want: checkers.OK,
+		},
+		{
+			// host mismatch ignored
+			args: []string{"--connect-to", fmt.Sprintf("not.target:%s:%s:%s", port, addr2, port2),
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+		{
+			// port mismatch ignored
+			args: []string{"--connect-to", fmt.Sprintf("%s:%s:%s:%s", addr, port2, addr2, port2),
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+		{
+			// host mismatch ignored, even if port is empty
+			args: []string{"--connect-to", fmt.Sprintf("not.target::%s:%s", addr2, port2),
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+		{
+			// port mismatch ignored, even if host is empty
+			args: []string{"--connect-to", fmt.Sprintf(":%s:%s:%s", port2, addr2, port2),
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+		{
+			// multiple setting (1)
+			args: []string{"--connect-to", fmt.Sprintf("not.hoge:80:%s:%s", addr2, port2),
+				"--connect-to", fmt.Sprintf("hoge:80:%s:%s", addr, port),
+				"-u", "http://hoge"},
+			want: checkers.OK,
+		},
+		{
+			// multiple setting (2)
+			args: []string{"--connect-to", fmt.Sprintf("hoge:80:%s:%s", addr, port),
+				"--connect-to", fmt.Sprintf("hoge:80:%s:%s", addr2, port2),
+				"-u", "http://hoge"},
+			want: checkers.OK,
+		},
+	}
+
+	for i, tc := range testCases {
+		ckr := Run(tc.args)
+		assert.Equal(t, ckr.Status, tc.want, "#%d: Status should be %s, %s", i, tc.want, ckr.Message)
 	}
 }
