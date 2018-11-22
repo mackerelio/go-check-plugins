@@ -209,15 +209,27 @@ func TestConnectTos(t *testing.T) {
 			want: checkers.OK,
 		},
 		{
-			// empty host means ANY
+			// empty srcHost means ANY
 			args: []string{"--connect-to", fmt.Sprintf(":80:%s:%s", addr, port),
 				"-u", "http://hoge"},
 			want: checkers.OK,
 		},
 		{
-			// empty port means ANY
+			// empty srcPort means ANY
 			args: []string{"--connect-to", fmt.Sprintf("hoge::%s:%s", addr, port),
 				"-u", "http://hoge"},
+			want: checkers.OK,
+		},
+		{
+			// empty destHost means unchanged
+			args: []string{"--connect-to", fmt.Sprintf("%s:80::%s", addr, port),
+				"-u", fmt.Sprintf("http://%s", addr)},
+			want: checkers.OK,
+		},
+		{
+			// empty destPort means unchanged
+			args: []string{"--connect-to", fmt.Sprintf("hoge:%s:%s:", port, addr),
+				"-u", fmt.Sprintf("http://hoge:%s", port)},
 			want: checkers.OK,
 		},
 		{

@@ -29,7 +29,7 @@ type checkHTTPOpts struct {
 	Headers            []string `short:"H" description:"HTTP request headers"`
 	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
 	MaxRedirects       int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
-	ConnectTos         []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1. HOST1 and PORT1 can be empty, and in case they're treated as ANY"`
+	ConnectTos         []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1"`
 }
 
 // Do the plugin
@@ -47,10 +47,12 @@ type statusRange struct {
 
 const invalidMapping = "Invalid mapping of status: %s"
 
-// host, port maybe empty. in case that is treated as "any"
+// when empty:
+// - src* will be treated as ANY
+// - dest* will be treated as unchanged
 type resolveMapping struct {
-	host     string
-	port     string
+	srcHost  string
+	srcPort  string
 	destHost string
 	destPort string
 }
@@ -64,13 +66,19 @@ func newReplacableDial(dialer *net.Dialer, mappings []resolveMapping) func(ctx c
 
 		addr := hostport
 		for _, m := range mappings {
-			if m.host != "" && m.host != host {
+			if m.srcHost != "" && m.srcHost != host {
 				continue
 			}
-			if m.port != "" && m.port != port {
+			if m.srcPort != "" && m.srcPort != port {
 				continue
 			}
-			addr = net.JoinHostPort(m.destHost, m.destPort)
+			if m.destHost != "" {
+				host = m.destHost
+			}
+			if m.destPort != "" {
+				port = m.destPort
+			}
+			addr = net.JoinHostPort(host, port)
 			break
 		}
 		return dialer.DialContext(ctx, network, addr)
@@ -139,18 +147,26 @@ func parseHeader(opts *checkHTTPOpts) (http.Header, error) {
 	return http.Header(mimeheader), nil
 }
 
-var connectToRegexp = regexp.MustCompile(`^(\[.+\]|[^\[\]]+)?:(\d*):(\[.+\]|[^\[\]]+):(\d+)$`)
+var connectToRegexp = regexp.MustCompile(`^(\[.+\]|[^\[\]]+)?:(\d*):(\[.+\]|[^\[\]]+)?:(\d+)?$`)
 
 func parseConnectTo(opts *checkHTTPOpts) ([]resolveMapping, error) {
 	mappings := make([]resolveMapping, len(opts.ConnectTos))
 	for i, c := range opts.ConnectTos {
 		s := connectToRegexp.FindStringSubmatch(c)
-		mappings[i] = resolveMapping{
-			host:     s[1],
-			port:     s[2],
-			destHost: s[3],
-			destPort: s[4],
+		r := resolveMapping{}
+		if len(s) >= 2 {
+			r.srcHost = s[1]
 		}
+		if len(s) >= 3 {
+			r.srcPort = s[2]
+		}
+		if len(s) >= 4 {
+			r.destHost = s[3]
+		}
+		if len(s) >= 5 {
+			r.destPort = s[4]
+		}
+		mappings[i] = r
 	}
 	return mappings, nil
 }
