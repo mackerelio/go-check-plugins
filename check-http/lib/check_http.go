@@ -71,6 +71,7 @@ func newReplacableDial(dialer *net.Dialer, mappings []resolveMapping) func(ctx c
 				continue
 			}
 			addr = net.JoinHostPort(m.destHost, m.destPort)
+			break
 		}
 		return dialer.DialContext(ctx, network, addr)
 	}
