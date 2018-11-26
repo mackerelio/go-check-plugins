@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.26.0-1) stable; urgency=low
+
+  * [check-http] Support --connect-to option (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/263>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Mon, 26 Nov 2018 15:16:57 +0900
+
 mackerel-check-plugins (0.25.0-1) stable; urgency=low
 
   * [check-redis] add replication subcommand (by yuuki)

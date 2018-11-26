@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.26.0 (2018-11-26)
+
+* [check-http] Support --connect-to option #263 (astj)
+
+
 ## 0.25.0 (2018-11-12)
 
 * [check-redis] add replication subcommand #261 (yuuki)
