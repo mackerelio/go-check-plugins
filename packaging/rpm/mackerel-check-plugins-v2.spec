@@ -37,6 +37,9 @@ done
 %{__targetdir}/*
 
 %changelog
+* Mon Nov 26 2018 <mackerel-developers@hatena.ne.jp> - 0.26.0
+- [check-http] Support --connect-to option (by astj)
+
 * Mon Nov 12 2018 <mackerel-developers@hatena.ne.jp> - 0.25.0
 - [check-redis] add replication subcommand (by yuuki)
 
