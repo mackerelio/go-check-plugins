@@ -276,12 +276,12 @@ func filterPartitionsByInclusion(partitions []gpud.PartitionStat, list []string,
 	for _, partition := range partitions {
 		var ok = false
 		for _, l := range list {
-			if (l == key(partition)) {
+			if l == key(partition) {
 				ok = true
 				break
 			}
 		}
-		if (ok) {
+		if ok {
 			newPartitions = append(newPartitions, partition)
 		}
 	}
@@ -294,12 +294,12 @@ func filterPartitionsByExclusion(partitions []gpud.PartitionStat, list []string,
 	for _, partition := range partitions {
 		var ok = true
 		for _, l := range list {
-			if (l == key(partition)) {
+			if l == key(partition) {
 				ok = false
 				break
 			}
 		}
-		if (ok) {
+		if ok {
 			newPartitions = append(newPartitions, partition)
 		}
 	}
