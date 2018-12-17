@@ -65,26 +65,26 @@ func checkDisk(current checkers.Status, threshold string, units float64, disk *g
 }
 
 func checkInodes(current checkers.Status, threshold string, disk *gpud.UsageStat, status checkers.Status) (checkers.Status, error) {
-	if strings.HasSuffix(threshold, "%") {
-		thresholdPct, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
-		if err != nil {
-			return checkers.UNKNOWN, err
-		}
-
-		// Skip checking if disk.InodesTotal == 0 since inodesFreePct is meaningless.
-		if disk.InodesTotal == 0 {
-			return current, nil
-		}
-
-		inodesFreePct := float64(100) - disk.InodesUsedPercent
-		if thresholdPct > inodesFreePct {
-			current = status
-		}
-
-		return current, nil
-	} else {
+	if !strings.HasSuffix(threshold, "%") {
 		return checkers.UNKNOWN, errors.New("-W, -K value should be N%")
 	}
+
+	thresholdPct, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
+	if err != nil {
+		return checkers.UNKNOWN, err
+	}
+
+	// Skip checking if disk.InodesTotal == 0 since inodesFreePct is meaningless.
+	if disk.InodesTotal == 0 {
+		return current, nil
+	}
+
+	inodesFreePct := float64(100) - disk.InodesUsedPercent
+	if thresholdPct > inodesFreePct {
+		current = status
+	}
+
+	return current, nil
 }
 
 func genMessage(disk *gpud.UsageStat, u unit) string {
