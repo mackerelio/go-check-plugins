@@ -40,7 +40,7 @@ type unit struct {
 
 func checkStatus(current checkers.Status, threshold string, units float64, disk *gpud.UsageStat, chkInode bool, status checkers.Status) (checkers.Status, error) {
 	if strings.HasSuffix(threshold, "%") {
-		v, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
+		thresholdPct, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
 		if err != nil {
 			return checkers.UNKNOWN, err
 		}
@@ -48,11 +48,11 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 		freePct := float64(100) - disk.UsedPercent
 		inodesFreePct := float64(100) - disk.InodesUsedPercent
 
-		if chkInode && (disk.InodesTotal != 0 && v > inodesFreePct) {
+		if chkInode && (disk.InodesTotal != 0 && thresholdPct > inodesFreePct) {
 			current = status
 		}
 
-		if !chkInode && (v > freePct || (disk.InodesTotal != 0 && v > inodesFreePct)) {
+		if !chkInode && (thresholdPct > freePct || (disk.InodesTotal != 0 && thresholdPct > inodesFreePct)) {
 			current = status
 		}
 	} else {
@@ -60,13 +60,13 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 			return checkers.UNKNOWN, errors.New("-W, -K value should be N%")
 		}
 
-		v, err := strconv.ParseFloat(threshold, 64)
+		thresholdVal, err := strconv.ParseFloat(threshold, 64)
 		if err != nil {
 			return checkers.UNKNOWN, err
 		}
 
 		free := float64(disk.Free) / units
-		if v > free {
+		if thresholdVal > free {
 			current = status
 		}
 	}
