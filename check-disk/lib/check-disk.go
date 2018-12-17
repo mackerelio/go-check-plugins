@@ -40,23 +40,20 @@ type unit struct {
 
 func checkStatus(current checkers.Status, threshold string, units float64, disk *gpud.UsageStat, chkInode bool, status checkers.Status) (checkers.Status, error) {
 	if strings.HasSuffix(threshold, "%") {
-		v, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
+		thresholdPct, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
 		if err != nil {
 			return checkers.UNKNOWN, err
 		}
 
 		freePct := float64(100) - disk.UsedPercent
-
 		inodesFreePct := float64(100) - disk.InodesUsedPercent
-		if float64(disk.InodesTotal) == float64(0) {
-			inodesFreePct = float64(0)
-		}
 
-		if chkInode && v > inodesFreePct {
+		// Skip checking if disk.InodesTotal == 0 since inodesFreePct is meaningless.
+		if chkInode && (disk.InodesTotal != 0 && thresholdPct > inodesFreePct) {
 			current = status
 		}
 
-		if !chkInode && (v > freePct || v > inodesFreePct) {
+		if !chkInode && (thresholdPct > freePct || (disk.InodesTotal != 0 && thresholdPct > inodesFreePct)) {
 			current = status
 		}
 	} else {
@@ -64,13 +61,13 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 			return checkers.UNKNOWN, errors.New("-W, -K value should be N%")
 		}
 
-		v, err := strconv.ParseFloat(threshold, 64)
+		thresholdVal, err := strconv.ParseFloat(threshold, 64)
 		if err != nil {
 			return checkers.UNKNOWN, err
 		}
 
 		free := float64(disk.Free) / units
-		if v > free {
+		if thresholdVal > free {
 			current = status
 		}
 	}
@@ -280,12 +277,12 @@ func filterPartitionsByInclusion(partitions []gpud.PartitionStat, list []string,
 	for _, partition := range partitions {
 		var ok = false
 		for _, l := range list {
-			if (l == key(partition)) {
+			if l == key(partition) {
 				ok = true
 				break
 			}
 		}
-		if (ok) {
+		if ok {
 			newPartitions = append(newPartitions, partition)
 		}
 	}
@@ -298,12 +295,12 @@ func filterPartitionsByExclusion(partitions []gpud.PartitionStat, list []string,
 	for _, partition := range partitions {
 		var ok = true
 		for _, l := range list {
-			if (l == key(partition)) {
+			if l == key(partition) {
 				ok = false
 				break
 			}
 		}
-		if (ok) {
+		if ok {
 			newPartitions = append(newPartitions, partition)
 		}
 	}
