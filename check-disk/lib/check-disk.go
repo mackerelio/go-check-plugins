@@ -53,7 +53,7 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 			current = status
 		}
 
-		if !chkInode && (thresholdPct > freePct || (disk.InodesTotal != 0 && thresholdPct > inodesFreePct)) {
+		if !chkInode && (thresholdPct > freePct) {
 			current = status
 		}
 	} else {
