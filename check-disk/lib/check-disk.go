@@ -91,9 +91,14 @@ func genMessage(disk *gpud.UsageStat, u unit) string {
 	used := float64(disk.Used) / u.Size
 	free := float64(disk.Free) / u.Size
 	freePct := float64(100) - disk.UsedPercent
-	inodesFreePct := float64(100) - disk.InodesUsedPercent
 
-	return fmt.Sprintf("Path: %v, All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Free percentage: %.2f (inodes: %.2f)", disk.Path, all, u.Name, used, u.Name, free, u.Name, freePct, inodesFreePct)
+	inodesFreePctStr := ""
+	if disk.InodesTotal != 0 {
+		inodesFreePct := float64(100) - disk.InodesUsedPercent
+		inodesFreePctStr = fmt.Sprintf(" (inodes %.2f)", inodesFreePct)
+	}
+
+	return fmt.Sprintf("Path: %v, All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Free percentage: %.2f%s", disk.Path, all, u.Name, used, u.Name, free, u.Name, freePct, inodesFreePctStr)
 }
 
 // Do the plugin
