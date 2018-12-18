@@ -74,9 +74,8 @@ func checkInodes(current checkers.Status, threshold string, disk *gpud.UsageStat
 		return checkers.UNKNOWN, err
 	}
 
-	// Skip checking if disk.InodesTotal == 0 since inodesFreePct is meaningless.
 	if disk.InodesTotal == 0 {
-		return current, nil
+		return checkers.UNKNOWN, fmt.Errorf("Disk %s does not have inodes", disk.Path)
 	}
 
 	inodesFreePct := float64(100) - disk.InodesUsedPercent
