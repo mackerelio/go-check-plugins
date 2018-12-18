@@ -38,7 +38,7 @@ type unit struct {
 	Size float64
 }
 
-func checkStatus(current checkers.Status, threshold string, units float64, disk *gpud.UsageStat, chkInode bool, status checkers.Status) (checkers.Status, error) {
+func checkDisk(current checkers.Status, threshold string, units float64, disk *gpud.UsageStat, status checkers.Status) (checkers.Status, error) {
 	if strings.HasSuffix(threshold, "%") {
 		thresholdPct, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
 		if err != nil {
@@ -46,21 +46,10 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 		}
 
 		freePct := float64(100) - disk.UsedPercent
-		inodesFreePct := float64(100) - disk.InodesUsedPercent
-
-		// Skip checking if disk.InodesTotal == 0 since inodesFreePct is meaningless.
-		if chkInode && (disk.InodesTotal != 0 && thresholdPct > inodesFreePct) {
-			current = status
-		}
-
-		if !chkInode && (thresholdPct > freePct || (disk.InodesTotal != 0 && thresholdPct > inodesFreePct)) {
+		if thresholdPct > freePct {
 			current = status
 		}
 	} else {
-		if chkInode {
-			return checkers.UNKNOWN, errors.New("-W, -K value should be N%")
-		}
-
 		thresholdVal, err := strconv.ParseFloat(threshold, 64)
 		if err != nil {
 			return checkers.UNKNOWN, err
@@ -75,14 +64,41 @@ func checkStatus(current checkers.Status, threshold string, units float64, disk 
 	return current, nil
 }
 
+func checkInodes(current checkers.Status, threshold string, disk *gpud.UsageStat, status checkers.Status) (checkers.Status, error) {
+	if !strings.HasSuffix(threshold, "%") {
+		return checkers.UNKNOWN, errors.New("-W, -K value should be N%")
+	}
+
+	thresholdPct, err := strconv.ParseFloat(strings.TrimRight(threshold, "%"), 64)
+	if err != nil {
+		return checkers.UNKNOWN, err
+	}
+
+	if disk.InodesTotal == 0 {
+		return checkers.UNKNOWN, fmt.Errorf("Disk %s does not have inodes", disk.Path)
+	}
+
+	inodesFreePct := float64(100) - disk.InodesUsedPercent
+	if thresholdPct > inodesFreePct {
+		current = status
+	}
+
+	return current, nil
+}
+
 func genMessage(disk *gpud.UsageStat, u unit) string {
 	all := float64(disk.Total) / u.Size
 	used := float64(disk.Used) / u.Size
 	free := float64(disk.Free) / u.Size
 	freePct := float64(100) - disk.UsedPercent
-	inodesFreePct := float64(100) - disk.InodesUsedPercent
 
-	return fmt.Sprintf("Path: %v, All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Free percentage: %.2f (inodes: %.2f)", disk.Path, all, u.Name, used, u.Name, free, u.Name, freePct, inodesFreePct)
+	inodesFreePctStr := ""
+	if disk.InodesTotal != 0 {
+		inodesFreePct := float64(100) - disk.InodesUsedPercent
+		inodesFreePctStr = fmt.Sprintf(" (inodes %.2f)", inodesFreePct)
+	}
+
+	return fmt.Sprintf("Path: %v, All: %.2f %v, Used: %.2f %v, Free: %.2f %v, Free percentage: %.2f%s", disk.Path, all, u.Name, used, u.Name, free, u.Name, freePct, inodesFreePctStr)
 }
 
 // Do the plugin
@@ -169,7 +185,7 @@ func run(args []string) *checkers.Checker {
 	checkSt := checkers.OK
 	if opts.InodeCritical != nil {
 		for _, disk := range disks {
-			checkSt, err = checkStatus(checkSt, *opts.InodeCritical, u.Size, disk, true, checkers.CRITICAL)
+			checkSt, err = checkInodes(checkSt, *opts.InodeCritical, disk, checkers.CRITICAL)
 			if err != nil {
 				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
 			}
@@ -182,7 +198,7 @@ func run(args []string) *checkers.Checker {
 
 	if checkSt != checkers.CRITICAL && opts.Critical != nil {
 		for _, disk := range disks {
-			checkSt, err = checkStatus(checkSt, *opts.Critical, u.Size, disk, false, checkers.CRITICAL)
+			checkSt, err = checkDisk(checkSt, *opts.Critical, u.Size, disk, checkers.CRITICAL)
 			if err != nil {
 				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
 			}
@@ -195,7 +211,7 @@ func run(args []string) *checkers.Checker {
 
 	if checkSt != checkers.CRITICAL && opts.InodeWarning != nil {
 		for _, disk := range disks {
-			checkSt, err = checkStatus(checkSt, *opts.InodeWarning, u.Size, disk, true, checkers.WARNING)
+			checkSt, err = checkInodes(checkSt, *opts.InodeWarning, disk, checkers.WARNING)
 			if err != nil {
 				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
 			}
@@ -208,7 +224,7 @@ func run(args []string) *checkers.Checker {
 
 	if checkSt == checkers.OK && opts.Warning != nil {
 		for _, disk := range disks {
-			checkSt, err = checkStatus(checkSt, *opts.Warning, u.Size, disk, false, checkers.WARNING)
+			checkSt, err = checkDisk(checkSt, *opts.Warning, u.Size, disk, checkers.WARNING)
 			if err != nil {
 				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
 			}
