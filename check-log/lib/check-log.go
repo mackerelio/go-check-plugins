@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -22,6 +23,9 @@ import (
 	"github.com/mattn/go-zglob"
 	enc "golang.org/x/text/encoding"
 )
+
+// overwritten with syscall.SIGTERM on unix environment (see check-log_unix.go)
+var defaultSignal = os.Interrupt
 
 type logOpts struct {
 	LogFile             string   `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
@@ -46,6 +50,8 @@ type logOpts struct {
 	fileListFromPattern []string
 	origArgs            []string
 	decoder             *enc.Decoder
+
+	testHookNewBufferedReader func(r io.Reader) *bufio.Reader
 }
 
 func (opts *logOpts) prepare() error {
@@ -114,6 +120,12 @@ func (opts *logOpts) prepare() error {
 func Do() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	sigCh := make(chan os.Signal, 1)
+	go func() {
+		<-sigCh
+		cancel()
+	}()
+	signal.Notify(sigCh, defaultSignal)
 
 	ckr := run(ctx, os.Args[1:])
 	ckr.Name = "LOG"
@@ -320,9 +332,18 @@ func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int6
 	return warnNum, critNum, errLines, nil
 }
 
+func newBufferedReader(r io.Reader) *bufio.Reader {
+	return bufio.NewReader(r)
+}
+
 func (opts *logOpts) searchReader(ctx context.Context, rdr io.Reader) (warnNum, critNum, readBytes int64, errLines string, err error) {
-	r := bufio.NewReader(rdr)
-	for {
+	newReader := opts.testHookNewBufferedReader
+	if newReader == nil {
+		newReader = newBufferedReader
+	}
+
+	r := newReader(rdr)
+	for ctx.Err() == nil {
 		lineBytes, rErr := r.ReadBytes('\n')
 		if rErr != nil {
 			if rErr != io.EOF {

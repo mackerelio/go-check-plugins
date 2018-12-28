@@ -1,14 +1,17 @@
 package checklog
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/mackerelio/checkers"
 	"github.com/stretchr/testify/assert"
@@ -229,6 +232,44 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, int64(len(l2)), bytes, "something went wrong")
 	}
 	testRotate()
+
+	opts.testHookNewBufferedReader = func(r io.Reader) *bufio.Reader {
+		return bufio.NewReaderSize(&slowReader{
+			r: r,
+			d: 10 * time.Millisecond,
+			n: 1,
+		}, 1)
+	}
+	testCancel := func() {
+		ctx, cancel := context.WithCancel(context.Background())
+		go func() {
+			<-time.After(10 * time.Millisecond)
+			cancel()
+		}()
+		fh.WriteString("OK\nFATAL\nFATAL\n")
+
+		expected := time.Now().Add(30 * time.Millisecond)
+		w, c, errLines, err := opts.searchLog(ctx, logf)
+		assert.WithinDuration(t, expected, time.Now(), 10*time.Millisecond, "searching time exceeded")
+
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+	}
+	testCancel()
+	opts.testHookNewBufferedReader = nil
+}
+
+type slowReader struct {
+	r io.Reader
+	d time.Duration
+	n int
+}
+
+func (r *slowReader) Read(p []byte) (int, error) {
+	time.Sleep(r.d)
+	return r.r.Read(p[:r.n])
 }
 
 func TestRunWithGlob(t *testing.T) {
