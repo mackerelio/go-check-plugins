@@ -2,6 +2,7 @@ package checklog
 
 import (
 	"bufio"
+	"context"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -111,7 +112,10 @@ func (opts *logOpts) prepare() error {
 
 // Do the plugin
 func Do() {
-	ckr := run(os.Args[1:])
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	ckr := run(ctx, os.Args[1:])
 	ckr.Name = "LOG"
 	ckr.Exit()
 }
@@ -145,7 +149,7 @@ func parseArgs(args []string) (*logOpts, error) {
 	return opts, err
 }
 
-func run(args []string) *checkers.Checker {
+func run(ctx context.Context, args []string) *checkers.Checker {
 	opts, err := parseArgs(args)
 	if err != nil {
 		os.Exit(1)
@@ -171,7 +175,7 @@ func run(args []string) *checkers.Checker {
 			missingFiles = append(missingFiles, f)
 			continue
 		}
-		w, c, errLines, err := opts.searchLog(f)
+		w, c, errLines, err := opts.searchLog(ctx, f)
 		if err != nil {
 			return checkers.Unknown(err.Error())
 		}
@@ -220,7 +224,7 @@ func run(args []string) *checkers.Checker {
 	return checkers.NewChecker(checkSt, msg)
 }
 
-func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
+func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int64, string, error) {
 	stateFile := getStateFile(opts.StateDir, logFile, opts.origArgs)
 	skipBytes, inode := int64(0), uint(0)
 	if !opts.NoState {
@@ -280,7 +284,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		opts.decoder = e.NewDecoder()
 	}
 
-	warnNum, critNum, readBytes, errLines, err := opts.searchReader(r)
+	warnNum, critNum, readBytes, errLines, err := opts.searchReader(ctx, r)
 	if err != nil {
 		return warnNum, critNum, errLines, err
 	}
@@ -292,7 +296,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 			oldErrLines            string
 		)
 		// ignore readBytes under the premise that the old file will never be updated.
-		oldWarnNum, oldCritNum, _, oldErrLines, err := opts.searchReader(oldr)
+		oldWarnNum, oldCritNum, _, oldErrLines, err := opts.searchReader(ctx, oldr)
 		if err != nil {
 			return oldWarnNum, critNum, errLines, err
 		}
@@ -316,7 +320,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	return warnNum, critNum, errLines, nil
 }
 
-func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes int64, errLines string, err error) {
+func (opts *logOpts) searchReader(ctx context.Context, rdr io.Reader) (warnNum, critNum, readBytes int64, errLines string, err error) {
 	r := bufio.NewReader(rdr)
 	for {
 		lineBytes, rErr := r.ReadBytes('\n')
