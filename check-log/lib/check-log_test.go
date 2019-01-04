@@ -233,6 +233,9 @@ func TestRun(t *testing.T) {
 	}
 	testRotate()
 
+	// Should test that check-log stops reading logs when timed out.
+	// If a period (10*time.Millisecond in below) is very short,
+	// normal behavior such as open a file, read it, etc could reach over a period.
 	opts.testHookNewBufferedReader = func(r io.Reader) *bufio.Reader {
 		return bufio.NewReaderSize(&slowReader{
 			r: r,
