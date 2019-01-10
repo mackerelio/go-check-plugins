@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.27.0-1) stable; urgency=low
+
+  * [check-disk] Do not check inodes% along with disk% (by susisu)
+    <https://github.com/mackerelio/go-check-plugins/pull/266>
+  * [check-disk] skip checks if there are no inodes (by susisu)
+    <https://github.com/mackerelio/go-check-plugins/pull/265>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 10 Jan 2019 15:15:09 +0900
+
 mackerel-check-plugins (0.26.0-1) stable; urgency=low
 
   * [check-http] Support --connect-to option (by astj)
