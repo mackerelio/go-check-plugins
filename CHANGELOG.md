@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.27.0 (2019-01-10)
+
+* [check-disk] Do not check inodes% along with disk% #266 (susisu)
+* [check-disk] skip checks if there are no inodes #265 (susisu)
+
+
 ## 0.26.0 (2018-11-26)
 
 * [check-http] Support --connect-to option #263 (astj)
