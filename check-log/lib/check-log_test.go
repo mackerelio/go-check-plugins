@@ -278,6 +278,28 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, checkers.OK, result.Status, "something went wrong")
 		assert.Equal(t, "0 warnings, 0 criticals for pattern /FATAL/.", result.Message, "something went wrong")
 	})
+
+	opts.testHookNewBufferedReader = func(r io.Reader) *bufio.Reader {
+		assert.Fail(t, "don't reach here")
+		return nil
+	}
+	testCancelBeforeSearchLog := func() {
+		fh.Close()
+		os.Remove(logf)
+		fh, _ = os.Create(logf)
+		fh.WriteString("FATAL\nFATAL\n")
+
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		w, c, errLines, err := opts.searchLog(ctx, logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(0), c, "something went wrong")
+		assert.Equal(t, "", errLines, "something went wrong")
+	}
+	testCancelBeforeSearchLog()
+	opts.testHookNewBufferedReader = nil
 }
 
 type slowReader struct {

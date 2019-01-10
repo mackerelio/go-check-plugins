@@ -240,6 +240,9 @@ func run(ctx context.Context, args []string) *checkers.Checker {
 }
 
 func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int64, string, error) {
+	if ctx.Err() != nil {
+		return 0, 0, "", nil
+	}
 	stateFile := getStateFile(opts.StateDir, logFile, opts.origArgs)
 	skipBytes, inode := int64(0), uint(0)
 	if !opts.NoState {
