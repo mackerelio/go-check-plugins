@@ -182,6 +182,9 @@ func run(ctx context.Context, args []string) *checkers.Checker {
 	}
 
 	for _, f := range append(opts.fileListFromGlob, opts.fileListFromPattern...) {
+		if ctx.Err() != nil {
+			break
+		}
 		_, err := os.Stat(f)
 		if err != nil {
 			missingFiles = append(missingFiles, f)

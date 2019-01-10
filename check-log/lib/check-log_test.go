@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -262,6 +263,21 @@ func TestRun(t *testing.T) {
 	}
 	testCancel()
 	opts.testHookNewBufferedReader = nil
+
+	t.Run("testCancelBeforeProcessing", func(t *testing.T) {
+		switch runtime.GOOS {
+		case "windows":
+			// TODO(lufia): Is there a file that a user running `go test` can't read on Windows?
+			t.Skip()
+		}
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		cmdline := []string{"--no-state", "-p", "FATAL", "-f", "/etc/sudoers"}
+		result := run(ctx, cmdline)
+		assert.Equal(t, checkers.OK, result.Status, "something went wrong")
+		assert.Equal(t, "0 warnings, 0 criticals for pattern /FATAL/.", result.Message, "something went wrong")
+	})
 }
 
 type slowReader struct {
