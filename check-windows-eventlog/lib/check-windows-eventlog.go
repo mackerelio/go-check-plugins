@@ -23,6 +23,7 @@ import (
 	"github.com/mackerelio/checkers"
 	"github.com/mackerelio/go-check-plugins/check-windows-eventlog/lib/internal/eventlog"
 	"github.com/mackerelio/golib/pluginutil"
+	"github.com/natefinch/atomic"
 )
 
 const (
@@ -532,5 +533,5 @@ func writeLastOffset(f string, num int64) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(f, []byte(fmt.Sprintf("%d", num)), 0644)
+	return atomic.WriteFile(f, strings.NewReader(fmt.Sprintf("%d", num)))
 }
