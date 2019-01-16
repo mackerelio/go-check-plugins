@@ -7,6 +7,10 @@ import (
 	"syscall"
 )
 
+func init() {
+	defaultSignal = syscall.SIGTERM
+}
+
 func detectInode(fi os.FileInfo) uint {
 	if stat, ok := fi.Sys().(*syscall.Stat_t); ok {
 		return uint(stat.Ino)

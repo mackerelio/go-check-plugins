@@ -2,6 +2,7 @@ package checklog
 
 import (
 	"bufio"
+	"context"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -21,6 +23,9 @@ import (
 	"github.com/mattn/go-zglob"
 	enc "golang.org/x/text/encoding"
 )
+
+// overwritten with syscall.SIGTERM on unix environment (see check-log_unix.go)
+var defaultSignal = os.Interrupt
 
 type logOpts struct {
 	LogFile             string   `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
@@ -45,6 +50,8 @@ type logOpts struct {
 	fileListFromPattern []string
 	origArgs            []string
 	decoder             *enc.Decoder
+
+	testHookNewBufferedReader func(r io.Reader) *bufio.Reader
 }
 
 func (opts *logOpts) prepare() error {
@@ -111,7 +118,17 @@ func (opts *logOpts) prepare() error {
 
 // Do the plugin
 func Do() {
-	ckr := run(os.Args[1:])
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	sigCh := make(chan os.Signal, 1)
+	go func() {
+		sig := <-sigCh
+		log.Printf("check-log is exiting: caught a signal: %v", sig)
+		cancel()
+	}()
+	signal.Notify(sigCh, defaultSignal)
+
+	ckr := run(ctx, os.Args[1:])
 	ckr.Name = "LOG"
 	ckr.Exit()
 }
@@ -145,7 +162,7 @@ func parseArgs(args []string) (*logOpts, error) {
 	return opts, err
 }
 
-func run(args []string) *checkers.Checker {
+func run(ctx context.Context, args []string) *checkers.Checker {
 	opts, err := parseArgs(args)
 	if err != nil {
 		os.Exit(1)
@@ -166,12 +183,15 @@ func run(args []string) *checkers.Checker {
 	}
 
 	for _, f := range append(opts.fileListFromGlob, opts.fileListFromPattern...) {
+		if ctx.Err() != nil {
+			break
+		}
 		_, err := os.Stat(f)
 		if err != nil {
 			missingFiles = append(missingFiles, f)
 			continue
 		}
-		w, c, errLines, err := opts.searchLog(f)
+		w, c, errLines, err := opts.searchLog(ctx, f)
 		if err != nil {
 			return checkers.Unknown(err.Error())
 		}
@@ -220,7 +240,10 @@ func run(args []string) *checkers.Checker {
 	return checkers.NewChecker(checkSt, msg)
 }
 
-func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
+func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int64, string, error) {
+	if ctx.Err() != nil {
+		return 0, 0, "", nil
+	}
 	stateFile := getStateFile(opts.StateDir, logFile, opts.origArgs)
 	skipBytes, inode := int64(0), uint(0)
 	if !opts.NoState {
@@ -280,7 +303,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 		opts.decoder = e.NewDecoder()
 	}
 
-	warnNum, critNum, readBytes, errLines, err := opts.searchReader(r)
+	warnNum, critNum, readBytes, errLines, err := opts.searchReader(ctx, r)
 	if err != nil {
 		return warnNum, critNum, errLines, err
 	}
@@ -292,7 +315,7 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 			oldErrLines            string
 		)
 		// ignore readBytes under the premise that the old file will never be updated.
-		oldWarnNum, oldCritNum, _, oldErrLines, err := opts.searchReader(oldr)
+		oldWarnNum, oldCritNum, _, oldErrLines, err := opts.searchReader(ctx, oldr)
 		if err != nil {
 			return oldWarnNum, critNum, errLines, err
 		}
@@ -316,9 +339,18 @@ func (opts *logOpts) searchLog(logFile string) (int64, int64, string, error) {
 	return warnNum, critNum, errLines, nil
 }
 
-func (opts *logOpts) searchReader(rdr io.Reader) (warnNum, critNum, readBytes int64, errLines string, err error) {
-	r := bufio.NewReader(rdr)
-	for {
+func newBufferedReader(r io.Reader) *bufio.Reader {
+	return bufio.NewReader(r)
+}
+
+func (opts *logOpts) searchReader(ctx context.Context, rdr io.Reader) (warnNum, critNum, readBytes int64, errLines string, err error) {
+	newReader := opts.testHookNewBufferedReader
+	if newReader == nil {
+		newReader = newBufferedReader
+	}
+
+	r := newReader(rdr)
+	for ctx.Err() == nil {
 		lineBytes, rErr := r.ReadBytes('\n')
 		if rErr != nil {
 			if rErr != io.EOF {

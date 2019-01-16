@@ -3,6 +3,7 @@
 package checklog
 
 import (
+	"context"
 	"io"
 	"io/ioutil"
 	"os"
@@ -128,7 +129,7 @@ func TestRunTraceInode(t *testing.T) {
 	testRotate := func() {
 		// first check
 		fh.WriteString(l1)
-		opts.searchLog(logf)
+		opts.searchLog(context.Background(), logf)
 
 		// write FATAL
 		fh.WriteString(l2)
@@ -141,7 +142,7 @@ func TestRunTraceInode(t *testing.T) {
 
 		fh.WriteString(l3)
 		// second check
-		w, c, errLines, err := opts.searchLog(logf)
+		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(1), c, "something went wrong")
@@ -159,7 +160,7 @@ func TestRunTraceInode(t *testing.T) {
 	testRotateDifferentDir := func() {
 		// first check
 		fh.WriteString(l1)
-		opts.searchLog(logf)
+		opts.searchLog(context.Background(), logf)
 
 		// write FATAL
 		fh.WriteString(l2)
@@ -174,7 +175,7 @@ func TestRunTraceInode(t *testing.T) {
 
 		fh.WriteString(l3)
 		// second check
-		w, c, errLines, err := opts.searchLog(logf)
+		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil when the old file is not found")
 		assert.Equal(t, int64(0), w, "something went wrong")
 		assert.Equal(t, int64(0), c, "something went wrong")
