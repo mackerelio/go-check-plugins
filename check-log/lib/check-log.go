@@ -122,7 +122,8 @@ func Do() {
 	defer cancel()
 	sigCh := make(chan os.Signal, 1)
 	go func() {
-		<-sigCh
+		sig := <-sigCh
+		log.Printf("check-log is exiting: caught a signal: %v", sig)
 		cancel()
 	}()
 	signal.Notify(sigCh, defaultSignal)
