@@ -63,7 +63,7 @@ func TestGetBytesToSkip(t *testing.T) {
 	newf := ".tmp/fuga/piyo.json"
 	state := &state{SkipBytes: 15}
 	os.MkdirAll(filepath.Dir(oldf), 0755)
-	writeFileAtomically(oldf, []byte(fmt.Sprintf("%d", state.SkipBytes)))
+	ioutil.WriteFile(oldf, []byte(fmt.Sprintf("%d", state.SkipBytes)), 0600)
 	defer os.RemoveAll(".tmp")
 
 	n, err := getBytesToSkip(newf)

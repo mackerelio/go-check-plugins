@@ -2,6 +2,7 @@ package checklog
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"crypto/md5"
 	"encoding/json"
@@ -21,6 +22,7 @@ import (
 	"github.com/mackerelio/golib/pluginutil"
 	"github.com/mattn/go-encoding"
 	"github.com/mattn/go-zglob"
+	"github.com/natefinch/atomic"
 	enc "golang.org/x/text/encoding"
 )
 
@@ -492,7 +494,7 @@ func saveState(f string, state *state) error {
 	if err := os.MkdirAll(filepath.Dir(f), 0755); err != nil {
 		return err
 	}
-	return writeFileAtomically(f, b)
+	return atomic.WriteFile(f, bytes.NewReader(b))
 }
 
 var errFileNotFoundByInode = fmt.Errorf("old file not found")
@@ -533,21 +535,4 @@ func openOldFile(f string, state *state) (*os.File, error) {
 		// just ignore the process of searching old file if errFileNotFoundByInode
 	}
 	return nil, nil
-}
-
-func writeFileAtomically(f string, contents []byte) error {
-	// MUST be located on same disk partition
-	tmpf, err := ioutil.TempFile(filepath.Dir(f), "tmp")
-	if err != nil {
-		return err
-	}
-	// os.Remove here works successfully when tmpf.Write fails or os.Rename fails.
-	// In successful case, os.Remove fails because the temporary file is already renamed.
-	defer os.Remove(tmpf.Name())
-	_, err = tmpf.Write(contents)
-	tmpf.Close() // should be called before rename
-	if err != nil {
-		return err
-	}
-	return os.Rename(tmpf.Name(), f)
 }
