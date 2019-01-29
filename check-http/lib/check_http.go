@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -16,7 +17,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jessevdk/go-flags"
+	flags "github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 )
 
@@ -30,6 +31,9 @@ type checkHTTPOpts struct {
 	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
 	MaxRedirects       int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
 	ConnectTos         []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1"`
+	CustomCA           string   `long:"cacert" required:"false" description:"use a custom ca certificate"`
+	ClientCert         string   `long:"cert" required:"false" description:"path to certificate to use TLS Client auth"`
+	ClientKey          string   `long:"key" required:"false" description:"path to certificate key to use TLS Client auth"`
 }
 
 // Do the plugin
@@ -187,11 +191,48 @@ func Run(args []string) *checkers.Checker {
 		return checkers.Unknown(err.Error())
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{
+	rootCAs, _ := x509.SystemCertPool()
+	if rootCAs == nil {
+		rootCAs = x509.NewCertPool()
+	}
+
+	if opts.CustomCA != "" {
+		certs, err := ioutil.ReadFile(opts.CustomCA)
+		if err != nil {
+			return checkers.Unknown(fmt.Sprintf("Unable to load custom ca: %s, %v", opts.CustomCA, err))
+		}
+		if ok := rootCAs.AppendCertsFromPEM(certs); !ok {
+			return checkers.Unknown(fmt.Sprintf("Unable to append custom cert to ca bundle: %s", opts.CustomCA))
+		}
+	}
+
+	// Set the default tls configuration
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: opts.NoCheckCertificate,
+		RootCAs:            rootCAs,
+	}
+
+	if opts.ClientCert != "" {
+		if opts.ClientKey == "" {
+			return checkers.Unknown("Must provide a key when using a client certificate")
+		}
+
+		clientCert, err := tls.LoadX509KeyPair(opts.ClientCert, opts.ClientKey)
+		if err != nil {
+			return checkers.Unknown(fmt.Sprintf("Unable to load client certificate: %v", err))
+		}
+
+		tlsConfig = &tls.Config{
 			InsecureSkipVerify: opts.NoCheckCertificate,
-		},
-		Proxy: http.ProxyFromEnvironment,
+			RootCAs:            rootCAs,
+			Certificates:       []tls.Certificate{clientCert},
+		}
+		tlsConfig.BuildNameToCertificate()
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: tlsConfig,
+		Proxy:           http.ProxyFromEnvironment,
 	}
 	// same as http.Transport's default dialer
 	dialer := &net.Dialer{
