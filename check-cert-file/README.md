@@ -4,7 +4,12 @@
 Check expiry for a certification file.
 
 
-## Setting
+## Synopsis
+```
+check-cert-file --file=/path/to/cert.pem --warning=30 --critical=14
+```
+
+## Installation
 
 First, build this program.
 
@@ -23,6 +28,9 @@ Next, you can execute this program :-)
 check-cert-file --file=/path/to/cert.pem --warning=30 --critical=14
 ```
 
+
+## Setting for mackerel-agent
+
 If there is no problem in the execution result, add the setting in mackerel-agent.conf .
 
 ```
@@ -30,14 +38,8 @@ If there is no problem in the execution result, add the setting in mackerel-agen
 command = ["check-cert-file", "--file", "/path/to/cert.pem", "--warning", "30", "--critical", "14"]
 ```
 
-
-## Synopsis
-```
-check-cert-file --file=/path/to/cert.pem --warning=30 --critical=14
-```
-
-
-## Options
+## Usage
+### Options
 
 ```
   -f, --file=     cert file name
