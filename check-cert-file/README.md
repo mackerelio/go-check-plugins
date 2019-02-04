@@ -19,7 +19,7 @@ cd $(go env GOPATH)/src/github.com/mackerelio/go-check-plugins/check-cert-file
 go install
 ```
 
-Or you can use this program by installing the official Mackerel package. see [Using the official check plugin pack for check monitoring - Mackerel Docs](https://mackerel.io/docs/entry/howto/mackerel-check-plugins).
+Or you can use this program by installing the official Mackerel package. See [Using the official check plugin pack for check monitoring - Mackerel Docs](https://mackerel.io/docs/entry/howto/mackerel-check-plugins).
 
 
 Next, you can execute this program :-)
@@ -31,7 +31,7 @@ check-cert-file --file=/path/to/cert.pem --warning=30 --critical=14
 
 ## Setting for mackerel-agent
 
-If there is no problem in the execution result, add the setting in mackerel-agent.conf .
+If there are no problems in the execution result, add s setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.cert-file]
