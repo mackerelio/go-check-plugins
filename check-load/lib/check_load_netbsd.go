@@ -1,31 +1,12 @@
 package checkload
 
 import (
-	"os/exec"
-	"strconv"
-	"strings"
+  "github.com/mackerelio/go-osstat/loadavg"
 )
 
 func getloadavg() (loadavgs [3]float64, err error) {
-	outputBytes, err := exec.Command("sysctl", "-n", "vm.loadavg").Output()
-	if err != nil {
-		return loadavgs, err
-	}
+  output, err := loadavg.Get()
+  loadavgs = [3]float64{output.Loadavg1,output.Loadavg5,output.Loadavg15}
 
-	output := string(outputBytes)
-
-	// fields will be "<loadavg1>, <loadavg5>, <loadavg15>"
-	fields := strings.Fields(output)
-	if len(fields) != 3 {
-		return loadavgs, err
-	}
-
-	for i := 0; i < 3; i++ {
-		loadavg, err := strconv.ParseFloat(fields[i], 64)
-		if err != nil {
-			return loadavgs, err
-		}
-		loadavgs[i] = loadavg
-	}
   return loadavgs, nil
 }
