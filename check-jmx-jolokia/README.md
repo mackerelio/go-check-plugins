@@ -31,7 +31,7 @@ check-jmx-jolokia -H 127.0.0.1 -p 8778 -m java.lang:type=OperatingSystem -a Proc
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.check-jmx-jolokia-sample]

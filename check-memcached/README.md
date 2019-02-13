@@ -31,7 +31,7 @@ check-memcached -H localhost -p 11211 -t 3 -k KeyForTest
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.cert-memcached-sample]

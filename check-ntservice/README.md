@@ -31,7 +31,7 @@ check-ntservice --service-name=SERVICE_NAME
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.check-ntservice-sample]

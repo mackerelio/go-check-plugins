@@ -31,7 +31,7 @@ check-file-age -w 240 -W 10 -c 600 -C 0 -f /path/to/filename
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.fileage-sample]

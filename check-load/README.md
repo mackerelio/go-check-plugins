@@ -31,7 +31,7 @@ check-load -w 4,3,2 -c 3,2,1
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.check-load-sample]

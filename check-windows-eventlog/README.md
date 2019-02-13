@@ -31,7 +31,7 @@ check-windows-eventlog --log=LOGTYPE --type=EVENTTYPE --source-pattern=REGEXP --
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.check-windows-eventlog-sample]

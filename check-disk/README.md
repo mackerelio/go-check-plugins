@@ -30,7 +30,7 @@ check-disk --warning=10 --critical=5 --path=/
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.disk-sample]

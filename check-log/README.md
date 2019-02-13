@@ -31,7 +31,7 @@ check-log --file=/path/to/file --pattern=REGEXP --warning-over=N --critical-over
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.check-log-sample]

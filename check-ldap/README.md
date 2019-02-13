@@ -31,7 +31,7 @@ check-ldap -b 'dc=jp' -w 5 -c 10
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.check-ldap-sample]

@@ -31,7 +31,7 @@ check-mailq -w 100 -c 200 -M postfix
 
 ## Setting for mackerel-agent
 
-If there are no problems in the execution result, add s setting in mackerel-agent.conf .
+If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
 [plugin.checks.check-mailq-sample]
