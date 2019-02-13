@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.28.0 (2019-02-13)
+
+* Improve READMEs #274 (a-know)
+* added support for netbsd on check-load #273 (paulbsd)
+* [check-cert-file] improve README #272 (a-know)
+*  [check-log][check-windows-eventlog] Improve atomic write #270 (itchyny)
+* [check-log]stop reading logs on SIGTERM #268 (lufia)
+
+
 ## 0.27.0 (2019-01-10)
 
 * [check-disk] Do not check inodes% along with disk% #266 (susisu)

@@ -46,6 +46,13 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Feb 13 2019 <mackerel-developers@hatena.ne.jp> - 0.28.0
+- Improve READMEs (by a-know)
+- added support for netbsd on check-load (by paulbsd)
+- [check-cert-file] improve README (by a-know)
+-  [check-log][check-windows-eventlog] Improve atomic write (by itchyny)
+- [check-log]stop reading logs on SIGTERM (by lufia)
+
 * Thu Jan 10 2019 <mackerel-developers@hatena.ne.jp> - 0.27.0
 - [check-disk] Do not check inodes% along with disk% (by susisu)
 - [check-disk] skip checks if there are no inodes (by susisu)
