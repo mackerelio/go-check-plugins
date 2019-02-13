@@ -1,3 +1,18 @@
+mackerel-check-plugins (0.28.0-1.v2) stable; urgency=low
+
+  * Improve READMEs (by a-know)
+    <https://github.com/mackerelio/go-check-plugins/pull/274>
+  * added support for netbsd on check-load (by paulbsd)
+    <https://github.com/mackerelio/go-check-plugins/pull/273>
+  * [check-cert-file] improve README (by a-know)
+    <https://github.com/mackerelio/go-check-plugins/pull/272>
+  *  [check-log][check-windows-eventlog] Improve atomic write (by itchyny)
+    <https://github.com/mackerelio/go-check-plugins/pull/270>
+  * [check-log]stop reading logs on SIGTERM (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/268>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 13 Feb 2019 08:01:26 +0000
+
 mackerel-check-plugins (0.27.0-1.v2) stable; urgency=low
 
   * [check-disk] Do not check inodes% along with disk% (by susisu)
