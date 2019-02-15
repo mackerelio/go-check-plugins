@@ -51,6 +51,12 @@ func run(args []string) *checkers.Checker {
 
 	var chkSt checkers.Status
 	var msg string
+	stratum, err := getNTPStratum()
+	if err != nil {
+		msg = fmt.Sprintf("ntp stratum not found offset is %f(actual), %f(warning threshold), %f(critical threshold)", math.Abs(offset), opts.Warn, opts.Crit)
+		return checkers.NewChecker(checkers.WARNING, msg)
+	}
+
 	if opts.Crit < math.Abs(offset) {
 		msg = fmt.Sprintf("ntp offset is over %f(actual) > %f(threshold)", math.Abs(offset), opts.Crit)
 		chkSt = checkers.CRITICAL
@@ -58,7 +64,7 @@ func run(args []string) *checkers.Checker {
 		msg = fmt.Sprintf("ntp offset is over %f(actual) > %f(threshold)", math.Abs(offset), opts.Warn)
 		chkSt = checkers.WARNING
 	} else {
-		msg = fmt.Sprintf("ntp offset is %f(actual) < %f(warning threshold), %f(critial threshold)", math.Abs(offset), opts.Warn, opts.Crit)
+		msg = fmt.Sprintf("ntp stratum=%s, offset is %f(actual) < %f(warning threshold), %f(critial threshold)", stratum, math.Abs(offset), opts.Warn, opts.Crit)
 		chkSt = checkers.OK
 	}
 
@@ -118,7 +124,6 @@ func getNTPOffset(ntpServers string) (float64, error) {
 	if ntpServers != "" {
 		return getNTPOffsetFromNTPServers(ntpServers)
 	}
-
 	ntpdName, err := detectNTPDname()
 	if err != nil {
 		return 0.0, err
@@ -205,4 +210,66 @@ func parseNTPOffsetFromChrony(out io.Reader) (offset float64, err error) {
 		}
 	}
 	return 0.0, fmt.Errorf("failed to get ntp offset")
+}
+
+func getNTPStratum() (string, error) {
+	ntpdName, err := detectNTPDname()
+	if err != nil {
+		return "unknown", err
+	}
+	switch ntpdName {
+	case ntpNTPD:
+		return getNTPStratumFromNTPD()
+	case ntpChronyd:
+		return getNTPStratumFromChrony()
+	}
+	return "unknown", fmt.Errorf("unsupported ntp daemon %q", ntpdName)
+}
+
+func getNTPStratumFromNTPD() (stratum string, err error) {
+	err = withCmd(exec.Command(cmdNTPq, "-np"), func(out io.Reader) error {
+		stratum, err = parseNTPStratumFromNTPD(out)
+		return err
+	})
+	return stratum, err
+}
+
+func parseNTPStratumFromNTPD(out io.Reader) (string, error) {
+	scr := bufio.NewScanner(out)
+    const stratumPrefix = "*"
+	for scr.Scan() {
+		line := scr.Text()
+		if strings.HasPrefix(line, stratumPrefix) {
+            flds := strings.Fields(line)
+			if len(flds) != 10 {
+				return "unknown", fmt.Errorf("failed to get ntp stratum")
+			}
+            return strings.TrimPrefix(flds[0], stratumPrefix), nil
+		}
+	}
+	return "unknown", fmt.Errorf("couldn't get ntp stratum.")
+}
+
+func getNTPStratumFromChrony() (stratum string, err error) {
+	err = withCmd(exec.Command(cmdChronyc, "-n", "sources"), func(out io.Reader) error {
+		stratum, err = parseNTPStratumFromChrony(out)
+		return err
+	})
+	return stratum, err
+}
+
+func parseNTPStratumFromChrony(out io.Reader) (string, error) {
+	scr := bufio.NewScanner(out)
+	const stratumPrefix = "^*"
+	for scr.Scan() {
+		line := scr.Text()
+		if strings.HasPrefix(line, stratumPrefix) {
+            flds := strings.Fields(line)
+			if len(flds) != 10 {
+				return "unknown", fmt.Errorf("failed to get ntp stratum")
+			}
+            return flds[1], nil
+		}
+	}
+	return "unknown", fmt.Errorf("couldn't get ntp stratum.")
 }
