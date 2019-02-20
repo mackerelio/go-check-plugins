@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/textproto"
+	"net/url"
 	"os"
 	"regexp"
 	"strconv"
@@ -30,6 +31,7 @@ type checkHTTPOpts struct {
 	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
 	MaxRedirects       int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
 	ConnectTos         []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1"`
+	Proxy              string   `short:"x" long:"proxy" value-name:"[PROTOCOL://]HOST[:PORT]" description:"Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080."`
 }
 
 // Do the plugin
@@ -174,6 +176,29 @@ func parseConnectTo(opts *checkHTTPOpts) ([]resolveMapping, error) {
 	return mappings, nil
 }
 
+func parseProxy(opts *checkHTTPOpts) (*url.URL, error) {
+	if opts.Proxy == "" {
+		return nil, nil
+	}
+	// url.Parse cannot parse hostname:port, so append protocol if absent
+	proxy := opts.Proxy
+	if !strings.Contains(proxy, "://") {
+		proxy = "http://" + proxy
+	}
+	u, err := url.Parse(proxy)
+	if err != nil {
+		return nil, err
+	}
+	// if u.Scheme == "" {
+	// 	// http.Transport treats empty scheme as http, but fill scheme here explicitly
+	// 	u.Scheme = "http"
+	// }
+	if u.Port() == "" {
+		u.Host = u.Hostname() + ":1080"
+	}
+	return u, nil
+}
+
 // Run do external monitoring via HTTP
 func Run(args []string) *checkers.Checker {
 	opts := checkHTTPOpts{}
@@ -205,6 +230,14 @@ func Run(args []string) *checkers.Checker {
 			return checkers.Unknown(fmt.Sprintf("Invalid source IP address: %v", opts.SourceIP))
 		}
 		dialer.LocalAddr = &net.TCPAddr{IP: ip}
+	}
+
+	proxyUrl, err := parseProxy(&opts)
+	if err != nil {
+		return checkers.Unknown(err.Error())
+	}
+	if proxyUrl != nil {
+		tr.Proxy = http.ProxyURL(proxyUrl)
 	}
 
 	if len(opts.ConnectTos) != 0 {
