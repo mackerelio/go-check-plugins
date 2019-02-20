@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elazarl/goproxy"
 	"github.com/mackerelio/checkers"
 	"github.com/stretchr/testify/assert"
 )
@@ -275,6 +276,58 @@ func TestConnectTos(t *testing.T) {
 			args: []string{"--connect-to", "foo:123:",
 				"-u", ts.URL},
 			want: checkers.UNKNOWN,
+		},
+	}
+
+	for i, tc := range testCases {
+		ckr := Run(tc.args)
+		assert.Equal(t, ckr.Status, tc.want, "#%d: Status should be %s, %s", i, tc.want, ckr.Message)
+	}
+}
+
+func TestProxy(t *testing.T) {
+	// target server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "I am target")
+	}))
+	defer ts.Close()
+
+	// proxy server, which intercepts request
+	proxy := goproxy.NewProxyHttpServer()
+	proxy.OnRequest().DoFunc(
+		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			return r, goproxy.NewResponse(r,
+				goproxy.ContentTypeText, http.StatusOK,
+				fmt.Sprintf("intercept a req to %s", r.URL))
+		})
+	tsP := httptest.NewServer(proxy)
+	defer tsP.Close()
+	// extract host and port
+	s2 := strings.SplitN(tsP.URL, ":", 3)
+	hostP := strings.TrimPrefix(s2[1], "//")
+	portP := s2[2]
+
+	testCases := []struct {
+		args []string
+		want checkers.Status
+	}{
+		{
+			// direct target
+			args: []string{"--pattern", "I am target",
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+		{
+			// proxy with full url
+			args: []string{"--proxy", tsP.URL, "--pattern", fmt.Sprintf("intercept a req to %s", ts.URL),
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+		{
+			// proxy without scheme
+			args: []string{"--proxy", hostP + ":" + portP, "--pattern", fmt.Sprintf("intercept a req to %s", ts.URL),
+				"-u", ts.URL},
+			want: checkers.OK,
 		},
 	}
 
