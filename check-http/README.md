@@ -50,6 +50,7 @@ command = ["check-http", "-u", "http://example.com"]
   -p, --pattern=                              Expected pattern in the content
       --max-redirects=                        Maximum number of redirects followed (default: 10)
       --connect-to=HOST1:PORT1:HOST2:PORT2    Request to HOST2:PORT2 instead of HOST1:PORT1
+  -x, --proxy=[PROTOCOL://]HOST[:PORT]        Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080.
 ```
 
 
@@ -68,6 +69,11 @@ check-http --connect-to=localhost:443::8080 https://localhost # empty host2 mean
 check-http --connect-to=example.com:443:127.0.0.1: https://example.com # empty port2 means unchanged, therefore will request to 127.0.0.1:443
 ```
 
+To request via proxy (http/https/socks5)
+```shell
+check-http --proxy=http://localhost:8080 -u http://example.com # request via http://localhost:8080
+HTTP_PROXY=http://localhost:8080 check-http  -u http://example.com # Same. you can set proxy via environment variable
+```
 ## For more information
 
 Please execute `check-http -h` and you can get command line options.
