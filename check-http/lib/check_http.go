@@ -180,7 +180,8 @@ func parseProxy(opts *checkHTTPOpts) (*url.URL, error) {
 	if opts.Proxy == "" {
 		return nil, nil
 	}
-	// url.Parse cannot parse hostname:port, so append protocol if absent
+	// Append protocol if absent.
+	// Overwriting u.Scheme is not enough, since url.Parse cannot parse "HOST:PORT" since it's ambiguous
 	proxy := opts.Proxy
 	if !strings.Contains(proxy, "://") {
 		proxy = "http://" + proxy
@@ -189,10 +190,6 @@ func parseProxy(opts *checkHTTPOpts) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	// if u.Scheme == "" {
-	// 	// http.Transport treats empty scheme as http, but fill scheme here explicitly
-	// 	u.Scheme = "http"
-	// }
 	if u.Port() == "" {
 		u.Host = u.Hostname() + ":1080"
 	}
