@@ -229,12 +229,12 @@ func Run(args []string) *checkers.Checker {
 		dialer.LocalAddr = &net.TCPAddr{IP: ip}
 	}
 
-	proxyUrl, err := parseProxy(&opts)
+	proxyURL, err := parseProxy(&opts)
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
-	if proxyUrl != nil {
-		tr.Proxy = http.ProxyURL(proxyUrl)
+	if proxyURL != nil {
+		tr.Proxy = http.ProxyURL(proxyURL)
 	}
 
 	if len(opts.ConnectTos) != 0 {
