@@ -373,7 +373,7 @@ func TestProxy_Auth(t *testing.T) {
 			want: checkers.OK,
 		},
 		{
-			//
+			// with basic => pass
 			args: []string{"--proxy", "http://somename:somepassword@" + hostPort,
 				"--pattern", fmt.Sprintf("intercept a req to %s", ts.URL),
 				"-u", ts.URL},
