@@ -31,7 +31,7 @@ type checkHTTPOpts struct {
 	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
 	MaxRedirects       int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
 	ConnectTos         []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1"`
-	Proxy              string   `short:"x" long:"proxy" value-name:"[PROTOCOL://]HOST[:PORT]" description:"Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080."`
+	Proxy              string   `short:"x" long:"proxy" value-name:"[PROTOCOL://][USER:PASS@]HOST[:PORT]" description:"Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080."`
 }
 
 // Do the plugin

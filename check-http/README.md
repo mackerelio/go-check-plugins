@@ -73,6 +73,7 @@ To request via proxy (http/https/socks5)
 ```shell
 check-http --proxy=http://localhost:8080 -u http://example.com # request via http://localhost:8080
 HTTP_PROXY=http://localhost:8080 check-http  -u http://example.com # Same. you can set proxy via environment variable
+check-http --proxy=http://user:pass@localhost:8080 -u http://example.com # basic authentication is also supported
 ```
 ## For more information
 

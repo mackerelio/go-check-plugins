@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/elazarl/goproxy"
+	"github.com/elazarl/goproxy/ext/auth"
 	"github.com/mackerelio/checkers"
 	"github.com/stretchr/testify/assert"
 )
@@ -326,6 +327,55 @@ func TestProxy(t *testing.T) {
 		{
 			// proxy without scheme
 			args: []string{"--proxy", hostP + ":" + portP, "--pattern", fmt.Sprintf("intercept a req to %s", ts.URL),
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+	}
+
+	for i, tc := range testCases {
+		ckr := Run(tc.args)
+		assert.Equal(t, ckr.Status, tc.want, "#%d: Status should be %s, %s", i, tc.want, ckr.Message)
+	}
+}
+
+func TestProxy_Auth(t *testing.T) {
+	// target server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "I am target")
+	}))
+	defer ts.Close()
+
+	// proxy server, which forces basic authentication and intercepts
+	proxy := goproxy.NewProxyHttpServer()
+	auth.ProxyBasic(proxy, "basic!", func(user, password string) bool {
+		return user == "somename" && password == "somepassword"
+	})
+	proxy.OnRequest().DoFunc(
+		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			return r, goproxy.NewResponse(r,
+				goproxy.ContentTypeText, http.StatusOK,
+				fmt.Sprintf("intercept a req to %s", r.URL))
+		})
+	tsP := httptest.NewServer(proxy)
+	defer tsP.Close()
+	// extract host and port
+	s2 := strings.SplitN(tsP.URL, ":", 2)
+	hostPort := strings.TrimPrefix(s2[1], "//")
+
+	testCases := []struct {
+		args []string
+		want checkers.Status
+	}{
+		{
+			// without basic => 407
+			args: []string{"--proxy", tsP.URL, "-s", "200=warning", "-s", "407=ok",
+				"-u", ts.URL},
+			want: checkers.OK,
+		},
+		{
+			//
+			args: []string{"--proxy", "http://somename:somepassword@" + hostPort,
+				"--pattern", fmt.Sprintf("intercept a req to %s", ts.URL),
 				"-u", ts.URL},
 			want: checkers.OK,
 		},
