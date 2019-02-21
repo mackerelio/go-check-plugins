@@ -42,15 +42,15 @@ command = ["check-http", "-u", "http://example.com"]
 ### Options
 
 ```
-  -u, --url=                                  A URL to connect to
-  -s, --status=                               mapping of HTTP status
-      --no-check-certificate                  Do not check certificate
-  -i, --source-ip=                            source IP address
-  -H=                                         HTTP request headers
-  -p, --pattern=                              Expected pattern in the content
-      --max-redirects=                        Maximum number of redirects followed (default: 10)
-      --connect-to=HOST1:PORT1:HOST2:PORT2    Request to HOST2:PORT2 instead of HOST1:PORT1
-  -x, --proxy=[PROTOCOL://]HOST[:PORT]        Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080.
+  -u, --url=                                          A URL to connect to
+  -s, --status=                                       mapping of HTTP status
+      --no-check-certificate                          Do not check certificate
+  -i, --source-ip=                                    source IP address
+  -H=                                                 HTTP request headers
+  -p, --pattern=                                      Expected pattern in the content
+      --max-redirects=                                Maximum number of redirects followed (default: 10)
+      --connect-to=HOST1:PORT1:HOST2:PORT2            Request to HOST2:PORT2 instead of HOST1:PORT1
+  -x, --proxy=[PROTOCOL://][USER:PASS@]HOST[:PORT]    Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080.
 ```
 
 
