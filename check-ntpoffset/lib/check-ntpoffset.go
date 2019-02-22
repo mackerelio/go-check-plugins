@@ -247,7 +247,7 @@ func parseNTPStratumFromNTPD(out io.Reader) (string, error) {
                         return strings.TrimPrefix(flds[0], stratumPrefix), nil
 		}
 	}
-	return "unknown", fmt.Errorf("couldn't get ntp stratum.")
+	return "unknown", fmt.Errorf("failed to get ntp stratum")
 }
 
 func getNTPStratumFromChrony() (stratum string, err error) {
@@ -271,5 +271,5 @@ func parseNTPStratumFromChrony(out io.Reader) (string, error) {
                         return flds[1], nil
 		}
 	}
-	return "unknown", fmt.Errorf("couldn't get ntp stratum.")
+	return "unknown", fmt.Errorf("failed to get ntp stratum")
 }
