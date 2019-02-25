@@ -236,15 +236,15 @@ func getNTPStratumFromNTPD() (stratum string, err error) {
 
 func parseNTPStratumFromNTPD(out io.Reader) (string, error) {
 	scr := bufio.NewScanner(out)
-        const stratumPrefix = "*"
+	const stratumPrefix = "*"
 	for scr.Scan() {
 		line := scr.Text()
 		if strings.HasPrefix(line, stratumPrefix) {
-                        flds := strings.Fields(line)
+			flds := strings.Fields(line)
 			if len(flds) != 10 {
 				return "unknown", fmt.Errorf("failed to get ntp stratum")
 			}
-                        return strings.TrimPrefix(flds[0], stratumPrefix), nil
+			return strings.TrimPrefix(flds[0], stratumPrefix), nil
 		}
 	}
 	return "unknown", fmt.Errorf("failed to get ntp stratum")
@@ -264,11 +264,11 @@ func parseNTPStratumFromChrony(out io.Reader) (string, error) {
 	for scr.Scan() {
 		line := scr.Text()
 		if strings.HasPrefix(line, stratumPrefix) {
-                        flds := strings.Fields(line)
+			flds := strings.Fields(line)
 			if len(flds) != 10 {
 				return "unknown", fmt.Errorf("failed to get ntp stratum")
 			}
-                        return flds[1], nil
+			return flds[1], nil
 		}
 	}
 	return "unknown", fmt.Errorf("failed to get ntp stratum")
