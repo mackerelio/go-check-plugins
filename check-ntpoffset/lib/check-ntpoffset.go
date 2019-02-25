@@ -51,7 +51,6 @@ func run(args []string) *checkers.Checker {
 
 	var chkSt checkers.Status
 	var msg string
-
 	if opts.Crit < math.Abs(offset) {
 		msg = fmt.Sprintf("ntp offset is over %f(actual) > %f(threshold)", math.Abs(offset), opts.Crit)
 		chkSt = checkers.CRITICAL
@@ -119,6 +118,7 @@ func getNTPOffset(ntpServers string) (float64, error) {
 	if ntpServers != "" {
 		return getNTPOffsetFromNTPServers(ntpServers)
 	}
+
 	ntpdName, err := detectNTPDname()
 	if err != nil {
 		return 0.0, err
