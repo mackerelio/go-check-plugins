@@ -215,7 +215,7 @@ func parseNTPOffsetFromChrony(out io.Reader) (offset float64, err error) {
 func getNTPStratum() (string, error) {
 	ntpdName, err := detectNTPDname()
 	if err != nil {
-		return "unknown", err
+		return "", err
 	}
 	switch ntpdName {
 	case ntpNTPD:
@@ -223,7 +223,7 @@ func getNTPStratum() (string, error) {
 	case ntpChronyd:
 		return getNTPStratumFromChrony()
 	}
-	return "unknown", fmt.Errorf("unsupported ntp daemon %q", ntpdName)
+	return "", fmt.Errorf("unsupported ntp daemon %q", ntpdName)
 }
 
 func getNTPStratumFromNTPD() (stratum string, err error) {
