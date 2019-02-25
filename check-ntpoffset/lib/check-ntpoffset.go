@@ -221,7 +221,8 @@ func parseNTPOffsetFromChrony(out io.Reader) (offset float64, err error) {
 			}
 			var stratum int64
 			stratum, stratumErr = strconv.ParseInt(flds[2], 10, 64)
-			//
+			// Documents does NOT indicate about "Stratum : 0" means unsychronized...
+			// https://chrony.tuxfamily.org/manual.html#tracking-command
 			if stratum == 0 && stratumErr == nil {
 				stratumErr = fmt.Errorf("not synchronized to stratum")
 			}
