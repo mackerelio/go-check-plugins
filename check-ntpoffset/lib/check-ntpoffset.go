@@ -161,7 +161,7 @@ func getNTPOffsetFromNTPServers(ntpServers string) (offset float64, err error) {
 }
 
 func getNTPOffsetFromNTPD() (offset float64, err error) {
-	err = withCmd(exec.Command(cmdNTPq, "-c", "rv 0 offset"), func(out io.Reader) error {
+	err = withCmd(exec.Command(cmdNTPq, "-c", "rv 0 stratum,offset"), func(out io.Reader) error {
 		offset, err = parseNTPOffsetFromNTPD(out)
 		return err
 	})
@@ -170,11 +170,32 @@ func getNTPOffsetFromNTPD() (offset float64, err error) {
 
 func parseNTPOffsetFromNTPD(out io.Reader) (float64, error) {
 	scr := bufio.NewScanner(out)
+	const stratumPrefix = "stratum="
+	var stratumErr error
 	const offsetPrefix = "offset="
 	for scr.Scan() {
 		line := scr.Text()
-		if strings.HasPrefix(line, offsetPrefix) {
-			return strconv.ParseFloat(strings.TrimPrefix(line, offsetPrefix), 64)
+		for _, column := range strings.Split(line, ",") {
+			column = strings.TrimPrefix(column, " ")
+			if strings.HasPrefix(column, stratumPrefix) {
+				var stratum int64
+				stratum, stratumErr = strconv.ParseInt(strings.TrimPrefix(column, stratumPrefix), 10, 64)
+				if stratumErr != nil {
+					return 0.0, stratumErr
+				}
+				// the stratum of the remote machine. 16 is "unsynchronized"
+				// ref. https://support.ntp.org/bin/view/Support/TroubleshootingNTP
+				if stratum == 16 {
+					stratumErr = fmt.Errorf("not synchronized to stratum")
+				}
+			}
+			if strings.HasPrefix(column, offsetPrefix) {
+				offset, err := strconv.ParseFloat(strings.TrimPrefix(column, offsetPrefix), 64)
+				if err != nil {
+					return 0.0, err
+				}
+				return offset, stratumErr
+			}
 		}
 	}
 	return 0.0, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
@@ -189,9 +210,23 @@ func getNTPOffsetFromChrony() (offset float64, err error) {
 }
 
 func parseNTPOffsetFromChrony(out io.Reader) (offset float64, err error) {
+	var stratumErr error
 	scr := bufio.NewScanner(out)
 	for scr.Scan() {
 		line := scr.Text()
+		if strings.HasPrefix(line, "Stratum") {
+			flds := strings.Fields(line)
+			if len(flds) != 3 {
+				return 0.0, fmt.Errorf("failed to get ntp stratum")
+			}
+			var stratum int64
+			stratum, stratumErr = strconv.ParseInt(flds[2], 10, 64)
+			// Documents does NOT indicate about "Stratum : 0" means unsychronized...
+			// https://chrony.tuxfamily.org/manual.html#tracking-command
+			if stratum == 0 && stratumErr == nil {
+				stratumErr = fmt.Errorf("not synchronized to stratum")
+			}
+		}
 		if strings.HasPrefix(line, "Last offset") {
 			flds := strings.Fields(line)
 			if len(flds) != 5 {
@@ -201,7 +236,7 @@ func parseNTPOffsetFromChrony(out io.Reader) (offset float64, err error) {
 			if err != nil {
 				return 0.0, err
 			}
-			return offset * 1000, nil
+			return offset * 1000, stratumErr
 		}
 	}
 	return 0.0, fmt.Errorf("failed to get ntp offset")
