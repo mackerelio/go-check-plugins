@@ -171,34 +171,36 @@ func getNTPOffsetFromNTPD() (offset float64, err error) {
 func parseNTPOffsetFromNTPD(out io.Reader) (float64, error) {
 	scr := bufio.NewScanner(out)
 	const stratumPrefix = "stratum="
-	var stratumErr error
 	const offsetPrefix = "offset="
+	var offset *float64
 	for scr.Scan() {
 		line := scr.Text()
 		for _, column := range strings.Split(line, ",") {
 			column = strings.TrimPrefix(column, " ")
 			if strings.HasPrefix(column, stratumPrefix) {
-				var stratum int64
-				stratum, stratumErr = strconv.ParseInt(strings.TrimPrefix(column, stratumPrefix), 10, 64)
-				if stratumErr != nil {
-					return 0.0, stratumErr
-				}
-				// the stratum of the remote machine. 16 is "unsynchronized"
-				// ref. https://support.ntp.org/bin/view/Support/TroubleshootingNTP
-				if stratum == 16 {
-					stratumErr = fmt.Errorf("not synchronized to stratum")
-				}
-			}
-			if strings.HasPrefix(column, offsetPrefix) {
-				offset, err := strconv.ParseFloat(strings.TrimPrefix(column, offsetPrefix), 64)
+				stratum, err := strconv.ParseInt(strings.TrimPrefix(column, stratumPrefix), 10, 64)
 				if err != nil {
 					return 0.0, err
 				}
-				return offset, stratumErr
+				// stratum == 16 means that the machine is unsynchronized.
+				// ref. https://support.ntp.org/bin/view/Support/TroubleshootingNTP
+				if stratum == 16 {
+					return 0.0, fmt.Errorf("not synchronized to stratum")
+				}
+			}
+			if offset == nil && strings.HasPrefix(column, offsetPrefix) {
+				offsetMillis, err := strconv.ParseFloat(strings.TrimPrefix(column, offsetPrefix), 64)
+				if err != nil {
+					return 0.0, err
+				}
+				offset = &offsetMillis
 			}
 		}
 	}
-	return 0.0, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
+	if offset == nil {
+		return 0.0, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
+	}
+	return *offset, nil
 }
 
 func getNTPOffsetFromChrony() (offset float64, err error) {
@@ -209,35 +211,43 @@ func getNTPOffsetFromChrony() (offset float64, err error) {
 	return offset, err
 }
 
-func parseNTPOffsetFromChrony(out io.Reader) (offset float64, err error) {
-	var stratumErr error
+func parseNTPOffsetFromChrony(out io.Reader) (float64, error) {
 	scr := bufio.NewScanner(out)
+	const stratumPrefix = "Stratum"
+	const offsetPrefix = "Last offset"
+	var offset *float64
 	for scr.Scan() {
 		line := scr.Text()
-		if strings.HasPrefix(line, "Stratum") {
+		if strings.HasPrefix(line, stratumPrefix) {
 			flds := strings.Fields(line)
 			if len(flds) != 3 {
 				return 0.0, fmt.Errorf("failed to get ntp stratum")
 			}
-			var stratum int64
-			stratum, stratumErr = strconv.ParseInt(flds[2], 10, 64)
-			// Documents does NOT indicate about "Stratum : 0" means unsychronized...
-			// https://chrony.tuxfamily.org/manual.html#tracking-command
-			if stratum == 0 && stratumErr == nil {
-				stratumErr = fmt.Errorf("not synchronized to stratum")
+			stratum, err := strconv.ParseInt(flds[2], 10, 64)
+			if err != nil {
+				return 0.0, err
+			}
+			// stratum == 0 means that the machine is unsynchronized.
+			// Actually this can be the best case, but that would be rare...
+			if stratum == 0 {
+				return 0.0, fmt.Errorf("not synchronized to stratum")
 			}
 		}
-		if strings.HasPrefix(line, "Last offset") {
+		if offset == nil && strings.HasPrefix(line, offsetPrefix) {
 			flds := strings.Fields(line)
 			if len(flds) != 5 {
 				return 0.0, fmt.Errorf("failed to get ntp offset")
 			}
-			offset, err = strconv.ParseFloat(flds[3], 64)
+			offsetSeconds, err := strconv.ParseFloat(flds[3], 64)
 			if err != nil {
 				return 0.0, err
 			}
-			return offset * 1000, stratumErr
+			offsetMillis := offsetSeconds * 1000
+			offset = &offsetMillis
 		}
 	}
-	return 0.0, fmt.Errorf("failed to get ntp offset")
+	if offset == nil {
+		return 0.0, fmt.Errorf("failed to get ntp offset")
+	}
+	return *offset, nil
 }
