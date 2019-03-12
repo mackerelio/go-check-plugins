@@ -42,11 +42,12 @@ command = ["check-ntpoffset", "-w", "50", "-c", "100"]
 ### Options
 
 ```
-  -c, --critical=    Critical threshold of ntp offset(ms) (default: 100)
-  -w, --warning=     Warning threshold of ntp offset(ms) (default: 50)
-  -s, --ntp-servers= Use specified NTP Servers(plural servers can be set separated by ,). When set plural servers, use first
-                     response. If not set, use local command just like ntpd/chronyd.
-  -t, --ntp-timeout= Timeout of NTP Server Querying(in seconds). (default: 15)
+  -c, --critical=     Critical threshold of ntp offset(ms) (default: 100)
+  -w, --warning=      Warning threshold of ntp offset(ms) (default: 50)
+  -s, --ntp-servers=  Use specified NTP Servers(plural servers can be set separated by ,). When set plural servers, use first
+                      response. If not set, use local command just like ntpd/chronyd.
+  -t, --ntp-timeout=  Timeout of NTP Server Querying(in seconds). (default: 15)
+  -S, --check-stratum Check stratum and fail if the machine is not synchronized.
 ```
 
 
