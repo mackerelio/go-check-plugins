@@ -18,10 +18,11 @@ import (
 )
 
 var opts struct {
-	Crit       float64 `short:"c" long:"critical" default:"100" description:"Critical threshold of ntp offset(ms)"`
-	Warn       float64 `short:"w" long:"warning" default:"50" description:"Warning threshold of ntp offset(ms)"`
-	NTPServers string  `short:"s" long:"ntp-servers" default:"" description:"Use specified NTP Servers(plural servers can be set separated by ,). When set plural servers, use first response. If not set, use local command just like ntpd/chronyd."`
-	NTPTimeout int     `short:"t" long:"ntp-timeout" default:"15" description:"Timeout of NTP Server Querying(in seconds)."`
+	Crit         float64 `short:"c" long:"critical" default:"100" description:"Critical threshold of ntp offset(ms)"`
+	Warn         float64 `short:"w" long:"warning" default:"50" description:"Warning threshold of ntp offset(ms)"`
+	NTPServers   string  `short:"s" long:"ntp-servers" default:"" description:"Use specified NTP Servers(plural servers can be set separated by ,). When set plural servers, use first response. If not set, use local command just like ntpd/chronyd."`
+	NTPTimeout   int     `short:"t" long:"ntp-timeout" default:"15" description:"Timeout of NTP Server Querying(in seconds)."`
+	CheckStratum bool    `short:"S" long:"check-stratum" description:"Check stratum and fail if the machine is not synchronized."`
 }
 
 var ntpTimeout int
@@ -44,7 +45,7 @@ func run(args []string) *checkers.Checker {
 	}
 	ntpTimeout = opts.NTPTimeout
 
-	offset, err := getNTPOffset(opts.NTPServers)
+	offset, err := getNTPOffset(opts.NTPServers, opts.CheckStratum)
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
@@ -114,7 +115,7 @@ func detectNTPDname() (ntpdName string, err error) {
 	return ntpdName, err
 }
 
-func getNTPOffset(ntpServers string) (float64, error) {
+func getNTPOffset(ntpServers string, checkStratum bool) (float64, error) {
 	if ntpServers != "" {
 		return getNTPOffsetFromNTPServers(ntpServers)
 	}
@@ -125,9 +126,9 @@ func getNTPOffset(ntpServers string) (float64, error) {
 	}
 	switch ntpdName {
 	case ntpNTPD:
-		return getNTPOffsetFromNTPD()
+		return getNTPOffsetFromNTPD(checkStratum)
 	case ntpChronyd:
-		return getNTPOffsetFromChrony()
+		return getNTPOffsetFromChrony(checkStratum)
 	}
 	return 0.0, fmt.Errorf("unsupported ntp daemon %q", ntpdName)
 }
@@ -160,15 +161,15 @@ func getNTPOffsetFromNTPServers(ntpServers string) (offset float64, err error) {
 	}
 }
 
-func getNTPOffsetFromNTPD() (offset float64, err error) {
+func getNTPOffsetFromNTPD(checkStratum bool) (offset float64, err error) {
 	err = withCmd(exec.Command(cmdNTPq, "-c", "rv 0 stratum,offset"), func(out io.Reader) error {
-		offset, err = parseNTPOffsetFromNTPD(out)
+		offset, err = parseNTPOffsetFromNTPD(out, checkStratum)
 		return err
 	})
 	return offset, err
 }
 
-func parseNTPOffsetFromNTPD(out io.Reader) (float64, error) {
+func parseNTPOffsetFromNTPD(out io.Reader, checkStratum bool) (float64, error) {
 	scr := bufio.NewScanner(out)
 	const stratumPrefix = "stratum="
 	const offsetPrefix = "offset="
@@ -177,7 +178,7 @@ func parseNTPOffsetFromNTPD(out io.Reader) (float64, error) {
 		line := scr.Text()
 		for _, column := range strings.Split(line, ",") {
 			column = strings.TrimPrefix(column, " ")
-			if strings.HasPrefix(column, stratumPrefix) {
+			if checkStratum && strings.HasPrefix(column, stratumPrefix) {
 				stratum, err := strconv.ParseInt(strings.TrimPrefix(column, stratumPrefix), 10, 64)
 				if err != nil {
 					return 0.0, err
@@ -203,22 +204,22 @@ func parseNTPOffsetFromNTPD(out io.Reader) (float64, error) {
 	return *offset, nil
 }
 
-func getNTPOffsetFromChrony() (offset float64, err error) {
+func getNTPOffsetFromChrony(checkStratum bool) (offset float64, err error) {
 	err = withCmd(exec.Command(cmdChronyc, "tracking"), func(out io.Reader) error {
-		offset, err = parseNTPOffsetFromChrony(out)
+		offset, err = parseNTPOffsetFromChrony(out, checkStratum)
 		return err
 	})
 	return offset, err
 }
 
-func parseNTPOffsetFromChrony(out io.Reader) (float64, error) {
+func parseNTPOffsetFromChrony(out io.Reader, checkStratum bool) (float64, error) {
 	scr := bufio.NewScanner(out)
 	const stratumPrefix = "Stratum"
 	const offsetPrefix = "Last offset"
 	var offset *float64
 	for scr.Scan() {
 		line := scr.Text()
-		if strings.HasPrefix(line, stratumPrefix) {
+		if checkStratum && strings.HasPrefix(line, stratumPrefix) {
 			flds := strings.Fields(line)
 			if len(flds) != 3 {
 				return 0.0, fmt.Errorf("failed to get ntp stratum")
