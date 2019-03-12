@@ -199,7 +199,7 @@ func parseNTPOffsetFromNTPD(out io.Reader, checkStratum bool) (float64, error) {
 		}
 	}
 	if offset == nil {
-		return 0.0, fmt.Errorf("couldn't get ntp offset. ntpd process may be down")
+		return 0.0, fmt.Errorf("failed to get ntp offset")
 	}
 	return *offset, nil
 }
