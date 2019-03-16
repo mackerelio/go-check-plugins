@@ -28,6 +28,8 @@ func Do() {
 	ckr.Exit()
 }
 
+var getServiceStateFunc = getServiceState
+
 func run(args []string) *checkers.Checker {
 	var parser = flags.NewParser(&opts, flags.Default)
 	_, err := parser.ParseArgs(args)
@@ -35,7 +37,7 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	ss, err := getServiceState()
+	ss, err := getServiceStateFunc()
 	if opts.ListService {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

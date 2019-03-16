@@ -5,6 +5,9 @@ import (
 	"runtime"
 	"syscall"
 	"testing"
+
+	"github.com/mackerelio/checkers"
+	"github.com/stretchr/testify/assert"
 )
 
 func stopFaxService() error {
@@ -15,6 +18,26 @@ func stopFaxService() error {
 func startFaxService() error {
 	_, err := exec.Command("net", "start", "Fax").CombinedOutput()
 	return err
+}
+
+func mockServiceState() {
+	getServiceStateFunc = func() ([]Win32Service, error) {
+		runningService := Win32Service{
+			Caption: "running-service-caption",
+			Name:    "running-service-name",
+			State:   "Running",
+		}
+		stoppedService := Win32Service{
+			Caption: "stopped-service-caption",
+			Name:    "stopped-service-name",
+			State:   "Stopped",
+		}
+		ss := []Win32Service{
+			runningService,
+			stoppedService,
+		}
+		return ss, nil
+	}
 }
 
 func TestNtService(t *testing.T) {
@@ -53,4 +76,20 @@ func TestNtService(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestRunAboutRunningService(t *testing.T) {
+	mockServiceState()
+	cmdline := []string{"-s", "running-service"}
+	result := run(cmdline)
+	assert.Equal(t, checkers.OK, result.Status, "something went wrong")
+	assert.Equal(t, "", result.Message, "something went wrong")
+}
+
+func TestRunAboutStoppedService(t *testing.T) {
+	mockServiceState()
+	cmdline := []string{"-s", "stopped-service"}
+	result := run(cmdline)
+	assert.Equal(t, checkers.CRITICAL, result.Status, "something went wrong")
+	assert.Equal(t, "stopped-service-name: stopped-service-caption - Stopped", result.Message, "something went wrong")
 }
