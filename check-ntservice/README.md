@@ -42,8 +42,9 @@ command = ["check-ntservice", "--service-name", "SERVICE_NAME"]
 ### Options
 
 ```
-  -s, --service-name= service name
-  -l, --list-service  list service
+  -s, --service-name=    service name
+  -E, --exclude-service= service name to exclude from matching
+  -l, --list-service     list service
 ```
 
 
