@@ -10,8 +10,9 @@ import (
 )
 
 var opts struct {
-	ServiceName string `long:"service-name" short:"s" description:"service name"`
-	ListService bool   `long:"list-service" short:"l" description:"list service"`
+	ServiceName    string `long:"service-name" short:"s" description:"service name"`
+	ExcludeService string `long:"exclude-service" short:"E" description:"service name to exclude from matching"`
+	ListService    bool   `long:"list-service" short:"l" description:"list service"`
 }
 
 // Win32Service is struct for Win32_Service.
@@ -60,6 +61,9 @@ func run(args []string) *checkers.Checker {
 	checkSt := checkers.OK
 	msg := ""
 	for _, s := range ss {
+		if opts.ExcludeService != "" && strings.Contains(s.Name, opts.ExcludeService) {
+			continue
+		}
 		if !strings.Contains(s.Name, opts.ServiceName) {
 			continue
 		}

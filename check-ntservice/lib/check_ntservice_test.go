@@ -97,6 +97,12 @@ func TestRun(t *testing.T) {
 			expectStatus:  checkers.CRITICAL,
 			expectMessage: "stopped-service-name: stopped-service-caption - Stopped",
 		},
+		{
+			casename:      "check about running service with exclude option",
+			cmdline:       []string{"-s", "service", "-E", "stopped"},
+			expectStatus:  checkers.OK,
+			expectMessage: "",
+		},
 	}
 
 	mockServiceState()
