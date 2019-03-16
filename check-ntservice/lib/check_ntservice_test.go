@@ -78,18 +78,34 @@ func TestNtService(t *testing.T) {
 	}
 }
 
-func TestRunAboutRunningService(t *testing.T) {
-	mockServiceState()
-	cmdline := []string{"-s", "running-service"}
-	result := run(cmdline)
-	assert.Equal(t, checkers.OK, result.Status, "something went wrong")
-	assert.Equal(t, "", result.Message, "something went wrong")
-}
+func TestRun(t *testing.T) {
+	testCases := []struct {
+		casename      string
+		cmdline       []string
+		expectStatus  checkers.Status
+		expectMessage string
+	}{
+		{
+			casename:      "check about running service",
+			cmdline:       []string{"-s", "running-service"},
+			expectStatus:  checkers.OK,
+			expectMessage: "",
+		},
+		{
+			casename:      "check about stopped service",
+			cmdline:       []string{"-s", "stopped-service"},
+			expectStatus:  checkers.CRITICAL,
+			expectMessage: "stopped-service-name: stopped-service-caption - Stopped",
+		},
+	}
 
-func TestRunAboutStoppedService(t *testing.T) {
 	mockServiceState()
-	cmdline := []string{"-s", "stopped-service"}
-	result := run(cmdline)
-	assert.Equal(t, checkers.CRITICAL, result.Status, "something went wrong")
-	assert.Equal(t, "stopped-service-name: stopped-service-caption - Stopped", result.Message, "something went wrong")
+
+	for _, tc := range testCases {
+		t.Run(tc.casename, func(t *testing.T) {
+			result := run(tc.cmdline)
+			assert.Equal(t, tc.expectStatus, result.Status, "something went wrong")
+			assert.Equal(t, tc.expectMessage, result.Message, "something went wrong")
+		})
+	}
 }
