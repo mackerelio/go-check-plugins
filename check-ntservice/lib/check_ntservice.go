@@ -10,8 +10,9 @@ import (
 )
 
 var opts struct {
-	ServiceName string `long:"service-name" short:"s" description:"service name"`
-	ListService bool   `long:"list-service" short:"l" description:"list service"`
+	ServiceName    string `long:"service-name" short:"s" description:"service name"`
+	ExcludeService string `long:"exclude-service" short:"x" description:"service name to exclude from matching. This option takes precedence over --service-name"`
+	ListService    bool   `long:"list-service" short:"l" description:"list service"`
 }
 
 // Win32Service is struct for Win32_Service.
@@ -28,6 +29,8 @@ func Do() {
 	ckr.Exit()
 }
 
+var getServiceStateFunc = getServiceState
+
 func run(args []string) *checkers.Checker {
 	var parser = flags.NewParser(&opts, flags.Default)
 	_, err := parser.ParseArgs(args)
@@ -35,7 +38,7 @@ func run(args []string) *checkers.Checker {
 		os.Exit(1)
 	}
 
-	ss, err := getServiceState()
+	ss, err := getServiceStateFunc()
 	if opts.ListService {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -58,6 +61,9 @@ func run(args []string) *checkers.Checker {
 	checkSt := checkers.OK
 	msg := ""
 	for _, s := range ss {
+		if opts.ExcludeService != "" && strings.Contains(s.Name, opts.ExcludeService) {
+			continue
+		}
 		if !strings.Contains(s.Name, opts.ServiceName) {
 			continue
 		}

@@ -5,6 +5,9 @@ import (
 	"runtime"
 	"syscall"
 	"testing"
+
+	"github.com/mackerelio/checkers"
+	"github.com/stretchr/testify/assert"
 )
 
 func stopFaxService() error {
@@ -15,6 +18,26 @@ func stopFaxService() error {
 func startFaxService() error {
 	_, err := exec.Command("net", "start", "Fax").CombinedOutput()
 	return err
+}
+
+func mockServiceState() {
+	getServiceStateFunc = func() ([]Win32Service, error) {
+		runningService := Win32Service{
+			Caption: "running-service-caption",
+			Name:    "running-service-name",
+			State:   "Running",
+		}
+		stoppedService := Win32Service{
+			Caption: "stopped-service-caption",
+			Name:    "stopped-service-name",
+			State:   "Stopped",
+		}
+		ss := []Win32Service{
+			runningService,
+			stoppedService,
+		}
+		return ss, nil
+	}
 }
 
 func TestNtService(t *testing.T) {
@@ -52,5 +75,47 @@ func TestNtService(t *testing.T) {
 				t.Error("Fax service should be stopped now")
 			}
 		}
+	}
+}
+
+func TestRun(t *testing.T) {
+	testCases := []struct {
+		casename      string
+		cmdline       []string
+		expectStatus  checkers.Status
+		expectMessage string
+	}{
+		{
+			casename:      "check about running service",
+			cmdline:       []string{"-s", "running-service"},
+			expectStatus:  checkers.OK,
+			expectMessage: "",
+		},
+		{
+			casename:      "check about stopped service",
+			cmdline:       []string{"-s", "stopped-service"},
+			expectStatus:  checkers.CRITICAL,
+			expectMessage: "stopped-service-name: stopped-service-caption - Stopped",
+		},
+		{
+			casename:      "check about running service with exclude option",
+			cmdline:       []string{"-s", "service", "-x", "stopped"},
+			expectStatus:  checkers.OK,
+			expectMessage: "",
+		},
+	}
+
+	originalFunc := getServiceStateFunc
+	defer func() {
+		getServiceStateFunc = originalFunc
+	}()
+	mockServiceState()
+
+	for _, tc := range testCases {
+		t.Run(tc.casename, func(t *testing.T) {
+			result := run(tc.cmdline)
+			assert.Equal(t, tc.expectStatus, result.Status, "something went wrong")
+			assert.Equal(t, tc.expectMessage, result.Message, "something went wrong")
+		})
 	}
 }
