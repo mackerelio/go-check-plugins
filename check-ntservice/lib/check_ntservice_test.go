@@ -105,6 +105,10 @@ func TestRun(t *testing.T) {
 		},
 	}
 
+	originalFunc := getServiceStateFunc
+	defer func() {
+		getServiceStateFunc = originalFunc
+	}()
 	mockServiceState()
 
 	for _, tc := range testCases {
