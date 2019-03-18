@@ -43,7 +43,7 @@ command = ["check-ntservice", "--service-name", "SERVICE_NAME"]
 
 ```
   -s, --service-name=    service name
-  -E, --exclude-service= service name to exclude from matching
+  -E, --exclude-service= service name to exclude from matching. This option takes precedence over --service-name
   -l, --list-service     list service
 ```
 

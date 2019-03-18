@@ -11,7 +11,7 @@ import (
 
 var opts struct {
 	ServiceName    string `long:"service-name" short:"s" description:"service name"`
-	ExcludeService string `long:"exclude-service" short:"x" description:"service name to exclude from matching"`
+	ExcludeService string `long:"exclude-service" short:"x" description:"service name to exclude from matching. This option takes precedence over --service-name"`
 	ListService    bool   `long:"list-service" short:"l" description:"list service"`
 }
 
