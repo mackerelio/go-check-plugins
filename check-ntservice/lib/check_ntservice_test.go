@@ -99,7 +99,7 @@ func TestRun(t *testing.T) {
 		},
 		{
 			casename:      "check about running service with exclude option",
-			cmdline:       []string{"-s", "service", "-E", "stopped"},
+			cmdline:       []string{"-s", "service", "-x", "stopped"},
 			expectStatus:  checkers.OK,
 			expectMessage: "",
 		},
