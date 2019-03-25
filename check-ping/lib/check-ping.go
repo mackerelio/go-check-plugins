@@ -3,7 +3,6 @@ package checkping
 import (
 	"net"
 	"os"
-	"strings"
 	"time"
 
 	flags "github.com/jessevdk/go-flags"
@@ -30,7 +29,7 @@ func run(args []string) *checkers.Checker {
 
 	p := ping.NewPinger()
 	netProto := "ip4:icmp"
-	if strings.Index(opts.Host, ":") != -1 {
+	if isIPv6(opts.Host) {
 		netProto = "ip6:ipv6-icmp"
 	}
 
@@ -54,6 +53,17 @@ func run(args []string) *checkers.Checker {
 	}
 
 	return checkers.NewChecker(status, "")
+}
+
+func isIPv6(host string) bool {
+	addr, err := net.ResolveIPAddr("ip", host)
+	if err != nil {
+		os.Exit(1)
+	}
+	if ip4 := addr.IP.To4(); len(ip4) != net.IPv4len {
+		return true
+	}
+	return false
 }
 
 // Do the plugin
