@@ -18,6 +18,7 @@
        "memcached",
        "mysql",
        "ntpoffset",
+       "ping",
        "postgresql",
        "procs",
        "redis",

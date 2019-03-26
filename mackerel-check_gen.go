@@ -21,6 +21,7 @@ import (
 	"github.com/mackerelio/go-check-plugins/check-memcached/lib"
 	"github.com/mackerelio/go-check-plugins/check-mysql/lib"
 	"github.com/mackerelio/go-check-plugins/check-ntpoffset/lib"
+	"github.com/mackerelio/go-check-plugins/check-ping/lib"
 	"github.com/mackerelio/go-check-plugins/check-postgresql/lib"
 	"github.com/mackerelio/go-check-plugins/check-procs/lib"
 	"github.com/mackerelio/go-check-plugins/check-redis/lib"
@@ -68,6 +69,8 @@ func runPlugin(plug string) error {
 		checkmysql.Do()
 	case "ntpoffset":
 		checkntpoffset.Do()
+	case "ping":
+		checkping.Do()
 	case "postgresql":
 		checkpostgresql.Do()
 	case "procs":
@@ -110,6 +113,7 @@ var plugins = []string{
 	"memcached",
 	"mysql",
 	"ntpoffset",
+	"ping",
 	"postgresql",
 	"procs",
 	"redis",
