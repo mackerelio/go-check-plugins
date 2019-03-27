@@ -26,7 +26,7 @@ mackerel.io check plugins
 
 %{__mkdir} -p %{buildroot}%{__targetdir}
 
-for i in aws-cloudwatch-logs aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset postgresql procs redis smtp solr ssh ssl-cert tcp uptime; do \
+for i in aws-cloudwatch-logs aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset ping postgresql procs redis smtp solr ssh ssl-cert tcp uptime; do \
     %{__install} -m0755 %{_sourcedir}/build/check-$i %{buildroot}%{__targetdir}/; \
 done
 
@@ -46,6 +46,12 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Mar 27 2019 <mackerel-developers@hatena.ne.jp> - 0.29.0
+- Add check-ping (by a-know)
+- [ntservice] Enable to specify service name to exclude from match (by a-know)
+- Add NTP stratum check to check-ntpoffset (by susisu)
+- [check-http] add --proxy option (by astj)
+
 * Wed Feb 13 2019 <mackerel-developers@hatena.ne.jp> - 0.28.0
 - Improve READMEs (by a-know)
 - added support for netbsd on check-load (by paulbsd)

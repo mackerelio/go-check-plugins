@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.29.0 (2019-03-27)
+
+* Add check-ping #280 (a-know)
+* [ntservice] Enable to specify service name to exclude from match #279 (a-know)
+* Add NTP stratum check to check-ntpoffset #278 (susisu)
+* [check-http] add --proxy option #277 (astj)
+
+
 ## 0.28.0 (2019-02-13)
 
 * Improve READMEs #274 (a-know)
