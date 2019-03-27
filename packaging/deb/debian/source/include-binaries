@@ -15,6 +15,7 @@ debian/check-masterha
 debian/check-memcached
 debian/check-mysql
 debian/check-ntpoffset
+debian/check-ping
 debian/check-postgresql
 debian/check-procs
 debian/check-redis
