@@ -4,7 +4,7 @@ mackerel-check-plugins (0.29.0-1.v2) stable; urgency=low
     <https://github.com/mackerelio/go-check-plugins/pull/280>
   * [ntservice] Enable to specify service name to exclude from match (by a-know)
     <https://github.com/mackerelio/go-check-plugins/pull/279>
-  * Add NTP stratum check to check-ntpoffset (by susisu)
+  * Add NTP stratum check to check-ntpoffset (by EijiSugiura, susisu)
     <https://github.com/mackerelio/go-check-plugins/pull/278>
   * [check-http] add --proxy option (by astj)
     <https://github.com/mackerelio/go-check-plugins/pull/277>

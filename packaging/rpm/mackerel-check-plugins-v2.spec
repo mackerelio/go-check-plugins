@@ -40,7 +40,7 @@ done
 * Wed Mar 27 2019 <mackerel-developers@hatena.ne.jp> - 0.29.0
 - Add check-ping (by a-know)
 - [ntservice] Enable to specify service name to exclude from match (by a-know)
-- Add NTP stratum check to check-ntpoffset (by susisu)
+- Add NTP stratum check to check-ntpoffset (by EijiSugiura, susisu)
 - [check-http] add --proxy option (by astj)
 
 * Wed Feb 13 2019 <mackerel-developers@hatena.ne.jp> - 0.28.0
