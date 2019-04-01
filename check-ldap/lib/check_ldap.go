@@ -8,7 +8,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
-	"gopkg.in/ldap.v2"
+	"gopkg.in/ldap.v3"
 )
 
 type checkLDAPOpts struct {
@@ -42,8 +42,16 @@ func run(args []string) *checkers.Checker {
 	}
 	defer lconn.Close()
 
-	if err := lconn.Bind(opts.BindDN, opts.Password); err != nil {
-		return checkers.Unknown(err.Error())
+	// Bind() method does not allow empty password.
+	// https://godoc.org/gopkg.in/ldap.v3#Conn.Bind
+	if opts.Password != "" {
+		if err := lconn.Bind(opts.BindDN, opts.Password); err != nil {
+			return checkers.Unknown(err.Error())
+		}
+	} else {
+		if err := lconn.UnauthenticatedBind(opts.BindDN); err != nil {
+			return checkers.Unknown(err.Error())
+		}
 	}
 
 	req := ldap.NewSearchRequest(
