@@ -37,7 +37,7 @@ func TestLoadStateIfAccessDenied(t *testing.T) {
 	case "windows":
 		file = `C:\pagefile.sys`
 	default:
-		file = "/etc/sudoers"
+		file = "testdata/plain.txt/file"
 	}
 	s, err := loadState(file)
 	if err == nil {
@@ -175,7 +175,7 @@ func TestGetBytesToSkipOldErr(t *testing.T) {
 	case "windows":
 		file = `C:\pagefile.sys`
 	default:
-		file = "/etc/sudoers"
+		file = "testdata/plain.txt/file"
 	}
 	n, err := getBytesToSkipOld(file)
 	if err == nil {

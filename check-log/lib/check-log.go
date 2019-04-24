@@ -461,12 +461,11 @@ func getBytesToSkip(f string) (int64, error) {
 }
 
 func getBytesToSkipOld(f string) (int64, error) {
-	_, err := os.Stat(f)
-	if err != nil {
-		return 0, nil
-	}
 	b, err := ioutil.ReadFile(f)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return 0, nil
+		}
 		return 0, err
 	}
 
