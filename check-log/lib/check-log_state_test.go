@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"testing"
 )
 
@@ -31,7 +32,13 @@ func TestLoadStateIfFileNotExist(t *testing.T) {
 }
 
 func TestLoadStateIfAccessDenied(t *testing.T) {
-	file := "testdata/file.txt/any"
+	var file string
+	switch runtime.GOOS {
+	case "windows":
+		file = `C:\pagefile.sys`
+	default:
+		file = "/etc/sudoers"
+	}
 	s, err := loadState(file)
 	if err == nil {
 		t.Errorf("loadState(%q) = %v; want an error", file, s)
@@ -95,6 +102,11 @@ func testSaveLoadState(t *testing.T, file string, s *state) {
 }
 
 func TestSaveStateIfAccessDenied(t *testing.T) {
+	switch runtime.GOOS {
+	case "windows": // Almost os.Chmod operations will ignore on Windows.
+		t.Skip()
+		return
+	}
 	file := "testdata/readonly/state"
 	dir := filepath.Dir(file)
 	defer func() {
