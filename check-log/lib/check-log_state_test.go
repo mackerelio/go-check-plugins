@@ -38,6 +38,8 @@ func TestLoadStateIfAccessDenied(t *testing.T) {
 	}
 }
 
+// TODO(lufia): We might be better to test a condition too that file is exist but loadState can't read it.
+
 func TestSaveStateIfFileNotExist(t *testing.T) {
 	file := "testdata/file_will_create"
 	defer func() {
