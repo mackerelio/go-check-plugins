@@ -146,3 +146,39 @@ func TestSaveStateIfAccessDenied(t *testing.T) {
 		t.Errorf("saveState into readonly directory should keep original contents: result = %s", data1)
 	}
 }
+
+func TestGetBytesToSkipOld(t *testing.T) {
+	file := "testdata/old-state.txt"
+	n, err := getBytesToSkipOld(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := int64(20); n != want {
+		t.Errorf("getBytesToSkip(%s) = %d; want %d", file, n, want)
+	}
+}
+
+func TestGetBytesToSkipOldIfFileNotExist(t *testing.T) {
+	file := "testdata/file_not_found"
+	n, err := getBytesToSkipOld(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := int64(0); n != want {
+		t.Errorf("getBytesToSkip(%s) = %d; want %d", file, n, want)
+	}
+}
+
+func TestGetBytesToSkipOldErr(t *testing.T) {
+	var file string
+	switch runtime.GOOS {
+	case "windows":
+		file = `C:\pagefile.sys`
+	default:
+		file = "/etc/sudoers"
+	}
+	n, err := getBytesToSkipOld(file)
+	if err == nil {
+		t.Errorf("getBytesToSkip(%s) = %d; but want an error", file, n)
+	}
+}
