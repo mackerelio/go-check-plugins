@@ -420,15 +420,15 @@ type state struct {
 
 func loadState(fname string) (*state, error) {
 	state := &state{}
-	_, err := os.Stat(fname)
-	if err == nil { // state file exists
-		b, err := ioutil.ReadFile(fname)
-		if err == nil {
-			err = json.Unmarshal(b, state)
+	b, err := ioutil.ReadFile(fname)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
 		}
 		return state, err
 	}
-	return nil, nil
+	err = json.Unmarshal(b, state)
+	return state, err
 }
 
 var stateRe = regexp.MustCompile(`^([a-zA-Z]):[/\\]`)
@@ -461,12 +461,11 @@ func getBytesToSkip(f string) (int64, error) {
 }
 
 func getBytesToSkipOld(f string) (int64, error) {
-	_, err := os.Stat(f)
-	if err != nil {
-		return 0, nil
-	}
 	b, err := ioutil.ReadFile(f)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return 0, nil
+		}
 		return 0, err
 	}
 
