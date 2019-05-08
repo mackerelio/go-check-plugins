@@ -1,6 +1,7 @@
 package checkawscloudwatchlogs
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/mackerelio/checkers"
 	"github.com/mackerelio/golib/pluginutil"
+	"github.com/natefinch/atomic"
 )
 
 type logOpts struct {
@@ -164,16 +166,14 @@ func (p *awsCloudwatchLogsPlugin) loadState() (*logState, error) {
 }
 
 func (p *awsCloudwatchLogsPlugin) saveState(s *logState) error {
-	err := os.MkdirAll(filepath.Dir(p.StateFile), 0755)
-	if err != nil {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(s); err != nil {
 		return err
 	}
-	f, err := os.Create(p.StateFile)
-	if err != nil {
+	if err := os.MkdirAll(filepath.Dir(p.StateFile), 0755); err != nil {
 		return err
 	}
-	defer f.Close()
-	return json.NewEncoder(f).Encode(s)
+	return atomic.WriteFile(p.StateFile, &buf)
 }
 
 func (p *awsCloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
