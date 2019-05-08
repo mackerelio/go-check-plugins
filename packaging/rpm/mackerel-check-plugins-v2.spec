@@ -37,6 +37,11 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed May 08 2019 <mackerel-developers@hatena.ne.jp> - 0.30.0
+- [check-aws-cloudwatch-logs] make handling a state file more safe (by lufia)
+- [check-log] make handling a state file more safe (by lufia)
+- [check-ldap] Update go-ldap to v3 (by nonylene)
+
 * Wed Mar 27 2019 <mackerel-developers@hatena.ne.jp> - 0.29.0
 - Add check-ping (by a-know)
 - [ntservice] Enable to specify service name to exclude from match (by a-know)

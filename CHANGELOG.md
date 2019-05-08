@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.30.0 (2019-05-08)
+
+* [check-aws-cloudwatch-logs] make handling a state file more safe #286 (lufia)
+* [check-log] make handling a state file more safe #285 (lufia)
+* [check-ldap] Update go-ldap to v3 #284 (nonylene)
+
+
 ## 0.29.0 (2019-03-27)
 
 * Add check-ping #280 (a-know)

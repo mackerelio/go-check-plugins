@@ -1,3 +1,14 @@
+mackerel-check-plugins (0.30.0-1.v2) stable; urgency=low
+
+  * [check-aws-cloudwatch-logs] make handling a state file more safe (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/286>
+  * [check-log] make handling a state file more safe (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/285>
+  * [check-ldap] Update go-ldap to v3 (by nonylene)
+    <https://github.com/mackerelio/go-check-plugins/pull/284>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 08 May 2019 07:37:39 +0000
+
 mackerel-check-plugins (0.29.0-1.v2) stable; urgency=low
 
   * Add check-ping (by a-know)
