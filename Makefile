@@ -11,11 +11,8 @@ all: clean testconvention test build rpm deb
 test: lint
 	go test $(TESTFLAGS) ./...
 
-deps:
-	go get -d -v -t ./...
-
-devel-deps: deps
-	go get golang.org/x/lint/golint  \
+devel-deps:
+	GO111MODULE=off go get golang.org/x/lint/golint  \
 	  github.com/pierrre/gotestcover \
 	  github.com/mattn/goveralls
 
@@ -40,14 +37,14 @@ testconvention:
 cover: devel-deps
 	gotestcover -v -short -covermode=count -coverprofile=.profile.cov -parallelpackages=4 ./...
 
-build: deps
+build:
 	mkdir -p build
 	for i in $(filter-out check-windows-%, $(wildcard check-*)); do \
 	  go build -ldflags "-s -w" -o build/$$i \
 	  `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
 	done
 
-build/mackerel-check: deps
+build/mackerel-check:
 	mkdir -p build
 	go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
 	  -o build/mackerel-check
@@ -94,4 +91,4 @@ clean:
 	fi
 	go clean
 
-.PHONY: all test testconvention deps devel-deps lint cover build rpm rpm-v1 rpm-v2 deb deb-v1 deb-v2 clean release check-release-deps
+.PHONY: all test testconvention devel-deps lint cover build rpm rpm-v1 rpm-v2 deb deb-v1 deb-v2 clean release check-release-deps
