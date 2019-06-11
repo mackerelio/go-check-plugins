@@ -37,6 +37,9 @@ done
 %{__targetdir}/*
 
 %changelog
+* Tue Jun 11 2019 <mackerel-developers@hatena.ne.jp> - 0.31.0
+- Support go modules (by astj)
+
 * Wed May 08 2019 <mackerel-developers@hatena.ne.jp> - 0.30.0
 - [check-aws-cloudwatch-logs] make handling a state file more safe (by lufia)
 - [check-log] make handling a state file more safe (by lufia)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.31.0 (2019-06-11)
+
+* Support go modules #289 (astj)
+
+
 ## 0.30.0 (2019-05-08)
 
 * [check-aws-cloudwatch-logs] make handling a state file more safe #286 (lufia)

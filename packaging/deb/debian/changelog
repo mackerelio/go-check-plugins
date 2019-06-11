@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.31.0-1) stable; urgency=low
+
+  * Support go modules (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/289>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 11 Jun 2019 03:15:20 +0000
+
 mackerel-check-plugins (0.30.0-1) stable; urgency=low
 
   * [check-aws-cloudwatch-logs] make handling a state file more safe (by lufia)
