@@ -3,6 +3,9 @@ package checkprocs
 import (
 	"runtime"
 	"testing"
+
+	"github.com/mackerelio/checkers"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestProcs(t *testing.T) {
@@ -42,4 +45,25 @@ func TestProcs(t *testing.T) {
 			t.Fatal("csec should not be 0")
 		}
 	}
+}
+
+func TestOptimizeStatus(t *testing.T) {
+	var CritOver int64 = 100
+	var WarningOver int64 = 80
+	var WarningUnder int64 = 40
+	var CritUnder int64 = 10
+
+	opts.CritOver = &CritOver
+	opts.WarningOver = &WarningOver
+	opts.WarningUnder = WarningUnder
+	opts.CritUnder = CritUnder
+
+	assert.Equal(t, checkers.OK, optimizeStatus(80, checkers.OK))
+	assert.Equal(t, checkers.WARNING, optimizeStatus(81, checkers.OK))
+	assert.Equal(t, checkers.WARNING, optimizeStatus(100, checkers.OK))
+	assert.Equal(t, checkers.CRITICAL, optimizeStatus(101, checkers.OK))
+	assert.Equal(t, checkers.OK, optimizeStatus(40, checkers.OK))
+	assert.Equal(t, checkers.WARNING, optimizeStatus(39, checkers.OK))
+	assert.Equal(t, checkers.WARNING, optimizeStatus(10, checkers.OK))
+	assert.Equal(t, checkers.CRITICAL, optimizeStatus(9, checkers.OK))
 }
