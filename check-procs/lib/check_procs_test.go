@@ -1,6 +1,7 @@
 package checkprocs
 
 import (
+	"fmt"
 	"runtime"
 	"testing"
 
@@ -66,4 +67,14 @@ func TestOptimizeStatus(t *testing.T) {
 	assert.Equal(t, checkers.WARNING, optimizeStatus(39, checkers.OK))
 	assert.Equal(t, checkers.WARNING, optimizeStatus(10, checkers.OK))
 	assert.Equal(t, checkers.CRITICAL, optimizeStatus(9, checkers.OK))
+}
+
+func TestGatherMsg(t *testing.T) {
+	var count int64 = 1
+	opts.CmdPat = []string{"foo", "bar"}
+
+	for _, pattern := range opts.CmdPat {
+		expected := fmt.Sprintf("Found %d matching processes; cmd /%s/", count, pattern)
+		assert.Equal(t, expected, gatherMsg(count, pattern))
+	}
 }
