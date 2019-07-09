@@ -879,3 +879,43 @@ func TestRunWithSuppressOption(t *testing.T) {
 	}
 	testInvalidPattern()
 }
+
+func TestRunMultipleExcludePattern(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	params := []string{"-s", dir, "-f", logf, "-p", "ERROR", "-p", "TESTAPP", "-E", "FOO", "-E", "BAR"}
+	opts, _ := parseArgs(params)
+	opts.prepare()
+
+	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
+
+	bytes, _ := getBytesToSkip(stateFile)
+	assert.Equal(t, int64(0), bytes, "stateFile size should be 0 (actual: %d)", bytes)
+
+	runPlugin := func(logmsg string, status checkers.Status, matchedCount int) {
+		fh.WriteString(logmsg)
+		ckr := run(context.Background(), params)
+
+		assert.Equal(t, status, ckr.Status, fmt.Sprintf("ckr.Status should be %s", status.String()))
+
+		msg := fmt.Sprintf("%d warnings, %d criticals for pattern /ERROR/ and /TESTAPP/.", matchedCount, matchedCount)
+		assert.Equal(t, msg, ckr.Message, fmt.Sprintf("chk.Message should be '%s' (actual: '%s')", msg, ckr.Message))
+	}
+
+	lo1 := "[TESTAPP] DEBUG: THIS LINE UNMATCHED\n"
+	lo2 := "[TESTAPP] ERROR: THIS LINE MATCHED\n"
+	lo3 := "[TESTAPP] ERROR: THIS LINE EXCLUDED(FOO BAR)\n[TESTAPP] ERROR: THIS LINE MATCHED(FOO)\n"
+	lo4 := "[TESTAPP] ERROR: THIS LINE EXCLUDED(FOO BAR)\nERROR: THIS LINE UNMATCHED\n"
+	runPlugin(lo1, checkers.OK, 0)
+	runPlugin(lo2, checkers.CRITICAL, 1)
+	runPlugin(lo3, checkers.CRITICAL, 1)
+	runPlugin(lo4, checkers.OK, 0)
+}
