@@ -37,6 +37,9 @@ done
 %{__targetdir}/*
 
 %changelog
+* Mon Jul 22 2019 <mackerel-developers@hatena.ne.jp> - 0.31.1
+- Build with Go 1.12 (by astj)
+
 * Tue Jun 11 2019 <mackerel-developers@hatena.ne.jp> - 0.31.0
 - Support go modules (by astj)
 
