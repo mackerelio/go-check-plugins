@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.31.1 (2019-07-22)
+
+* Build with Go 1.12 #292 (astj)
+
+
 ## 0.31.0 (2019-06-11)
 
 * Support go modules #289 (astj)

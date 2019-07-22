@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.31.1-1.v2) stable; urgency=low
+
+  * Build with Go 1.12 (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/292>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Mon, 22 Jul 2019 13:11:21 +0900
+
 mackerel-check-plugins (0.31.0-1.v2) stable; urgency=low
 
   * Support go modules (by astj)
