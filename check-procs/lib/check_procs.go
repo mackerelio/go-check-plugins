@@ -105,7 +105,7 @@ func run(args []string) *checkers.Checker {
 			}
 		}
 		count := int64(len(resultrocStates))
-		result = optimizeStatus(count, result)
+		result = mergeStatus(count, result)
 		msg += fmt.Sprintf("\n%s", gatherMsg(count, reg.String()))
 
 		resultrocStates = []procState{}
@@ -180,7 +180,7 @@ func gatherMsg(count int64, pattern string) string {
 	return msg
 }
 
-func optimizeStatus(count int64, current checkers.Status) checkers.Status {
+func mergeStatus(count int64, current checkers.Status) checkers.Status {
 	result := checkers.OK
 	if opts.CritUnder != 0 && count < opts.CritUnder ||
 		opts.CritOver != nil && count > *opts.CritOver {

@@ -48,7 +48,7 @@ func TestProcs(t *testing.T) {
 	}
 }
 
-func TestOptimizeStatus(t *testing.T) {
+func TestMergeStatus(t *testing.T) {
 	var CritOver int64 = 100
 	var WarningOver int64 = 80
 	var WarningUnder int64 = 40
@@ -59,14 +59,14 @@ func TestOptimizeStatus(t *testing.T) {
 	opts.WarningUnder = WarningUnder
 	opts.CritUnder = CritUnder
 
-	assert.Equal(t, checkers.OK, optimizeStatus(80, checkers.OK))
-	assert.Equal(t, checkers.WARNING, optimizeStatus(81, checkers.OK))
-	assert.Equal(t, checkers.WARNING, optimizeStatus(100, checkers.OK))
-	assert.Equal(t, checkers.CRITICAL, optimizeStatus(101, checkers.OK))
-	assert.Equal(t, checkers.OK, optimizeStatus(40, checkers.OK))
-	assert.Equal(t, checkers.WARNING, optimizeStatus(39, checkers.OK))
-	assert.Equal(t, checkers.WARNING, optimizeStatus(10, checkers.OK))
-	assert.Equal(t, checkers.CRITICAL, optimizeStatus(9, checkers.OK))
+	assert.Equal(t, checkers.OK, mergeStatus(80, checkers.OK))
+	assert.Equal(t, checkers.WARNING, mergeStatus(81, checkers.OK))
+	assert.Equal(t, checkers.WARNING, mergeStatus(100, checkers.OK))
+	assert.Equal(t, checkers.CRITICAL, mergeStatus(101, checkers.OK))
+	assert.Equal(t, checkers.OK, mergeStatus(40, checkers.OK))
+	assert.Equal(t, checkers.WARNING, mergeStatus(39, checkers.OK))
+	assert.Equal(t, checkers.WARNING, mergeStatus(10, checkers.OK))
+	assert.Equal(t, checkers.CRITICAL, mergeStatus(9, checkers.OK))
 }
 
 func TestGatherMsg(t *testing.T) {
