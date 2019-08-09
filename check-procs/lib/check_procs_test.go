@@ -71,9 +71,9 @@ func TestOptimizeStatus(t *testing.T) {
 
 func TestGatherMsg(t *testing.T) {
 	var count int64 = 1
-	opts.CmdPat = []string{"foo", "bar"}
+	opts.CmdPatterns = []string{"foo", "bar"}
 
-	for _, pattern := range opts.CmdPat {
+	for _, pattern := range opts.CmdPatterns {
 		expected := fmt.Sprintf("Found %d matching processes; cmd /%s/", count, pattern)
 		assert.Equal(t, expected, gatherMsg(count, pattern))
 	}
