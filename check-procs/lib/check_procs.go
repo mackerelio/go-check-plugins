@@ -97,6 +97,7 @@ func run(args []string) *checkers.Checker {
 	}
 	result := checkers.OK
 	var msg string
+
 	var resultrocStates []procState
 	for _, reg := range cmdPatRegexp {
 		for _, proc := range procs {
