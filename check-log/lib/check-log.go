@@ -33,7 +33,7 @@ type logOpts struct {
 	LogFile             string   `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
 	Pattern             []string `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for. If specified multiple, they will be treated together with the AND operator"`
 	SuppressPattern     bool     `long:"suppress-pattern" description:"Suppress pattern display"`
-	Exclude             []string `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
+	Exclude             []string `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching. If specified multiple, they will be treated together with the AND operator"`
 	WarnOver            int64    `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver            int64    `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	WarnLevel           float64  `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
