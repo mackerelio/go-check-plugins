@@ -1,8 +1,12 @@
 package checkprocs
 
 import (
+	"fmt"
 	"runtime"
 	"testing"
+
+	"github.com/mackerelio/checkers"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestProcs(t *testing.T) {
@@ -41,5 +45,36 @@ func TestProcs(t *testing.T) {
 		if proc.csec == 0 && runtime.GOOS != "windows" {
 			t.Fatal("csec should not be 0")
 		}
+	}
+}
+
+func TestMergeStatus(t *testing.T) {
+	var CritOver int64 = 100
+	var WarningOver int64 = 80
+	var WarningUnder int64 = 40
+	var CritUnder int64 = 10
+
+	opts.CritOver = &CritOver
+	opts.WarningOver = &WarningOver
+	opts.WarningUnder = WarningUnder
+	opts.CritUnder = CritUnder
+
+	assert.Equal(t, checkers.OK, mergeStatus(80, checkers.OK))
+	assert.Equal(t, checkers.WARNING, mergeStatus(81, checkers.OK))
+	assert.Equal(t, checkers.WARNING, mergeStatus(100, checkers.OK))
+	assert.Equal(t, checkers.CRITICAL, mergeStatus(101, checkers.OK))
+	assert.Equal(t, checkers.OK, mergeStatus(40, checkers.OK))
+	assert.Equal(t, checkers.WARNING, mergeStatus(39, checkers.OK))
+	assert.Equal(t, checkers.WARNING, mergeStatus(10, checkers.OK))
+	assert.Equal(t, checkers.CRITICAL, mergeStatus(9, checkers.OK))
+}
+
+func TestGatherMsg(t *testing.T) {
+	var count int64 = 1
+	opts.CmdPatterns = []string{"foo", "bar"}
+
+	for _, pattern := range opts.CmdPatterns {
+		expected := fmt.Sprintf("Found %d matching processes; cmd /%s/", count, pattern)
+		assert.Equal(t, expected, gatherMsg(count, pattern))
 	}
 }
