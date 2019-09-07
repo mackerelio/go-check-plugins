@@ -14,10 +14,11 @@ import (
 )
 
 type redisSetting struct {
-	Host    string `short:"H" long:"host" default:"localhost" description:"Hostname"`
-	Socket  string `short:"s" long:"socket" default:"" description:"Server socket"`
-	Port    string `short:"p" long:"port" default:"6379" description:"Port"`
-	Timeout uint64 `short:"t" long:"timeout" default:"5" description:"Dial Timeout in sec"`
+	Host     string `short:"H" long:"host" default:"localhost" description:"Hostname"`
+	Socket   string `short:"s" long:"socket" default:"" description:"Server socket"`
+	Port     string `short:"p" long:"port" default:"6379" description:"Port"`
+	Password string `short:"P" long:"password" default:"" description:"Password"`
+	Timeout  uint64 `short:"t" long:"timeout" default:"5" description:"Dial Timeout in sec"`
 }
 
 var commands = map[string](func([]string) *checkers.Checker){
@@ -63,6 +64,24 @@ func connectRedis(m redisSetting) (*redis.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("couldn't connect: %s", err)
 	}
+
+	password := ""
+
+	if os.Getenv("REDIS_PASSWORD") != "" {
+		password = os.Getenv("REDIS_PASSWORD")
+	}
+
+	if m.Password != "" {
+		password = m.Password
+	}
+
+	if password != "" {
+		r := c.Cmd("AUTH", password)
+		if r.Err != nil {
+			return nil, fmt.Errorf("couldn't authenticate: %v", r.Err)
+		}
+	}
+
 	return c, nil
 }
 
