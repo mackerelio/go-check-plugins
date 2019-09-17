@@ -32,6 +32,7 @@ type checkHTTPOpts struct {
 	MaxRedirects       int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
 	ConnectTos         []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1"`
 	Proxy              string   `short:"x" long:"proxy" value-name:"[PROTOCOL://][USER:PASS@]HOST[:PORT]" description:"Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080."`
+        BasicAuth          string   `long:"user" value-name:"USER[:PASSWORD]" description:"Basic Authentication user ID and an optional password."`
 }
 
 // Do the plugin
@@ -257,6 +258,14 @@ func Run(args []string) *checkers.Checker {
 		return checkers.Unknown(err.Error())
 	}
 
+	if len(opts.BasicAuth) != 0 {
+		auth := strings.SplitN(opts.BasicAuth, ":", 2)
+		if (len(auth) == 1) {
+			req.SetBasicAuth(auth[0], "")
+		} else {
+			req.SetBasicAuth(auth[0], auth[1])
+		}
+	}
 	if len(opts.Headers) != 0 {
 		header, err := parseHeader(&opts)
 		if err != nil {
