@@ -83,6 +83,7 @@ Japanese: https://mackerel.io/ja/docs/entry/custom-checks
 Contribution
 ------------
 
+* see [The official plugin registry](https://mackerel.io/blog/entry/feature/20171116#The-official-plugin-registry) and [Pull requests to the existing central repository](https://mackerel.io/blog/entry/feature/20171116#Pull-Requests-to-the-existing-central-repository)
 * fork it
 * develop the plugin you want
 * create a pull request!
