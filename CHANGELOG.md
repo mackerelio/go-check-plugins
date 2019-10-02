@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.32.0 (2019-10-02)
+
+* [doc]add repository policy #300 (lufia)
+* add --user to check-http #297 (lausser)
+* Update modules #298 (ne-sachirou)
+* [check-procs] If more than one pattern is specified, find processes that meet any of the conditions. #293 (tukaelu)
+
+
 ## 0.31.1 (2019-07-22)
 
 * Build with Go 1.12 #292 (astj)
