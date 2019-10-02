@@ -1,3 +1,16 @@
+mackerel-check-plugins (0.32.0-1) stable; urgency=low
+
+  * [doc]add repository policy (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/300>
+  * add --user to check-http (by lausser)
+    <https://github.com/mackerelio/go-check-plugins/pull/297>
+  * Update modules (by ne-sachirou)
+    <https://github.com/mackerelio/go-check-plugins/pull/298>
+  * [check-procs] If more than one pattern is specified, find processes that meet any of the conditions. (by tukaelu)
+    <https://github.com/mackerelio/go-check-plugins/pull/293>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 02 Oct 2019 06:50:03 +0000
+
 mackerel-check-plugins (0.31.1-1) stable; urgency=low
 
   * Build with Go 1.12 (by astj)

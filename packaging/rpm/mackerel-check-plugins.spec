@@ -46,6 +46,12 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Oct 02 2019 <mackerel-developers@hatena.ne.jp> - 0.32.0
+- [doc]add repository policy (by lufia)
+- add --user to check-http (by lausser)
+- Update modules (by ne-sachirou)
+- [check-procs] If more than one pattern is specified, find processes that meet any of the conditions. (by tukaelu)
+
 * Mon Jul 22 2019 <mackerel-developers@hatena.ne.jp> - 0.31.1
 - Build with Go 1.12 (by astj)
 
