@@ -428,7 +428,11 @@ func loadState(fname string) (*state, error) {
 		return state, err
 	}
 	err = json.Unmarshal(b, state)
-	return state, err
+	if err != nil {
+		log.Printf("failed to loadState (ignoring): %s", err)
+		return nil, nil
+	}
+	return state, nil
 }
 
 var stateRe = regexp.MustCompile(`^([a-zA-Z]):[/\\]`)
