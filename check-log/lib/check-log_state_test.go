@@ -183,7 +183,7 @@ func TestGetBytesToSkipOld(t *testing.T) {
 func TestGetBytesToSkipOldIfFileNotExist(t *testing.T) {
 	file := "testdata/file_not_found"
 	n, err := getBytesToSkipOld(file)
-	if err != nil {
+	if err != errValidStateFileNotFound {
 		t.Fatal(err)
 	}
 	if want := int64(0); n != want {

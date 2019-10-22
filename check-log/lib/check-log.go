@@ -247,11 +247,14 @@ func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int6
 		return 0, 0, "", nil
 	}
 	stateFile := getStateFile(opts.StateDir, logFile, opts.origArgs)
-	skipBytes, inode := int64(0), uint(0)
+	skipBytes, inode, isFirstCheck := int64(0), uint(0), false
 	if !opts.NoState {
 		s, err := getBytesToSkip(stateFile)
 		if err != nil {
-			return 0, 0, "", err
+			if err != errValidStateFileNotFound {
+				return 0, 0, "", err
+			}
+			isFirstCheck = true
 		}
 		skipBytes = s
 
@@ -282,11 +285,9 @@ func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int6
 		return 0, 0, "", err
 	}
 
-	if !opts.NoState && !opts.CheckFirst {
-		// skip whole file if state file does not exist
-		if _, err = os.Stat(stateFile); os.IsNotExist(err) {
-			skipBytes = stat.Size()
-		}
+	// Skip whole file on first check, unless CheckFirst specified
+	if !opts.NoState && isFirstCheck && !opts.CheckFirst {
+		skipBytes = stat.Size()
 	}
 
 	rotated := false
@@ -450,6 +451,8 @@ func getStateFile(stateDir, f string, args []string) string {
 	)
 }
 
+var errValidStateFileNotFound = fmt.Errorf("state file not found, or corrupted")
+
 func getBytesToSkip(f string) (int64, error) {
 	state, err := loadState(f)
 	if err != nil {
@@ -470,7 +473,7 @@ func getBytesToSkipOld(f string) (int64, error) {
 	b, err := ioutil.ReadFile(f)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return 0, nil
+			return 0, errValidStateFileNotFound
 		}
 		return 0, err
 	}
