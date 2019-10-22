@@ -283,6 +283,7 @@ func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int6
 	}
 
 	if !opts.NoState && !opts.CheckFirst {
+		// skip whole file if state file does not exist
 		if _, err = os.Stat(stateFile); os.IsNotExist(err) {
 			skipBytes = stat.Size()
 		}
@@ -429,6 +430,7 @@ func loadState(fname string) (*state, error) {
 	}
 	err = json.Unmarshal(b, state)
 	if err != nil {
+		// Ignore json unmarshal error
 		log.Printf("failed to loadState (ignoring): %s", err)
 		return nil, nil
 	}
