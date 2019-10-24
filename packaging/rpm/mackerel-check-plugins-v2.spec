@@ -37,6 +37,8 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu Oct 24 2019 <mackerel-developers@hatena.ne.jp> - 0.32.1
+
 * Wed Oct 02 2019 <mackerel-developers@hatena.ne.jp> - 0.32.0
 - [doc]add repository policy (by lufia)
 - add --user to check-http (by lausser)

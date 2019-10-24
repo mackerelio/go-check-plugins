@@ -1,3 +1,8 @@
+mackerel-check-plugins (0.32.1-1.v2) stable; urgency=low
+
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 24 Oct 2019 07:31:36 +0000
+
 mackerel-check-plugins (0.32.0-1.v2) stable; urgency=low
 
   * [doc]add repository policy (by lufia)
