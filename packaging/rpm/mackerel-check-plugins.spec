@@ -47,6 +47,7 @@ done
 
 %changelog
 * Thu Oct 24 2019 <mackerel-developers@hatena.ne.jp> - 0.32.1
+- Build with Go 1.12.12
 
 * Wed Oct 02 2019 <mackerel-developers@hatena.ne.jp> - 0.32.0
 - [doc]add repository policy (by lufia)
