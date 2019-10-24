@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.32.1 (2019-10-24)
+
+* Build with Go 1.12.12
+
+
 ## 0.32.0 (2019-10-02)
 
 * [doc]add repository policy #300 (lufia)
