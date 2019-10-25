@@ -431,9 +431,9 @@ func loadState(fname string) (*state, error) {
 	}
 	err = json.Unmarshal(b, state)
 	if err != nil {
-		// Ignore json unmarshal error
-		log.Printf("failed to loadState (ignoring): %s", err)
-		return nil, nil
+		// this json unmarshal error will be ignored by callers
+		log.Printf("failed to loadState (will be ignored): %s", err)
+		return nil, errStateFileCorrupted
 	}
 	return state, nil
 }
@@ -452,9 +452,14 @@ func getStateFile(stateDir, f string, args []string) string {
 }
 
 var errValidStateFileNotFound = fmt.Errorf("state file not found, or corrupted")
+var errStateFileCorrupted = fmt.Errorf("state file is corrupted")
 
 func getBytesToSkip(f string) (int64, error) {
 	state, err := loadState(f)
+	// ignore corrupted json
+	if err == errStateFileCorrupted {
+		return 0, errValidStateFileNotFound
+	}
 	if err != nil {
 		return 0, err
 	}
@@ -487,6 +492,10 @@ func getBytesToSkipOld(f string) (int64, error) {
 
 func getInode(f string) (uint, error) {
 	state, err := loadState(f)
+	// ignore corrupted json
+	if err == errStateFileCorrupted {
+		return 0, nil
+	}
 	if err != nil {
 		return 0, err
 	}
