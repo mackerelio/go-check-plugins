@@ -456,7 +456,7 @@ var errStateFileCorrupted = fmt.Errorf("state file is corrupted")
 
 func getBytesToSkip(f string) (int64, error) {
 	state, err := loadState(f)
-	// ignore corrupted json
+	// Do not fallback to old status file when JSON file is corrupted
 	if err == errStateFileCorrupted {
 		return 0, errValidStateFileNotFound
 	}
