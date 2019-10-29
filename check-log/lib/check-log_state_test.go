@@ -45,6 +45,28 @@ func TestLoadStateIfAccessDenied(t *testing.T) {
 	}
 }
 
+func TestLoadStateUnexpectedJson(t *testing.T) {
+	file := "testdata/unexpected_json.json"
+	s, err := loadState(file)
+	if err != errStateFileCorrupted {
+		t.Errorf("loadState(%q) = %v; want errStateFileCorrupted", file, err)
+	}
+	if s != nil {
+		t.Errorf("loadState(%q) = %v; want nil", file, *s)
+	}
+}
+
+func TestLoadStateBrokenJson(t *testing.T) {
+	file := "testdata/invalid_json.json"
+	s, err := loadState(file)
+	if err != errStateFileCorrupted {
+		t.Errorf("loadState(%q) = %v; want errStateFileCorrupted", file, err)
+	}
+	if s != nil {
+		t.Errorf("loadState(%q) = %v; want nil", file, *s)
+	}
+}
+
 // TODO(lufia): We might be better to test a condition too that file is exist but loadState can't read it.
 
 func TestSaveStateIfFileNotExist(t *testing.T) {
@@ -161,7 +183,7 @@ func TestGetBytesToSkipOld(t *testing.T) {
 func TestGetBytesToSkipOldIfFileNotExist(t *testing.T) {
 	file := "testdata/file_not_found"
 	n, err := getBytesToSkipOld(file)
-	if err != nil {
+	if err != errValidStateFileNotFound {
 		t.Fatal(err)
 	}
 	if want := int64(0); n != want {

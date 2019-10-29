@@ -247,11 +247,14 @@ func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int6
 		return 0, 0, "", nil
 	}
 	stateFile := getStateFile(opts.StateDir, logFile, opts.origArgs)
-	skipBytes, inode := int64(0), uint(0)
+	skipBytes, inode, isFirstCheck := int64(0), uint(0), false
 	if !opts.NoState {
 		s, err := getBytesToSkip(stateFile)
 		if err != nil {
-			return 0, 0, "", err
+			if err != errValidStateFileNotFound {
+				return 0, 0, "", err
+			}
+			isFirstCheck = true
 		}
 		skipBytes = s
 
@@ -282,10 +285,9 @@ func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int6
 		return 0, 0, "", err
 	}
 
-	if !opts.NoState && !opts.CheckFirst {
-		if _, err = os.Stat(stateFile); os.IsNotExist(err) {
-			skipBytes = stat.Size()
-		}
+	// Skip whole file on first check, unless CheckFirst specified
+	if !opts.NoState && isFirstCheck && !opts.CheckFirst {
+		skipBytes = stat.Size()
 	}
 
 	rotated := false
@@ -428,7 +430,12 @@ func loadState(fname string) (*state, error) {
 		return state, err
 	}
 	err = json.Unmarshal(b, state)
-	return state, err
+	if err != nil {
+		// this json unmarshal error will be ignored by callers
+		log.Printf("failed to loadState (will be ignored): %s", err)
+		return nil, errStateFileCorrupted
+	}
+	return state, nil
 }
 
 var stateRe = regexp.MustCompile(`^([a-zA-Z]):[/\\]`)
@@ -444,8 +451,15 @@ func getStateFile(stateDir, f string, args []string) string {
 	)
 }
 
+var errValidStateFileNotFound = fmt.Errorf("state file not found, or corrupted")
+var errStateFileCorrupted = fmt.Errorf("state file is corrupted")
+
 func getBytesToSkip(f string) (int64, error) {
 	state, err := loadState(f)
+	// Do not fallback to old status file when JSON file is corrupted
+	if err == errStateFileCorrupted {
+		return 0, errValidStateFileNotFound
+	}
 	if err != nil {
 		return 0, err
 	}
@@ -464,7 +478,7 @@ func getBytesToSkipOld(f string) (int64, error) {
 	b, err := ioutil.ReadFile(f)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return 0, nil
+			return 0, errValidStateFileNotFound
 		}
 		return 0, err
 	}
@@ -478,6 +492,10 @@ func getBytesToSkipOld(f string) (int64, error) {
 
 func getInode(f string) (uint, error) {
 	state, err := loadState(f)
+	// ignore corrupted json
+	if err == errStateFileCorrupted {
+		return 0, nil
+	}
 	if err != nil {
 		return 0, err
 	}
