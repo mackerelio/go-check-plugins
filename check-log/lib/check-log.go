@@ -353,6 +353,7 @@ func (opts *logOpts) searchReader(ctx context.Context, rdr io.Reader) (warnNum, 
 		newReader = newBufferedReader
 	}
 
+	var errLinesBuilder strings.Builder
 	r := newReader(rdr)
 	for ctx.Err() == nil {
 		lineBytes, rErr := r.ReadBytes('\n')
@@ -377,7 +378,8 @@ func (opts *logOpts) searchReader(ctx context.Context, rdr io.Reader) (warnNum, 
 				if err != nil {
 					warnNum++
 					critNum++
-					errLines += line + "\n"
+					errLinesBuilder.WriteString(line)
+					errLinesBuilder.WriteString("\n")
 				} else {
 					levelOver := false
 					if level > opts.WarnLevel {
@@ -389,16 +391,20 @@ func (opts *logOpts) searchReader(ctx context.Context, rdr io.Reader) (warnNum, 
 						critNum++
 					}
 					if levelOver {
-						errLines += line + "\n"
+						errLinesBuilder.WriteString(line)
+						errLinesBuilder.WriteString("\n")
 					}
 				}
 			} else {
 				warnNum++
 				critNum++
-				errLines += line + "\n"
+				errLinesBuilder.WriteString(line)
+				errLinesBuilder.WriteString("\n")
 			}
 		}
 	}
+
+	errLines = errLinesBuilder.String()
 	return
 }
 
