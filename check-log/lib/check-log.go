@@ -411,21 +411,20 @@ func (opts *logOpts) searchReader(ctx context.Context, rdr io.Reader) (warnNum, 
 func (opts *logOpts) match(line string) (bool, []string) {
 	var matches []string
 	for _, pReg := range opts.patternReg {
-
 		matches = pReg.FindStringSubmatch(line)
-		if len(matches) != 0 {
-			if len(opts.excludeReg) > 0 {
-				excludeAllMatched := true
-				for _, eReg := range opts.excludeReg {
-					if !eReg.MatchString(line) {
-						excludeAllMatched = false
-					}
-				}
-				if excludeAllMatched {
-					return false, nil
-				}
+		if len(matches) == 0 {
+			return false, nil
+		}
+	}
+	if len(opts.excludeReg) > 0 {
+		exclude := true
+		for _, eReg := range opts.excludeReg {
+			if !eReg.MatchString(line) {
+				exclude = false
+				break
 			}
-		} else {
+		}
+		if exclude {
 			return false, nil
 		}
 	}
