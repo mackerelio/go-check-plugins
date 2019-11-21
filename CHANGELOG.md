@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.33.0 (2019-11-21)
+
+* [check-log] Make building the error lines efficiently #304 (ygurumi)
+* [check-log] Ignore broken/unexpected json on reading state #302 (astj)
+
+
 ## 0.32.1 (2019-10-24)
 
 * Build with Go 1.12.12

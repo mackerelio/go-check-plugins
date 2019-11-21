@@ -46,6 +46,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Nov 21 2019 <mackerel-developers@hatena.ne.jp> - 0.33.0
+- [check-log] Make building the error lines efficiently (by ygurumi)
+- [check-log] Ignore broken/unexpected json on reading state (by astj)
+
 * Thu Oct 24 2019 <mackerel-developers@hatena.ne.jp> - 0.32.1
 - Build with Go 1.12.12
 
