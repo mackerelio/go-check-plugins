@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.33.0-1) stable; urgency=low
+
+  * [check-log] Make building the error lines efficiently (by ygurumi)
+    <https://github.com/mackerelio/go-check-plugins/pull/304>
+  * [check-log] Ignore broken/unexpected json on reading state (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/302>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 21 Nov 2019 05:59:48 +0000
+
 mackerel-check-plugins (0.32.1-1) stable; urgency=low
 
   * Build with Go 1.12.12
