@@ -1,4 +1,5 @@
 .*
+!/.dependabot
 !.gitignore
 !.goxc.json
 !.travis.yml
