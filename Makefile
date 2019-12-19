@@ -6,6 +6,8 @@ else
 GOPATH_ROOT:=${GOPATH}
 endif
 
+export GO111MODULE=on
+
 .PHONY: all
 all: clean testconvention test build rpm deb
 
@@ -15,7 +17,7 @@ test: lint
 
 .PHONY: devel-deps
 devel-deps:
-	GO111MODULE=off go get golang.org/x/lint/golint  \
+	cd && go get golang.org/x/lint/golint  \
 	  github.com/pierrre/gotestcover \
 	  github.com/mattn/goveralls
 
@@ -106,3 +108,8 @@ clean:
 	  rmdir build; \
 	fi
 	go clean
+
+.PHONY: update
+update:
+	go get -u ./...
+	go mod tidy
