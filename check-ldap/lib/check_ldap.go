@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-ldap/ldap/v3"
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
-	"gopkg.in/ldap.v3"
 )
 
 type checkLDAPOpts struct {
