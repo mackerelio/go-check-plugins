@@ -33,7 +33,7 @@ type logOpts struct {
 	LogFile             string   `short:"f" long:"file" value-name:"FILE" description:"Path to log file"`
 	Pattern             []string `short:"p" long:"pattern" required:"true" value-name:"PAT" description:"Pattern to search for. If specified multiple, they will be treated together with the AND operator"`
 	SuppressPattern     bool     `long:"suppress-pattern" description:"Suppress pattern display"`
-	Exclude             string   `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching"`
+	Exclude             []string `short:"E" long:"exclude" value-name:"PAT" description:"Pattern to exclude from matching. If specified multiple, they will be treated together with the AND operator"`
 	WarnOver            int64    `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver            int64    `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	WarnLevel           float64  `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
@@ -47,7 +47,7 @@ type logOpts struct {
 	Missing             string   `long:"missing" default:"UNKNOWN" value-name:"(CRITICAL|WARNING|OK|UNKNOWN)" description:"Exit status when log files missing"`
 	CheckFirst          bool     `long:"check-first" description:"Check the log on the first run"`
 	patternReg          []*regexp.Regexp
-	excludeReg          *regexp.Regexp
+	excludeReg          []*regexp.Regexp
 	fileListFromGlob    []string
 	fileListFromPattern []string
 	origArgs            []string
@@ -74,11 +74,11 @@ func (opts *logOpts) prepare() error {
 		return fmt.Errorf("When multiple patterns specified, --warning-level --critical-level can not be used")
 	}
 
-	if opts.Exclude != "" {
-		opts.excludeReg, err = regCompileWithCase(opts.Exclude, opts.CaseInsensitive)
-		if err != nil {
+	for _, exclude := range opts.Exclude {
+		if reg, err = regCompileWithCase(exclude, opts.CaseInsensitive); err != nil {
 			return fmt.Errorf("exclude pattern is invalid")
 		}
+		opts.excludeReg = append(opts.excludeReg, reg)
 	}
 
 	if opts.LogFile != "" {
@@ -411,10 +411,20 @@ func (opts *logOpts) searchReader(ctx context.Context, rdr io.Reader) (warnNum, 
 func (opts *logOpts) match(line string) (bool, []string) {
 	var matches []string
 	for _, pReg := range opts.patternReg {
-		eReg := opts.excludeReg
-
 		matches = pReg.FindStringSubmatch(line)
-		if len(matches) == 0 || (eReg != nil && eReg.MatchString(line)) {
+		if len(matches) == 0 {
+			return false, nil
+		}
+	}
+	if len(opts.excludeReg) > 0 {
+		exclude := true
+		for _, eReg := range opts.excludeReg {
+			if !eReg.MatchString(line) {
+				exclude = false
+				break
+			}
+		}
+		if exclude {
 			return false, nil
 		}
 	}

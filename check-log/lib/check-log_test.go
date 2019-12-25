@@ -879,3 +879,61 @@ func TestRunWithSuppressOption(t *testing.T) {
 	}
 	testInvalidPattern()
 }
+
+func TestRunMultipleExcludePattern(t *testing.T) {
+	dir, err := ioutil.TempDir("", "check-log-test")
+	if err != nil {
+		t.Errorf("something went wrong")
+	}
+	defer os.RemoveAll(dir)
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	defer fh.Close()
+
+	params := []string{"-s", dir, "-f", logf, "-p", "ERROR", "-p", "TESTAPP", "-E", "FOO", "-E", "BAR"}
+	opts, _ := parseArgs(params)
+	opts.prepare()
+
+	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
+
+	bytes, _ := getBytesToSkip(stateFile)
+	assert.Equal(t, int64(0), bytes, "stateFile size should be 0 (actual: %d)", bytes)
+
+	tests := []struct {
+		logmsg       string
+		want         checkers.Status
+		matchedCount int64
+	}{
+		{
+			logmsg:       "[TESTAPP] DEBUG: THIS LINE UNMATCHED\n",
+			want:         checkers.OK,
+			matchedCount: 0,
+		},
+		{
+			logmsg:       "[TESTAPP] ERROR: THIS LINE MATCHED\n",
+			want:         checkers.CRITICAL,
+			matchedCount: 1,
+		},
+		{
+			logmsg:       "[TESTAPP] ERROR: THIS LINE EXCLUDED(FOO BAR)\n[TESTAPP] ERROR: THIS LINE MATCHED(FOO)\n",
+			want:         checkers.CRITICAL,
+			matchedCount: 1,
+		},
+		{
+			logmsg:       "[TESTAPP] ERROR: THIS LINE EXCLUDED(FOO BAR)\nERROR: THIS LINE UNMATCHED\n",
+			want:         checkers.OK,
+			matchedCount: 0,
+		},
+	}
+
+	for _, test := range tests {
+		fh.WriteString(test.logmsg)
+		ckr := run(context.Background(), params)
+
+		assert.Equal(t, test.want, ckr.Status, fmt.Sprintf("ckr.Status should be %s", test.want.String()))
+
+		msg := fmt.Sprintf("%d warnings, %d criticals for pattern /ERROR/ and /TESTAPP/.", test.matchedCount, test.matchedCount)
+		assert.Equal(t, msg, ckr.Message, fmt.Sprintf("chk.Message should be '%s' (actual: '%s')", msg, ckr.Message))
+	}
+}
