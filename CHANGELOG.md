@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.33.1 (2020-01-22)
+
+* Bump github.com/aws/aws-sdk-go from 1.27.0 to 1.28.7 #319 (dependabot-preview[bot])
+* [check-aws-cloudwatch-logs] Use "errors" instead of "github.com/pkg/errors" #318 (astj)
+* Bump github.com/shirou/gopsutil from 2.19.11+incompatible to 2.19.12+incompatible #312 (dependabot-preview[bot])
+* Bump github.com/aws/aws-sdk-go from 1.26.7 to 1.27.0 #313 (dependabot-preview[bot])
+* [check-log] When specified multiple exclude pattern, perform search that excludes all conditions. #294 (tukaelu)
+* Bump github.com/aws/aws-sdk-go from 1.26.5 to 1.26.7 #310 (dependabot-preview[bot])
+* Bump github.com/stretchr/testify from 1.3.0 to 1.4.0 #309 (dependabot-preview[bot])
+* add .dependabot/config.yml #307 (lufia)
+* refactor Makefile and update dependencies #306 (lufia)
+
+
 ## 0.33.0 (2019-11-21)
 
 * [check-log] Make building the error lines efficiently #304 (ygurumi)
