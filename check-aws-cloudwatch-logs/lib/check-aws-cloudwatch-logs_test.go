@@ -3,12 +3,12 @@ package checkawscloudwatchlogs
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/mackerelio/checkers"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/aws/aws-sdk-go/aws"
