@@ -46,6 +46,17 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jan 22 2020 <mackerel-developers@hatena.ne.jp> - 0.33.1
+- Bump github.com/aws/aws-sdk-go from 1.27.0 to 1.28.7 (by dependabot-preview[bot])
+- [check-aws-cloudwatch-logs] Use "errors" instead of "github.com/pkg/errors" (by astj)
+- Bump github.com/shirou/gopsutil from 2.19.11+incompatible to 2.19.12+incompatible (by dependabot-preview[bot])
+- Bump github.com/aws/aws-sdk-go from 1.26.7 to 1.27.0 (by dependabot-preview[bot])
+- [check-log] When specified multiple exclude pattern, perform search that excludes all conditions. (by tukaelu)
+- Bump github.com/aws/aws-sdk-go from 1.26.5 to 1.26.7 (by dependabot-preview[bot])
+- Bump github.com/stretchr/testify from 1.3.0 to 1.4.0 (by dependabot-preview[bot])
+- add .dependabot/config.yml (by lufia)
+- refactor Makefile and update dependencies (by lufia)
+
 * Thu Nov 21 2019 <mackerel-developers@hatena.ne.jp> - 0.33.0
 - [check-log] Make building the error lines efficiently (by ygurumi)
 - [check-log] Ignore broken/unexpected json on reading state (by astj)
