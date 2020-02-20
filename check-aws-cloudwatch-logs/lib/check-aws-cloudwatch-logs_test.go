@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 	"github.com/stretchr/testify/assert"
 
@@ -166,5 +167,40 @@ func Test_cloudwatchLogsPlugin_check(t *testing.T) {
 		res := p.check(testCase.Messages)
 		assert.Equal(t, res.Status, testCase.Status)
 		assert.Equal(t, res.Message, testCase.Message)
+	}
+}
+
+func Test_cloudwatchLogsPlugin_options(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+		want logOpts
+	}{
+		{
+			name: "quoted string",
+			args: []string{
+				"--log-group-name", `"name"`,
+				"--log-stream-name-prefix", `"prefix"`,
+				"-p", `"err:"`,
+				"-s", `"dir"`,
+			},
+			want: logOpts{
+				LogGroupName:        `"name"`,
+				LogStreamNamePrefix: `"prefix"`,
+				Pattern:             `"err:"`,
+				StateDir:            `"dir"`,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var opts logOpts
+			_, err := flags.ParseArgs(&opts, tt.args)
+			if err != nil {
+				t.Fatal("newCloudwatchLogsPlugin:", err)
+			}
+			assert.Equal(t, tt.want, opts)
+		})
 	}
 }
