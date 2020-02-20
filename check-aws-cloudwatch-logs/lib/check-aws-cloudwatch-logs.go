@@ -23,13 +23,13 @@ import (
 )
 
 type logOpts struct {
-	LogGroupName        string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name"`
-	LogStreamNamePrefix string `long:"log-stream-name-prefix" value-name:"LOG-STREAM-NAME-PREFIX" description:"Log stream name prefix"`
+	LogGroupName        string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name" unquote:"false"`
+	LogStreamNamePrefix string `long:"log-stream-name-prefix" value-name:"LOG-STREAM-NAME-PREFIX" description:"Log stream name prefix" unquote:"false"`
 
-	Pattern       string `short:"p" long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs."`
+	Pattern       string `short:"p" long:"pattern" required:"true" value-name:"PATTERN" description:"Pattern to search for. The value is recognized as the pattern syntax of CloudWatch Logs." unquote:"false"`
 	WarningOver   int    `short:"w" long:"warning-over" value-name:"WARNING" description:"Trigger a warning if matched lines is over a number"`
 	CriticalOver  int    `short:"c" long:"critical-over" value-name:"CRITICAL" description:"Trigger a critical if matched lines is over a number"`
-	StateDir      string `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
+	StateDir      string `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under" unquote:"false"`
 	ReturnContent bool   `short:"r" long:"return" description:"Output matched lines"`
 }
 
