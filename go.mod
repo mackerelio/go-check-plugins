@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/AdRoll/goamz v0.0.0-20170825154802-2731d20f46f4
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
-	github.com/aws/aws-sdk-go v1.28.7
+	github.com/aws/aws-sdk-go v1.29.8
 	github.com/beevik/ntp v0.2.0
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
 	github.com/elazarl/goproxy v0.0.0-20191011121108-aa519ddbe484
