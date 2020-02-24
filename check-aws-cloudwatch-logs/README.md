@@ -55,6 +55,7 @@ command = ["check-aws-cloudwatch-logs", "--log-group-name", "/aws/lambda/sample_
   -c, --critical-over=CRITICAL                           Trigger a critical if matched lines is over a number
   -s, --state-dir=DIR                                    Dir to keep state files under
   -r, --return                                           Output matched lines
+  -t, --max-retries=MAX-RETRIES                          Maximum number of retries to call the AWS API
 ```
 
 Note that for `--pattern` argument, you can use the syntax described in [Filter and Pattern Syntax - Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html). This is not a regular expression.

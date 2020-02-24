@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -201,6 +202,29 @@ func Test_cloudwatchLogsPlugin_options(t *testing.T) {
 				t.Fatal("newCloudwatchLogsPlugin:", err)
 			}
 			assert.Equal(t, tt.want, opts)
+		})
+	}
+}
+
+func Test_createAWSConfig(t *testing.T) {
+	tests := []struct {
+		opts *logOpts
+		want *aws.Config
+	}{
+		{
+			opts: &logOpts{MaxRetries: 0},
+			want: aws.NewConfig(),
+		},
+		{
+			opts: &logOpts{MaxRetries: 1},
+			want: aws.NewConfig().WithMaxRetries(1),
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case:%d", i), func(t *testing.T) {
+			res := createAWSConfig(tt.opts)
+			assert.Equal(t, tt.want, res)
 		})
 	}
 }
