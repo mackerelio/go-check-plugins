@@ -31,6 +31,7 @@ type logOpts struct {
 	CriticalOver  int    `short:"c" long:"critical-over" value-name:"CRITICAL" description:"Trigger a critical if matched lines is over a number"`
 	StateDir      string `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under" unquote:"false"`
 	ReturnContent bool   `short:"r" long:"return" description:"Output matched lines"`
+	MaxRetries    int    `short:"t" long:"max-retries" value-name:"MAX-RETRIES" description:"Maximum number of retries to call the AWS API"`
 }
 
 // Do the plugin
@@ -85,12 +86,20 @@ func getStateFile(stateDir, logGroupName, logStreamNamePrefix string, args []str
 	)
 }
 
+func createAWSConfig(opts *logOpts) *aws.Config {
+	conf := aws.NewConfig()
+	if opts.MaxRetries > 0 {
+		return conf.WithMaxRetries(opts.MaxRetries)
+	}
+	return conf
+}
+
 func createService(opts *logOpts) (*cloudwatchlogs.CloudWatchLogs, error) {
 	sess, err := session.NewSession()
 	if err != nil {
 		return nil, err
 	}
-	return cloudwatchlogs.New(sess, aws.NewConfig()), nil
+	return cloudwatchlogs.New(sess, createAWSConfig(opts)), nil
 }
 
 type logState struct {
