@@ -28,7 +28,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	github.com/ziutek/mymysql v1.5.4
-	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413
+	golang.org/x/crypto v0.0.0-20200220183623-bac4c82f6975
 	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	golang.org/x/sys v0.0.0-20191218084908-4a24b4065292
 	golang.org/x/text v0.3.2
