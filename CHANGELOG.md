@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.34.0 (2020-04-03)
+
+* Bump github.com/aws/aws-sdk-go from 1.29.24 to 1.29.30 #342 (dependabot-preview[bot])
+* Bump github.com/beevik/ntp from 0.2.0 to 0.3.0 #340 (dependabot-preview[bot])
+* Bump github.com/aws/aws-sdk-go from 1.29.14 to 1.29.24 #339 (dependabot-preview[bot])
+* [check-redis] Add password support for check-redis #338 (n-rodriguez)
+* Bump github.com/aws/aws-sdk-go from 1.28.7 to 1.29.14 #336 (dependabot-preview[bot])
+* Bump github.com/shirou/gopsutil from 2.20.1+incompatible to 2.20.2+incompatible #335 (dependabot-preview[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.6.0 to 1.6.3 #332 (dependabot-preview[bot])
+* Bump github.com/stretchr/testify from 1.4.0 to 1.5.1 #331 (dependabot-preview[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.1.5 to 3.1.7 #329 (dependabot-preview[bot])
+* [check-aws-cloudwatch-logs] Added option to specify AWS API retry count #334 (masahide)
+* [check-aws-cloudwatch-logs] fix removing of quote (") implicitly from few options #330 (lufia)
+* Bump github.com/shirou/gopsutil from 2.19.12+incompatible to 2.20.1+incompatible #323 (dependabot-preview[bot])
+* rename: github.com/motemen/gobump -> github.com/x-motemen/gobump #322 (lufia)
+
+
 ## 0.33.1 (2020-01-22)
 
 * Bump github.com/aws/aws-sdk-go from 1.27.0 to 1.28.7 #319 (dependabot-preview[bot])

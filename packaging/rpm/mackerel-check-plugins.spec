@@ -46,6 +46,21 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Fri Apr 03 2020 <mackerel-developers@hatena.ne.jp> - 0.34.0
+- Bump github.com/aws/aws-sdk-go from 1.29.24 to 1.29.30 (by dependabot-preview[bot])
+- Bump github.com/beevik/ntp from 0.2.0 to 0.3.0 (by dependabot-preview[bot])
+- Bump github.com/aws/aws-sdk-go from 1.29.14 to 1.29.24 (by dependabot-preview[bot])
+- [check-redis] Add password support for check-redis (by n-rodriguez)
+- Bump github.com/aws/aws-sdk-go from 1.28.7 to 1.29.14 (by dependabot-preview[bot])
+- Bump github.com/shirou/gopsutil from 2.20.1+incompatible to 2.20.2+incompatible (by dependabot-preview[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.6.0 to 1.6.3 (by dependabot-preview[bot])
+- Bump github.com/stretchr/testify from 1.4.0 to 1.5.1 (by dependabot-preview[bot])
+- Bump github.com/go-ldap/ldap/v3 from 3.1.5 to 3.1.7 (by dependabot-preview[bot])
+- [check-aws-cloudwatch-logs] Added option to specify AWS API retry count (by masahide)
+- [check-aws-cloudwatch-logs] fix removing of quote (") implicitly from few options (by lufia)
+- Bump github.com/shirou/gopsutil from 2.19.12+incompatible to 2.20.1+incompatible (by dependabot-preview[bot])
+- rename: github.com/motemen/gobump -> github.com/x-motemen/gobump (by lufia)
+
 * Wed Jan 22 2020 <mackerel-developers@hatena.ne.jp> - 0.33.1
 - Bump github.com/aws/aws-sdk-go from 1.27.0 to 1.28.7 (by dependabot-preview[bot])
 - [check-aws-cloudwatch-logs] Use "errors" instead of "github.com/pkg/errors" (by astj)
