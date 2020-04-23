@@ -3,7 +3,7 @@ image: Previous Visual Studio 2019
 clone_folder: c:\gopath\src\github.com\mackerelio\go-check-plugins
 environment:
   GOPATH: c:\gopath
-  GOROOT: c:\go114-x86
+  GOROOT: c:\go112-x86
 install:
   - set PATH=%GOROOT%\bin;%GOPATH%\bin;%PATH%;C:\MinGW\bin
   - echo %Path%

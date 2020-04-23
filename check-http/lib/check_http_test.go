@@ -16,13 +16,13 @@ import (
 func TestRun(t *testing.T) {
 	ckr := Run([]string{"-u", "hoge"})
 	assert.Equal(t, checkers.CRITICAL, ckr.Status, "chr.Status should be CRITICAL")
-	assert.Equal(t, `Get "hoge": unsupported protocol scheme ""`, ckr.Message, "something went wrong")
+	assert.Equal(t, `Get hoge: unsupported protocol scheme ""`, ckr.Message, "something went wrong")
 }
 
 func TestNoCheckCertificate(t *testing.T) {
 	ckr := Run([]string{"--no-check-certificate", "-u", "hoge"})
 	assert.Equal(t, checkers.CRITICAL, ckr.Status, "chr.Status should be CRITICAL")
-	assert.Equal(t, `Get "hoge": unsupported protocol scheme ""`, ckr.Message, "something went wrong")
+	assert.Equal(t, `Get hoge: unsupported protocol scheme ""`, ckr.Message, "something went wrong")
 }
 
 func TestStatusRange(t *testing.T) {
