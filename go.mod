@@ -1,6 +1,6 @@
 module github.com/mackerelio/go-check-plugins
 
-go 1.13
+go 1.14
 
 require (
 	github.com/AdRoll/goamz v0.0.0-20170825154802-2731d20f46f4
