@@ -245,11 +245,8 @@ func TestRun(t *testing.T) {
 		}, 1)
 	}
 	testCancel := func() {
-		ctx, cancel := context.WithCancel(context.Background())
-		go func() {
-			<-time.After(10 * time.Millisecond)
-			cancel()
-		}()
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+		defer cancel()
 		fh.WriteString("OK\nFATAL\nFATAL\n")
 
 		expected := time.Now().Add(30 * time.Millisecond)
