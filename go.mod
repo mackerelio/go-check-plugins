@@ -17,7 +17,7 @@ require (
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/lestrrat/go-tcptest v0.0.0-20180223004105-0f9f9980aecf
 	github.com/lestrrat/go-tcputil v0.0.0-20180223002529-67ef49c1ebf3 // indirect
-	github.com/lib/pq v1.3.0
+	github.com/lib/pq v1.4.0
 	github.com/mackerelio/checkers v0.0.0-20190411030116-60cbd7b55456
 	github.com/mackerelio/go-osstat v0.1.0
 	github.com/mackerelio/golib v0.0.0-20191002020229-a65782d392ca
