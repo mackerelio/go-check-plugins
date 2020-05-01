@@ -245,7 +245,10 @@ func TestRun(t *testing.T) {
 		}, 1)
 	}
 	testCancel := func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+		// This test checks searchLog keeps reading until EOL even if ctx is cancelled.
+		// To guarantee to read at least once, a timeout sec
+		// should be choice it is greater than reading the state file.
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
 		defer cancel()
 		fh.WriteString("OK\nFATAL\nFATAL\n")
 
