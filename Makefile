@@ -43,7 +43,7 @@ testconvention:
 
 .PHONY: cover
 cover: devel-deps
-	# TODO: enable -race option
+	# TODO: we should enable the -race option
 	#go test -race -covermode atomic -coverprofile=.profile.cov ./...
 	go test -covermode atomic -coverprofile=.profile.cov ./...
 
