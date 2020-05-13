@@ -10,7 +10,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
 	github.com/elazarl/goproxy v0.0.0-20191011121108-aa519ddbe484
 	github.com/elazarl/goproxy/ext v0.0.0-20191011121108-aa519ddbe484
-	github.com/fsouza/go-dockerclient v1.6.3
+	github.com/fsouza/go-dockerclient v1.6.5
 	github.com/fzzy/radix v0.5.6
 	github.com/go-ldap/ldap/v3 v3.1.8
 	github.com/go-ole/go-ole v1.2.4
@@ -31,4 +31,6 @@ require (
 	golang.org/x/crypto v0.0.0-20200220183623-bac4c82f6975
 	golang.org/x/sys v0.0.0-20191218084908-4a24b4065292
 	golang.org/x/text v0.3.2
+	golang.org/x/tools v0.0.0-20190524140312-2c0ae7006135 // indirect
+	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
 )
