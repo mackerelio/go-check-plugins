@@ -40,7 +40,7 @@ lint: devel-deps
 .PHONY: testconvention
 testconvention:
 	prove -r t/
-	@go generate ./... && git diff --exit-code || (echo 'please `go generate ./...` and commit them' && false)
+	@go generate ./... && git diff --exit-code -- . ':(exclude)go.*' || (echo 'please `go generate ./...` and commit them' && false)
 
 .PHONY: cover
 cover: devel-deps
