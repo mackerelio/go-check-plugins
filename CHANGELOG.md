@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.34.1 (2020-05-14)
+
+* Bump github.com/lib/pq from 1.3.0 to 1.5.2 #359 (dependabot-preview[bot])
+* ignore diffs of go.mod and go.sum #363 (lufia)
+* Bump github.com/shirou/gopsutil from 2.20.3+incompatible to 2.20.4+incompatible #358 (dependabot-preview[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.1.8 to 3.1.10 #360 (dependabot-preview[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.6.3 to 1.6.5 #355 (dependabot-preview[bot])
+* Bump github.com/aws/aws-sdk-go from 1.29.30 to 1.30.9 #351 (dependabot-preview[bot])
+* Bump github.com/shirou/gopsutil from 2.20.2+incompatible to 2.20.3+incompatible #347 (dependabot-preview[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.1.7 to 3.1.8 #346 (dependabot-preview[bot])
+* Add documents for testing #348 (lufia)
+
+
 ## 0.34.0 (2020-04-03)
 
 * Bump github.com/aws/aws-sdk-go from 1.29.24 to 1.29.30 #342 (dependabot-preview[bot])
