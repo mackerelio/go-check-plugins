@@ -37,6 +37,17 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu May 14 2020 <mackerel-developers@hatena.ne.jp> - 0.34.1
+- Bump github.com/lib/pq from 1.3.0 to 1.5.2 (by dependabot-preview[bot])
+- ignore diffs of go.mod and go.sum (by lufia)
+- Bump github.com/shirou/gopsutil from 2.20.3+incompatible to 2.20.4+incompatible (by dependabot-preview[bot])
+- Bump github.com/go-ldap/ldap/v3 from 3.1.8 to 3.1.10 (by dependabot-preview[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.6.3 to 1.6.5 (by dependabot-preview[bot])
+- Bump github.com/aws/aws-sdk-go from 1.29.30 to 1.30.9 (by dependabot-preview[bot])
+- Bump github.com/shirou/gopsutil from 2.20.2+incompatible to 2.20.3+incompatible (by dependabot-preview[bot])
+- Bump github.com/go-ldap/ldap/v3 from 3.1.7 to 3.1.8 (by dependabot-preview[bot])
+- Add documents for testing (by lufia)
+
 * Fri Apr 03 2020 <mackerel-developers@hatena.ne.jp> - 0.34.0
 - Bump github.com/aws/aws-sdk-go from 1.29.24 to 1.29.30 (by dependabot-preview[bot])
 - Bump github.com/beevik/ntp from 0.2.0 to 0.3.0 (by dependabot-preview[bot])
