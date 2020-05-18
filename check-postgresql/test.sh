@@ -24,7 +24,7 @@ docker run -d \
 trap 'docker stop test-$plugin; docker rm test-$plugin; exit' EXIT
 sleep 10
 
-if $plugin --port 15432 --user=$user --password=$password >/dev/null 2>&1
+if $plugin connection --port 15432 --user=$user --password=$password >/dev/null 2>&1
 then
 	echo OK
 else
