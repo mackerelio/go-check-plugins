@@ -32,13 +32,11 @@ func TestLoadStateIfFileNotExist(t *testing.T) {
 }
 
 func TestLoadStateIfAccessDenied(t *testing.T) {
-	var file string
 	switch runtime.GOOS {
 	case "windows":
-		file = `C:\pagefile.sys`
-	default:
-		file = "testdata/plain.txt/file"
+		t.Skip()
 	}
+	file := "testdata/plain.txt/file"
 	s, err := loadState(file)
 	if err == nil {
 		t.Errorf("loadState(%q) = %v; want an error", file, s)
@@ -192,13 +190,11 @@ func TestGetBytesToSkipOldIfFileNotExist(t *testing.T) {
 }
 
 func TestGetBytesToSkipOldErr(t *testing.T) {
-	var file string
 	switch runtime.GOOS {
 	case "windows":
-		file = `C:\pagefile.sys`
-	default:
-		file = "testdata/plain.txt/file"
+		t.Skip()
 	}
+	file := "testdata/plain.txt/file"
 	n, err := getBytesToSkipOld(file)
 	if err == nil {
 		t.Errorf("getBytesToSkip(%s) = %d; but want an error", file, n)
