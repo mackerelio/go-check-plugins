@@ -41,6 +41,9 @@ func waitForPort(ctx context.Context, port string) error {
 }
 
 func TestMemd(t *testing.T) {
+	if _, err := exec.LookPath("memcached"); err != nil {
+		t.Skip("memcached is not installed")
+	}
 	port, err := allocUnusedPort()
 	if err != nil {
 		t.Fatal("allocUnusedPort:", err)
