@@ -1,6 +1,6 @@
 module github.com/mackerelio/go-check-plugins
 
-go 1.13
+go 1.14
 
 require (
 	github.com/AdRoll/goamz v0.0.0-20170825154802-2731d20f46f4
@@ -15,8 +15,6 @@ require (
 	github.com/go-ldap/ldap/v3 v3.1.10
 	github.com/go-ole/go-ole v1.2.4
 	github.com/jessevdk/go-flags v1.4.0
-	github.com/lestrrat/go-tcptest v0.0.0-20180223004105-0f9f9980aecf
-	github.com/lestrrat/go-tcputil v0.0.0-20180223002529-67ef49c1ebf3 // indirect
 	github.com/lib/pq v1.5.2
 	github.com/mackerelio/checkers v0.0.0-20190411030116-60cbd7b55456
 	github.com/mackerelio/go-osstat v0.1.0
@@ -31,6 +29,4 @@ require (
 	golang.org/x/crypto v0.0.0-20200220183623-bac4c82f6975
 	golang.org/x/sys v0.0.0-20191218084908-4a24b4065292
 	golang.org/x/text v0.3.2
-	golang.org/x/tools v0.0.0-20190524140312-2c0ae7006135 // indirect
-	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
 )

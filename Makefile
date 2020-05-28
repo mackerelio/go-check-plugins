@@ -18,7 +18,6 @@ test: lint
 .PHONY: devel-deps
 devel-deps:
 	cd && go get golang.org/x/lint/golint  \
-	  github.com/pierrre/gotestcover \
 	  github.com/mattn/goveralls
 
 .PHONY: check-release-deps
@@ -44,7 +43,7 @@ testconvention:
 
 .PHONY: cover
 cover: devel-deps
-	gotestcover -v -short -covermode=count -coverprofile=.profile.cov -parallelpackages=4 ./...
+	go test -race -covermode atomic -coverprofile=.profile.cov ./...
 
 .PHONY: build
 build:

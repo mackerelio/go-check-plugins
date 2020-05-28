@@ -15,14 +15,14 @@ import (
 
 func TestRun(t *testing.T) {
 	ckr := Run([]string{"-u", "hoge"})
-	assert.Equal(t, ckr.Status, checkers.CRITICAL, "chr.Status should be CRITICAL")
-	assert.Equal(t, ckr.Message, `Get hoge: unsupported protocol scheme ""`, "something went wrong")
+	assert.Equal(t, checkers.CRITICAL, ckr.Status, "chr.Status should be CRITICAL")
+	assert.Equal(t, `Get "hoge": unsupported protocol scheme ""`, ckr.Message, "something went wrong")
 }
 
 func TestNoCheckCertificate(t *testing.T) {
 	ckr := Run([]string{"--no-check-certificate", "-u", "hoge"})
-	assert.Equal(t, ckr.Status, checkers.CRITICAL, "chr.Status should be CRITICAL")
-	assert.Equal(t, ckr.Message, `Get hoge: unsupported protocol scheme ""`, "something went wrong")
+	assert.Equal(t, checkers.CRITICAL, ckr.Status, "chr.Status should be CRITICAL")
+	assert.Equal(t, `Get "hoge": unsupported protocol scheme ""`, ckr.Message, "something went wrong")
 }
 
 func TestStatusRange(t *testing.T) {
@@ -70,13 +70,13 @@ func TestStatusRange(t *testing.T) {
 	}
 	for _, tt := range tests {
 		ckr := Run(tt.args)
-		assert.Equal(t, ckr.Status, tt.want, fmt.Sprintf("chr.Status wrong: %v", ckr.Status))
+		assert.Equal(t, tt.want, ckr.Status, fmt.Sprintf("chr.Status wrong: %v", ckr.Status))
 	}
 }
 
 func TestSourceIP(t *testing.T) {
 	ckr := Run([]string{"-u", "hoge", "-i", "1.2.3"})
-	assert.Equal(t, ckr.Status, checkers.UNKNOWN, "chr.Status should be UNKNOWN")
+	assert.Equal(t, checkers.UNKNOWN, ckr.Status, "chr.Status should be UNKNOWN")
 }
 
 func TestHost(t *testing.T) {
@@ -96,7 +96,7 @@ func TestHost(t *testing.T) {
 		"-u", ts.URL,
 	})
 
-	assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
+	assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
 }
 
 func TestExpectedContent(t *testing.T) {
@@ -133,7 +133,7 @@ func TestExpectedContent(t *testing.T) {
 
 	for i, tc := range testCases {
 		ckr := Run([]string{"-u", ts.URL, "-p", tc.regexp})
-		assert.Equal(t, ckr.Status, tc.status, "#%d: Status should be %s", i, tc.status)
+		assert.Equal(t, tc.status, ckr.Status, "#%d: Status should be %s", i, tc.status)
 	}
 }
 
@@ -169,7 +169,7 @@ func TestMaxRedirects(t *testing.T) {
 
 	for i, tc := range testCases {
 		ckr := Run(tc.args)
-		assert.Equal(t, ckr.Status, tc.want, "#%d: Status should be %s", i, tc.want)
+		assert.Equal(t, tc.want, ckr.Status, "#%d: Status should be %s", i, tc.want)
 	}
 }
 
@@ -282,7 +282,7 @@ func TestConnectTos(t *testing.T) {
 
 	for i, tc := range testCases {
 		ckr := Run(tc.args)
-		assert.Equal(t, ckr.Status, tc.want, "#%d: Status should be %s, %s", i, tc.want, ckr.Message)
+		assert.Equal(t, tc.want, ckr.Status, "#%d: Status should be %s, %s", i, tc.want, ckr.Message)
 	}
 }
 
@@ -334,7 +334,7 @@ func TestProxy(t *testing.T) {
 
 	for i, tc := range testCases {
 		ckr := Run(tc.args)
-		assert.Equal(t, ckr.Status, tc.want, "#%d: Status should be %s, %s", i, tc.want, ckr.Message)
+		assert.Equal(t, tc.want, ckr.Status, "#%d: Status should be %s, %s", i, tc.want, ckr.Message)
 	}
 }
 
@@ -383,6 +383,6 @@ func TestProxy_Auth(t *testing.T) {
 
 	for i, tc := range testCases {
 		ckr := Run(tc.args)
-		assert.Equal(t, ckr.Status, tc.want, "#%d: Status should be %s, %s", i, tc.want, ckr.Message)
+		assert.Equal(t, tc.want, ckr.Status, "#%d: Status should be %s, %s", i, tc.want, ckr.Message)
 	}
 }

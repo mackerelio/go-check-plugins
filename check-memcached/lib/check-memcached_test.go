@@ -1,42 +1,78 @@
 package checkmemcached
 
 import (
-	"fmt"
-	"log"
+	"context"
+	"net"
 	"os/exec"
 	"syscall"
 	"testing"
 	"time"
-
-	"github.com/lestrrat/go-tcptest"
 )
 
-func TestMemd(t *testing.T) {
-	var cmd *exec.Cmd
-	memd := func(t *tcptest.TCPTest) {
-		cmd = exec.Command("memcached", "-p", fmt.Sprintf("%d", t.Port()))
-		cmd.SysProcAttr = &syscall.SysProcAttr{
-			Setpgid: true,
+func allocUnusedPort() (string, error) {
+	l, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		return "", err
+	}
+	_, port, err := net.SplitHostPort(l.Addr().String())
+	if err != nil {
+		return "", err
+	}
+	l.Close()
+	return port, nil
+}
+
+func waitForPort(ctx context.Context, port string) error {
+	addr := net.JoinHostPort("127.0.0.1", port)
+	d, _ := ctx.Deadline()
+	dialer := net.Dialer{
+		Deadline: d,
+	}
+	for ctx.Err() == nil {
+		c, err := dialer.Dial("tcp", addr)
+		if err != nil {
+			time.Sleep(100 * time.Millisecond)
+			continue
 		}
-		cmd.Run()
+		c.Close()
+		return nil
+	}
+	return ctx.Err()
+}
+
+func TestMemd(t *testing.T) {
+	if _, err := exec.LookPath("memcached"); err != nil {
+		t.Skip("memcached is not installed")
+	}
+	port, err := allocUnusedPort()
+	if err != nil {
+		t.Fatal("allocUnusedPort:", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "memcached", "-p", port)
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+	if err := cmd.Start(); err != nil {
+		t.Fatal("Start:", err)
+	}
+	if err := waitForPort(ctx, port); err != nil {
+		t.Fatal("waitForPort:", err)
 	}
 
-	server, err := tcptest.Start2(memd, 30*time.Second)
-	if err != nil {
-		log.Fatalf("Failed to start memcached: %s", err)
-	}
-	t.Logf("memcached started on port %d", server.Port())
+	t.Logf("memcached started on port %s", port)
 	defer func() {
 		if cmd != nil && cmd.Process != nil {
 			cmd.Process.Signal(syscall.SIGTERM)
 		}
 	}()
 
-	argv := []string{"-p", fmt.Sprintf("%d", server.Port()), "-k", "test"}
+	argv := []string{"-p", port, "-k", "test"}
 	ckr := run(argv)
 	if ckr.Status.String() != "OK" {
 		t.Errorf("failed to check memcache:%s", ckr)
 	}
 	cmd.Process.Signal(syscall.SIGTERM)
-	server.Wait()
+	cmd.Wait()
 }
