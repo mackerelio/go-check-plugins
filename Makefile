@@ -1,4 +1,4 @@
-VERSION = 0.34.0
+VERSION = 0.34.1
 CURRENT_REVISION = $(shell git rev-parse --short HEAD)
 ifeq ($(OS),Windows_NT)
 GOPATH_ROOT:=$(shell cygpath ${GOPATH})
@@ -39,7 +39,7 @@ lint: devel-deps
 .PHONY: testconvention
 testconvention:
 	prove -r t/
-	@go generate ./... && git diff --exit-code || (echo 'please `go generate ./...` and commit them' && false)
+	@go generate ./... && git diff --exit-code -- . ':(exclude)go.*' || (echo 'please `go generate ./...` and commit them' && false)
 
 .PHONY: cover
 cover: devel-deps
