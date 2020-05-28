@@ -254,7 +254,7 @@ func TestRun(t *testing.T) {
 
 		expected := time.Now().Add(30 * time.Millisecond)
 		w, c, errLines, err := opts.searchLog(ctx, logf)
-		assert.WithinDuration(t, expected, time.Now(), 15*time.Millisecond, "searching time exceeded")
+		assert.WithinDuration(t, expected, time.Now(), 18*time.Millisecond, "searching time exceeded")
 
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(0), w, "something went wrong")
