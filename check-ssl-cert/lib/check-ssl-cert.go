@@ -74,5 +74,11 @@ func getCert(addr string) (*x509.Certificate, error) {
 	if len(certs) < 1 {
 		return nil, fmt.Errorf("no certifiations are available")
 	}
-	return certs[0], err
+	cert := certs[0]
+	for _, c := range certs[1:] {
+		if c.NotAfter.Before(cert.NotAfter) {
+			cert = c
+		}
+	}
+	return cert, err
 }
