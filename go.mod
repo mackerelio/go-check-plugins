@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/AdRoll/goamz v0.0.0-20170825154802-2731d20f46f4
+	github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c // indirect
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
 	github.com/aws/aws-sdk-go v1.31.11
 	github.com/beevik/ntp v0.3.0
@@ -12,7 +13,7 @@ require (
 	github.com/elazarl/goproxy/ext v0.0.0-20191011121108-aa519ddbe484
 	github.com/fsouza/go-dockerclient v1.6.5
 	github.com/fzzy/radix v0.5.6
-	github.com/go-ldap/ldap/v3 v3.1.10
+	github.com/go-ldap/ldap/v3 v3.2.0
 	github.com/go-ole/go-ole v1.2.4
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/lib/pq v1.6.0
