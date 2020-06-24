@@ -20,7 +20,7 @@ require (
 	github.com/mackerelio/go-osstat v0.1.0
 	github.com/mackerelio/golib v0.0.0-20191002020229-a65782d392ca
 	github.com/mattn/go-encoding v0.0.2
-	github.com/mattn/go-zglob v0.0.1
+	github.com/mattn/go-zglob v0.0.2
 	github.com/natefinch/atomic v0.0.0-20150920032501-a62ce929ffcc
 	github.com/shirou/gopsutil v2.20.4+incompatible
 	github.com/stretchr/testify v1.6.1
