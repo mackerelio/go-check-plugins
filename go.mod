@@ -15,7 +15,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.1.10
 	github.com/go-ole/go-ole v1.2.4
 	github.com/jessevdk/go-flags v1.4.0
-	github.com/lib/pq v1.6.0
+	github.com/lib/pq v1.7.0
 	github.com/mackerelio/checkers v0.0.0-20190411030116-60cbd7b55456
 	github.com/mackerelio/go-osstat v0.1.0
 	github.com/mackerelio/golib v0.0.0-20191002020229-a65782d392ca
