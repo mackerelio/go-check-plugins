@@ -28,5 +28,5 @@ require (
 	github.com/ziutek/mymysql v1.5.4
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
 	golang.org/x/sys v0.0.0-20191218084908-4a24b4065292
-	golang.org/x/text v0.3.2
+	golang.org/x/text v0.3.3
 )
