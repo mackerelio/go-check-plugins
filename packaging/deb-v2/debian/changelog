@@ -1,3 +1,30 @@
+mackerel-check-plugins (0.35.0-1.v2) stable; urgency=low
+
+  * Bump github.com/lib/pq from 1.6.0 to 1.7.0 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/379>
+  * Bump golang.org/x/text from 0.3.2 to 0.3.3 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/383>
+  * Bump github.com/stretchr/testify from 1.6.0 to 1.6.1 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/373>
+  * [check-ssl-cert] check intermediate- and root-certificates (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/377>
+  * aws-sdk-go 1.31.11 (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/372>
+  * Bump github.com/aws/aws-sdk-go from 1.30.26 to 1.31.7 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/369>
+  * Bump github.com/lib/pq from 1.5.2 to 1.6.0 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/370>
+  * Bump github.com/stretchr/testify from 1.5.1 to 1.6.0 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/371>
+  * Go 1.14 (by ne-sachirou)
+    <https://github.com/mackerelio/go-check-plugins/pull/352>
+  * [check-postgresql] add test.sh (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/365>
+  * Bump github.com/aws/aws-sdk-go from 1.30.9 to 1.30.26 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/362>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Mon, 20 Jul 2020 03:08:41 +0000
+
 mackerel-check-plugins (0.34.1-1.v2) stable; urgency=low
 
   * Bump github.com/lib/pq from 1.3.0 to 1.5.2 (by dependabot-preview[bot])
