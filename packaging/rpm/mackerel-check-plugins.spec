@@ -46,6 +46,19 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Mon Jul 20 2020 <mackerel-developers@hatena.ne.jp> - 0.35.0
+- Bump github.com/lib/pq from 1.6.0 to 1.7.0 (by dependabot-preview[bot])
+- Bump golang.org/x/text from 0.3.2 to 0.3.3 (by dependabot-preview[bot])
+- Bump github.com/stretchr/testify from 1.6.0 to 1.6.1 (by dependabot-preview[bot])
+- [check-ssl-cert] check intermediate- and root-certificates (by lufia)
+- aws-sdk-go 1.31.11 (by astj)
+- Bump github.com/aws/aws-sdk-go from 1.30.26 to 1.31.7 (by dependabot-preview[bot])
+- Bump github.com/lib/pq from 1.5.2 to 1.6.0 (by dependabot-preview[bot])
+- Bump github.com/stretchr/testify from 1.5.1 to 1.6.0 (by dependabot-preview[bot])
+- Go 1.14 (by ne-sachirou)
+- [check-postgresql] add test.sh (by lufia)
+- Bump github.com/aws/aws-sdk-go from 1.30.9 to 1.30.26 (by dependabot-preview[bot])
+
 * Thu May 14 2020 <mackerel-developers@hatena.ne.jp> - 0.34.1
 - Bump github.com/lib/pq from 1.3.0 to 1.5.2 (by dependabot-preview[bot])
 - ignore diffs of go.mod and go.sum (by lufia)

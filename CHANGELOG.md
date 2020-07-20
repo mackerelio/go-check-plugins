@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.35.0 (2020-07-20)
+
+* Bump github.com/lib/pq from 1.6.0 to 1.7.0 #379 (dependabot-preview[bot])
+* Bump golang.org/x/text from 0.3.2 to 0.3.3 #383 (dependabot-preview[bot])
+* Bump github.com/stretchr/testify from 1.6.0 to 1.6.1 #373 (dependabot-preview[bot])
+* [check-ssl-cert] check intermediate- and root-certificates #377 (lufia)
+* aws-sdk-go 1.31.11 #372 (astj)
+* Bump github.com/aws/aws-sdk-go from 1.30.26 to 1.31.7 #369 (dependabot-preview[bot])
+* Bump github.com/lib/pq from 1.5.2 to 1.6.0 #370 (dependabot-preview[bot])
+* Bump github.com/stretchr/testify from 1.5.1 to 1.6.0 #371 (dependabot-preview[bot])
+* Go 1.14 #352 (ne-sachirou)
+* [check-postgresql] add test.sh #365 (lufia)
+* Bump github.com/aws/aws-sdk-go from 1.30.9 to 1.30.26 #362 (dependabot-preview[bot])
+
+
 ## 0.34.1 (2020-05-14)
 
 * Bump github.com/lib/pq from 1.3.0 to 1.5.2 #359 (dependabot-preview[bot])
