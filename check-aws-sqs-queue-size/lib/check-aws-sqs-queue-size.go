@@ -1,17 +1,19 @@
 package checkawssqsqueuesize
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
-	"github.com/AdRoll/goamz/aws"
-	"github.com/AdRoll/goamz/sqs"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/sqs"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 
 	"strconv"
-	"time"
 )
 
 // Do the plugin
@@ -22,9 +24,9 @@ func Do() {
 }
 
 var opts struct {
-	Region          string `short:"r" long:"region" required:"true" description:"AWS Region"`
-	AccessKeyID     string `short:"i" long:"access-key-id" required:"true" description:"AWS Access Key ID"`
-	SecretAccessKey string `short:"s" long:"secret-access-key" required:"true" description:"AWS Secret Access Key"`
+	Region          string `short:"r" long:"region" description:"AWS Region"`
+	AccessKeyID     string `short:"i" long:"access-key-id" description:"AWS Access Key ID"`
+	SecretAccessKey string `short:"s" long:"secret-access-key" description:"AWS Secret Access Key"`
 	QueueName       string `short:"q" long:"queue" required:"true" description:"The name of the queue name"`
 	Warn            int    `short:"w" long:"warning" default:"10" description:"warning if the number of queues is over"`
 	Crit            int    `short:"c" long:"critical" default:"100" description:"critical if the number of queues is over"`
@@ -32,28 +34,51 @@ var opts struct {
 
 const sqsAttributeOfQueueSize = "ApproximateNumberOfMessages"
 
-func getSqsQueueSize(region, awsAccessKeyID, awsSecretAccessKey, queueName string) (int, error) {
-	// Auth
-	auth, err := aws.GetAuth(awsAccessKeyID, awsSecretAccessKey, "", time.Now())
+func createService(region, awsAccessKeyID, awsSecretAccessKey string) (*sqs.SQS, error) {
+	sess, err := session.NewSession()
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 
-	// SQS
-	sqsClient := sqs.New(auth, aws.GetRegion(region))
-	queue, err := sqsClient.GetQueue(queueName)
+	config := aws.NewConfig()
+	if awsAccessKeyID != "" && awsSecretAccessKey != "" {
+		config = config.WithCredentials(credentials.NewStaticCredentials(awsAccessKeyID, awsSecretAccessKey, ""))
+	}
+	if region != "" {
+		config = config.WithRegion(region)
+	}
+	return sqs.New(sess, config), nil
+}
+
+func getSqsQueueSize(region, awsAccessKeyID, awsSecretAccessKey, queueName string) (int, error) {
+	sqsClient, err := createService(region, awsAccessKeyID, awsSecretAccessKey)
+	if err != nil {
+		return -1, nil
+	}
+
+	// Get queue url
+	q, err := sqsClient.GetQueueUrl(&sqs.GetQueueUrlInput{
+		QueueName: aws.String(queueName),
+	})
 	if err != nil {
 		return -1, err
 	}
 
 	// Get queue attribute
-	attr, err := queue.GetQueueAttributes(sqsAttributeOfQueueSize)
+	attr, err := sqsClient.GetQueueAttributes(&sqs.GetQueueAttributesInput{
+		QueueUrl:       q.QueueUrl,
+		AttributeNames: []*string{aws.String(sqsAttributeOfQueueSize)},
+	})
 	if err != nil {
 		return -1, err
 	}
 
 	// Queue size
-	size, err := strconv.Atoi(attr.Attributes[0].Value)
+	sizeStr, ok := attr.Attributes[sqsAttributeOfQueueSize]
+	if !ok || sizeStr == nil {
+		return -1, errors.New("attribute not found")
+	}
+	size, err := strconv.Atoi(*sizeStr)
 	if err != nil {
 		return -1, err
 	}
