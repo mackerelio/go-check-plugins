@@ -51,7 +51,7 @@ func createService(region, awsAccessKeyID, awsSecretAccessKey string) (*sqs.SQS,
 func getSqsQueueSize(region, awsAccessKeyID, awsSecretAccessKey, queueName string) (int, error) {
 	sqsClient, err := createService(region, awsAccessKeyID, awsSecretAccessKey)
 	if err != nil {
-		return -1, nil
+		return -1, err
 	}
 
 	// Get queue url
