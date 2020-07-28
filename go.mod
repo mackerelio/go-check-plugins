@@ -3,7 +3,6 @@ module github.com/mackerelio/go-check-plugins
 go 1.14
 
 require (
-	github.com/AdRoll/goamz v0.0.0-20170825154802-2731d20f46f4
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
 	github.com/aws/aws-sdk-go v1.33.12
 	github.com/beevik/ntp v0.3.0

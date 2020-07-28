@@ -49,5 +49,7 @@ command = ["check-aws-sqs-queue-size", "--access-key-id", "<aws-access-key-id>",
   -c, --critical=          critical if the number of queues is over (default: 100)
 ```
 
+The plugin uses the instance profile if possible, or you can configure `AWS_PROFILE` or `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables in the `env` settings.
+
 ## For more information
 Please execute `check-aws-sqs-queue-size -h` and you can get command line options.
