@@ -37,6 +37,13 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Jul 29 2020 <mackerel-developers@hatena.ne.jp> - 0.36.0
+- [check-aws-sqs-queue-size] Replace GoAMZ with aws-sdk-go (by astj)
+- Bump github.com/aws/aws-sdk-go from 1.31.11 to 1.33.12 (by dependabot-preview[bot])
+- Bump github.com/shirou/gopsutil from 2.20.4+incompatible to 2.20.6+incompatible (by dependabot-preview[bot])
+- Bump github.com/mattn/go-zglob from 0.0.1 to 0.0.3 (by dependabot-preview[bot])
+- Bump github.com/lib/pq from 1.7.0 to 1.7.1 (by dependabot-preview[bot])
+
 * Mon Jul 20 2020 <mackerel-developers@hatena.ne.jp> - 0.35.0
 - Bump github.com/lib/pq from 1.6.0 to 1.7.0 (by dependabot-preview[bot])
 - Bump golang.org/x/text from 0.3.2 to 0.3.3 (by dependabot-preview[bot])

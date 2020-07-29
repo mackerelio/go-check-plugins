@@ -1,3 +1,18 @@
+mackerel-check-plugins (0.36.0-1.v2) stable; urgency=low
+
+  * [check-aws-sqs-queue-size] Replace GoAMZ with aws-sdk-go (by astj)
+    <https://github.com/mackerelio/go-check-plugins/pull/396>
+  * Bump github.com/aws/aws-sdk-go from 1.31.11 to 1.33.12 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/393>
+  * Bump github.com/shirou/gopsutil from 2.20.4+incompatible to 2.20.6+incompatible (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/386>
+  * Bump github.com/mattn/go-zglob from 0.0.1 to 0.0.3 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/394>
+  * Bump github.com/lib/pq from 1.7.0 to 1.7.1 (by dependabot-preview[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/395>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 29 Jul 2020 08:08:25 +0000
+
 mackerel-check-plugins (0.35.0-1.v2) stable; urgency=low
 
   * Bump github.com/lib/pq from 1.6.0 to 1.7.0 (by dependabot-preview[bot])
