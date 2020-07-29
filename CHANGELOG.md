@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.36.0 (2020-07-29)
+
+* [check-aws-sqs-queue-size] Replace GoAMZ with aws-sdk-go #396 (astj)
+* Bump github.com/aws/aws-sdk-go from 1.31.11 to 1.33.12 #393 (dependabot-preview[bot])
+* Bump github.com/shirou/gopsutil from 2.20.4+incompatible to 2.20.6+incompatible #386 (dependabot-preview[bot])
+* Bump github.com/mattn/go-zglob from 0.0.1 to 0.0.3 #394 (dependabot-preview[bot])
+* Bump github.com/lib/pq from 1.7.0 to 1.7.1 #395 (dependabot-preview[bot])
+
+
 ## 0.35.0 (2020-07-20)
 
 * Bump github.com/lib/pq from 1.6.0 to 1.7.0 #379 (dependabot-preview[bot])
