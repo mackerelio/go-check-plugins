@@ -11,7 +11,7 @@ require (
 	github.com/elazarl/goproxy/ext v0.0.0-20191011121108-aa519ddbe484
 	github.com/fsouza/go-dockerclient v1.6.5
 	github.com/fzzy/radix v0.5.6
-	github.com/go-ldap/ldap/v3 v3.1.10
+	github.com/go-ldap/ldap/v3 v3.2.3
 	github.com/go-ole/go-ole v1.2.4
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/lib/pq v1.7.1
@@ -25,7 +25,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	github.com/ziutek/mymysql v1.5.4
-	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
+	golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9
 	golang.org/x/sys v0.0.0-20191218084908-4a24b4065292
 	golang.org/x/text v0.3.3
 )
