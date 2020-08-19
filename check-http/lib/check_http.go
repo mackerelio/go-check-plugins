@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -30,9 +31,17 @@ type checkHTTPOpts struct {
 	Headers            []string `short:"H" description:"HTTP request headers"`
 	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
 	MaxRedirects       int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
+	Method             string   `short:"m" long:"method" choice:"GET" choice:"HEAD" choice:"POST" choice:"PUT" default:"GET" description:"Specify a GET, HEAD, POST, or PUT operation"`
 	ConnectTos         []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1"`
 	Proxy              string   `short:"x" long:"proxy" value-name:"[PROTOCOL://][USER:PASS@]HOST[:PORT]" description:"Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080."`
-        BasicAuth          string   `long:"user" value-name:"USER[:PASSWORD]" description:"Basic Authentication user ID and an optional password."`
+	BasicAuth          string   `long:"user" value-name:"USER[:PASSWORD]" description:"Basic Authentication user ID and an optional password."`
+	RequireBytes       int64    `short:"B" long:"require-bytes" description:"Check the response contains exactly BYTES bytes" default:"-1"`
+	Body               string   `short:"d" long:"body" description:"Send a data body string with the request"`
+	MinBytes           int64    `short:"g" long:"min-bytes" description:"Check the response contains at least BYTES bytes" default:"-1"`
+	Timeout            int64    `short:"t" long:"timeout" description:"Set the total execution timeout in seconds" default:"15"`
+	CertFile           string   `long:"cert-file" description:"A Cert file to use for client authentication"`
+	KeyFile            string   `long:"key-file" description:"A Key file to use for client authentication"`
+	CaFile             string   `long:"ca-file" description:"A CA Cert file to use for client authentication"`
 }
 
 // Do the plugin
@@ -210,11 +219,36 @@ func Run(args []string) *checkers.Checker {
 		return checkers.Unknown(err.Error())
 	}
 
+	// Setup HTTPS client
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: opts.NoCheckCertificate,
+	}
+
+	if opts.CertFile != "" && opts.KeyFile != "" {
+		// Load client cert
+		cert, err := tls.LoadX509KeyPair(opts.CertFile, opts.KeyFile)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
+		tlsConfig.BuildNameToCertificate()
+	}
+
+	if opts.CaFile != "" {
+		// Load CA cert
+		caCert, err := ioutil.ReadFile(opts.CaFile)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
+		tlsConfig.RootCAs = caCertPool
+		tlsConfig.BuildNameToCertificate()
+	}
+
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: opts.NoCheckCertificate,
-		},
-		Proxy: http.ProxyFromEnvironment,
+		TLSClientConfig: tlsConfig,
+		Proxy:           http.ProxyFromEnvironment,
 	}
 	// same as http.Transport's default dialer
 	dialer := &net.Dialer{
@@ -245,7 +279,10 @@ func Run(args []string) *checkers.Checker {
 		}
 		tr.DialContext = newReplacableDial(dialer, resolves)
 	}
-	client := &http.Client{Transport: tr}
+	client := &http.Client{
+		Transport: tr,
+		Timeout:   time.Second * time.Duration(opts.Timeout),
+	}
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		if len(via) > opts.MaxRedirects {
 			return http.ErrUseLastResponse
@@ -253,14 +290,23 @@ func Run(args []string) *checkers.Checker {
 		return nil
 	}
 
-	req, err := http.NewRequest(http.MethodGet, opts.URL, nil)
-	if err != nil {
-		return checkers.Unknown(err.Error())
+	var req *http.Request
+	if opts.Body == "" {
+		req, err = http.NewRequest(opts.Method, opts.URL, nil)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
+	} else {
+		buffer := bytes.NewBuffer([]byte(opts.Body))
+		req, err = http.NewRequest(opts.Method, opts.URL, buffer)
+		if err != nil {
+			return checkers.Unknown(err.Error())
+		}
 	}
 
 	if len(opts.BasicAuth) != 0 {
 		auth := strings.SplitN(opts.BasicAuth, ":", 2)
-		if (len(auth) == 1) {
+		if len(auth) == 1 {
 			req.SetBasicAuth(auth[0], "")
 		} else {
 			req.SetBasicAuth(auth[0], auth[1])
@@ -334,6 +380,16 @@ func Run(args []string) *checkers.Checker {
 			fmt.Fprintf(respMsg, "'%s' not found in the content\n", opts.Regexp)
 			checkSt = checkers.CRITICAL
 		}
+	}
+
+	if opts.RequireBytes != -1 && cLength != opts.RequireBytes {
+		fmt.Fprintf(respMsg, "Response was '%d' bytes instead of '%d'\n", cLength, opts.RequireBytes)
+		checkSt = checkers.CRITICAL
+	}
+
+	if opts.MinBytes != -1 && cLength < opts.MinBytes {
+		fmt.Fprintf(respMsg, "Response was '%d' bytes instead of the indicated minimum '%d'\n", cLength, opts.MinBytes)
+		checkSt = checkers.CRITICAL
 	}
 
 	fmt.Fprintf(respMsg, "%s %s - %d bytes in %f second response time",
