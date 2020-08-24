@@ -63,11 +63,13 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown(err.Error())
 	}
 
+	var thresholds_per_cpu []float64
 	result := checkers.OK
 	for i, load := range loadavgs {
 		if opts.PerCPU {
 			numCPU := runtime.NumCPU()
 			load = load / float64(numCPU)
+			thresholds_per_cpu = append(thresholds_per_cpu, load)
 		}
 		if load > cload[i] {
 			result = checkers.CRITICAL
@@ -78,6 +80,11 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 
-	msg := fmt.Sprintf("load average: %.2f, %.2f, %.2f", loadavgs[0], loadavgs[1], loadavgs[2])
+	var msg string
+	if opts.PerCPU {
+		msg = fmt.Sprintf("load average: %.2f, %.2f, %.2f", thresholds_per_cpu[0], thresholds_per_cpu[1], thresholds_per_cpu[2])
+	} else {
+		msg = fmt.Sprintf("load average: %.2f, %.2f, %.2f", loadavgs[0], loadavgs[1], loadavgs[2])
+	}
 	return checkers.NewChecker(result, msg)
 }
