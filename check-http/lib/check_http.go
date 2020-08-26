@@ -38,7 +38,7 @@ type checkHTTPOpts struct {
 	RequireBytes       int64    `short:"B" long:"require-bytes" description:"Check the response contains exactly BYTES bytes" default:"-1"`
 	Body               string   `short:"d" long:"body" description:"Send a data body string with the request"`
 	MinBytes           int64    `short:"g" long:"min-bytes" description:"Check the response contains at least BYTES bytes" default:"-1"`
-	Timeout            int64    `short:"t" long:"timeout" description:"Set the total execution timeout in seconds" default:"15"`
+	Timeout            int64    `short:"t" long:"timeout" description:"Set the total execution timeout in seconds" default:"0"`
 	CertFile           string   `long:"cert-file" description:"A Cert file to use for client authentication"`
 	KeyFile            string   `long:"key-file" description:"A Key file to use for client authentication"`
 	CaFile             string   `long:"ca-file" description:"A CA Cert file to use for client authentication"`
@@ -297,8 +297,8 @@ func Run(args []string) *checkers.Checker {
 			return checkers.Unknown(err.Error())
 		}
 	} else {
-		buffer := bytes.NewBuffer([]byte(opts.Body))
-		req, err = http.NewRequest(opts.Method, opts.URL, buffer)
+		body := strings.NewReader(opts.Body)
+		req, err = http.NewRequest(opts.Method, opts.URL, body)
 		if err != nil {
 			return checkers.Unknown(err.Error())
 		}
