@@ -49,8 +49,17 @@ command = ["check-http", "-u", "http://example.com"]
   -H=                                                 HTTP request headers
   -p, --pattern=                                      Expected pattern in the content
       --max-redirects=                                Maximum number of redirects followed (default: 10)
+  -m, --method=[GET|HEAD|POST|PUT]                    Specify a GET, HEAD, POST, or PUT operation (default: GET)
       --connect-to=HOST1:PORT1:HOST2:PORT2            Request to HOST2:PORT2 instead of HOST1:PORT1
   -x, --proxy=[PROTOCOL://][USER:PASS@]HOST[:PORT]    Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080.
+      --user=USER[:PASSWORD]                          Basic Authentication user ID and an optional password.
+  -B, --require-bytes=                                Check the response contains exactly BYTES bytes (default: -1)
+  -d, --body=                                         Send a data body string with the request
+  -g, --min-bytes=                                    Check the response contains at least BYTES bytes (default: -1)
+  -t, --timeout=                                      Set the total execution timeout in seconds (default: 15)
+      --cert-file=                                    A Cert file to use for client authentication
+      --key-file=                                     A Key file to use for client authentication
+      --ca-file=                                      A CA Cert file to use for client authentication
 ```
 
 
