@@ -245,21 +245,20 @@ func TestRun(t *testing.T) {
 		}, 1)
 	}
 	testCancel := func() {
-		// This test checks searchLog keeps reading until EOL even if ctx is cancelled.
+		// This test checks searchLog keeps reading until the first EOL even if ctx is cancelled.
 		// To guarantee to read at least once, a timeout sec
 		// should be choice it is greater than reading the state file.
-		fh.WriteString("OK\nFATAL\nFATAL\n")
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+		fh.WriteString("FATAL\nFATAL\nFATAL\n")
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Millisecond)
 		defer cancel()
 
-		expected := time.Now().Add(30 * time.Millisecond)
 		w, c, errLines, err := opts.searchLog(ctx, logf)
-		assert.WithinDuration(t, expected, time.Now(), 18*time.Millisecond, "searching time exceeded")
 
+		// searchLog should read only first line, so the result counts only the first `FATAL`
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(1), w, "something went wrong")
+		assert.Equal(t, int64(1), c, "something went wrong")
+		assert.Equal(t, "FATAL\n", errLines, "something went wrong")
 	}
 	testCancel()
 	opts.testHookNewBufferedReader = nil
