@@ -53,10 +53,14 @@ build:
 	  `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
 	done
 
-build/mackerel-check:
+build/mackerel-check: $(patsubst %,depends_on,$(GOOS)$(GOARCH))
 	mkdir -p build
 	go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
 	  -o build/mackerel-check
+
+.PHONY: depends_on
+depends_on:
+	@:
 
 .PHONY: rpm
 rpm: rpm-v1 rpm-v2
