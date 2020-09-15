@@ -53,6 +53,11 @@ build:
 	  `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
 	done
 
+# This recipe will be called from some other recipes.
+# Though these other recipes expects this to build multi platform binaries
+# using GOOS, GOARCH or both, "make" itself don't recognize switching of
+# environment variables, this recipe will just say "mackerel-check is up to date."
+# We need to force rebuild "mackerel-check" if GOOS or GOARCH are passed.
 build/mackerel-check: $(patsubst %,depends_on,$(GOOS)$(GOARCH))
 	mkdir -p build
 	go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
