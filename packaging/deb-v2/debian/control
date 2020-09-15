@@ -6,7 +6,7 @@ Build-Depends: debhelper
 Standards-Version: 3.9.3
 
 Package: mackerel-check-plugins
-Architecture: amd64
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: macekrel.io check plugins
  monitoring check plugins for https://mackerel.io
