@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.37.0 (2020-09-15)
+
+* add arm64 architecture packages #410 (lufia)
+* Bump github.com/shirou/gopsutil from 2.20.7+incompatible to 2.20.8+incompatible #408 (dependabot-preview[bot])
+* Bump github.com/aws/aws-sdk-go from 1.33.17 to 1.34.22 #411 (dependabot-preview[bot])
+* [check-log] stabilize time-dependent tests #406 (astj)
+* [check-http]adding more options to check-http #403 (fgouteroux)
+* [check-load]fix check-load percpu output #405 (fgouteroux)
+* Bump github.com/shirou/gopsutil from 2.20.6+incompatible to 2.20.7+incompatible #400 (dependabot-preview[bot])
+* Bump github.com/aws/aws-sdk-go from 1.33.12 to 1.33.17 #399 (dependabot-preview[bot])
+* Bump github.com/lib/pq from 1.7.1 to 1.8.0 #398 (dependabot-preview[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.1.10 to 3.2.3 #390 (dependabot-preview[bot])
+
+
 ## 0.36.0 (2020-07-29)
 
 * [check-aws-sqs-queue-size] Replace GoAMZ with aws-sdk-go #396 (astj)
