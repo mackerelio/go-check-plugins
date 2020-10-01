@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Oct 01 2020 <mackerel-developers@hatena.ne.jp> - 0.37.1
+- Bump github.com/aws/aws-sdk-go from 1.34.22 to 1.34.32 (by dependabot-preview[bot])
+
 * Tue Sep 15 2020 <mackerel-developers@hatena.ne.jp> - 0.37.0
 - add arm64 architecture packages (by lufia)
 - Bump github.com/shirou/gopsutil from 2.20.7+incompatible to 2.20.8+incompatible (by dependabot-preview[bot])
