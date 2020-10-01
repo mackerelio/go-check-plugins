@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.37.1 (2020-10-01)
+
+* Bump github.com/aws/aws-sdk-go from 1.34.22 to 1.34.32 #414 (dependabot-preview[bot])
+
+
 ## 0.37.0 (2020-09-15)
 
 * add arm64 architecture packages #410 (lufia)
