@@ -19,6 +19,7 @@ github.com/aws/aws-sdk-go v1.34.22 h1:7V2sKilVVgHqdjbW+O/xaVWYfnmuLwZdF/+6JuUh6C
 github.com/aws/aws-sdk-go v1.34.22/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-sdk-go v1.34.32 h1:EHjowHEGXyLHWhcO7M7AVA+oA2c8aLE9WfRvqHwxd3A=
 github.com/aws/aws-sdk-go v1.34.32/go.mod h1:H7NKnBqNVzoTJpGfLrQkkD+ytBA93eiDYi/+8rV9s48=
+github.com/aws/aws-sdk-go v1.35.19/go.mod h1:tlPOdRjfxPBpNIwqDj61rmsnA85v9jc0Ps9+muhnW+k=
 github.com/beevik/ntp v0.3.0 h1:xzVrPrE4ziasFXgBVBZJDP0Wg/KpMwk2KHJ4Ba8GrDw=
 github.com/beevik/ntp v0.3.0/go.mod h1:hIHWr+l3+/clUnF44zdK+CWW7fO8dR5cIylAQ76NRpg=
 github.com/blang/semver v3.1.0+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
