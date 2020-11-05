@@ -51,15 +51,17 @@ command = ["check-postgresql", "connection", "--host", "127.0.0.1", "--port", "5
 Checks the number of PostgreSQL connections.
 
 ```
-  -H, --host=     Hostname (default: localhost)
-  -p, --port=     Port (default: 5432)
-  -u, --user=     Username (default: postgres)
-  -P, --password= Password [$PGPASSWORD]
-  -d, --database= DBname
-  -s, --sslmode=  SSLmode (default: disable)
-  -t, --timeout=  Maximum wait for connection, in seconds. (default: 5)
-  -w, --warning=  warning if the number of connection is over (default: 70)
-  -c, --critical= critical if the number of connection is over (default: 90)
+  -H, --host=        Hostname (default: localhost)
+  -p, --port=        Port (default: 5432)
+  -u, --user=        Username (default: postgres)
+  -P, --password=    Password [$PGPASSWORD]
+  -d, --database=    DBname
+  -s, --sslmode=     SSLmode (default: disable)
+      --sslrootcert= The root certificate used for SSL certificate verification.
+  -t, --timeout=     Maximum wait for connection, in seconds. (default: 5)
+  -w, --warning=     warning if the number of connection is over (default: 70)
+  -c, --critical=    critical if the number of connection is over (default: 90)
+
 ```
 
 ## For more information
