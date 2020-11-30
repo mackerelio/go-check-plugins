@@ -6,7 +6,9 @@ on:
     branches:
     - master
   pull_request:
-
+env:
+  GO111MODULE: on
+  DEBIAN_FRONTEND: noninteractive
 jobs:
   test:
     strategy:
@@ -20,10 +22,14 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - run: |
-          make lint
-          make cover
-
+          make lint cover testconvention test
   test-windows:
     strategy:
       matrix:
@@ -34,9 +40,47 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - run: |
           go build -o check-log/check-log.exe ./check-log
           go build -o check-procs/check-procs.exe ./check-procs
           go build -o check-windows-eventlog/check-windows-evenglog.exe ./check-windows-eventlog
-          go vet -all ./check-log/... ./check-procs/... ./check-ntservice/... ./check-windows-eventlog/...
           go test ./check-log/... ./check-procs/... ./check-ntservice/... ./check-windows-eventlog/...
+  release:
+    needs: [test, test-windows]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm devscripts debhelper fakeroot crossbuild-essential-arm64
+          mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.14.x
+      - uses: actions/checkout@v2
+      - run: |
+          go get github.com/x-motemen/gobump/cmd/gobump
+          go get github.com/mackerelio/golib/cmd/mackerel-github-release
+          make clean build rpm deb
+          mackerel-github-release && mackerel-github-release -staging
+        env:
+          GITHUB_TOKEN: ${{ secrets.MACKERELBOT_GITHUB_TOKEN }}
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,action,eventName,ref,workflow,job,took
+          username: go-check-plugins-release
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.MACKEREL_SLACK_WEBHOOK_URL }}
