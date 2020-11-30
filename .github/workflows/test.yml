@@ -54,7 +54,8 @@ jobs:
   release:
     needs: [test, test-windows]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    # TODO: uncomment
+    #if: github.ref == 'refs/heads/master'
     steps:
       - run: |
           sudo apt-get update
