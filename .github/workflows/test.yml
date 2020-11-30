@@ -81,6 +81,6 @@ jobs:
         with:
           status: ${{ job.status }}
           fields: repo,message,commit,action,eventName,ref,workflow,job,took
-          username: mkr-release
+          username: go-check-plugins-release
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.MACKEREL_SLACK_WEBHOOK_URL }}
