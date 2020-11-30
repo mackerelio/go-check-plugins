@@ -20,6 +20,12 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - run: |
           make lint
           make cover
@@ -34,6 +40,12 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - run: |
           go build -o check-log/check-log.exe ./check-log
           go build -o check-procs/check-procs.exe ./check-procs
