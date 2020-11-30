@@ -29,7 +29,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - run: |
-          make lint cover all
+          make lint cover testconvention test
   test-windows:
     strategy:
       matrix:
@@ -73,7 +73,7 @@ jobs:
       - run: |
           go get github.com/x-motemen/gobump/cmd/gobump
           go get github.com/mackerelio/golib/cmd/mackerel-github-release
-          make build rpm deb
+          make clean build rpm deb
           # TODO: uncomment
           #mackerel-github-release && mackerel-github-release -staging
           mackerel-github-release -dry-run && mackerel-github-release -staging -dry-run
