@@ -6,7 +6,9 @@ on:
     branches:
     - master
   pull_request:
-
+env:
+  GO111MODULE: on
+  DEBIAN_FRONTEND: noninteractive
 jobs:
   test:
     strategy:
@@ -27,9 +29,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - run: |
-          make lint
-          make cover
-
+          make lint cover all
   test-windows:
     strategy:
       matrix:
@@ -51,3 +51,38 @@ jobs:
           go build -o check-procs/check-procs.exe ./check-procs
           go build -o check-windows-eventlog/check-windows-evenglog.exe ./check-windows-eventlog
           go test ./check-log/... ./check-procs/... ./check-ntservice/... ./check-windows-eventlog/...
+  release:
+    needs: [test, test-windows]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm devscripts debhelper fakeroot crossbuild-essential-arm64
+          mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.14.x
+      - uses: actions/checkout@v2
+      - run: |
+          go get github.com/x-motemen/gobump/cmd/gobump
+          go get github.com/mackerelio/golib/cmd/mackerel-github-release
+          make build rpm deb
+          # TODO: uncomment
+          #mackerel-github-release && mackerel-github-release -staging
+          mackerel-github-release -dry-run && mackerel-github-release -staging -dry-run
+        env:
+          GITHUB_TOKEN: ${{ secrets.MACKERELBOT_GITHUB_TOKEN }}
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,action,eventName,ref,workflow,job,took
+          username: mkr-release
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.MACKEREL_SLACK_WEBHOOK_URL }}
