@@ -45,6 +45,15 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Dec 09 2020 <mackerel-developers@hatena.ne.jp> - 0.38.0
+- Bump github.com/shirou/gopsutil from 2.20.8+incompatible to 2.20.9+incompatible (by dependabot-preview[bot])
+- migrate CIs to GitHub Actions (by lufia)
+- Bump github.com/aws/aws-sdk-go from 1.34.32 to 1.35.35 (by dependabot[bot])
+- Bump golang.org/x/text from 0.3.3 to 0.3.4 (by dependabot-preview[bot])
+- Bump github.com/go-ldap/ldap/v3 from 3.2.3 to 3.2.4 (by dependabot-preview[bot])
+- Update Dependabot config file (by dependabot-preview[bot])
+- [check-postgresql] Add sslrootcert option (by nonylene)
+
 * Thu Oct 01 2020 <mackerel-developers@hatena.ne.jp> - 0.37.1
 - Bump github.com/aws/aws-sdk-go from 1.34.22 to 1.34.32 (by dependabot-preview[bot])
 
