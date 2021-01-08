@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -235,7 +236,10 @@ func run(args []string) *checkers.Checker {
 		}
 	}
 
+	sortDisks(disks)
+
 	var msgs []string
+
 	for _, disk := range disks {
 		msg := genMessage(disk, u)
 		msgs = append(msgs, msg)
@@ -322,4 +326,16 @@ func filterPartitionsByExclusion(partitions []gpud.PartitionStat, list []string,
 	}
 
 	return newPartitions
+}
+
+// sortDisks sorts by UsedPercent only at the moment. If this is refactored, ideally this sort would match what threshold was tripped.
+func sortDisks(disks []*gpud.UsageStat) {
+	if len(disks) <= 1 {
+		return
+	}
+
+	sort.SliceStable(disks, func(i, j int) bool {
+		return disks[i].UsedPercent > disks[j].UsedPercent
+	})
+
 }
