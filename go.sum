@@ -13,8 +13,8 @@ github.com/Microsoft/hcsshim v0.8.9/go.mod h1:5692vkUqntj1idxauYlpoINNKeqCiG6Sg3
 github.com/Songmu/retry v0.1.0/go.mod h1:7sXIW7eseB9fq0FUvigRcQMVLR9tuHI0Scok+rkpAuA=
 github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d h1:G0m3OIz70MZUWq3EgK3CesDbo8upS2Vm9/P3FtgI+Jk=
 github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=
-github.com/aws/aws-sdk-go v1.36.19 h1:zbJZKkxeDiYxUYFjymjWxPye+qa1G2gRVyhIzZrB9zA=
-github.com/aws/aws-sdk-go v1.36.19/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
+github.com/aws/aws-sdk-go v1.36.23 h1:umM44ptMKImsUWLtjGBv/4Ut7Nd99DfqoZDkO0j0/Kc=
+github.com/aws/aws-sdk-go v1.36.23/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/beevik/ntp v0.3.0 h1:xzVrPrE4ziasFXgBVBZJDP0Wg/KpMwk2KHJ4Ba8GrDw=
 github.com/beevik/ntp v0.3.0/go.mod h1:hIHWr+l3+/clUnF44zdK+CWW7fO8dR5cIylAQ76NRpg=
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=
