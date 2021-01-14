@@ -36,6 +36,12 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu Jan 14 2021 <mackerel-developers@hatena.ne.jp> - 0.39.0
+- Bump github.com/aws/aws-sdk-go from 1.35.35 to 1.36.19 (by dependabot[bot])
+- Bump github.com/lib/pq from 1.8.0 to 1.9.0 (by dependabot[bot])
+- [check-disk] Closes #440 added sort the chec-disk output (by hurrycaine)
+- Bump github.com/fsouza/go-dockerclient from 1.6.5 to 1.6.6 (by dependabot[bot])
+
 * Wed Dec 09 2020 <mackerel-developers@hatena.ne.jp> - 0.38.0
 - Bump github.com/shirou/gopsutil from 2.20.8+incompatible to 2.20.9+incompatible (by dependabot-preview[bot])
 - migrate CIs to GitHub Actions (by lufia)
