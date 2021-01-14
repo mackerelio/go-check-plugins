@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.39.0 (2021-01-14)
+
+* Bump github.com/aws/aws-sdk-go from 1.35.35 to 1.36.19 #442 (dependabot[bot])
+* Bump github.com/lib/pq from 1.8.0 to 1.9.0 #433 (dependabot[bot])
+* [check-disk] Closes #440 added sort the chec-disk output #441 (hurrycaine)
+* Bump github.com/fsouza/go-dockerclient from 1.6.5 to 1.6.6 #434 (dependabot[bot])
+
+
 ## 0.38.0 (2020-12-09)
 
 * Bump github.com/shirou/gopsutil from 2.20.8+incompatible to 2.20.9+incompatible #416 (dependabot-preview[bot])

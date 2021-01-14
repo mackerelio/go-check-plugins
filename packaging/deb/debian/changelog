@@ -1,3 +1,16 @@
+mackerel-check-plugins (0.39.0-1) stable; urgency=low
+
+  * Bump github.com/aws/aws-sdk-go from 1.35.35 to 1.36.19 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/442>
+  * Bump github.com/lib/pq from 1.8.0 to 1.9.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/433>
+  * [check-disk] Closes #440 added sort the chec-disk output (by hurrycaine)
+    <https://github.com/mackerelio/go-check-plugins/pull/441>
+  * Bump github.com/fsouza/go-dockerclient from 1.6.5 to 1.6.6 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/434>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 14 Jan 2021 06:20:34 +0000
+
 mackerel-check-plugins (0.38.0-1) stable; urgency=low
 
   * Bump github.com/shirou/gopsutil from 2.20.8+incompatible to 2.20.9+incompatible (by dependabot-preview[bot])
