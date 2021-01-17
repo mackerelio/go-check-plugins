@@ -12,7 +12,7 @@ require (
 	github.com/fsouza/go-dockerclient v1.6.6
 	github.com/fzzy/radix v0.5.6
 	github.com/go-ldap/ldap/v3 v3.2.4
-	github.com/go-ole/go-ole v1.2.4
+	github.com/go-ole/go-ole v1.2.5
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/lib/pq v1.9.0
 	github.com/mackerelio/checkers v0.0.0-20190411030116-60cbd7b55456
