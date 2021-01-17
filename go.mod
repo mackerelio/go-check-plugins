@@ -22,7 +22,7 @@ require (
 	github.com/mattn/go-zglob v0.0.3
 	github.com/natefinch/atomic v0.0.0-20150920032501-a62ce929ffcc
 	github.com/shirou/gopsutil v2.20.9+incompatible
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	github.com/ziutek/mymysql v1.5.4
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
