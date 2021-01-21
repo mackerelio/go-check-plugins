@@ -36,6 +36,13 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu Jan 21 2021 <mackerel-developers@hatena.ne.jp> - 0.39.1
+- Bump github.com/aws/aws-sdk-go from 1.36.19 to 1.36.28 (by dependabot[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.6.6 to 1.7.0 (by dependabot[bot])
+- Bump github.com/stretchr/testify from 1.6.1 to 1.7.0 (by dependabot[bot])
+- Bump github.com/go-ole/go-ole from 1.2.4 to 1.2.5 (by dependabot[bot])
+- Bump golang.org/x/text from 0.3.4 to 0.3.5 (by dependabot[bot])
+
 * Thu Jan 14 2021 <mackerel-developers@hatena.ne.jp> - 0.39.0
 - Bump github.com/aws/aws-sdk-go from 1.35.35 to 1.36.19 (by dependabot[bot])
 - Bump github.com/lib/pq from 1.8.0 to 1.9.0 (by dependabot[bot])
