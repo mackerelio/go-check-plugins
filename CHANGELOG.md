@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.39.1 (2021-01-21)
+
+* Bump github.com/aws/aws-sdk-go from 1.36.19 to 1.36.28 #447 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.6.6 to 1.7.0 #445 (dependabot[bot])
+* Bump github.com/stretchr/testify from 1.6.1 to 1.7.0 #448 (dependabot[bot])
+* Bump github.com/go-ole/go-ole from 1.2.4 to 1.2.5 #449 (dependabot[bot])
+* Bump golang.org/x/text from 0.3.4 to 0.3.5 #443 (dependabot[bot])
+
+
 ## 0.39.0 (2021-01-14)
 
 * Bump github.com/aws/aws-sdk-go from 1.35.35 to 1.36.19 #442 (dependabot[bot])
