@@ -63,23 +63,24 @@ func run(args []string) *checkers.Checker {
 		return checkers.Unknown(err.Error())
 	}
 
-	var thresholds []float64
-	result := checkers.OK
-	for i, load := range loadavgs {
-		if opts.PerCPU {
-			numCPU := runtime.NumCPU()
-			load = load / float64(numCPU)
+	if opts.PerCPU {
+		numCPU := runtime.NumCPU()
+		for i, load := range loadavgs {
+			loadavgs[i] = load / float64(numCPU)
 		}
-		if load > cload[i] {
+	}
+
+	result := checkers.OK
+	for i := range loadavgs {
+		if loadavgs[i] > cload[i] {
 			result = checkers.CRITICAL
 			break
 		}
-		if load > wload[i] {
+		if loadavgs[i] > wload[i] {
 			result = checkers.WARNING
 		}
-		thresholds = append(thresholds, load)
 	}
 
-	msg := fmt.Sprintf("load average: %.2f, %.2f, %.2f", thresholds[0], thresholds[1], thresholds[2])
+	msg := fmt.Sprintf("load average: %.2f, %.2f, %.2f", loadavgs[0], loadavgs[1], loadavgs[2])
 	return checkers.NewChecker(result, msg)
 }
