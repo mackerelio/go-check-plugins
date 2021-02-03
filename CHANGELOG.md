@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.39.2 (2021-02-03)
+
+* Bump github.com/aws/aws-sdk-go from 1.36.31 to 1.37.1 #454 (dependabot[bot])
+* Closes #455 check-load fix null pointer issue when critical #456 (hurrycaine)
+* Bump github.com/aws/aws-sdk-go from 1.36.28 to 1.36.31 #452 (dependabot[bot])
+
+
 ## 0.39.1 (2021-01-21)
 
 * Bump github.com/aws/aws-sdk-go from 1.36.19 to 1.36.28 #447 (dependabot[bot])

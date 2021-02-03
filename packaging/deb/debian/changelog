@@ -1,3 +1,14 @@
+mackerel-check-plugins (0.39.2-1) stable; urgency=low
+
+  * Bump github.com/aws/aws-sdk-go from 1.36.31 to 1.37.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/454>
+  * Closes #455 check-load fix null pointer issue when critical (by hurrycaine)
+    <https://github.com/mackerelio/go-check-plugins/pull/456>
+  * Bump github.com/aws/aws-sdk-go from 1.36.28 to 1.36.31 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/452>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 03 Feb 2021 02:34:47 +0000
+
 mackerel-check-plugins (0.39.1-1) stable; urgency=low
 
   * Bump github.com/aws/aws-sdk-go from 1.36.19 to 1.36.28 (by dependabot[bot])
