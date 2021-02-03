@@ -45,6 +45,11 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Feb 03 2021 <mackerel-developers@hatena.ne.jp> - 0.39.2
+- Bump github.com/aws/aws-sdk-go from 1.36.31 to 1.37.1 (by dependabot[bot])
+- Closes #455 check-load fix null pointer issue when critical (by hurrycaine)
+- Bump github.com/aws/aws-sdk-go from 1.36.28 to 1.36.31 (by dependabot[bot])
+
 * Thu Jan 21 2021 <mackerel-developers@hatena.ne.jp> - 0.39.1
 - Bump github.com/aws/aws-sdk-go from 1.36.19 to 1.36.28 (by dependabot[bot])
 - Bump github.com/fsouza/go-dockerclient from 1.6.6 to 1.7.0 (by dependabot[bot])
