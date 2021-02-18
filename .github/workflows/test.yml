@@ -5,6 +5,8 @@ on:
   push:
     branches:
     - master
+    tags:
+    - v*
   pull_request:
 env:
   GO111MODULE: on
@@ -51,10 +53,10 @@ jobs:
           go build -o check-procs/check-procs.exe ./check-procs
           go build -o check-windows-eventlog/check-windows-evenglog.exe ./check-windows-eventlog
           go test ./check-log/... ./check-procs/... ./check-ntservice/... ./check-windows-eventlog/...
-  release:
+  build:
     needs: [test, test-windows]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     steps:
       - run: |
           sudo apt-get update
@@ -70,13 +72,35 @@ jobs:
         with:
           go-version: 1.14.x
       - uses: actions/checkout@v2
-      - run: |
-          go get github.com/x-motemen/gobump/cmd/gobump
-          go get github.com/mackerelio/golib/cmd/mackerel-github-release
-          make clean build rpm deb
-          mackerel-github-release && mackerel-github-release -staging
-        env:
-          GITHUB_TOKEN: ${{ secrets.MACKERELBOT_GITHUB_TOKEN }}
+      - run: make clean build rpm deb
+      - uses: actions/upload-artifact@v2
+        with:
+          name: linux-build-artifacts
+          path: |
+            ~/rpmbuild/RPMS/*/*.rpm
+            packaging/*.deb
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: linux-build-artifacts
+          path: artifacts/
+      - uses: mackerelio/staging-release-update-action@main
+        if: github.ref == 'refs/heads/master'
+        with:
+          directory: artifacts/
+          github-token: ${{ secrets.MACKERELBOT_GITHUB_TOKEN }}
+          tag: staging
+      - uses: mackerelio/create-release-action@main
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          directory: artifacts/
+          github-token: ${{ secrets.MACKERELBOT_GITHUB_TOKEN }}
+          tag-prefix: 'refs/tags/v'
+          bump-up-branch-prefix: 'bump-version-'
       - uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
