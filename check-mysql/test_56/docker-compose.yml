@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+  primary:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+    command:
+      - --relay-log=relay-bin
+      - --server_id=1
+      - --bind_address=0.0.0.0
+      - --log_bin=bin.log
+    ports:
+      - 13306:3306
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+  replica:
+    image: mysql:5.6
+    ports:
+      - 23306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+    command:
+      - --relay-log=relay-bin
+      - --server_id=2
+      - --bind_address=0.0.0.0
+      - --log_bin=bin.log
+      - --read_only=1
