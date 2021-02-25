@@ -22,20 +22,20 @@ func checkConnection(args []string) *checkers.Checker {
 	if err != nil {
 		os.Exit(1)
 	}
-	db := newMySQL(opts.mysqlSetting)
-	err = db.Connect()
+	db, err := newDB(opts.mysqlSetting)
 	if err != nil {
-		return checkers.Unknown("couldn't connect DB")
+		return checkers.Unknown(fmt.Sprintf("Couldn't open DB: %s", err))
 	}
 	defer db.Close()
 
-	rows, res, err := db.Query("SHOW GLOBAL STATUS LIKE 'Threads_Connected'")
+	var (
+		variableName     string
+		threadsConnected int64
+	)
+	err = db.QueryRow("SHOW GLOBAL STATUS LIKE 'Threads_Connected'").Scan(&variableName, &threadsConnected)
 	if err != nil {
-		return checkers.Unknown("couldn't execute query")
+		return checkers.Unknown(fmt.Sprintf("Couldn't get 'Threads_Connected' status: %s", err))
 	}
-
-	idxValue := res.Map("Value")
-	threadsConnected := rows[0].Int64(idxValue)
 
 	checkSt := checkers.OK
 	msg := fmt.Sprintf("%d connections", threadsConnected)
