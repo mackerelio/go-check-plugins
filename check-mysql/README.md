@@ -104,6 +104,23 @@ Checks the number of MySQL connections.
   -w, --warning=  warning if the number of connection is over (default: 200)
 ```
 
-## For more information
+### For more information
 
 Please execute `check-mysql -h` and you can get command line options.
+
+## Test scripts
+
+You can perform basic tests under `test` and `test_56` (for MySQL 5.6) directory.
+
+### Requirements
+
+- docker and docker-compose
+- check-mysql is available in `PATH`
+
+### Usage
+
+```sh
+(cd ..; make build)
+./test/test.sh # MySQL 8
+./test_56/test.sh # MySQL 5.6
+```
