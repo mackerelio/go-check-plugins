@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
@@ -20,10 +19,9 @@ type mysqlSetting struct {
 }
 
 type mysqlVersion struct {
-	major     int
-	minor     int
-	patch     int
-	stability string
+	major int
+	minor int
+	patch int
 }
 
 var commands = map[string](func([]string) *checkers.Checker){
@@ -84,35 +82,16 @@ func getMySQLVersion(db *sql.DB) (*mysqlVersion, error) {
 		return nil, fmt.Errorf("Failed to query SELECT VERSION(): %s", err)
 	}
 
-	// Version example: mysql-8.0.1-dmr
-	splitted := strings.Split(rawVersion, "-")
-	stability := ""
-	if len(splitted) > 1 {
-		stability = splitted[1]
-	}
-
-	versionError := func(err error) error {
-		return fmt.Errorf("Failed to parse version: %s", err)
-	}
-
-	versionSplitted := strings.Split(splitted[0], ".")
-	major, err := strconv.Atoi(versionSplitted[0])
+	// Version example: 5.5.44-0+deb8u1-log
+	var major, minor, patch int
+	_, err = fmt.Sscanf(rawVersion, "%d.%d.%d", &major, &minor, &patch)
 	if err != nil {
-		return nil, versionError(err)
-	}
-	minor, err := strconv.Atoi(versionSplitted[1])
-	if err != nil {
-		return nil, versionError(err)
-	}
-	patch, err := strconv.Atoi(versionSplitted[2])
-	if err != nil {
-		return nil, versionError(err)
+		return nil, fmt.Errorf("Failed to parse version: %s", err)
 	}
 
 	return &mysqlVersion{
-		major:     major,
-		minor:     minor,
-		patch:     patch,
-		stability: stability,
+		major: major,
+		minor: minor,
+		patch: patch,
 	}, nil
 }
