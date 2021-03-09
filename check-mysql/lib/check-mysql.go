@@ -9,9 +9,6 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/mackerelio/checkers"
-
-	// MySQL Driver
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type mysqlSetting struct {
