@@ -110,7 +110,7 @@ Please execute `check-mysql -h` and you can get command line options.
 
 ## Test scripts
 
-You can perform basic tests under `test` and `test_57` (for MySQL 5.7.8) directory.
+You can perform basic tests under `test_8` (MySQL 8.0.23) and `test_57` (MySQL 5.7.8) directory.
 
 ### Requirements
 
@@ -121,6 +121,6 @@ You can perform basic tests under `test` and `test_57` (for MySQL 5.7.8) directo
 
 ```sh
 (cd ..; make build)
-./test/test.sh # MySQL 8
+./test_8/test.sh # MySQL 8.0.23
 ./test_57/test.sh # MySQL 5.7.8
 ```
