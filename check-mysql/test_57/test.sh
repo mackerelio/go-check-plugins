@@ -19,7 +19,6 @@ then
 fi
 
 sleep_time=30
-database=test
 user=root
 password=mysql
 primary_port=13306
