@@ -1,14 +1,13 @@
 package checkmysql
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"strings"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/mackerelio/checkers"
-	"github.com/ziutek/mymysql/mysql"
-	// MySQL Driver
-	_ "github.com/ziutek/mymysql/native"
 )
 
 type mysqlSetting struct {
@@ -17,6 +16,12 @@ type mysqlSetting struct {
 	Socket string `short:"S" long:"socket" default:"" description:"Path to unix socket"`
 	User   string `short:"u" long:"user" default:"root" description:"Username"`
 	Pass   string `short:"P" long:"password" default:"" description:"Password" env:"MYSQL_PASSWORD"`
+}
+
+type mysqlVersion struct {
+	major int
+	minor int
+	patch int
 }
 
 var commands = map[string](func([]string) *checkers.Checker){
@@ -52,12 +57,41 @@ SubCommands:`)
 	ckr.Exit()
 }
 
-func newMySQL(m mysqlSetting) mysql.Conn {
+func newDB(m mysqlSetting) (*sql.DB, error) {
 	proto := "tcp"
 	target := fmt.Sprintf("%s:%s", m.Host, m.Port)
 	if m.Socket != "" {
 		proto = "unix"
 		target = m.Socket
 	}
-	return mysql.New(proto, "", target, m.User, m.Pass, "")
+	cfg := &mysql.Config{
+		User:                 m.User,
+		Passwd:               m.Pass,
+		Net:                  proto,
+		Addr:                 target,
+		AllowNativePasswords: true,
+	}
+
+	return sql.Open("mysql", cfg.FormatDSN())
+}
+
+func getMySQLVersion(db *sql.DB) (*mysqlVersion, error) {
+	var rawVersion string
+	err := db.QueryRow("SELECT VERSION()").Scan(&rawVersion)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to query SELECT VERSION(): %s", err)
+	}
+
+	// Version example: 5.5.44-0+deb8u1-log
+	var major, minor, patch int
+	_, err = fmt.Sscanf(rawVersion, "%d.%d.%d", &major, &minor, &patch)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse version: %s", err)
+	}
+
+	return &mysqlVersion{
+		major: major,
+		minor: minor,
+		patch: patch,
+	}, nil
 }

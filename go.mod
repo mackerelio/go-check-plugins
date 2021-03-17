@@ -13,7 +13,9 @@ require (
 	github.com/fzzy/radix v0.5.6
 	github.com/go-ldap/ldap/v3 v3.2.4
 	github.com/go-ole/go-ole v1.2.5
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/jessevdk/go-flags v1.4.0
+	github.com/jmoiron/sqlx v1.3.1
 	github.com/lib/pq v1.9.0
 	github.com/mackerelio/checkers v0.0.0-20190411030116-60cbd7b55456
 	github.com/mackerelio/go-osstat v0.1.0
@@ -24,7 +26,6 @@ require (
 	github.com/shirou/gopsutil v2.20.9+incompatible
 	github.com/stretchr/testify v1.7.0
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
-	github.com/ziutek/mymysql v1.5.4
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f
 	golang.org/x/text v0.3.5

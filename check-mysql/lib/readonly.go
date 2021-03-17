@@ -26,25 +26,25 @@ func checkReadOnly(args []string) *checkers.Checker {
 	}
 	argStatus := args[0]
 
-	db := newMySQL(opts.mysqlSetting)
-	err = db.Connect()
+	db, err := newDB(opts.mysqlSetting)
 	if err != nil {
-		return checkers.Unknown("couldn't connect DB")
+		return checkers.Unknown(fmt.Sprintf("Couldn't open DB: %s", err))
 	}
 	defer db.Close()
 
-	rows, res, err := db.Query("SHOW GLOBAL VARIABLES LIKE 'read_only'")
+	var (
+		variableName   string
+		readOnlyStatus string
+	)
+	err = db.QueryRow("SHOW GLOBAL VARIABLES LIKE 'read_only'").Scan(&variableName, &readOnlyStatus)
 	if err != nil {
-		return checkers.Unknown("couldn't execute query")
+		return checkers.Unknown(fmt.Sprintf("Couldn't get 'read_only' variable status: %s", err))
 	}
-
-	idxReadOnly := res.Map("Value")
-	readOnlyStatus := rows[0].Str(idxReadOnly)
 
 	if readOnlyStatus != argStatus {
 		msg := fmt.Sprintf("the expected value of read_only is different. readOnlyStatus:%s", readOnlyStatus)
 		return checkers.Critical(msg)
 	}
 
-	return checkers.Ok("read_only is the expected value")
+	return checkers.Ok(fmt.Sprintf("read_only is the expected value (%s)", argStatus))
 }
