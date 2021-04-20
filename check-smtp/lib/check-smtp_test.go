@@ -7,6 +7,7 @@ import (
 
 	"net/textproto"
 	"strings"
+	"sync/atomic"
 )
 
 var responseDefault = []string{
@@ -21,6 +22,7 @@ type mockSMTPServer struct {
 	listener  net.Listener
 	delay     int
 	responses []string
+	closed    int32
 }
 
 func (m *mockSMTPServer) runServe() error {
@@ -49,8 +51,16 @@ func (m *mockSMTPServer) runServe() error {
 	case <-doneCh:
 		return nil
 	case err := <-errCh:
+		if atomic.LoadInt32(&m.closed) != 0 {
+			return nil
+		}
 		return err
 	}
+}
+
+func (m *mockSMTPServer) Close() {
+	atomic.StoreInt32(&m.closed, 1)
+	m.listener.Close()
 }
 
 func TestSMTP_Default(t *testing.T) {
@@ -96,15 +106,21 @@ func TestSMTP_Default(t *testing.T) {
 				responses: c.responses,
 				delay:     c.delay,
 			}
+			errCh := make(chan error, 1)
 			go func() {
 				if err := s.runServe(); err != nil {
-					t.Fatal(err.Error())
+					errCh <- err
 				}
+				close(errCh)
 			}()
 			port := strings.Split(ln.Addr().String(), ":")[1]
 			argv := []string{"--host", "127.0.0.1", "--port", port}
 			argv = append(argv, c.argv...)
 			ckr := run(argv)
+			s.Close()
+			if err := <-errCh; err != nil {
+				t.Fatal(err)
+			}
 			if ckr.Status.String() != c.expected {
 				t.Errorf("%s: %s", ckr.Status.String(), ckr.Message)
 			}
