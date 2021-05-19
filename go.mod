@@ -16,7 +16,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jmoiron/sqlx v1.3.1
-	github.com/lib/pq v1.10.0
+	github.com/lib/pq v1.10.2
 	github.com/mackerelio/checkers v0.0.0-20190411030116-60cbd7b55456
 	github.com/mackerelio/go-osstat v0.2.0
 	github.com/mackerelio/golib v0.0.0-20191002020229-a65782d392ca
