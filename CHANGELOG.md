@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.39.3 (2021-06-03)
+
+* Bump github.com/aws/aws-sdk-go from 1.38.40 to 1.38.45 #489 (dependabot[bot])
+* Bump github.com/go-sql-driver/mysql from 1.5.0 to 1.6.0 #473 (dependabot[bot])
+* Bump github.com/jmoiron/sqlx from 1.3.1 to 1.3.4 #486 (dependabot[bot])
+* Bump github.com/jessevdk/go-flags from 1.4.0 to 1.5.0 #470 (dependabot[bot])
+* Bump github.com/lib/pq from 1.10.0 to 1.10.2 #488 (dependabot[bot])
+* Bump golang.org/x/text from 0.3.5 to 0.3.6 #474 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go from 1.37.30 to 1.38.40 #487 (dependabot[bot])
+* Bump github.com/mackerelio/go-osstat from 0.1.0 to 0.2.0 #484 (dependabot[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.2.4 to 3.3.0 #476 (dependabot[bot])
+* upgrade go1.14 -> 1.16 #480 (lufia)
+* Bump github.com/aws/aws-sdk-go from 1.37.1 to 1.37.30 #468 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.7.0 to 1.7.2 #466 (dependabot[bot])
+* Bump github.com/lib/pq from 1.9.0 to 1.10.0 #469 (dependabot[bot])
+* [check-mysql] Use go-mysql-driver and sqlx instead of mymysql #464 (nonylene)
+* [ci] replace token #461 (yseto)
+* [ci] replace mackerel-github-release #459 (yseto)
+
+
 ## 0.39.2 (2021-02-03)
 
 * Bump github.com/aws/aws-sdk-go from 1.36.31 to 1.37.1 #454 (dependabot[bot])

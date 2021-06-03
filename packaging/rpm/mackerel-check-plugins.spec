@@ -45,6 +45,24 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Jun 03 2021 <mackerel-developers@hatena.ne.jp> - 0.39.3
+- Bump github.com/aws/aws-sdk-go from 1.38.40 to 1.38.45 (by dependabot[bot])
+- Bump github.com/go-sql-driver/mysql from 1.5.0 to 1.6.0 (by dependabot[bot])
+- Bump github.com/jmoiron/sqlx from 1.3.1 to 1.3.4 (by dependabot[bot])
+- Bump github.com/jessevdk/go-flags from 1.4.0 to 1.5.0 (by dependabot[bot])
+- Bump github.com/lib/pq from 1.10.0 to 1.10.2 (by dependabot[bot])
+- Bump golang.org/x/text from 0.3.5 to 0.3.6 (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go from 1.37.30 to 1.38.40 (by dependabot[bot])
+- Bump github.com/mackerelio/go-osstat from 0.1.0 to 0.2.0 (by dependabot[bot])
+- Bump github.com/go-ldap/ldap/v3 from 3.2.4 to 3.3.0 (by dependabot[bot])
+- upgrade go1.14 -> 1.16 (by lufia)
+- Bump github.com/aws/aws-sdk-go from 1.37.1 to 1.37.30 (by dependabot[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.7.0 to 1.7.2 (by dependabot[bot])
+- Bump github.com/lib/pq from 1.9.0 to 1.10.0 (by dependabot[bot])
+- [check-mysql] Use go-mysql-driver and sqlx instead of mymysql (by nonylene)
+- [ci] replace token (by yseto)
+- [ci] replace mackerel-github-release (by yseto)
+
 * Wed Feb 03 2021 <mackerel-developers@hatena.ne.jp> - 0.39.2
 - Bump github.com/aws/aws-sdk-go from 1.36.31 to 1.37.1 (by dependabot[bot])
 - Closes #455 check-load fix null pointer issue when critical (by hurrycaine)

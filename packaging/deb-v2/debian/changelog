@@ -1,3 +1,40 @@
+mackerel-check-plugins (0.39.3-1.v2) stable; urgency=low
+
+  * Bump github.com/aws/aws-sdk-go from 1.38.40 to 1.38.45 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/489>
+  * Bump github.com/go-sql-driver/mysql from 1.5.0 to 1.6.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/473>
+  * Bump github.com/jmoiron/sqlx from 1.3.1 to 1.3.4 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/486>
+  * Bump github.com/jessevdk/go-flags from 1.4.0 to 1.5.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/470>
+  * Bump github.com/lib/pq from 1.10.0 to 1.10.2 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/488>
+  * Bump golang.org/x/text from 0.3.5 to 0.3.6 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/474>
+  * Bump github.com/aws/aws-sdk-go from 1.37.30 to 1.38.40 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/487>
+  * Bump github.com/mackerelio/go-osstat from 0.1.0 to 0.2.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/484>
+  * Bump github.com/go-ldap/ldap/v3 from 3.2.4 to 3.3.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/476>
+  * upgrade go1.14 -> 1.16 (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/480>
+  * Bump github.com/aws/aws-sdk-go from 1.37.1 to 1.37.30 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/468>
+  * Bump github.com/fsouza/go-dockerclient from 1.7.0 to 1.7.2 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/466>
+  * Bump github.com/lib/pq from 1.9.0 to 1.10.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/469>
+  * [check-mysql] Use go-mysql-driver and sqlx instead of mymysql (by nonylene)
+    <https://github.com/mackerelio/go-check-plugins/pull/464>
+  * [ci] replace token (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/461>
+  * [ci] replace mackerel-github-release (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/459>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 03 Jun 2021 02:58:31 +0000
+
 mackerel-check-plugins (0.39.2-1.v2) stable; urgency=low
 
   * Bump github.com/aws/aws-sdk-go from 1.36.31 to 1.37.1 (by dependabot[bot])
