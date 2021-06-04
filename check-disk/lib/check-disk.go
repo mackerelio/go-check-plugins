@@ -273,7 +273,7 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 			"ignore":
 			continue
 		case "none":
-			if !strings.Contains(p.Opts, "bind") {
+			if !isBindMount(p.Opts) {
 				partitions = append(partitions, p)
 			}
 		default:
@@ -282,6 +282,15 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 	}
 
 	return partitions, nil
+}
+
+func isBindMount(mountOpts []string) bool {
+	for _, opt := range mountOpts {
+		if opt == "bind" {
+			return true
+		}
+	}
+	return false
 }
 
 func mountpointOfPartition(partition gpud.PartitionStat) string {
