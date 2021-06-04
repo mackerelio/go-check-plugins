@@ -274,8 +274,9 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 			continue
 		case "none":
 			if !isBindMount(p.Opts) {
-				partitions = append(partitions, p)
+				continue
 			}
+			partitions = append(partitions, p)
 		default:
 			partitions = append(partitions, p)
 		}
