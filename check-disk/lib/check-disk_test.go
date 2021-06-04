@@ -3,7 +3,7 @@ package checkdisk
 import (
 	"testing"
 
-	gpud "github.com/shirou/gopsutil/disk"
+	gpud "github.com/shirou/gopsutil/v3/disk"
 )
 
 var root = gpud.UsageStat{

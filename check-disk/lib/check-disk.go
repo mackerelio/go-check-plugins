@@ -10,7 +10,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
-	gpud "github.com/shirou/gopsutil/disk"
+	gpud "github.com/shirou/gopsutil/v3/disk"
 )
 
 var opts struct {
