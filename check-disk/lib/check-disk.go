@@ -10,7 +10,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
-	gpud "github.com/shirou/gopsutil/disk"
+	gpud "github.com/shirou/gopsutil/v3/disk"
 )
 
 var opts struct {
@@ -273,15 +273,25 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 			"ignore":
 			continue
 		case "none":
-			if !strings.Contains(p.Opts, "bind") {
-				partitions = append(partitions, p)
+			if !isBindMount(p.Opts) {
+				continue
 			}
+			partitions = append(partitions, p)
 		default:
 			partitions = append(partitions, p)
 		}
 	}
 
 	return partitions, nil
+}
+
+func isBindMount(mountOpts []string) bool {
+	for _, opt := range mountOpts {
+		if opt == "bind" {
+			return true
+		}
+	}
+	return false
 }
 
 func mountpointOfPartition(partition gpud.PartitionStat) string {
