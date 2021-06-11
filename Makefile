@@ -14,6 +14,7 @@ all: clean testconvention test build rpm deb
 .PHONY: test
 test: lint
 	go test $(TESTFLAGS) ./...
+	./test.bash
 
 .PHONY: devel-deps
 devel-deps:
