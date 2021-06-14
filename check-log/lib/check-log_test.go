@@ -137,7 +137,7 @@ func TestScenario(t *testing.T) {
 	bytes, _ := getBytesToSkip(stateFile)
 	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
-	t.Run("Read an empty file", func(t *testing.T) {
+	t.Run("read an empty file", func(t *testing.T) {
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(0), w, "should not be detected as it is empty")
@@ -199,7 +199,7 @@ func TestScenario(t *testing.T) {
 		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)+len(lineOfSuccess)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
-	t.Run("detected when there is a change in the state of the file, resulting in an error condition.", func(t *testing.T) {
+	t.Run("detected when there is a change in the state of the file, resulting in an error condition", func(t *testing.T) {
 		fh.WriteString(linesOf3Fatals)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
@@ -211,7 +211,7 @@ func TestScenario(t *testing.T) {
 		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)*2+len(lineOfSuccess)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
-	t.Run("detected when there is a change in the state of the file, the error has been resolved.", func(t *testing.T) {
+	t.Run("detected when there is a change in the state of the file, the error has been resolved", func(t *testing.T) {
 		fh.WriteString(lineOfSuccess)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
@@ -223,7 +223,7 @@ func TestScenario(t *testing.T) {
 		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)*2+len(lineOfSuccess)*2), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
-	t.Run("detect that a file has been rotated.", func(t *testing.T) {
+	t.Run("detect that a file has been rotated", func(t *testing.T) {
 		// delete the inherited file and create a new file with the same name but a different inode.
 		fh.Close()
 		os.Remove(logf)
