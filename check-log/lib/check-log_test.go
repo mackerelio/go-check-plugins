@@ -622,9 +622,9 @@ func TestRunWithoutEncoding(t *testing.T) {
 		fh.Write([]byte(fatal))
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "エラー\n", errLines, "something went wrong")
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "エラー\n", errLines, "should be detected")
 	})
 
 	fatal = "エラー\n"
@@ -632,9 +632,9 @@ func TestRunWithoutEncoding(t *testing.T) {
 		fh.Write([]byte(fatal))
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "エラー\n", errLines, "something went wrong")
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "エラー\n", errLines, "should be detected")
 	})
 }
 
@@ -659,7 +659,7 @@ func TestRunWithMissingOk(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
 	})
 }
 
@@ -684,7 +684,7 @@ func TestRunWithMissingWarning(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.WARNING, "ckr.Status should be WARNING")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
 	})
 }
 
@@ -709,7 +709,7 @@ func TestRunWithMissingCritical(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.CRITICAL, "ckr.Status should be CRITICAL")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
 	})
 }
 
@@ -734,7 +734,7 @@ func TestRunWithMissingUnknown(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.UNKNOWN, "ckr.Status should be UNKNOWN")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
 	})
 }
 
@@ -759,7 +759,7 @@ func TestRunWithGlobAndMissingWarning(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.WARNING, "ckr.Status should be WARNING")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logfGlob)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
 	})
 }
 
@@ -787,7 +787,7 @@ func TestRunMultiplePattern(t *testing.T) {
 	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
+	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
 	l1 := "FATAL\nTESTAPPLICATION\n"
 	t.Run("two lines", func(t *testing.T) {
@@ -795,10 +795,10 @@ func TestRunMultiplePattern(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
 		msg := "0 warnings, 0 criticals for pattern /FATAL/ and /TESTAPPLICATION/."
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it is not meet the conditions to be detected as an error string, so should be no error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
+		assert.Equal(t, int64(len(l1)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
 	l2 := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
@@ -807,10 +807,10 @@ func TestRunMultiplePattern(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
 		msg := "2 warnings, 2 criticals for pattern /FATAL/ and /TESTAPPLICATION/."
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it is meet the conditions to be detected as an error string, so should be error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
+		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
 	l3 := "OK\n"
