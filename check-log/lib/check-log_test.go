@@ -789,33 +789,33 @@ func TestRunMultiplePattern(t *testing.T) {
 	bytes, _ := getBytesToSkip(stateFile)
 	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
-	l1 := "FATAL\nTESTAPPLICATION\n"
+	individualTextslines := "FATAL\nTESTAPPLICATION\n"
 	t.Run("two lines", func(t *testing.T) {
-		fh.WriteString(l1)
+		fh.WriteString(individualTextslines)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
 		msg := "0 warnings, 0 criticals for pattern /FATAL/ and /TESTAPPLICATION/."
 		assert.Equal(t, ckr.Message, msg, "it is not meet the conditions to be detected as an error string, so should be no error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+		assert.Equal(t, int64(len(individualTextslines)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
-	l2 := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
+	matchedTextsLines := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
 	t.Run("condition", func(t *testing.T) {
-		fh.WriteString(l2)
+		fh.WriteString(matchedTextsLines)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
 		msg := "2 warnings, 2 criticals for pattern /FATAL/ and /TESTAPPLICATION/."
 		assert.Equal(t, ckr.Message, msg, "it is meet the conditions to be detected as an error string, so should be error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+		assert.Equal(t, int64(len(individualTextslines)+len(matchedTextsLines)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
-	l3 := "OK\n"
+	okLine := "OK\n"
 	t.Run("with level", func(t *testing.T) {
-		fh.WriteString(l3)
+		fh.WriteString(okLine)
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--warning-level", "12"}
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
@@ -824,7 +824,7 @@ func TestRunMultiplePattern(t *testing.T) {
 	})
 
 	t.Run("invalid pattern", func(t *testing.T) {
-		fh.WriteString(l3)
+		fh.WriteString(okLine)
 		ptn3 := "+"
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn3}
 		ckr := run(context.Background(), params)
@@ -860,33 +860,33 @@ func TestRunWithSuppressOption(t *testing.T) {
 	bytes, _ := getBytesToSkip(stateFile)
 	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
-	l1 := "FATAL\nTESTAPPLICATION\n"
+	individualTextslines := "FATAL\nTESTAPPLICATION\n"
 	t.Run("two lines", func(t *testing.T) {
-		fh.WriteString(l1)
+		fh.WriteString(individualTextslines)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
 		msg := "0 warnings, 0 criticals."
 		assert.Equal(t, ckr.Message, msg, "it is not meet the conditions to be detected as an error string, so should be no error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+		assert.Equal(t, int64(len(individualTextslines)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
-	l2 := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
+	matchedTextsLines := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
 	t.Run("condition", func(t *testing.T) {
-		fh.WriteString(l2)
+		fh.WriteString(matchedTextsLines)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
 		msg := "2 warnings, 2 criticals."
 		assert.Equal(t, ckr.Message, msg, "it is meet the conditions to be detected as an error string, so should be error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+		assert.Equal(t, int64(len(individualTextslines)+len(matchedTextsLines)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
-	l3 := "OK\n"
+	okLine := "OK\n"
 	t.Run("with level", func(t *testing.T) {
-		fh.WriteString(l3)
+		fh.WriteString(okLine)
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--warning-level", "12", "--suppress-pattern"}
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
@@ -895,7 +895,7 @@ func TestRunWithSuppressOption(t *testing.T) {
 	})
 
 	t.Run("invalid pattern", func(t *testing.T) {
-		fh.WriteString(l3)
+		fh.WriteString(okLine)
 		ptn3 := "+"
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn3, "--suppress-pattern"}
 		ckr := run(context.Background(), params)
