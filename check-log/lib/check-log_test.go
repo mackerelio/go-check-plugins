@@ -820,7 +820,7 @@ func TestRunMultiplePattern(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "When multiple patterns specified, --warning-level --critical-level can not be used"
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it should be detected that the option cannot be specified")
 	})
 
 	t.Run("invalid pattern", func(t *testing.T) {
@@ -830,7 +830,7 @@ func TestRunMultiplePattern(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "pattern is invalid"
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it should be detected that the pattern cannot be specified")
 	})
 }
 
@@ -858,7 +858,7 @@ func TestRunWithSuppressOption(t *testing.T) {
 	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
+	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
 	l1 := "FATAL\nTESTAPPLICATION\n"
 	t.Run("two lines", func(t *testing.T) {
@@ -866,10 +866,10 @@ func TestRunWithSuppressOption(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
 		msg := "0 warnings, 0 criticals."
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it is not meet the conditions to be detected as an error string, so should be no error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
+		assert.Equal(t, int64(len(l1)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
 	l2 := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
@@ -878,10 +878,10 @@ func TestRunWithSuppressOption(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
 		msg := "2 warnings, 2 criticals."
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it is meet the conditions to be detected as an error string, so should be error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
+		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "the pointer should be moved by the amount of the character string written in the file")
 	})
 
 	l3 := "OK\n"
@@ -891,7 +891,7 @@ func TestRunWithSuppressOption(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "When multiple patterns specified, --warning-level --critical-level can not be used"
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it should be detected that the option cannot be specified")
 	})
 
 	t.Run("invalid pattern", func(t *testing.T) {
@@ -901,7 +901,7 @@ func TestRunWithSuppressOption(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "pattern is invalid"
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it should be detected that the pattern cannot be specified")
 	})
 }
 
