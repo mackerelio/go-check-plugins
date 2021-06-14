@@ -32,7 +32,9 @@ func TestGetStateFile(t *testing.T) {
 func TestSaveState(t *testing.T) {
 	f := ".tmp/fuga/piyo.json"
 	err := saveState(f, &state{SkipBytes: 15, Inode: 150})
-	defer os.RemoveAll(".tmp")
+	t.Cleanup(func() {
+		os.RemoveAll(".tmp")
+	})
 	assert.Equal(t, err, nil, "err should be nil")
 
 	state, err := loadState(f)
@@ -44,7 +46,9 @@ func TestSaveState(t *testing.T) {
 func TestGetInode(t *testing.T) {
 	f := ".tmp/hoge/piyo.json"
 	state := &state{SkipBytes: 15, Inode: 150}
-	defer os.RemoveAll(".tmp")
+	t.Cleanup(func() {
+		os.RemoveAll(".tmp")
+	})
 
 	i, err := getInode(f)
 	assert.Equal(t, err, nil, "err should be nil")
@@ -64,7 +68,9 @@ func TestGetBytesToSkip(t *testing.T) {
 	state := &state{SkipBytes: 15}
 	os.MkdirAll(filepath.Dir(oldf), 0755)
 	ioutil.WriteFile(oldf, []byte(fmt.Sprintf("%d", state.SkipBytes)), 0600)
-	defer os.RemoveAll(".tmp")
+	t.Cleanup(func() {
+		os.RemoveAll(".tmp")
+	})
 
 	n, err := getBytesToSkip(newf)
 	assert.Equal(t, err, nil, "err should be nil")
@@ -82,7 +88,9 @@ func TestSearchReader(t *testing.T) {
 	if err != nil {
 		t.Fatalf("TempDir failed: %s", err)
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	opts := &logOpts{
 		StateDir: dir,
@@ -105,16 +113,20 @@ Fatal
 	assert.Equal(t, int64(len(content)), readBytes, "readBytes should be 26")
 }
 
-func TestRun(t *testing.T) {
+func TestScenario(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-log-test")
 	if err != nil {
-		t.Errorf("something went wrong")
+		t.Fatalf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn := `FATAL`
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
@@ -123,116 +135,110 @@ func TestRun(t *testing.T) {
 	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
+	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
-	testEmpty := func() {
+	t.Run("Read an empty file", func(t *testing.T) {
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "should not be detected as it is empty")
+		assert.Equal(t, int64(0), c, "should not be detected as it is empty")
+		assert.Equal(t, "", errLines, "should not be detected as it is empty")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(0), bytes, "something went wrong")
-	}
-	testEmpty()
+		assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value, because file is empty")
+	})
 
-	lFirst := "FATAL\nFATAL\n"
-	test2Line := func() {
-		fh.WriteString(lFirst)
+	linesOf2Fatals := "FATAL\nFATAL\n"
+	t.Run("give a detection string and generate an error condition", func(t *testing.T) {
+		fh.WriteString(linesOf2Fatals)
+
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(2), w, "something went wrong")
-		assert.Equal(t, int64(2), c, "something went wrong")
-		assert.Equal(t, lFirst, errLines, "something went wrong")
+		assert.Equal(t, int64(2), w, "there are two error strings, so two should be detected")
+		assert.Equal(t, int64(2), c, "there are two error strings, so two should be detected")
+		assert.Equal(t, linesOf2Fatals, errLines, "given string should be detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)), bytes, "something went wrong")
-	}
-	test2Line()
+		assert.Equal(t, int64(len(linesOf2Fatals)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	l1 := "FATAL\nFATAL\nFATAL\n"
-	testReadAgain := func() {
-		fh.WriteString(l1)
+	linesOf3Fatals := "FATAL\nFATAL\nFATAL\n"
+	t.Run("change the state of the detected string and check that the error state changes", func(t *testing.T) {
+		fh.WriteString(linesOf3Fatals)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(3), w, "something went wrong")
-		assert.Equal(t, int64(3), c, "something went wrong")
-		assert.Equal(t, l1, errLines, "something went wrong")
+		assert.Equal(t, int64(3), w, "there are three error strings, so three should be detected")
+		assert.Equal(t, int64(3), c, "there are three error strings, so three should be detected")
+		assert.Equal(t, linesOf3Fatals, errLines, "given string should be detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst+l1)), bytes, "something went wrong")
-	}
-	testReadAgain()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	l2 := "SUCCESS\n"
-	testRecover := func() {
-		fh.WriteString(l2)
+	lineOfSuccess := "SUCCESS\n"
+	t.Run("change the state of the detected string and check that the error state is resolved.", func(t *testing.T) {
+		fh.WriteString(lineOfSuccess)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "should not be detected as the error condition has been resolved")
+		assert.Equal(t, int64(0), c, "should not be detected as the error condition has been resolved")
+		assert.Equal(t, "", errLines, "should not be detected as the error condition has been resolved")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)+len(l1)+len(l2)), bytes, "something went wrong")
-	}
-	testRecover()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)+len(lineOfSuccess)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	testSuccessAgain := func() {
+	t.Run("when the state of the file does not change, the state continues", func(t *testing.T) {
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "should not be detected as there is no change in state")
+		assert.Equal(t, int64(0), c, "should not be detected as there is no change in state")
+		assert.Equal(t, "", errLines, "should not be detected as there is no change in state")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)+len(l1)+len(l2)), bytes, "something went wrong")
-	}
-	testSuccessAgain()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)+len(lineOfSuccess)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	testErrorAgain := func() {
-		fh.WriteString(l1)
+	t.Run("detected when there is a change in the state of the file, resulting in an error condition.", func(t *testing.T) {
+		fh.WriteString(linesOf3Fatals)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(3), w, "something went wrong")
-		assert.Equal(t, int64(3), c, "something went wrong")
-		assert.Equal(t, l1, errLines, "something went wrong")
+		assert.Equal(t, int64(3), w, "there are three error strings, so three should be detected")
+		assert.Equal(t, int64(3), c, "there are three error strings, so three should be detected")
+		assert.Equal(t, linesOf3Fatals, errLines, "given string should be detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)+len(l1)*2+len(l2)), bytes, "something went wrong")
-	}
-	testErrorAgain()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)*2+len(lineOfSuccess)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	testRecoverAgain := func() {
-		fh.WriteString(l2)
+	t.Run("detected when there is a change in the state of the file, the error has been resolved.", func(t *testing.T) {
+		fh.WriteString(lineOfSuccess)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "should not be detected as the error condition has been resolved")
+		assert.Equal(t, int64(0), c, "should not be detected as the error condition has been resolved")
+		assert.Equal(t, "", errLines, "should not be detected as the error condition has been resolved")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)+len(l1)*2+len(l2)*2), bytes, "something went wrong")
-	}
-	testRecoverAgain()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)*2+len(lineOfSuccess)*2), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	testRotate := func() {
+	t.Run("detect that a file has been rotated.", func(t *testing.T) {
+		// delete the inherited file and create a new file with the same name but a different inode.
 		fh.Close()
 		os.Remove(logf)
 		fh, _ = os.Create(logf)
 
-		fh.WriteString(l2)
+		fh.WriteString(linesOf3Fatals)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(3), w, "the file is being rotated, so an error condition should be detected")
+		assert.Equal(t, int64(3), c, "the file is being rotated, so an error condition should be detected")
+		assert.Equal(t, linesOf3Fatals, errLines, "the file is being rotated, so an error condition should be detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l2)), bytes, "something went wrong")
-	}
-	testRotate()
+		assert.Equal(t, int64(len(linesOf3Fatals)), bytes, "the file is being rotated, the pointer should be the size of the new file")
+	})
 
 	// Should test that check-log stops reading logs when timed out.
 	// If a period (10*time.Millisecond in below) is very short,
@@ -317,15 +323,21 @@ func TestRunWithGlob(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf1 := filepath.Join(dir, "dummy1")
 	fh1, _ := os.Create(logf1)
-	defer fh1.Close()
+	t.Cleanup(func() {
+		fh1.Close()
+	})
 
 	logf2 := filepath.Join(dir, "dummy2")
 	fh2, _ := os.Create(logf2)
-	defer fh2.Close()
+	t.Cleanup(func() {
+		fh2.Close()
+	})
 
 	ptn := `FATAL`
 	params := []string{dir, "-f", filepath.Join(dir, "dummy*"), "-p", ptn, "--check-first"}
@@ -366,7 +378,9 @@ func TestRunWithZGlob(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	err = os.MkdirAll(filepath.Join(dir, "subdir"), 0755)
 	if err != nil {
@@ -375,11 +389,15 @@ func TestRunWithZGlob(t *testing.T) {
 
 	logf1 := filepath.Join(dir, "dummy1")
 	fh1, _ := os.Create(logf1)
-	defer fh1.Close()
+	t.Cleanup(func() {
+		fh1.Close()
+	})
 
 	logf2 := filepath.Join(dir, "subdir", "dummy2")
 	fh2, _ := os.Create(logf2)
-	defer fh2.Close()
+	t.Cleanup(func() {
+		fh2.Close()
+	})
 
 	ptn := `FATAL`
 	params := []string{dir, "-f", filepath.Join(dir, "**/dummy*"), "-p", ptn, "--check-first"}
@@ -420,11 +438,15 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn := `FATAL`
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--check-first"})
@@ -467,11 +489,15 @@ func TestRunWithNoState(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn := `FATAL`
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--no-state"})
@@ -505,7 +531,9 @@ func TestSearchReaderWithLevel(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	ptn := `FATAL level:([0-9]+)`
@@ -546,11 +574,15 @@ func TestRunWithEncoding(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--encoding", "euc-jp", "--check-first"})
 	opts.prepare()
@@ -585,11 +617,15 @@ func TestRunWithoutEncoding(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--check-first"})
 	opts.prepare()
@@ -622,7 +658,9 @@ func TestRunWithMissingOk(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -646,7 +684,9 @@ func TestRunWithMissingWarning(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -670,7 +710,9 @@ func TestRunWithMissingCritical(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -694,7 +736,9 @@ func TestRunWithMissingUnknown(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -718,7 +762,9 @@ func TestRunWithGlobAndMissingWarning(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logfGlob := filepath.Join(dir, "dummy*")
 
@@ -742,11 +788,15 @@ func TestRunMultiplePattern(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn1 := `FATAL`
 	ptn2 := `TESTAPPLICATION`
@@ -813,11 +863,15 @@ func TestRunWithSuppressOption(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn1 := `FATAL`
 	ptn2 := `TESTAPPLICATION`
@@ -884,11 +938,15 @@ func TestRunMultipleExcludePattern(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	params := []string{"-s", dir, "-f", logf, "-p", "ERROR", "-p", "TESTAPP", "-E", "FOO", "-E", "BAR"}
 	opts, _ := parseArgs(params)
