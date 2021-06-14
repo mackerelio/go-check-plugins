@@ -250,13 +250,15 @@ func TestScenario(t *testing.T) {
 			n: 1,
 		}, 1)
 	}
-	testCancel := func() {
+	t.Run("cancel", func(t *testing.T) {
 		// This test checks searchLog keeps reading until the first EOL even if ctx is cancelled.
 		// To guarantee to read at least once, a timeout sec
 		// should be choice it is greater than reading the state file.
 		fh.WriteString("FATAL\nFATAL\nFATAL\n")
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Millisecond)
-		defer cancel()
+		t.Cleanup(func() {
+			cancel()
+		})
 
 		w, c, errLines, err := opts.searchLog(ctx, logf)
 
@@ -265,11 +267,10 @@ func TestScenario(t *testing.T) {
 		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(1), c, "something went wrong")
 		assert.Equal(t, "FATAL\n", errLines, "something went wrong")
-	}
-	testCancel()
+	})
 	opts.testHookNewBufferedReader = nil
 
-	t.Run("testCancelBeforeProcessing", func(t *testing.T) {
+	t.Run("cancel before processing", func(t *testing.T) {
 		switch runtime.GOOS {
 		case "windows":
 			// TODO(lufia): Is there a file that a user running `go test` can't read on Windows?
@@ -288,7 +289,7 @@ func TestScenario(t *testing.T) {
 		assert.Fail(t, "don't reach here")
 		return nil
 	}
-	testCancelBeforeSearchLog := func() {
+	t.Run("cancel before search log", func(t *testing.T) {
 		fh.Close()
 		os.Remove(logf)
 		fh, _ = os.Create(logf)
@@ -302,8 +303,7 @@ func TestScenario(t *testing.T) {
 		assert.Equal(t, int64(0), w, "something went wrong")
 		assert.Equal(t, int64(0), c, "something went wrong")
 		assert.Equal(t, "", errLines, "something went wrong")
-	}
-	testCancelBeforeSearchLog()
+	})
 	opts.testHookNewBufferedReader = nil
 }
 
@@ -344,33 +344,28 @@ func TestRunWithGlob(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testSuccess := func() {
+	t.Run("success", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
-	}
-	testSuccess()
+	})
 
 	errorLine := "FATAL\n"
-	testCriticalOnce := func() {
+	t.Run("critical once", func(t *testing.T) {
 		fh1.WriteString(errorLine)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
-	}
-	testCriticalOnce()
+	})
 
-	testRecover := func() {
+	t.Run("recover", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
-	}
-	testRecover()
+	})
 
-	testCriticalAgain := func() {
+	t.Run("critical again", func(t *testing.T) {
 		fh2.WriteString(errorLine)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
-	}
-	testCriticalAgain()
-
+	})
 }
 
 func TestRunWithZGlob(t *testing.T) {
@@ -404,33 +399,28 @@ func TestRunWithZGlob(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testSuccess := func() {
+	t.Run("success", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
-	}
-	testSuccess()
+	})
 
 	errorLine := "FATAL\n"
-	testCriticalOnce := func() {
+	t.Run("critical once", func(t *testing.T) {
 		fh1.WriteString(errorLine)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
-	}
-	testCriticalOnce()
+	})
 
-	testRecover := func() {
+	t.Run("recover", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
-	}
-	testRecover()
+	})
 
-	testCriticalAgain := func() {
+	t.Run("critical again", func(t *testing.T) {
 		fh2.WriteString(errorLine)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
-	}
-	testCriticalAgain()
-
+	})
 }
 
 func TestRunWithMiddleOfLine(t *testing.T) {
@@ -457,7 +447,7 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	bytes, _ := getBytesToSkip(stateFile)
 	assert.Equal(t, int64(0), bytes, "something went wrong")
 
-	testMiddleOfLine := func() {
+	t.Run("middle of line", func(t *testing.T) {
 		fh.WriteString("FATA")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
@@ -467,10 +457,9 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 
 		bytes, _ = getBytesToSkip(stateFile)
 		assert.Equal(t, int64(0), bytes, "something went wrong")
-	}
-	testMiddleOfLine()
+	})
 
-	testFail := func() {
+	t.Run("fail", func(t *testing.T) {
 		fh.WriteString("L\nSUCC")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
@@ -480,8 +469,7 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 
 		bytes, _ = getBytesToSkip(stateFile)
 		assert.Equal(t, int64(len("FATAL\n")), bytes, "something went wrong")
-	}
-	testFail()
+	})
 }
 
 func TestRunWithNoState(t *testing.T) {
@@ -504,7 +492,7 @@ func TestRunWithNoState(t *testing.T) {
 	opts.prepare()
 
 	fatal := "FATAL\n"
-	test2Line := func() {
+	t.Run("two lines", func(t *testing.T) {
 		fh.WriteString(fatal)
 		fh.WriteString(fatal)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
@@ -512,18 +500,16 @@ func TestRunWithNoState(t *testing.T) {
 		assert.Equal(t, int64(2), w, "something went wrong")
 		assert.Equal(t, int64(2), c, "something went wrong")
 		assert.Equal(t, strings.Repeat(fatal, 2), errLines, "something went wrong")
-	}
-	test2Line()
+	})
 
-	test1LineAgain := func() {
+	t.Run("one line again", func(t *testing.T) {
 		fh.WriteString(fatal)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(3), w, "something went wrong")
 		assert.Equal(t, int64(3), c, "something went wrong")
 		assert.Equal(t, strings.Repeat(fatal, 3), errLines, "something went wrong")
-	}
-	test1LineAgain()
+	})
 }
 
 func TestSearchReaderWithLevel(t *testing.T) {
@@ -587,7 +573,7 @@ func TestRunWithEncoding(t *testing.T) {
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--encoding", "euc-jp", "--check-first"})
 	opts.prepare()
 
-	testEncoding := func() {
+	t.Run("encoding", func(t *testing.T) {
 		fh.Write([]byte("\xa5\xa8\xa5\xe9\xa1\xbc\n")) // エラー
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
@@ -608,8 +594,7 @@ func TestRunWithEncoding(t *testing.T) {
 		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(1), c, "something went wrong")
 		assert.Equal(t, "エラー\n", errLines, "something went wrong")
-	}
-	testEncoding()
+	})
 }
 
 func TestRunWithoutEncoding(t *testing.T) {
@@ -631,26 +616,24 @@ func TestRunWithoutEncoding(t *testing.T) {
 	opts.prepare()
 
 	fatal := "\xa5\xa8\xa5\xe9\xa1\xbc\nエラー\n" // エラー
-	testWithoutEncoding := func() {
+	t.Run("without encoding", func(t *testing.T) {
 		fh.Write([]byte(fatal))
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(1), c, "something went wrong")
 		assert.Equal(t, "エラー\n", errLines, "something went wrong")
-	}
-	testWithoutEncoding()
+	})
 
 	fatal = "エラー\n"
-	testWithEncoding := func() {
+	t.Run("with encoding", func(t *testing.T) {
 		fh.Write([]byte(fatal))
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(1), c, "something went wrong")
 		assert.Equal(t, "エラー\n", errLines, "something went wrong")
-	}
-	testWithEncoding()
+	})
 }
 
 func TestRunWithMissingOk(t *testing.T) {
@@ -670,13 +653,12 @@ func TestRunWithMissingOk(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+	})
 }
 
 func TestRunWithMissingWarning(t *testing.T) {
@@ -696,13 +678,12 @@ func TestRunWithMissingWarning(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.WARNING, "ckr.Status should be WARNING")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+	})
 }
 
 func TestRunWithMissingCritical(t *testing.T) {
@@ -722,13 +703,12 @@ func TestRunWithMissingCritical(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.CRITICAL, "ckr.Status should be CRITICAL")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+	})
 }
 
 func TestRunWithMissingUnknown(t *testing.T) {
@@ -748,13 +728,12 @@ func TestRunWithMissingUnknown(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.UNKNOWN, "ckr.Status should be UNKNOWN")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+	})
 }
 
 func TestRunWithGlobAndMissingWarning(t *testing.T) {
@@ -774,13 +753,12 @@ func TestRunWithGlobAndMissingWarning(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.WARNING, "ckr.Status should be WARNING")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logfGlob)
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+	})
 }
 
 func TestRunMultiplePattern(t *testing.T) {
@@ -810,7 +788,7 @@ func TestRunMultiplePattern(t *testing.T) {
 	assert.Equal(t, int64(0), bytes, "something went wrong")
 
 	l1 := "FATAL\nTESTAPPLICATION\n"
-	test2line := func() {
+	t.Run("two lines", func(t *testing.T) {
 		fh.WriteString(l1)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
@@ -819,11 +797,10 @@ func TestRunMultiplePattern(t *testing.T) {
 
 		bytes, _ = getBytesToSkip(stateFile)
 		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
-	}
-	test2line()
+	})
 
 	l2 := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
-	testAndCondition := func() {
+	t.Run("condition", func(t *testing.T) {
 		fh.WriteString(l2)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
@@ -832,21 +809,19 @@ func TestRunMultiplePattern(t *testing.T) {
 
 		bytes, _ = getBytesToSkip(stateFile)
 		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
-	}
-	testAndCondition()
+	})
 
 	l3 := "OK\n"
-	testWithLevel := func() {
+	t.Run("with level", func(t *testing.T) {
 		fh.WriteString(l3)
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--warning-level", "12"}
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "When multiple patterns specified, --warning-level --critical-level can not be used"
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testWithLevel()
+	})
 
-	testInvalidPattern := func() {
+	t.Run("invalid pattern", func(t *testing.T) {
 		fh.WriteString(l3)
 		ptn3 := "+"
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn3}
@@ -854,8 +829,7 @@ func TestRunMultiplePattern(t *testing.T) {
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "pattern is invalid"
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testInvalidPattern()
+	})
 }
 
 func TestRunWithSuppressOption(t *testing.T) {
@@ -885,7 +859,7 @@ func TestRunWithSuppressOption(t *testing.T) {
 	assert.Equal(t, int64(0), bytes, "something went wrong")
 
 	l1 := "FATAL\nTESTAPPLICATION\n"
-	test2line := func() {
+	t.Run("two lines", func(t *testing.T) {
 		fh.WriteString(l1)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
@@ -894,11 +868,10 @@ func TestRunWithSuppressOption(t *testing.T) {
 
 		bytes, _ = getBytesToSkip(stateFile)
 		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
-	}
-	test2line()
+	})
 
 	l2 := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
-	testAndCondition := func() {
+	t.Run("condition", func(t *testing.T) {
 		fh.WriteString(l2)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
@@ -907,21 +880,19 @@ func TestRunWithSuppressOption(t *testing.T) {
 
 		bytes, _ = getBytesToSkip(stateFile)
 		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
-	}
-	testAndCondition()
+	})
 
 	l3 := "OK\n"
-	testWithLevel := func() {
+	t.Run("with level", func(t *testing.T) {
 		fh.WriteString(l3)
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--warning-level", "12", "--suppress-pattern"}
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "When multiple patterns specified, --warning-level --critical-level can not be used"
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testWithLevel()
+	})
 
-	testInvalidPattern := func() {
+	t.Run("invalid pattern", func(t *testing.T) {
 		fh.WriteString(l3)
 		ptn3 := "+"
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn3, "--suppress-pattern"}
@@ -929,8 +900,7 @@ func TestRunWithSuppressOption(t *testing.T) {
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "pattern is invalid"
 		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testInvalidPattern()
+	})
 }
 
 func TestRunMultipleExcludePattern(t *testing.T) {
