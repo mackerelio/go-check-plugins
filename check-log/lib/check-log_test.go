@@ -497,18 +497,20 @@ func TestRunWithNoState(t *testing.T) {
 		fh.WriteString(fatal)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(2), w, "something went wrong")
-		assert.Equal(t, int64(2), c, "something went wrong")
-		assert.Equal(t, strings.Repeat(fatal, 2), errLines, "something went wrong")
+		assert.Equal(t, int64(2), w, "there are two error strings, so two should be detected")
+		assert.Equal(t, int64(2), c, "there are two error strings, so two should be detected")
+		assert.Equal(t, strings.Repeat(fatal, 2), errLines, "it should move up to the size of a two lines `FATAL\n`")
 	})
 
-	t.Run("one line again", func(t *testing.T) {
+	// Make sure the entire file is loaded.
+	// Because do not use the state file.
+	t.Run("added one line", func(t *testing.T) {
 		fh.WriteString(fatal)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(3), w, "something went wrong")
-		assert.Equal(t, int64(3), c, "something went wrong")
-		assert.Equal(t, strings.Repeat(fatal, 3), errLines, "something went wrong")
+		assert.Equal(t, int64(3), w, "there are three error strings, so three should be detected")
+		assert.Equal(t, int64(3), c, "there are three error strings, so three should be detected")
+		assert.Equal(t, strings.Repeat(fatal, 3), errLines, "it should move up to the size of a three lines `FATAL\n`")
 	})
 }
 
@@ -577,23 +579,23 @@ func TestRunWithEncoding(t *testing.T) {
 		fh.Write([]byte("\xa5\xa8\xa5\xe9\xa1\xbc\n")) // エラー
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "エラー\n", errLines, "something went wrong")
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "エラー\n", errLines, "given string should be detected")
 
 		fh.Write([]byte("\xb0\xdb\xbe\xef\n")) // 異常
 		w, c, errLines, err = opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "it is not an error string, so it should be zero.")
+		assert.Equal(t, int64(0), c, "it is not an error string, so it should be zero.")
+		assert.Equal(t, "", errLines, "it is not an error string, so it should be empty.")
 
 		fh.Write([]byte("\xa5\xa8\xa5\xe9\xa1\xbc\n")) // エラー
 		w, c, errLines, err = opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "エラー\n", errLines, "something went wrong")
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "エラー\n", errLines, "given string should be detected")
 	})
 }
 
