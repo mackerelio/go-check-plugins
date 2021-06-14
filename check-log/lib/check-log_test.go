@@ -445,30 +445,30 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
+	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
 	t.Run("middle of line", func(t *testing.T) {
 		fh.WriteString("FATA")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "it is not an error string, so it should be zero.")
+		assert.Equal(t, int64(0), c, "it is not an error string, so it should be zero.")
+		assert.Equal(t, "", errLines, "it is not an error string, so it should be empty.")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(0), bytes, "something went wrong")
+		assert.Equal(t, int64(0), bytes, "the pointer should be zero, because this file is not ended newline")
 	})
 
 	t.Run("fail", func(t *testing.T) {
 		fh.WriteString("L\nSUCC")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "FATAL\n", errLines, "something went wrong")
+		assert.Equal(t, int64(1), w, "there are one error string, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error string, so one should be detected")
+		assert.Equal(t, "FATAL\n", errLines, "it should detect one line.")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len("FATAL\n")), bytes, "something went wrong")
+		assert.Equal(t, int64(len("FATAL\n")), bytes, "it should move up to the size of a single line `FATAL\n`")
 	})
 }
 
