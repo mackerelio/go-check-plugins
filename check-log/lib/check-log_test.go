@@ -264,9 +264,9 @@ func TestScenario(t *testing.T) {
 
 		// searchLog should read only first line, so the result counts only the first `FATAL`
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "FATAL\n", errLines, "something went wrong")
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "FATAL\n", errLines, "the first `FATAL` should be detected")
 	})
 	opts.testHookNewBufferedReader = nil
 
@@ -281,8 +281,8 @@ func TestScenario(t *testing.T) {
 
 		cmdline := []string{"--no-state", "-p", "FATAL", "-f", "/etc/sudoers"}
 		result := run(ctx, cmdline)
-		assert.Equal(t, checkers.OK, result.Status, "something went wrong")
-		assert.Equal(t, "0 warnings, 0 criticals for pattern /FATAL/.", result.Message, "something went wrong")
+		assert.Equal(t, checkers.OK, result.Status, "OK should be detected")
+		assert.Equal(t, "0 warnings, 0 criticals for pattern /FATAL/.", result.Message, "message with content where `FATAL` is not detected")
 	})
 
 	opts.testHookNewBufferedReader = func(r io.Reader) *bufio.Reader {
@@ -300,9 +300,9 @@ func TestScenario(t *testing.T) {
 
 		w, c, errLines, err := opts.searchLog(ctx, logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "should not be detected because it's not running a search")
+		assert.Equal(t, int64(0), c, "should not be detected because it's not running a search")
+		assert.Equal(t, "", errLines, "should not be detected because it's not running a search")
 	})
 	opts.testHookNewBufferedReader = nil
 }
