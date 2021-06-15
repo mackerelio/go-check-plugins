@@ -32,7 +32,9 @@ func TestGetStateFile(t *testing.T) {
 func TestSaveState(t *testing.T) {
 	f := ".tmp/fuga/piyo.json"
 	err := saveState(f, &state{SkipBytes: 15, Inode: 150})
-	defer os.RemoveAll(".tmp")
+	t.Cleanup(func() {
+		os.RemoveAll(".tmp")
+	})
 	assert.Equal(t, err, nil, "err should be nil")
 
 	state, err := loadState(f)
@@ -44,7 +46,9 @@ func TestSaveState(t *testing.T) {
 func TestGetInode(t *testing.T) {
 	f := ".tmp/hoge/piyo.json"
 	state := &state{SkipBytes: 15, Inode: 150}
-	defer os.RemoveAll(".tmp")
+	t.Cleanup(func() {
+		os.RemoveAll(".tmp")
+	})
 
 	i, err := getInode(f)
 	assert.Equal(t, err, nil, "err should be nil")
@@ -64,7 +68,9 @@ func TestGetBytesToSkip(t *testing.T) {
 	state := &state{SkipBytes: 15}
 	os.MkdirAll(filepath.Dir(oldf), 0755)
 	ioutil.WriteFile(oldf, []byte(fmt.Sprintf("%d", state.SkipBytes)), 0600)
-	defer os.RemoveAll(".tmp")
+	t.Cleanup(func() {
+		os.RemoveAll(".tmp")
+	})
 
 	n, err := getBytesToSkip(newf)
 	assert.Equal(t, err, nil, "err should be nil")
@@ -82,7 +88,9 @@ func TestSearchReader(t *testing.T) {
 	if err != nil {
 		t.Fatalf("TempDir failed: %s", err)
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	opts := &logOpts{
 		StateDir: dir,
@@ -105,16 +113,20 @@ Fatal
 	assert.Equal(t, int64(len(content)), readBytes, "readBytes should be 26")
 }
 
-func TestRun(t *testing.T) {
+func TestScenario(t *testing.T) {
 	dir, err := ioutil.TempDir("", "check-log-test")
 	if err != nil {
-		t.Errorf("something went wrong")
+		t.Fatalf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn := `FATAL`
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn})
@@ -123,116 +135,110 @@ func TestRun(t *testing.T) {
 	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
+	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
-	testEmpty := func() {
+	t.Run("read an empty file", func(t *testing.T) {
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "should not be detected as it is empty")
+		assert.Equal(t, int64(0), c, "should not be detected as it is empty")
+		assert.Equal(t, "", errLines, "should not be detected as it is empty")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(0), bytes, "something went wrong")
-	}
-	testEmpty()
+		assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value, because file is empty")
+	})
 
-	lFirst := "FATAL\nFATAL\n"
-	test2Line := func() {
-		fh.WriteString(lFirst)
+	linesOf2Fatals := "FATAL\nFATAL\n"
+	t.Run("give a detection string and generate an error condition", func(t *testing.T) {
+		fh.WriteString(linesOf2Fatals)
+
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(2), w, "something went wrong")
-		assert.Equal(t, int64(2), c, "something went wrong")
-		assert.Equal(t, lFirst, errLines, "something went wrong")
+		assert.Equal(t, int64(2), w, "there are two error strings, so two should be detected")
+		assert.Equal(t, int64(2), c, "there are two error strings, so two should be detected")
+		assert.Equal(t, linesOf2Fatals, errLines, "given string should be detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)), bytes, "something went wrong")
-	}
-	test2Line()
+		assert.Equal(t, int64(len(linesOf2Fatals)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	l1 := "FATAL\nFATAL\nFATAL\n"
-	testReadAgain := func() {
-		fh.WriteString(l1)
+	linesOf3Fatals := "FATAL\nFATAL\nFATAL\n"
+	t.Run("change the state of the detected string and check that the error state changes", func(t *testing.T) {
+		fh.WriteString(linesOf3Fatals)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(3), w, "something went wrong")
-		assert.Equal(t, int64(3), c, "something went wrong")
-		assert.Equal(t, l1, errLines, "something went wrong")
+		assert.Equal(t, int64(3), w, "there are three error strings, so three should be detected")
+		assert.Equal(t, int64(3), c, "there are three error strings, so three should be detected")
+		assert.Equal(t, linesOf3Fatals, errLines, "given string should be detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst+l1)), bytes, "something went wrong")
-	}
-	testReadAgain()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	l2 := "SUCCESS\n"
-	testRecover := func() {
-		fh.WriteString(l2)
+	lineOfSuccess := "SUCCESS\n"
+	t.Run("change the state of the detected string and check that the error state is resolved.", func(t *testing.T) {
+		fh.WriteString(lineOfSuccess)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "should not be detected as the error condition has been resolved")
+		assert.Equal(t, int64(0), c, "should not be detected as the error condition has been resolved")
+		assert.Equal(t, "", errLines, "should not be detected as the error condition has been resolved")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)+len(l1)+len(l2)), bytes, "something went wrong")
-	}
-	testRecover()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)+len(lineOfSuccess)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	testSuccessAgain := func() {
+	t.Run("when the state of the file does not change, the state continues", func(t *testing.T) {
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "should not be detected as there is no change in state")
+		assert.Equal(t, int64(0), c, "should not be detected as there is no change in state")
+		assert.Equal(t, "", errLines, "should not be detected as there is no change in state")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)+len(l1)+len(l2)), bytes, "something went wrong")
-	}
-	testSuccessAgain()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)+len(lineOfSuccess)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	testErrorAgain := func() {
-		fh.WriteString(l1)
+	t.Run("detected when there is a change in the state of the file, resulting in an error condition", func(t *testing.T) {
+		fh.WriteString(linesOf3Fatals)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(3), w, "something went wrong")
-		assert.Equal(t, int64(3), c, "something went wrong")
-		assert.Equal(t, l1, errLines, "something went wrong")
+		assert.Equal(t, int64(3), w, "there are three error strings, so three should be detected")
+		assert.Equal(t, int64(3), c, "there are three error strings, so three should be detected")
+		assert.Equal(t, linesOf3Fatals, errLines, "given string should be detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)+len(l1)*2+len(l2)), bytes, "something went wrong")
-	}
-	testErrorAgain()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)*2+len(lineOfSuccess)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	testRecoverAgain := func() {
-		fh.WriteString(l2)
+	t.Run("detected when there is a change in the state of the file, the error has been resolved", func(t *testing.T) {
+		fh.WriteString(lineOfSuccess)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "should not be detected as the error condition has been resolved")
+		assert.Equal(t, int64(0), c, "should not be detected as the error condition has been resolved")
+		assert.Equal(t, "", errLines, "should not be detected as the error condition has been resolved")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(lFirst)+len(l1)*2+len(l2)*2), bytes, "something went wrong")
-	}
-	testRecoverAgain()
+		assert.Equal(t, int64(len(linesOf2Fatals)+len(linesOf3Fatals)*2+len(lineOfSuccess)*2), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	testRotate := func() {
+	t.Run("detect that a file has been rotated", func(t *testing.T) {
+		// delete the inherited file and create a new file with the same name but a different inode.
 		fh.Close()
 		os.Remove(logf)
 		fh, _ = os.Create(logf)
 
-		fh.WriteString(l2)
+		fh.WriteString(linesOf3Fatals)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(3), w, "the file is being rotated, so an error condition should be detected")
+		assert.Equal(t, int64(3), c, "the file is being rotated, so an error condition should be detected")
+		assert.Equal(t, linesOf3Fatals, errLines, "the file is being rotated, so an error condition should be detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l2)), bytes, "something went wrong")
-	}
-	testRotate()
+		assert.Equal(t, int64(len(linesOf3Fatals)), bytes, "the file is being rotated, the pointer should be the size of the new file")
+	})
 
 	// Should test that check-log stops reading logs when timed out.
 	// If a period (10*time.Millisecond in below) is very short,
@@ -244,26 +250,27 @@ func TestRun(t *testing.T) {
 			n: 1,
 		}, 1)
 	}
-	testCancel := func() {
+	t.Run("cancel", func(t *testing.T) {
 		// This test checks searchLog keeps reading until the first EOL even if ctx is cancelled.
 		// To guarantee to read at least once, a timeout sec
 		// should be choice it is greater than reading the state file.
 		fh.WriteString("FATAL\nFATAL\nFATAL\n")
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Millisecond)
-		defer cancel()
+		t.Cleanup(func() {
+			cancel()
+		})
 
 		w, c, errLines, err := opts.searchLog(ctx, logf)
 
 		// searchLog should read only first line, so the result counts only the first `FATAL`
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "FATAL\n", errLines, "something went wrong")
-	}
-	testCancel()
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "FATAL\n", errLines, "the first `FATAL` should be detected")
+	})
 	opts.testHookNewBufferedReader = nil
 
-	t.Run("testCancelBeforeProcessing", func(t *testing.T) {
+	t.Run("cancel before processing", func(t *testing.T) {
 		switch runtime.GOOS {
 		case "windows":
 			// TODO(lufia): Is there a file that a user running `go test` can't read on Windows?
@@ -274,15 +281,15 @@ func TestRun(t *testing.T) {
 
 		cmdline := []string{"--no-state", "-p", "FATAL", "-f", "/etc/sudoers"}
 		result := run(ctx, cmdline)
-		assert.Equal(t, checkers.OK, result.Status, "something went wrong")
-		assert.Equal(t, "0 warnings, 0 criticals for pattern /FATAL/.", result.Message, "something went wrong")
+		assert.Equal(t, checkers.OK, result.Status, "OK should be detected")
+		assert.Equal(t, "0 warnings, 0 criticals for pattern /FATAL/.", result.Message, "message with content where `FATAL` is not detected")
 	})
 
 	opts.testHookNewBufferedReader = func(r io.Reader) *bufio.Reader {
 		assert.Fail(t, "don't reach here")
 		return nil
 	}
-	testCancelBeforeSearchLog := func() {
+	t.Run("cancel before search log", func(t *testing.T) {
 		fh.Close()
 		os.Remove(logf)
 		fh, _ = os.Create(logf)
@@ -293,11 +300,10 @@ func TestRun(t *testing.T) {
 
 		w, c, errLines, err := opts.searchLog(ctx, logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
-	}
-	testCancelBeforeSearchLog()
+		assert.Equal(t, int64(0), w, "should not be detected because it's not running a search")
+		assert.Equal(t, int64(0), c, "should not be detected because it's not running a search")
+		assert.Equal(t, "", errLines, "should not be detected because it's not running a search")
+	})
 	opts.testHookNewBufferedReader = nil
 }
 
@@ -317,48 +323,49 @@ func TestRunWithGlob(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf1 := filepath.Join(dir, "dummy1")
 	fh1, _ := os.Create(logf1)
-	defer fh1.Close()
+	t.Cleanup(func() {
+		fh1.Close()
+	})
 
 	logf2 := filepath.Join(dir, "dummy2")
 	fh2, _ := os.Create(logf2)
-	defer fh2.Close()
+	t.Cleanup(func() {
+		fh2.Close()
+	})
 
 	ptn := `FATAL`
 	params := []string{dir, "-f", filepath.Join(dir, "dummy*"), "-p", ptn, "--check-first"}
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testSuccess := func() {
+	t.Run("success", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
-	}
-	testSuccess()
+	})
 
 	errorLine := "FATAL\n"
-	testCriticalOnce := func() {
+	t.Run("critical once", func(t *testing.T) {
 		fh1.WriteString(errorLine)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
-	}
-	testCriticalOnce()
+	})
 
-	testRecover := func() {
+	t.Run("recover", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
-	}
-	testRecover()
+	})
 
-	testCriticalAgain := func() {
+	t.Run("critical again", func(t *testing.T) {
 		fh2.WriteString(errorLine)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
-	}
-	testCriticalAgain()
-
+	})
 }
 
 func TestRunWithZGlob(t *testing.T) {
@@ -366,7 +373,9 @@ func TestRunWithZGlob(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	err = os.MkdirAll(filepath.Join(dir, "subdir"), 0755)
 	if err != nil {
@@ -375,44 +384,43 @@ func TestRunWithZGlob(t *testing.T) {
 
 	logf1 := filepath.Join(dir, "dummy1")
 	fh1, _ := os.Create(logf1)
-	defer fh1.Close()
+	t.Cleanup(func() {
+		fh1.Close()
+	})
 
 	logf2 := filepath.Join(dir, "subdir", "dummy2")
 	fh2, _ := os.Create(logf2)
-	defer fh2.Close()
+	t.Cleanup(func() {
+		fh2.Close()
+	})
 
 	ptn := `FATAL`
 	params := []string{dir, "-f", filepath.Join(dir, "**/dummy*"), "-p", ptn, "--check-first"}
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testSuccess := func() {
+	t.Run("success", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
-	}
-	testSuccess()
+	})
 
 	errorLine := "FATAL\n"
-	testCriticalOnce := func() {
+	t.Run("critical once", func(t *testing.T) {
 		fh1.WriteString(errorLine)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
-	}
-	testCriticalOnce()
+	})
 
-	testRecover := func() {
+	t.Run("recover", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
-	}
-	testRecover()
+	})
 
-	testCriticalAgain := func() {
+	t.Run("critical again", func(t *testing.T) {
 		fh2.WriteString(errorLine)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
-	}
-	testCriticalAgain()
-
+	})
 }
 
 func TestRunWithMiddleOfLine(t *testing.T) {
@@ -420,11 +428,15 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn := `FATAL`
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--check-first"})
@@ -433,33 +445,31 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
+	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
-	testMiddleOfLine := func() {
+	t.Run("middle of line", func(t *testing.T) {
 		fh.WriteString("FATA")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "it is not an error string, so it should be zero.")
+		assert.Equal(t, int64(0), c, "it is not an error string, so it should be zero.")
+		assert.Equal(t, "", errLines, "it is not an error string, so it should be empty.")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(0), bytes, "something went wrong")
-	}
-	testMiddleOfLine()
+		assert.Equal(t, int64(0), bytes, "the pointer should be zero, because this file is not ended newline")
+	})
 
-	testFail := func() {
+	t.Run("fail", func(t *testing.T) {
 		fh.WriteString("L\nSUCC")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "FATAL\n", errLines, "something went wrong")
+		assert.Equal(t, int64(1), w, "there are one error string, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error string, so one should be detected")
+		assert.Equal(t, "FATAL\n", errLines, "it should detect one line.")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len("FATAL\n")), bytes, "something went wrong")
-	}
-	testFail()
+		assert.Equal(t, int64(len("FATAL\n")), bytes, "it should move up to the size of a single line `FATAL\n`")
+	})
 }
 
 func TestRunWithNoState(t *testing.T) {
@@ -467,37 +477,41 @@ func TestRunWithNoState(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn := `FATAL`
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--no-state"})
 	opts.prepare()
 
 	fatal := "FATAL\n"
-	test2Line := func() {
+	t.Run("two lines", func(t *testing.T) {
 		fh.WriteString(fatal)
 		fh.WriteString(fatal)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(2), w, "something went wrong")
-		assert.Equal(t, int64(2), c, "something went wrong")
-		assert.Equal(t, strings.Repeat(fatal, 2), errLines, "something went wrong")
-	}
-	test2Line()
+		assert.Equal(t, int64(2), w, "there are two error strings, so two should be detected")
+		assert.Equal(t, int64(2), c, "there are two error strings, so two should be detected")
+		assert.Equal(t, strings.Repeat(fatal, 2), errLines, "it should move up to the size of a two lines `FATAL\n`")
+	})
 
-	test1LineAgain := func() {
+	// Make sure the entire file is loaded.
+	// Because do not use the state file.
+	t.Run("added one line", func(t *testing.T) {
 		fh.WriteString(fatal)
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(3), w, "something went wrong")
-		assert.Equal(t, int64(3), c, "something went wrong")
-		assert.Equal(t, strings.Repeat(fatal, 3), errLines, "something went wrong")
-	}
-	test1LineAgain()
+		assert.Equal(t, int64(3), w, "there are three error strings, so three should be detected")
+		assert.Equal(t, int64(3), c, "there are three error strings, so three should be detected")
+		assert.Equal(t, strings.Repeat(fatal, 3), errLines, "it should move up to the size of a three lines `FATAL\n`")
+	})
 }
 
 func TestSearchReaderWithLevel(t *testing.T) {
@@ -505,7 +519,9 @@ func TestSearchReaderWithLevel(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	ptn := `FATAL level:([0-9]+)`
@@ -546,38 +562,41 @@ func TestRunWithEncoding(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--encoding", "euc-jp", "--check-first"})
 	opts.prepare()
 
-	testEncoding := func() {
+	t.Run("encoding", func(t *testing.T) {
 		fh.Write([]byte("\xa5\xa8\xa5\xe9\xa1\xbc\n")) // エラー
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "エラー\n", errLines, "something went wrong")
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "エラー\n", errLines, "given string should be detected")
 
 		fh.Write([]byte("\xb0\xdb\xbe\xef\n")) // 異常
 		w, c, errLines, err = opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
-		assert.Equal(t, int64(0), c, "something went wrong")
-		assert.Equal(t, "", errLines, "something went wrong")
+		assert.Equal(t, int64(0), w, "it is not an error string, so it should be zero.")
+		assert.Equal(t, int64(0), c, "it is not an error string, so it should be zero.")
+		assert.Equal(t, "", errLines, "it is not an error string, so it should be empty.")
 
 		fh.Write([]byte("\xa5\xa8\xa5\xe9\xa1\xbc\n")) // エラー
 		w, c, errLines, err = opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "エラー\n", errLines, "something went wrong")
-	}
-	testEncoding()
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "エラー\n", errLines, "given string should be detected")
+	})
 }
 
 func TestRunWithoutEncoding(t *testing.T) {
@@ -585,36 +604,38 @@ func TestRunWithoutEncoding(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", `エラー`, "--check-first"})
 	opts.prepare()
 
 	fatal := "\xa5\xa8\xa5\xe9\xa1\xbc\nエラー\n" // エラー
-	testWithoutEncoding := func() {
+	t.Run("without encoding", func(t *testing.T) {
 		fh.Write([]byte(fatal))
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "エラー\n", errLines, "something went wrong")
-	}
-	testWithoutEncoding()
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "エラー\n", errLines, "should be detected")
+	})
 
 	fatal = "エラー\n"
-	testWithEncoding := func() {
+	t.Run("with encoding", func(t *testing.T) {
 		fh.Write([]byte(fatal))
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(1), w, "something went wrong")
-		assert.Equal(t, int64(1), c, "something went wrong")
-		assert.Equal(t, "エラー\n", errLines, "something went wrong")
-	}
-	testWithEncoding()
+		assert.Equal(t, int64(1), w, "there are one error strings, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error strings, so one should be detected")
+		assert.Equal(t, "エラー\n", errLines, "should be detected")
+	})
 }
 
 func TestRunWithMissingOk(t *testing.T) {
@@ -622,7 +643,9 @@ func TestRunWithMissingOk(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -632,13 +655,12 @@ func TestRunWithMissingOk(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.OK, "ckr.Status should be OK")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
+	})
 }
 
 func TestRunWithMissingWarning(t *testing.T) {
@@ -646,7 +668,9 @@ func TestRunWithMissingWarning(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -656,13 +680,12 @@ func TestRunWithMissingWarning(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.WARNING, "ckr.Status should be WARNING")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
+	})
 }
 
 func TestRunWithMissingCritical(t *testing.T) {
@@ -670,7 +693,9 @@ func TestRunWithMissingCritical(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -680,13 +705,12 @@ func TestRunWithMissingCritical(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.CRITICAL, "ckr.Status should be CRITICAL")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
+	})
 }
 
 func TestRunWithMissingUnknown(t *testing.T) {
@@ -694,7 +718,9 @@ func TestRunWithMissingUnknown(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -704,13 +730,12 @@ func TestRunWithMissingUnknown(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.UNKNOWN, "ckr.Status should be UNKNOWN")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logf)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
+	})
 }
 
 func TestRunWithGlobAndMissingWarning(t *testing.T) {
@@ -718,7 +743,9 @@ func TestRunWithGlobAndMissingWarning(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logfGlob := filepath.Join(dir, "dummy*")
 
@@ -728,13 +755,12 @@ func TestRunWithGlobAndMissingWarning(t *testing.T) {
 	opts, _ := parseArgs(params)
 	opts.prepare()
 
-	testRunLogFileMissing := func() {
+	t.Run("log file missing", func(t *testing.T) {
 		ckr := run(context.Background(), params)
 		assert.Equal(t, ckr.Status, checkers.WARNING, "ckr.Status should be WARNING")
 		msg := fmt.Sprintf("0 warnings, 0 criticals for pattern /FATAL/.\nThe following 1 files are missing.\n%s", logfGlob)
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testRunLogFileMissing()
+		assert.Equal(t, ckr.Message, msg, "no file, no error detected")
+	})
 }
 
 func TestRunMultiplePattern(t *testing.T) {
@@ -742,11 +768,15 @@ func TestRunMultiplePattern(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn1 := `FATAL`
 	ptn2 := `TESTAPPLICATION`
@@ -757,55 +787,51 @@ func TestRunMultiplePattern(t *testing.T) {
 	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
+	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
-	l1 := "FATAL\nTESTAPPLICATION\n"
-	test2line := func() {
-		fh.WriteString(l1)
+	individualTextslines := "FATAL\nTESTAPPLICATION\n"
+	t.Run("two lines", func(t *testing.T) {
+		fh.WriteString(individualTextslines)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
 		msg := "0 warnings, 0 criticals for pattern /FATAL/ and /TESTAPPLICATION/."
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it is not meet the conditions to be detected as an error string, so should be no error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
-	}
-	test2line()
+		assert.Equal(t, int64(len(individualTextslines)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	l2 := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
-	testAndCondition := func() {
-		fh.WriteString(l2)
+	matchedTextsLines := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
+	t.Run("condition", func(t *testing.T) {
+		fh.WriteString(matchedTextsLines)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
 		msg := "2 warnings, 2 criticals for pattern /FATAL/ and /TESTAPPLICATION/."
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it is meet the conditions to be detected as an error string, so should be error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
-	}
-	testAndCondition()
+		assert.Equal(t, int64(len(individualTextslines)+len(matchedTextsLines)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	l3 := "OK\n"
-	testWithLevel := func() {
-		fh.WriteString(l3)
+	okLine := "OK\n"
+	t.Run("with level", func(t *testing.T) {
+		fh.WriteString(okLine)
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--warning-level", "12"}
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "When multiple patterns specified, --warning-level --critical-level can not be used"
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testWithLevel()
+		assert.Equal(t, ckr.Message, msg, "it should be detected that the option cannot be specified")
+	})
 
-	testInvalidPattern := func() {
-		fh.WriteString(l3)
+	t.Run("invalid pattern", func(t *testing.T) {
+		fh.WriteString(okLine)
 		ptn3 := "+"
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn3}
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "pattern is invalid"
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testInvalidPattern()
+		assert.Equal(t, ckr.Message, msg, "it should be detected that the pattern cannot be specified")
+	})
 }
 
 func TestRunWithSuppressOption(t *testing.T) {
@@ -813,11 +839,15 @@ func TestRunWithSuppressOption(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	ptn1 := `FATAL`
 	ptn2 := `TESTAPPLICATION`
@@ -828,55 +858,51 @@ func TestRunWithSuppressOption(t *testing.T) {
 	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
 
 	bytes, _ := getBytesToSkip(stateFile)
-	assert.Equal(t, int64(0), bytes, "something went wrong")
+	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
-	l1 := "FATAL\nTESTAPPLICATION\n"
-	test2line := func() {
-		fh.WriteString(l1)
+	individualTextslines := "FATAL\nTESTAPPLICATION\n"
+	t.Run("two lines", func(t *testing.T) {
+		fh.WriteString(individualTextslines)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.OK, ckr.Status, "ckr.Status should be OK")
 		msg := "0 warnings, 0 criticals."
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it is not meet the conditions to be detected as an error string, so should be no error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)), bytes, "something went wrong")
-	}
-	test2line()
+		assert.Equal(t, int64(len(individualTextslines)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	l2 := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
-	testAndCondition := func() {
-		fh.WriteString(l2)
+	matchedTextsLines := "FATAL TESTAPPLICATION\nTESTAPPLICATION FATAL\n"
+	t.Run("condition", func(t *testing.T) {
+		fh.WriteString(matchedTextsLines)
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.CRITICAL, ckr.Status, "ckr.Status should be CRITICAL")
 		msg := "2 warnings, 2 criticals."
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
+		assert.Equal(t, ckr.Message, msg, "it is meet the conditions to be detected as an error string, so should be error detected")
 
 		bytes, _ = getBytesToSkip(stateFile)
-		assert.Equal(t, int64(len(l1)+len(l2)), bytes, "something went wrong")
-	}
-	testAndCondition()
+		assert.Equal(t, int64(len(individualTextslines)+len(matchedTextsLines)), bytes, "the pointer should be moved by the amount of the character string written in the file")
+	})
 
-	l3 := "OK\n"
-	testWithLevel := func() {
-		fh.WriteString(l3)
+	okLine := "OK\n"
+	t.Run("with level", func(t *testing.T) {
+		fh.WriteString(okLine)
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn2, "--warning-level", "12", "--suppress-pattern"}
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "When multiple patterns specified, --warning-level --critical-level can not be used"
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testWithLevel()
+		assert.Equal(t, ckr.Message, msg, "it should be detected that the option cannot be specified")
+	})
 
-	testInvalidPattern := func() {
-		fh.WriteString(l3)
+	t.Run("invalid pattern", func(t *testing.T) {
+		fh.WriteString(okLine)
 		ptn3 := "+"
 		params := []string{"-s", dir, "-f", logf, "-p", ptn1, "-p", ptn3, "--suppress-pattern"}
 		ckr := run(context.Background(), params)
 		assert.Equal(t, checkers.UNKNOWN, ckr.Status, "ckr.Status should be UNKNOWN")
 		msg := "pattern is invalid"
-		assert.Equal(t, ckr.Message, msg, "something went wrong")
-	}
-	testInvalidPattern()
+		assert.Equal(t, ckr.Message, msg, "it should be detected that the pattern cannot be specified")
+	})
 }
 
 func TestRunMultipleExcludePattern(t *testing.T) {
@@ -884,11 +910,15 @@ func TestRunMultipleExcludePattern(t *testing.T) {
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
-	defer os.RemoveAll(dir)
+	t.Cleanup(func() {
+		os.RemoveAll(dir)
+	})
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
-	defer fh.Close()
+	t.Cleanup(func() {
+		fh.Close()
+	})
 
 	params := []string{"-s", dir, "-f", logf, "-p", "ERROR", "-p", "TESTAPP", "-E", "FOO", "-E", "BAR"}
 	opts, _ := parseArgs(params)
