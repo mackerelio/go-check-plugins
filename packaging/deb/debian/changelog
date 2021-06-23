@@ -1,3 +1,16 @@
+mackerel-check-plugins (0.39.4-1) stable; urgency=low
+
+  * [ci]rewrite check-memcached tests. used docker. (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/498>
+  * refactor check-log tests. (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/497>
+  * [ci] run tests on the workflow (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/495>
+  * [check-disk] upgrade gopsutil to v3 and fix treatment for fstype=none (by susisu)
+    <https://github.com/mackerelio/go-check-plugins/pull/492>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 23 Jun 2021 06:40:48 +0000
+
 mackerel-check-plugins (0.39.3-1) stable; urgency=low
 
   * Bump github.com/aws/aws-sdk-go from 1.38.40 to 1.38.45 (by dependabot[bot])

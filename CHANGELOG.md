@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.39.4 (2021-06-23)
+
+* [ci]rewrite check-memcached tests. used docker. #498 (yseto)
+* refactor check-log tests. #497 (yseto)
+* [ci] run tests on the workflow #495 (lufia)
+* [check-disk] upgrade gopsutil to v3 and fix treatment for fstype=none #492 (susisu)
+
+
 ## 0.39.3 (2021-06-03)
 
 * Bump github.com/aws/aws-sdk-go from 1.38.40 to 1.38.45 #489 (dependabot[bot])
