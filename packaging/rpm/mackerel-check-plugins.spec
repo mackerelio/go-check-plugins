@@ -45,6 +45,12 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jun 23 2021 <mackerel-developers@hatena.ne.jp> - 0.39.4
+- [ci]rewrite check-memcached tests. used docker. (by yseto)
+- refactor check-log tests. (by yseto)
+- [ci] run tests on the workflow (by lufia)
+- [check-disk] upgrade gopsutil to v3 and fix treatment for fstype=none (by susisu)
+
 * Thu Jun 03 2021 <mackerel-developers@hatena.ne.jp> - 0.39.3
 - Bump github.com/aws/aws-sdk-go from 1.38.40 to 1.38.45 (by dependabot[bot])
 - Bump github.com/go-sql-driver/mysql from 1.5.0 to 1.6.0 (by dependabot[bot])
