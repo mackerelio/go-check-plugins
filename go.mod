@@ -9,7 +9,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
 	github.com/elazarl/goproxy v0.0.0-20191011121108-aa519ddbe484
 	github.com/elazarl/goproxy/ext v0.0.0-20191011121108-aa519ddbe484
-	github.com/fsouza/go-dockerclient v1.7.2
+	github.com/fsouza/go-dockerclient v1.7.3
 	github.com/fzzy/radix v0.5.6
 	github.com/go-ldap/ldap/v3 v3.3.0
 	github.com/go-ole/go-ole v1.2.5
