@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.39.5 (2021-07-06)
+
+* Bump github.com/shirou/gopsutil/v3 from 3.21.5 to 3.21.6 #505 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go from 1.38.45 to 1.38.68 #501 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.7.2 to 1.7.3 #494 (dependabot[bot])
+
+
 ## 0.39.4 (2021-06-23)
 
 * [ci]rewrite check-memcached tests. used docker. #498 (yseto)
