@@ -1,0 +1,48 @@
+name: 'Create Release PR'
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'next release version'
+        required: true
+env:
+  GIT_AUTHOR_NAME: mackerelbot
+  GIT_AUTHOR_EMAIL: mackerelbot@users.noreply.github.com
+  GIT_COMMITTER_NAME: mackerelbot
+  GIT_COMMITTER_EMAIL: mackerelbot@users.noreply.github.com
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.34'
+
+      - uses: mackerelio/mackerel-create-release-pull-request-action@main
+        id: start
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          next_version: ${{ github.event.inputs.release_version }}
+          package_name: mackerel-check-plugins
+
+      - run: |
+          CURRENT=${{ steps.start.outputs.currentVersion }}
+          NEXT=${{ steps.start.outputs.nextVersion }}
+          mv packaging/mackerel-check-plugins_$CURRENT.orig.tar.gz packaging/mackerel-check-plugins_$NEXT.orig.tar.gz
+
+      - run: |
+          cpanm -qn Path::Tiny
+          perl tool/update-docs.pl
+
+      - uses: mackerelio/mackerel-create-release-pull-request-action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          finished: "true"
+          package_name: mackerel-check-plugins
+          next_version: ${{ steps.start.outputs.nextVersion }}
+          branch_name: ${{ steps.start.outputs.branchName }}
+          pull_request_infos: ${{ steps.start.outputs.pullRequestInfos }}
+        # TODO: remove below lines. when completed test.
+        env:
+          RUNNER_DEBUG: 1
