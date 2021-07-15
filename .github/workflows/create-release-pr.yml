@@ -27,6 +27,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           next_version: ${{ github.event.inputs.release_version }}
           package_name: mackerel-check-plugins
+          version_go_file_path: mackerel-check.go
 
       - run: |
           CURRENT=${{ steps.start.outputs.currentVersion }}
