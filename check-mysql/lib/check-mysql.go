@@ -16,6 +16,8 @@ type mysqlSetting struct {
 	Socket string `short:"S" long:"socket" default:"" description:"Path to unix socket"`
 	User   string `short:"u" long:"user" default:"root" description:"Username"`
 	Pass   string `short:"P" long:"password" default:"" description:"Password" env:"MYSQL_PASSWORD"`
+
+	EnableTLS bool `long:"tls" description:"Enables TLS connection"`
 }
 
 type mysqlVersion struct {
@@ -70,6 +72,9 @@ func newDB(m mysqlSetting) (*sql.DB, error) {
 		Net:                  proto,
 		Addr:                 target,
 		AllowNativePasswords: true,
+	}
+	if m.EnableTLS {
+		cfg.TLSConfig = "true"
 	}
 
 	return sql.Open("mysql", cfg.FormatDSN())

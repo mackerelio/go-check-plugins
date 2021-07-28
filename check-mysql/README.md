@@ -6,7 +6,7 @@ Checks for MySQL.
 
 ## Synopsis
 ```
-check-mysql connection --host=127.0.0.1 --port=3306 --user=USER --password=PASSWORD --warning=250 --critical=280
+check-mysql connection --host=127.0.0.1 --port=3306 --user=USER --password=PASSWORD --tls --warning=250 --critical=280
 ```
 
 ## Installation
@@ -60,6 +60,7 @@ Checks the MySQL server uptime.
   -S, --socket=   Path to unix socket
   -u, --user=     Username (default: root)
   -P, --password= Password [$MYSQL_PASSWORD]
+      --tls       Enable TLS connection
   -c, --critical= critical if the uptime less than (default: 0)
   -w, --warning=  warning if the uptime less than (default: 0)
 ```
@@ -74,6 +75,7 @@ Checks the MySQL server is readonly or not.
   -S, --socket=   Path to unix socket
   -u, --user=     Username (default: root)
   -P, --password= Password [$MYSQL_PASSWORD]
+      --tls       Enable TLS connection
 ```
 
 #### `replication` subcommand
@@ -86,6 +88,7 @@ Checks MySQL replication status and its second behind master.
   -S, --socket=   Path to unix socket
   -u, --user=     Username (default: root)
   -P, --password= Password [$MYSQL_PASSWORD]
+      --tls       Enable TLS connection
   -c, --critical= critical if the seconds behind master is over (default: 250)
   -w, --warning=  warning if the seconds behind master is over (default: 200)
 ```
@@ -100,6 +103,7 @@ Checks the number of MySQL connections.
   -S, --socket=   Path to unix socket
   -u, --user=     Username (default: root)
   -P, --password= Password [$MYSQL_PASSWORD]
+      --tls       Enable TLS connection
   -c, --critical= critical if the number of connection is over (default: 250)
   -w, --warning=  warning if the number of connection is over (default: 200)
 ```
