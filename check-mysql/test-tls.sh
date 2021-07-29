@@ -19,12 +19,13 @@ fi
 password=passpass
 port=13306
 image=mysql:8
+cacert=$(mktemp 'ca.XXXXXXXXXX.pem')
 
 docker run -d \
 	--name "test-$plugin" \
 	-p "$port:3306" \
 	-e "MYSQL_ROOT_PASSWORD=$password" "$image"
-trap 'docker stop test-$plugin; docker rm test-$plugin; exit 1' 1 2 3 15
+trap 'docker stop test-$plugin; docker rm test-$plugin; rm $cacert; exit 1' 1 2 3 15
 
 # wait until bootstrap mysqld..
 for i in $(seq 10)
@@ -38,8 +39,12 @@ do
 done
 sleep 1
 
-$plugin connection --port $port --password=$password
+docker cp "test-$plugin:/var/lib/mysql/ca.pem" "$cacert"
+
+$plugin connection --port $port --password=$password \
+	--tls --tls-root-cert="$cacert"
 status=$?
 docker stop "test-$plugin"
 docker rm "test-$plugin"
+rm "$cacert"
 exit $status
