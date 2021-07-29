@@ -42,7 +42,7 @@ sleep 1
 docker cp "test-$plugin:/var/lib/mysql/ca.pem" "$cacert"
 
 $plugin connection --port $port --password=$password \
-	--tls --tls-root-cert="$cacert"
+	--tls --tls-root-cert="$cacert" --tls-skip-verify
 status=$?
 docker stop "test-$plugin"
 docker rm "test-$plugin"
