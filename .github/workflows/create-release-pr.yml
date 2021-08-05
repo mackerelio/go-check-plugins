@@ -24,7 +24,7 @@ jobs:
       - uses: mackerelio/mackerel-create-release-pull-request-action@main
         id: start
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.MACKERELBOT_GITHUB_TOKEN }}
           next_version: ${{ github.event.inputs.release_version }}
           package_name: mackerel-check-plugins
           version_go_file_path: mackerel-check.go
@@ -40,7 +40,7 @@ jobs:
 
       - uses: mackerelio/mackerel-create-release-pull-request-action@main
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.MACKERELBOT_GITHUB_TOKEN }}
           finished: "true"
           package_name: mackerel-check-plugins
           next_version: ${{ steps.start.outputs.nextVersion }}
