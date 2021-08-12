@@ -60,7 +60,7 @@ Checks the MySQL server uptime.
   -S, --socket=         Path to unix socket
   -u, --user=           Username (default: root)
   -P, --password=       Password [$MYSQL_PASSWORD]
-      --tls             Enable TLS connection
+      --tls             Enables TLS connection
       --tls-root-cert=  The root certificate used for TLS certificate verification
       --tls-skip-verify Disable TLS certificate verification
   -c, --critical=       critical if the uptime less than (default: 0)
