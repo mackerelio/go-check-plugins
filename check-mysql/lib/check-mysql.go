@@ -1,6 +1,8 @@
 package checkmysql
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"database/sql"
 	"fmt"
 	"os"
@@ -16,6 +18,10 @@ type mysqlSetting struct {
 	Socket string `short:"S" long:"socket" default:"" description:"Path to unix socket"`
 	User   string `short:"u" long:"user" default:"root" description:"Username"`
 	Pass   string `short:"P" long:"password" default:"" description:"Password" env:"MYSQL_PASSWORD"`
+
+	EnableTLS     bool   `long:"tls" description:"Enables TLS connection"`
+	TLSRootCert   string `long:"tls-root-cert" default:"" description:"The root certificate used for TLS certificate verification"`
+	TLSSkipVerify bool   `long:"tls-skip-verify" description:"Disable TLS certificate verification"`
 }
 
 type mysqlVersion struct {
@@ -70,6 +76,21 @@ func newDB(m mysqlSetting) (*sql.DB, error) {
 		Net:                  proto,
 		Addr:                 target,
 		AllowNativePasswords: true,
+	}
+	if m.EnableTLS {
+		var c tls.Config
+		if m.TLSRootCert != "" {
+			certPool := x509.NewCertPool()
+			pem, err := os.ReadFile(m.TLSRootCert)
+			if err != nil {
+				return nil, fmt.Errorf("cannot read %s: %v", m.TLSRootCert, err)
+			}
+			certPool.AppendCertsFromPEM(pem)
+			c.RootCAs = certPool
+		}
+		c.InsecureSkipVerify = m.TLSSkipVerify
+		mysql.RegisterTLSConfig("custom", &c)
+		cfg.TLSConfig = "custom"
 	}
 
 	return sql.Open("mysql", cfg.FormatDSN())
