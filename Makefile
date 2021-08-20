@@ -21,17 +21,6 @@ devel-deps:
 	cd && go get golang.org/x/lint/golint  \
 	  github.com/mattn/goveralls
 
-.PHONY: check-release-deps
-check-release-deps:
-	@have_error=0; \
-	for command in cpanm hub ghch gobump; do \
-	  if ! command -v $$command > /dev/null; then \
-	    have_error=1; \
-	    echo "\`$$command\` command is required for releasing"; \
-	  fi; \
-	done; \
-	test $$have_error = 0
-
 .PHONY: lint
 lint: devel-deps
 	go vet ./...
@@ -126,11 +115,6 @@ deb-v2-arm:
 	make build/mackerel-check GOOS=linux GOARCH=arm64
 	cp build/mackerel-check packaging/deb-v2/debian/
 	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us -aarm64
-
-.PHONY: release
-release: check-release-deps
-	(cd tool && cpanm -qn --installdeps .)
-	perl tool/create-release-pullrequest
 
 .PHONY: clean
 clean:
