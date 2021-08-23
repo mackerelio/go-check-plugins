@@ -1,2 +1,0 @@
-requires 'Path::Tiny';
-requires 'Mackerel::ReleaseUtils', 'v0.2.2';
