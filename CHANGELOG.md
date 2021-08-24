@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.40.0 (2021-08-24)
+
+* [check-mysql] add --tls, --tls-root-cert and --tls-skip-verify options #511 (lufia)
+* Bump github.com/aws/aws-sdk-go from 1.38.68 to 1.39.4 #507 (dependabot[bot])
+
+
 ## 0.39.5 (2021-07-06)
 
 * Bump github.com/shirou/gopsutil/v3 from 3.21.5 to 3.21.6 #505 (dependabot[bot])
