@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.40.0-1.v2) stable; urgency=low
+
+  * [check-mysql] add --tls, --tls-root-cert and --tls-skip-verify options (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/511>
+  * Bump github.com/aws/aws-sdk-go from 1.38.68 to 1.39.4 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/507>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 24 Aug 2021 02:43:46 +0000
+
 mackerel-check-plugins (0.39.5-1.v2) stable; urgency=low
 
   * Bump github.com/shirou/gopsutil/v3 from 3.21.5 to 3.21.6 (by dependabot[bot])

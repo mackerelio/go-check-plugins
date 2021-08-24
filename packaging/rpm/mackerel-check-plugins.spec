@@ -45,6 +45,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Tue Aug 24 2021 <mackerel-developers@hatena.ne.jp> - 0.40.0
+- [check-mysql] add --tls, --tls-root-cert and --tls-skip-verify options (by lufia)
+- Bump github.com/aws/aws-sdk-go from 1.38.68 to 1.39.4 (by dependabot[bot])
+
 * Tue Jul 06 2021 <mackerel-developers@hatena.ne.jp> - 0.39.5
 - Bump github.com/shirou/gopsutil/v3 from 3.21.5 to 3.21.6 (by dependabot[bot])
 - Bump github.com/aws/aws-sdk-go from 1.38.45 to 1.38.68 (by dependabot[bot])
