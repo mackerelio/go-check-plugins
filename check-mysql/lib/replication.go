@@ -95,6 +95,7 @@ func checkReplication(args []string) *checkers.Checker {
 	if err != nil {
 		return checkers.Unknown(fmt.Sprintf("Couldn't execute query: %s", err))
 	}
+	defer rows.Close()
 
 	if !rows.Next() {
 		return checkers.Ok("MySQL is not a replica")
