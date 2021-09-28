@@ -3,12 +3,13 @@ package checkredis
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"regexp"
 	"strings"
 	"time"
 
-	"github.com/fzzy/radix/redis"
+	"github.com/gomodule/redigo/redis"
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 )
@@ -53,14 +54,14 @@ SubCommands:`)
 	ckr.Exit()
 }
 
-func connectRedis(m redisSetting) (*redis.Client, error) {
+func connectRedis(m redisSetting) (redis.Conn, error) {
 	network := "tcp"
-	target := fmt.Sprintf("%s:%s", m.Host, m.Port)
+	address := net.JoinHostPort(m.Host, m.Port)
 	if m.Socket != "" {
-		target = m.Socket
 		network = "unix"
+		address = m.Socket
 	}
-	c, err := redis.DialTimeout(network, target, time.Duration(m.Timeout)*time.Second)
+	c, err := redis.Dial(network, address, redis.DialConnectTimeout(time.Duration(m.Timeout)*time.Second))
 	if err != nil {
 		return nil, fmt.Errorf("couldn't connect: %s", err)
 	}
@@ -76,23 +77,19 @@ func connectRedis(m redisSetting) (*redis.Client, error) {
 	}
 
 	if password != "" {
-		r := c.Cmd("AUTH", password)
-		if r.Err != nil {
-			return nil, fmt.Errorf("couldn't authenticate: %v", r.Err)
+		_, err := c.Do("AUTH", password)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't authenticate: %v", err)
 		}
 	}
 
 	return c, nil
 }
 
-func getRedisInfo(c *redis.Client) (*map[string]string, error) {
+func getRedisInfo(c redis.Conn) (*map[string]string, error) {
 	info := make(map[string]string)
 
-	r := c.Cmd("info")
-	if r.Err != nil {
-		return nil, errors.New("couldn't execute query")
-	}
-	str, err := r.Str()
+	str, err := redis.String(c.Do("info"))
 	if err != nil {
 		return nil, errors.New("couldn't execute query")
 	}
@@ -116,7 +113,7 @@ func getRedisInfo(c *redis.Client) (*map[string]string, error) {
 	return &info, nil
 }
 
-func connectRedisGetInfo(opts redisSetting) (*redis.Client, *map[string]string, error) {
+func connectRedisGetInfo(opts redisSetting) (redis.Conn, *map[string]string, error) {
 	c, err := connectRedis(opts)
 	if err != nil {
 		return nil, nil, err
