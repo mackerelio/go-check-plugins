@@ -91,33 +91,9 @@ func (opts *logOpts) prepare() error {
 	}
 
 	if opts.FilePattern != "" {
-		var dirStr string
-		var filePat string
-		if opts.Directory != "" {
-			dirStr = opts.Directory
-			filePat = opts.FilePattern
-		} else {
-			dirStr = filepath.Dir(opts.FilePattern)
-			filePat = filepath.Base(opts.FilePattern)
-		}
-		reg, err := regCompileWithCase(filePat, opts.CaseInsensitive)
+		opts.fileListFromPattern, err = parseFilePattern(opts.Directory, opts.FilePattern, opts.CaseInsensitive)
 		if err != nil {
-			return fmt.Errorf("file-pattern is invalid")
-		}
-
-		fileInfos, err := ioutil.ReadDir(dirStr)
-		if err != nil {
-			return fmt.Errorf("cannot read the directory:" + err.Error())
-		}
-
-		for _, fileInfo := range fileInfos {
-			if fileInfo.IsDir() {
-				continue
-			}
-			fname := fileInfo.Name()
-			if reg.MatchString(fname) {
-				opts.fileListFromPattern = append(opts.fileListFromPattern, dirStr+string(filepath.Separator)+fileInfo.Name())
-			}
+			return err
 		}
 	}
 	if !validateMissing(opts.Missing) {
@@ -437,6 +413,39 @@ func (opts *logOpts) match(line string) (bool, []string) {
 		}
 	}
 	return true, matches
+}
+
+func parseFilePattern(directory string, filePattern string, caseInsensitive bool) ([]string, error) {
+	var dirStr string
+	var filePat string
+	if directory != "" {
+		dirStr = directory
+		filePat = filePattern
+	} else {
+		dirStr = filepath.Dir(filePattern)
+		filePat = filepath.Base(filePattern)
+	}
+	reg, err := regCompileWithCase(filePat, caseInsensitive)
+	if err != nil {
+		return nil, fmt.Errorf("file-pattern is invalid")
+	}
+
+	fileInfos, err := ioutil.ReadDir(dirStr)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read the directory:" + err.Error())
+	}
+
+	var fileList []string
+	for _, fileInfo := range fileInfos {
+		if fileInfo.IsDir() {
+			continue
+		}
+		fname := fileInfo.Name()
+		if reg.MatchString(fname) {
+			fileList = append(fileList, dirStr+string(filepath.Separator)+fileInfo.Name())
+		}
+	}
+	return fileList, nil
 }
 
 type state struct {
