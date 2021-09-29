@@ -39,6 +39,7 @@ type logOpts struct {
 	WarnLevel           float64  `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
 	CritLevel           float64  `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
 	ReturnContent       bool     `short:"r" long:"return" description:"Return matched line"`
+	Directory           string   `long:"directory" value-name:"DIR" description:"Specify the directory of files to be detected"`
 	FilePattern         string   `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	CaseInsensitive     bool     `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir            string   `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
@@ -90,8 +91,15 @@ func (opts *logOpts) prepare() error {
 	}
 
 	if opts.FilePattern != "" {
-		dirStr := filepath.Dir(opts.FilePattern)
-		filePat := filepath.Base(opts.FilePattern)
+		var dirStr string
+		var filePat string
+		if opts.Directory != "" {
+			dirStr = opts.Directory
+			filePat = opts.FilePattern
+		} else {
+			dirStr = filepath.Dir(opts.FilePattern)
+			filePat = filepath.Base(opts.FilePattern)
+		}
 		reg, err := regCompileWithCase(filePat, opts.CaseInsensitive)
 		if err != nil {
 			return fmt.Errorf("file-pattern is invalid")
