@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Sep 29 2021 <mackerel-developers@hatena.ne.jp> - 0.40.1
+- check-mysql: Closes `checkReplication` rows (by mechairoi)
+
 * Tue Aug 24 2021 <mackerel-developers@hatena.ne.jp> - 0.40.0
 - [check-mysql] add --tls, --tls-root-cert and --tls-skip-verify options (by lufia)
 - Bump github.com/aws/aws-sdk-go from 1.38.68 to 1.39.4 (by dependabot[bot])

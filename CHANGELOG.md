@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.40.1 (2021-09-29)
+
+* check-mysql: Closes `checkReplication` rows #515 (mechairoi)
+
+
 ## 0.40.0 (2021-08-24)
 
 * [check-mysql] add --tls, --tls-root-cert and --tls-skip-verify options #511 (lufia)
