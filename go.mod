@@ -17,9 +17,9 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.2
-	github.com/mackerelio/checkers v0.0.0-20190411030116-60cbd7b55456
+	github.com/mackerelio/checkers v0.0.2
 	github.com/mackerelio/go-osstat v0.2.0
-	github.com/mackerelio/golib v0.0.0-20191002020229-a65782d392ca
+	github.com/mackerelio/golib v1.2.1
 	github.com/mattn/go-encoding v0.0.2
 	github.com/mattn/go-zglob v0.0.3
 	github.com/natefinch/atomic v0.0.0-20150920032501-a62ce929ffcc
