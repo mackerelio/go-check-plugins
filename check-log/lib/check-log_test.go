@@ -1003,6 +1003,8 @@ func TestParseFilePattern(t *testing.T) {
 			filePattern: dir + string(filepath.Separator) + `dummy\d.txt`,
 			insensitive: true,
 			actual:      []string{logf1, logf2, logf3},
+			// If in Windows, '\\' is used as both path separator and special meaning of regular expression.
+			// Thus the result of filepath.Dir do not become a expected directory name.
 			skipWindows: true,
 		},
 		{
