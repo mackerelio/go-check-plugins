@@ -415,13 +415,15 @@ func (opts *logOpts) match(line string) (bool, []string) {
 	return true, matches
 }
 
-func parseFilePattern(directory string, filePattern string, caseInsensitive bool) ([]string, error) {
+func parseFilePattern(directory, filePattern string, caseInsensitive bool) ([]string, error) {
 	var dirStr string
 	var filePat string
 	if directory != "" {
 		dirStr = directory
 		filePat = filePattern
 	} else {
+		// for backward compatibility.
+		// Directory delimiters and regular expressions can conflict in windows environment.
 		dirStr = filepath.Dir(filePattern)
 		filePat = filepath.Base(filePattern)
 	}

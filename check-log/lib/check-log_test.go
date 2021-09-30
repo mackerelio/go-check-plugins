@@ -969,13 +969,7 @@ func TestRunMultipleExcludePattern(t *testing.T) {
 }
 
 func TestParseFilePattern(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf1 := filepath.Join(dir, "dummy1.txt")
 	fh1, _ := os.Create(logf1)
