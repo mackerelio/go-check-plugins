@@ -62,6 +62,10 @@ func (opts *logOpts) prepare() error {
 		return fmt.Errorf("No log file specified")
 	}
 
+	if opts.Directory != "" && opts.FilePattern == "" {
+		return fmt.Errorf("directory option must be used with file-pattern option")
+	}
+
 	var err error
 	var reg *regexp.Regexp
 	for _, ptn := range opts.Pattern {
