@@ -51,7 +51,7 @@ command = ["check-log", "--file", "/path/to/file", "--pattern", "REGEXP", "--war
       --warning-level=N                          Warning level if pattern has a group
       --critical-level=N                         Critical level if pattern has a group
   -r, --return                                   Return matched line
-      --directory=DIR                            Specify the directory of files to be detected
+      --search-directory=DIR                     Specify the directory of files to be detected
   -F, --file-pattern=FILE                        Check a pattern of files, instead of one file
   -i, --icase                                    Run a case insensitive match
   -s, --state-dir=DIR                            Dir to keep state files under
