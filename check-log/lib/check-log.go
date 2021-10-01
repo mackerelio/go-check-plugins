@@ -39,7 +39,7 @@ type logOpts struct {
 	WarnLevel           float64  `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
 	CritLevel           float64  `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
 	ReturnContent       bool     `short:"r" long:"return" description:"Return matched line"`
-	Directory           string   `long:"search-directory" value-name:"DIR" description:"Specify the directory of files to be detected"`
+	Directory           string   `long:"search-in-directory" value-name:"DIR" description:"Specify the directory of files to be detected"`
 	FilePattern         string   `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	CaseInsensitive     bool     `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir            string   `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
@@ -63,7 +63,7 @@ func (opts *logOpts) prepare() error {
 	}
 
 	if opts.Directory != "" && opts.FilePattern == "" {
-		return fmt.Errorf("search-directory option must be used with file-pattern option")
+		return fmt.Errorf("search-in-directory option must be used with file-pattern option")
 	}
 
 	var err error
