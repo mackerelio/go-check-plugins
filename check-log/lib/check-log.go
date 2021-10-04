@@ -39,6 +39,7 @@ type logOpts struct {
 	WarnLevel           float64  `long:"warning-level" value-name:"N" description:"Warning level if pattern has a group"`
 	CritLevel           float64  `long:"critical-level" value-name:"N" description:"Critical level if pattern has a group"`
 	ReturnContent       bool     `short:"r" long:"return" description:"Return matched line"`
+	Directory           string   `long:"search-in-directory" value-name:"DIR" description:"Specify the directory of files to be detected"`
 	FilePattern         string   `short:"F" long:"file-pattern" value-name:"FILE" description:"Check a pattern of files, instead of one file"`
 	CaseInsensitive     bool     `short:"i" long:"icase" description:"Run a case insensitive match"`
 	StateDir            string   `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
@@ -59,6 +60,10 @@ type logOpts struct {
 func (opts *logOpts) prepare() error {
 	if opts.LogFile == "" && opts.FilePattern == "" {
 		return fmt.Errorf("No log file specified")
+	}
+
+	if opts.Directory != "" && opts.FilePattern == "" {
+		return fmt.Errorf("search-in-directory option must be used with file-pattern option")
 	}
 
 	var err error
@@ -90,26 +95,9 @@ func (opts *logOpts) prepare() error {
 	}
 
 	if opts.FilePattern != "" {
-		dirStr := filepath.Dir(opts.FilePattern)
-		filePat := filepath.Base(opts.FilePattern)
-		reg, err := regCompileWithCase(filePat, opts.CaseInsensitive)
+		opts.fileListFromPattern, err = parseFilePattern(opts.Directory, opts.FilePattern, opts.CaseInsensitive)
 		if err != nil {
-			return fmt.Errorf("file-pattern is invalid")
-		}
-
-		fileInfos, err := ioutil.ReadDir(dirStr)
-		if err != nil {
-			return fmt.Errorf("cannot read the directory:" + err.Error())
-		}
-
-		for _, fileInfo := range fileInfos {
-			if fileInfo.IsDir() {
-				continue
-			}
-			fname := fileInfo.Name()
-			if reg.MatchString(fname) {
-				opts.fileListFromPattern = append(opts.fileListFromPattern, dirStr+string(filepath.Separator)+fileInfo.Name())
-			}
+			return err
 		}
 	}
 	if !validateMissing(opts.Missing) {
@@ -429,6 +417,41 @@ func (opts *logOpts) match(line string) (bool, []string) {
 		}
 	}
 	return true, matches
+}
+
+func parseFilePattern(directory, filePattern string, caseInsensitive bool) ([]string, error) {
+	var dirStr string
+	var filePat string
+	if directory != "" {
+		dirStr = directory
+		filePat = filePattern
+	} else {
+		// for backward compatibility.
+		// Directory delimiters and regular expressions can conflict in windows environment.
+		dirStr = filepath.Dir(filePattern)
+		filePat = filepath.Base(filePattern)
+	}
+	reg, err := regCompileWithCase(filePat, caseInsensitive)
+	if err != nil {
+		return nil, fmt.Errorf("file-pattern is invalid")
+	}
+
+	fileInfos, err := ioutil.ReadDir(dirStr)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read the directory:" + err.Error())
+	}
+
+	var fileList []string
+	for _, fileInfo := range fileInfos {
+		if fileInfo.IsDir() {
+			continue
+		}
+		fname := fileInfo.Name()
+		if reg.MatchString(fname) {
+			fileList = append(fileList, dirStr+string(filepath.Separator)+fileInfo.Name())
+		}
+	}
+	return fileList, nil
 }
 
 type state struct {

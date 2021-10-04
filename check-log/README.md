@@ -45,12 +45,13 @@ command = ["check-log", "--file", "/path/to/file", "--pattern", "REGEXP", "--war
   -f, --file=FILE                                Path to log file
   -p, --pattern=PAT                              Pattern to search for. If specified multiple, they will be treated together with the AND operator
       --suppress-pattern                         Suppress pattern display
-  -E, --exclude=PAT                              Pattern to exclude from matching
+  -E, --exclude=PAT                              Pattern to exclude from matching. If specified multiple, they will be treated together with the AND operator
   -w, --warning-over=                            Trigger a warning if matched lines is over a number
   -c, --critical-over=                           Trigger a critical if matched lines is over a number
       --warning-level=N                          Warning level if pattern has a group
       --critical-level=N                         Critical level if pattern has a group
   -r, --return                                   Return matched line
+      --search-in-directory=DIR                  Specify the directory of files to be detected
   -F, --file-pattern=FILE                        Check a pattern of files, instead of one file
   -i, --icase                                    Run a case insensitive match
   -s, --state-dir=DIR                            Dir to keep state files under

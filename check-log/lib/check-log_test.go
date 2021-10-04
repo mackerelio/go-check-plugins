@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -964,5 +965,70 @@ func TestRunMultipleExcludePattern(t *testing.T) {
 
 		msg := fmt.Sprintf("%d warnings, %d criticals for pattern /ERROR/ and /TESTAPP/.", test.matchedCount, test.matchedCount)
 		assert.Equal(t, msg, ckr.Message, fmt.Sprintf("chk.Message should be '%s' (actual: '%s')", msg, ckr.Message))
+	}
+}
+
+func TestParseFilePattern(t *testing.T) {
+	dir := t.TempDir()
+
+	logf1 := filepath.Join(dir, "dummy1.txt")
+	fh1, _ := os.Create(logf1)
+	fh1.Close()
+
+	logf2 := filepath.Join(dir, "dummy2.txt")
+	fh2, _ := os.Create(logf2)
+	fh2.Close()
+
+	logf3 := filepath.Join(dir, "DUMMY3.txt")
+	fh3, _ := os.Create(logf3)
+	fh3.Close()
+
+	tests := []struct {
+		desc        string
+		directory   string
+		filePattern string
+		insensitive bool
+		actual      []string
+		skipWindows bool
+	}{
+		{
+			desc:        "filePattern only",
+			directory:   "",
+			filePattern: dir + string(filepath.Separator) + `dummy\d.txt`,
+			insensitive: true,
+			actual:      []string{logf1, logf2, logf3},
+			// If in Windows, '\\' is used as both path separator and special meaning of regular expression.
+			// Thus the result of filepath.Dir do not become a expected directory name.
+			skipWindows: true,
+		},
+		{
+			desc:        "separate directory, file pattern",
+			directory:   dir,
+			filePattern: `dummy\d.txt`,
+			insensitive: true,
+			actual:      []string{logf1, logf2, logf3},
+			skipWindows: false,
+		},
+		{
+			desc:        "case sensitive",
+			directory:   dir,
+			filePattern: `DUMMY\d.txt`,
+			insensitive: false,
+			actual:      []string{logf3},
+			skipWindows: false,
+		},
+	}
+
+	for _, tt := range tests {
+		if tt.skipWindows && runtime.GOOS == "windows" {
+			continue
+		}
+		list, err := parseFilePattern(tt.directory, tt.filePattern, tt.insensitive)
+		if err != nil {
+			t.Fatalf("failed: %s", err)
+		}
+		sort.Strings(list)
+		sort.Strings(tt.actual)
+		assert.Equal(t, list, tt.actual, fmt.Sprintf("%s - list should be '%s' (actual: '%s')", tt.desc, list, tt.actual))
 	}
 }
