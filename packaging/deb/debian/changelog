@@ -1,3 +1,14 @@
+mackerel-check-plugins (0.41.0-1) stable; urgency=low
+
+  * update golib, checkers (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/525>
+  * [check-log] add search-in-directory option (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/524>
+  * [check-redis] migrate redis client library to redigo (by pyto86pri)
+    <https://github.com/mackerelio/go-check-plugins/pull/516>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 6 Oct 2021 02:01:42 +0000
+
 mackerel-check-plugins (0.40.1-1) stable; urgency=low
 
   * check-mysql: Closes `checkReplication` rows (by mechairoi)

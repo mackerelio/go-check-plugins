@@ -36,6 +36,11 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Oct 6 2021 <mackerel-developers@hatena.ne.jp> - 0.41.0
+- update golib, checkers (by yseto)
+- [check-log] add search-in-directory option (by yseto)
+- [check-redis] migrate redis client library to redigo (by pyto86pri)
+
 * Wed Sep 29 2021 <mackerel-developers@hatena.ne.jp> - 0.40.1
 - check-mysql: Closes `checkReplication` rows (by mechairoi)
 

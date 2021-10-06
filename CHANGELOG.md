@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.41.0 (2021-10-06)
+
+* update golib, checkers #525 (yseto)
+* [check-log] add search-in-directory option #524 (yseto)
+* [check-redis] migrate redis client library to redigo #516 (pyto86pri)
+
+
 ## 0.40.1 (2021-09-29)
 
 * check-mysql: Closes `checkReplication` rows #515 (mechairoi)
