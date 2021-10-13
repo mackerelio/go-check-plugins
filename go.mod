@@ -3,7 +3,7 @@ module github.com/mackerelio/go-check-plugins
 go 1.16
 
 require (
-	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
+	github.com/StackExchange/wmi v1.2.1
 	github.com/aws/aws-sdk-go v1.40.59
 	github.com/beevik/ntp v0.3.0
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
@@ -23,10 +23,10 @@ require (
 	github.com/mattn/go-encoding v0.0.2
 	github.com/mattn/go-zglob v0.0.3
 	github.com/natefinch/atomic v0.0.0-20150920032501-a62ce929ffcc
-	github.com/shirou/gopsutil/v3 v3.21.6
+	github.com/shirou/gopsutil/v3 v3.21.9
 	github.com/stretchr/testify v1.7.0
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/sys v0.0.0-20210423082822-04245dca01da
+	golang.org/x/sys v0.0.0-20210816074244-15123e1e1f71
 	golang.org/x/text v0.3.7
 )
