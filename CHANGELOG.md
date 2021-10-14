@@ -2,8 +2,6 @@
 
 ## 0.41.1 (2021-10-14)
 
-* Revert "Release version 0.41.1" #531 (ne-sachirou)
-* Release version 0.41.1 #530 (mackerelbot)
 * Bump github.com/aws/aws-sdk-go from 1.39.4 to 1.40.59 #529 (dependabot[bot])
 * Bump github.com/shirou/gopsutil/v3 from 3.21.6 to 3.21.9 #527 (dependabot[bot])
 * Bump github.com/fsouza/go-dockerclient from 1.7.3 to 1.7.4 #521 (dependabot[bot])

@@ -1,9 +1,5 @@
 mackerel-check-plugins (0.41.1-1) stable; urgency=low
 
-  * Revert "Release version 0.41.1" (by ne-sachirou)
-    <https://github.com/mackerelio/go-check-plugins/pull/531>
-  * Release version 0.41.1 (by mackerelbot)
-    <https://github.com/mackerelio/go-check-plugins/pull/530>
   * Bump github.com/aws/aws-sdk-go from 1.39.4 to 1.40.59 (by dependabot[bot])
     <https://github.com/mackerelio/go-check-plugins/pull/529>
   * Bump github.com/shirou/gopsutil/v3 from 3.21.6 to 3.21.9 (by dependabot[bot])

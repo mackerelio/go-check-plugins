@@ -46,8 +46,6 @@ done
 
 %changelog
 * Thu Oct 14 2021 <mackerel-developers@hatena.ne.jp> - 0.41.1
-- Revert "Release version 0.41.1" (by ne-sachirou)
-- Release version 0.41.1 (by mackerelbot)
 - Bump github.com/aws/aws-sdk-go from 1.39.4 to 1.40.59 (by dependabot[bot])
 - Bump github.com/shirou/gopsutil/v3 from 3.21.6 to 3.21.9 (by dependabot[bot])
 - Bump github.com/fsouza/go-dockerclient from 1.7.3 to 1.7.4 (by dependabot[bot])
