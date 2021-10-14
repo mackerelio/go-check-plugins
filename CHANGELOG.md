@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.41.1 (2021-10-14)
+
+* Bump github.com/aws/aws-sdk-go from 1.39.4 to 1.40.59 #529 (dependabot[bot])
+* Bump github.com/shirou/gopsutil/v3 from 3.21.6 to 3.21.9 #527 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.7.3 to 1.7.4 #521 (dependabot[bot])
+* Bump github.com/lib/pq from 1.10.2 to 1.10.3 #520 (dependabot[bot])
+* Bump golang.org/x/text from 0.3.6 to 0.3.7 #519 (dependabot[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.3.0 to 3.4.1 #518 (dependabot[bot])
+
+
 ## 0.41.0 (2021-10-06)
 
 * update golib, checkers #525 (yseto)
