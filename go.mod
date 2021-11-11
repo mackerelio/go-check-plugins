@@ -18,7 +18,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.3
 	github.com/mackerelio/checkers v0.0.2
-	github.com/mackerelio/go-osstat v0.2.0
+	github.com/mackerelio/go-osstat v0.2.1
 	github.com/mackerelio/golib v1.2.1
 	github.com/mattn/go-encoding v0.0.2
 	github.com/mattn/go-zglob v0.0.3
