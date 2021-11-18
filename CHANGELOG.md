@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.41.2 (2021-11-18)
+
+* Bump github.com/shirou/gopsutil/v3 from 3.21.9 to 3.21.10 #539 (dependabot[bot])
+
+
 ## 0.41.1 (2021-10-14)
 
 * Bump github.com/aws/aws-sdk-go from 1.39.4 to 1.40.59 #529 (dependabot[bot])

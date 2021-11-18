@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Nov 18 2021 <mackerel-developers@hatena.ne.jp> - 0.41.2
+- Bump github.com/shirou/gopsutil/v3 from 3.21.9 to 3.21.10 (by dependabot[bot])
+
 * Thu Oct 14 2021 <mackerel-developers@hatena.ne.jp> - 0.41.1
 - Bump github.com/aws/aws-sdk-go from 1.39.4 to 1.40.59 (by dependabot[bot])
 - Bump github.com/shirou/gopsutil/v3 from 3.21.6 to 3.21.9 (by dependabot[bot])
