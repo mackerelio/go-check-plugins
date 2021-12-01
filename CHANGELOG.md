@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.41.3 (2021-12-01)
+
+* Bump github.com/aws/aws-sdk-go from 1.40.59 to 1.42.9 #544 (dependabot[bot])
+* Bump github.com/mackerelio/go-osstat from 0.2.0 to 0.2.1 #535 (dependabot[bot])
+
+
 ## 0.41.2 (2021-11-18)
 
 * Bump github.com/shirou/gopsutil/v3 from 3.21.9 to 3.21.10 #539 (dependabot[bot])
