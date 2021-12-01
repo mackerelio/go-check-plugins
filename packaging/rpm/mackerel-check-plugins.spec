@@ -45,6 +45,10 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Dec 1 2021 <mackerel-developers@hatena.ne.jp> - 0.41.3
+- Bump github.com/aws/aws-sdk-go from 1.40.59 to 1.42.9 (by dependabot[bot])
+- Bump github.com/mackerelio/go-osstat from 0.2.0 to 0.2.1 (by dependabot[bot])
+
 * Thu Nov 18 2021 <mackerel-developers@hatena.ne.jp> - 0.41.2
 - Bump github.com/shirou/gopsutil/v3 from 3.21.9 to 3.21.10 (by dependabot[bot])
 

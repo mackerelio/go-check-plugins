@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.41.3-1.v2) stable; urgency=low
+
+  * Bump github.com/aws/aws-sdk-go from 1.40.59 to 1.42.9 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/544>
+  * Bump github.com/mackerelio/go-osstat from 0.2.0 to 0.2.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/535>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 1 Dec 2021 05:25:43 +0000
+
 mackerel-check-plugins (0.41.2-1.v2) stable; urgency=low
 
   * Bump github.com/shirou/gopsutil/v3 from 3.21.9 to 3.21.10 (by dependabot[bot])
