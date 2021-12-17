@@ -8,16 +8,19 @@ import (
 	"os"
 	"strings"
 
+	"github.com/go-ini/ini"
 	"github.com/go-sql-driver/mysql"
 	"github.com/mackerelio/checkers"
 )
 
 type mysqlSetting struct {
-	Host   string `short:"H" long:"host" default:"localhost" description:"Hostname"`
-	Port   string `short:"p" long:"port" default:"3306" description:"Port"`
-	Socket string `short:"S" long:"socket" default:"" description:"Path to unix socket"`
-	User   string `short:"u" long:"user" default:"root" description:"Username"`
-	Pass   string `short:"P" long:"password" default:"" description:"Password" env:"MYSQL_PASSWORD"`
+	Host    string `short:"H" long:"host" default:"localhost" description:"Hostname"`
+	Port    string `short:"p" long:"port" default:"3306" description:"Port"`
+	Socket  string `short:"S" long:"socket" default:"" description:"Path to unix socket"`
+	User    string `short:"u" long:"user" default:"root" description:"Username"`
+	Pass    string `short:"P" long:"password" default:"" description:"Password" env:"MYSQL_PASSWORD"`
+	Cnf     string `long:"config" default:"" description:"use config my.cnf format file"`
+	Profile string `long:"profile" default:"client" description:"my.cnf profile to use"`
 
 	EnableTLS     bool   `long:"tls" description:"Enables TLS connection"`
 	TLSRootCert   string `long:"tls-root-cert" default:"" description:"The root certificate used for TLS certificate verification"`
@@ -35,6 +38,44 @@ var commands = map[string](func([]string) *checkers.Checker){
 	"connection":  checkConnection,
 	"uptime":      checkUptime,
 	"readonly":    checkReadOnly,
+}
+
+func readCnf(m mysqlSetting) (mysqlSetting, error) {
+	cfg, err := ini.LoadSources(
+		ini.LoadOptions{
+			AllowBooleanKeys: true,
+			Insensitive:      true,
+			Loose:            true,
+		},
+		m.Cnf,
+	)
+	if err != nil {
+		return m, err
+	}
+	if cfg != nil {
+		for _, s := range cfg.Sections() {
+			if s.Name() == m.Profile {
+				if s.Key("host").Value() != "" {
+					m.Host = s.Key("host").Value()
+				}
+				if s.Key("port").Value() != "" {
+					m.Port = s.Key("port").Value()
+				}
+				if s.Key("socket").Value() != "" {
+					m.Socket = s.Key("socket").Value()
+				}
+				if s.Key("user").Value() != "" {
+					m.User = s.Key("user").Value()
+				}
+				if s.Key("password").Value() != "" {
+					m.Pass = s.Key("password").Value()
+				}
+				return m, nil
+			}
+		}
+		return m, fmt.Errorf("cannot find profile %s in %s", m.Profile, m.Cnf)
+	}
+	return m, fmt.Errorf("had a nil config in %s", m.Cnf)
 }
 
 func separateSub(argv []string) (string, []string) {
@@ -64,12 +105,20 @@ SubCommands:`)
 }
 
 func newDB(m mysqlSetting) (*sql.DB, error) {
+	if m.Cnf != "" {
+		var err error
+		m, err = readCnf(m)
+		if err != nil {
+			return nil, err
+		}
+	}
 	proto := "tcp"
 	target := fmt.Sprintf("%s:%s", m.Host, m.Port)
 	if m.Socket != "" {
 		proto = "unix"
 		target = m.Socket
 	}
+
 	cfg := &mysql.Config{
 		User:                 m.User,
 		Passwd:               m.Pass,
