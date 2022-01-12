@@ -1,3 +1,12 @@
+mackerel-check-plugins (0.41.4-1) stable; urgency=low
+
+  * Bump github.com/gomodule/redigo from 1.8.5 to 1.8.6 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/548>
+  * Bump github.com/lib/pq from 1.10.3 to 1.10.4 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/542>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 12 Jan 2022 05:30:59 +0000
+
 mackerel-check-plugins (0.41.3-1) stable; urgency=low
 
   * Bump github.com/aws/aws-sdk-go from 1.40.59 to 1.42.9 (by dependabot[bot])

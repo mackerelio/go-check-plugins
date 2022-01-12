@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.41.4 (2022-01-12)
+
+* Bump github.com/gomodule/redigo from 1.8.5 to 1.8.6 #548 (dependabot[bot])
+* Bump github.com/lib/pq from 1.10.3 to 1.10.4 #542 (dependabot[bot])
+
+
 ## 0.41.3 (2021-12-01)
 
 * Bump github.com/aws/aws-sdk-go from 1.40.59 to 1.42.9 #544 (dependabot[bot])
