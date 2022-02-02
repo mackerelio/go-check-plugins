@@ -36,6 +36,12 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Feb 2 2022 <mackerel-developers@hatena.ne.jp> - 0.41.5
+- Bump github.com/aws/aws-sdk-go from 1.42.35 to 1.42.44 (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go from 1.42.9 to 1.42.35 (by dependabot[bot])
+- Bump github.com/gomodule/redigo from 1.8.6 to 1.8.8 (by dependabot[bot])
+- Bump github.com/shirou/gopsutil/v3 from 3.21.10 to 3.21.12 (by dependabot[bot])
+
 * Wed Jan 12 2022 <mackerel-developers@hatena.ne.jp> - 0.41.4
 - Bump github.com/gomodule/redigo from 1.8.5 to 1.8.6 (by dependabot[bot])
 - Bump github.com/lib/pq from 1.10.3 to 1.10.4 (by dependabot[bot])
