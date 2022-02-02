@@ -1,3 +1,16 @@
+mackerel-check-plugins (0.41.5-1.v2) stable; urgency=low
+
+  * Bump github.com/aws/aws-sdk-go from 1.42.35 to 1.42.44 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/563>
+  * Bump github.com/aws/aws-sdk-go from 1.42.9 to 1.42.35 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/561>
+  * Bump github.com/gomodule/redigo from 1.8.6 to 1.8.8 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/559>
+  * Bump github.com/shirou/gopsutil/v3 from 3.21.10 to 3.21.12 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/556>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 2 Feb 2022 02:21:16 +0000
+
 mackerel-check-plugins (0.41.4-1.v2) stable; urgency=low
 
   * Bump github.com/gomodule/redigo from 1.8.5 to 1.8.6 (by dependabot[bot])

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.41.5 (2022-02-02)
+
+* Bump github.com/aws/aws-sdk-go from 1.42.35 to 1.42.44 #563 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go from 1.42.9 to 1.42.35 #561 (dependabot[bot])
+* Bump github.com/gomodule/redigo from 1.8.6 to 1.8.8 #559 (dependabot[bot])
+* Bump github.com/shirou/gopsutil/v3 from 3.21.10 to 3.21.12 #556 (dependabot[bot])
+
+
 ## 0.41.4 (2022-01-12)
 
 * Bump github.com/gomodule/redigo from 1.8.5 to 1.8.6 #548 (dependabot[bot])
