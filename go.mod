@@ -7,9 +7,10 @@ require (
 	github.com/aws/aws-sdk-go v1.42.44
 	github.com/beevik/ntp v0.3.0
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
+	github.com/docker/docker v20.10.12+incompatible // indirect
 	github.com/elazarl/goproxy v0.0.0-20191011121108-aa519ddbe484
 	github.com/elazarl/goproxy/ext v0.0.0-20191011121108-aa519ddbe484
-	github.com/fsouza/go-dockerclient v1.7.7
+	github.com/fsouza/go-dockerclient v1.7.8
 	github.com/go-ldap/ldap/v3 v3.4.1
 	github.com/go-ole/go-ole v1.2.6
 	github.com/go-sql-driver/mysql v1.6.0
