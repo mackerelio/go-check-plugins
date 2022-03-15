@@ -1,4 +1,4 @@
-VERSION = 0.41.6
+VERSION = 0.41.7
 CURRENT_REVISION = $(shell git rev-parse --short HEAD)
 ifeq ($(OS),Windows_NT)
 GOPATH_ROOT:=$(shell cygpath ${GOPATH})
