@@ -3,7 +3,6 @@ package checkawscloudwatchlogs
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -20,23 +19,23 @@ import (
 
 type mockAWSCloudWatchLogsClient struct {
 	cloudwatchlogsiface.CloudWatchLogsAPI
-	outputs map[string]*cloudwatchlogs.FilterLogEventsOutput
+	outputs []*cloudwatchlogs.FilterLogEventsOutput
 }
 
-func (c *mockAWSCloudWatchLogsClient) FilterLogEvents(input *cloudwatchlogs.FilterLogEventsInput) (*cloudwatchlogs.FilterLogEventsOutput, error) {
-	if input.NextToken == nil {
-		return c.outputs[""], nil
+func (c *mockAWSCloudWatchLogsClient) FilterLogEventsPages(input *cloudwatchlogs.FilterLogEventsInput, fn func(*cloudwatchlogs.FilterLogEventsOutput, bool) bool) error {
+	for i, output := range c.outputs {
+		lastPage := i == len(c.outputs)-1
+		if !fn(output, lastPage) {
+			break
+		}
 	}
-	if out, ok := c.outputs[*input.NextToken]; ok {
-		return out, nil
-	}
-	return nil, errors.New("invalid NextToken")
+	return nil
 }
 
 func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 	return &mockAWSCloudWatchLogsClient{
-		outputs: map[string]*cloudwatchlogs.FilterLogEventsOutput{
-			"": &cloudwatchlogs.FilterLogEventsOutput{
+		outputs: []*cloudwatchlogs.FilterLogEventsOutput{
+			{
 				NextToken: aws.String("1"),
 				Events: []*cloudwatchlogs.FilteredLogEvent{
 					{
@@ -51,7 +50,7 @@ func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 					},
 				},
 			},
-			"1": &cloudwatchlogs.FilterLogEventsOutput{
+			{
 				NextToken: aws.String("2"),
 				Events: []*cloudwatchlogs.FilteredLogEvent{
 					{
@@ -71,7 +70,7 @@ func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 					},
 				},
 			},
-			"2": &cloudwatchlogs.FilterLogEventsOutput{
+			{
 				Events: []*cloudwatchlogs.FilteredLogEvent{
 					{
 						EventId:   aws.String("event-id-5"),

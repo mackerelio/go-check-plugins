@@ -124,20 +124,16 @@ func (p *awsCloudwatchLogsPlugin) collect() ([]string, error) {
 		startTime = aws.Int64(time.Now().Add(-1*time.Minute).Unix() * 1000)
 	}
 	var messages []string
-	for {
-		input := &cloudwatchlogs.FilterLogEventsInput{
-			StartTime:     startTime,
-			LogGroupName:  aws.String(p.LogGroupName),
-			NextToken:     nextToken,
-			FilterPattern: aws.String(p.Pattern),
-		}
-		if p.LogStreamNamePrefix != "" {
-			input.LogStreamNamePrefix = aws.String(p.LogStreamNamePrefix)
-		}
-		output, err := p.Service.FilterLogEvents(input)
-		if err != nil {
-			return nil, err
-		}
+	input := &cloudwatchlogs.FilterLogEventsInput{
+		StartTime:     startTime,
+		LogGroupName:  aws.String(p.LogGroupName),
+		NextToken:     nextToken,
+		FilterPattern: aws.String(p.Pattern),
+	}
+	if p.LogStreamNamePrefix != "" {
+		input.LogStreamNamePrefix = aws.String(p.LogStreamNamePrefix)
+	}
+	err := p.Service.FilterLogEventsPages(input, func(output *cloudwatchlogs.FilterLogEventsOutput, lastPage bool) bool {
 		for _, event := range output.Events {
 			messages = append(messages, *event.Message)
 			if startTime == nil || *startTime <= *event.Timestamp {
@@ -147,15 +143,16 @@ func (p *awsCloudwatchLogsPlugin) collect() ([]string, error) {
 		if output.NextToken != nil {
 			nextToken = output.NextToken
 		}
-		if nextToken != nil {
-			if err := p.saveState(&logState{nextToken, startTime}); err != nil {
-				return nil, err
-			}
-		}
-		if output.NextToken == nil {
-			break
-		}
 		time.Sleep(150 * time.Millisecond)
+		return true
+	})
+	if err != nil {
+		return nil, err
+	}
+	if nextToken != nil {
+		if err := p.saveState(&logState{nextToken, startTime}); err != nil {
+			return nil, err
+		}
 	}
 	return messages, nil
 }
