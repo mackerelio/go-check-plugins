@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -95,13 +96,13 @@ func Test_cloudwatchLogsPlugin_collect(t *testing.T) {
 			LogGroupName: "test-group",
 		},
 	}
-	messages, err := p.collect()
+	messages, err := p.collect(time.Unix(0, 0))
 	assert.Equal(t, err, nil, "err should be nil")
 	assert.Equal(t, len(messages), 6)
 	cnt, _ := ioutil.ReadFile(file.Name())
 	var s logState
 	json.NewDecoder(bytes.NewReader(cnt)).Decode(&s)
-	assert.Equal(t, *s.NextToken, "2")
+	assert.Equal(t, s, logState{StartTime: aws.Int64(5 + 1)})
 }
 
 func Test_cloudwatchLogsPlugin_check(t *testing.T) {

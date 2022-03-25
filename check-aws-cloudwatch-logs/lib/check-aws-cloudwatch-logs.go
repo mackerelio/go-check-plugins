@@ -107,7 +107,7 @@ type logState struct {
 	StartTime *int64
 }
 
-func (p *awsCloudwatchLogsPlugin) collect() ([]string, error) {
+func (p *awsCloudwatchLogsPlugin) collect(now time.Time) ([]string, error) {
 	var nextToken *string
 	var startTime *int64
 	if s, err := p.loadState(); err != nil {
@@ -115,13 +115,13 @@ func (p *awsCloudwatchLogsPlugin) collect() ([]string, error) {
 			return nil, err
 		}
 	} else {
-		if s.StartTime != nil && *s.StartTime > time.Now().Add(-time.Hour).Unix()*1000 {
+		if s.StartTime != nil && *s.StartTime > now.Add(-time.Hour).Unix()*1000 {
 			nextToken = s.NextToken
 			startTime = s.StartTime
 		}
 	}
 	if startTime == nil {
-		startTime = aws.Int64(time.Now().Add(-1*time.Minute).Unix() * 1000)
+		startTime = aws.Int64(now.Add(-1*time.Minute).Unix() * 1000)
 	}
 	var messages []string
 	input := &cloudwatchlogs.FilterLogEventsInput{
@@ -140,19 +140,15 @@ func (p *awsCloudwatchLogsPlugin) collect() ([]string, error) {
 				startTime = aws.Int64(*event.Timestamp + 1)
 			}
 		}
-		if output.NextToken != nil {
-			nextToken = output.NextToken
-		}
+		nextToken = output.NextToken
 		time.Sleep(150 * time.Millisecond)
 		return true
 	})
 	if err != nil {
 		return nil, err
 	}
-	if nextToken != nil {
-		if err := p.saveState(&logState{nextToken, startTime}); err != nil {
-			return nil, err
-		}
+	if err := p.saveState(&logState{nextToken, startTime}); err != nil {
+		return nil, err
 	}
 	return messages, nil
 }
@@ -199,8 +195,8 @@ func (p *awsCloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
 	return checkers.NewChecker(status, msg)
 }
 
-func (p *awsCloudwatchLogsPlugin) run() *checkers.Checker {
-	messages, err := p.collect()
+func (p *awsCloudwatchLogsPlugin) run(now time.Time) *checkers.Checker {
+	messages, err := p.collect(now)
 	if err != nil {
 		return checkers.Unknown(fmt.Sprint(err))
 	}
@@ -217,5 +213,5 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		return checkers.Unknown(fmt.Sprint(err))
 	}
-	return p.run()
+	return p.run(time.Now())
 }
