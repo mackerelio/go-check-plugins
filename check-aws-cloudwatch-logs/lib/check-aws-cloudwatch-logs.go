@@ -133,6 +133,9 @@ func (p *awsCloudwatchLogsPlugin) collect(now time.Time) ([]string, error) {
 			}
 		}
 		s.NextToken = output.NextToken
+		if lastPage {
+			s.NextToken = nil
+		}
 		time.Sleep(150 * time.Millisecond)
 		return true
 	})
