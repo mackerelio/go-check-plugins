@@ -2,6 +2,7 @@ package checkawscloudwatchlogs
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -96,13 +97,25 @@ func Test_cloudwatchLogsPlugin_collect(t *testing.T) {
 			LogGroupName: "test-group",
 		},
 	}
-	messages, err := p.collect(time.Unix(0, 0))
-	assert.Equal(t, err, nil, "err should be nil")
-	assert.Equal(t, len(messages), 6)
-	cnt, _ := ioutil.ReadFile(file.Name())
-	var s logState
-	json.NewDecoder(bytes.NewReader(cnt)).Decode(&s)
-	assert.Equal(t, s, logState{StartTime: aws.Int64(5 + 1)})
+
+	t.Run("collect log event messages", func(t *testing.T) {
+		messages, err := p.collect(context.Background(), time.Unix(0, 0))
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, len(messages), 6)
+		cnt, _ := ioutil.ReadFile(file.Name())
+		var s logState
+		json.NewDecoder(bytes.NewReader(cnt)).Decode(&s)
+		assert.Equal(t, s, logState{StartTime: aws.Int64(5 + 1)})
+	})
+
+	t.Run("cancel", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		messages, err := p.collect(ctx, time.Unix(0, 0))
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, len(messages), 0)
+	})
 }
 
 func Test_cloudwatchLogsPlugin_check(t *testing.T) {
