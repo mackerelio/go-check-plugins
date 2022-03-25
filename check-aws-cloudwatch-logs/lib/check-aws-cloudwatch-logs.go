@@ -108,58 +108,54 @@ type logState struct {
 }
 
 func (p *awsCloudwatchLogsPlugin) collect(now time.Time) ([]string, error) {
-	var nextToken *string
-	var startTime *int64
-	if s, err := p.loadState(); err != nil {
-		if !os.IsNotExist(err) {
-			return nil, err
-		}
-	} else {
-		if s.StartTime != nil && *s.StartTime > now.Add(-time.Hour).Unix()*1000 {
-			nextToken = s.NextToken
-			startTime = s.StartTime
-		}
+	s, err := p.loadState()
+	if err != nil {
+		return nil, err
 	}
-	if startTime == nil {
-		startTime = aws.Int64(now.Add(-1*time.Minute).Unix() * 1000)
+	if s.StartTime == nil || *s.StartTime <= now.Add(-time.Hour).Unix()*1000 {
+		s.StartTime = aws.Int64(now.Add(-1*time.Minute).Unix() * 1000)
 	}
 	var messages []string
 	input := &cloudwatchlogs.FilterLogEventsInput{
-		StartTime:     startTime,
+		StartTime:     s.StartTime,
 		LogGroupName:  aws.String(p.LogGroupName),
-		NextToken:     nextToken,
+		NextToken:     s.NextToken,
 		FilterPattern: aws.String(p.Pattern),
 	}
 	if p.LogStreamNamePrefix != "" {
 		input.LogStreamNamePrefix = aws.String(p.LogStreamNamePrefix)
 	}
-	err := p.Service.FilterLogEventsPages(input, func(output *cloudwatchlogs.FilterLogEventsOutput, lastPage bool) bool {
+	err = p.Service.FilterLogEventsPages(input, func(output *cloudwatchlogs.FilterLogEventsOutput, lastPage bool) bool {
 		for _, event := range output.Events {
 			messages = append(messages, *event.Message)
-			if startTime == nil || *startTime <= *event.Timestamp {
-				startTime = aws.Int64(*event.Timestamp + 1)
+			if s.StartTime == nil || *s.StartTime <= *event.Timestamp {
+				s.StartTime = aws.Int64(*event.Timestamp + 1)
 			}
 		}
-		nextToken = output.NextToken
+		s.NextToken = output.NextToken
 		time.Sleep(150 * time.Millisecond)
 		return true
 	})
 	if err != nil {
 		return nil, err
 	}
-	if err := p.saveState(&logState{nextToken, startTime}); err != nil {
+	err = p.saveState(s)
+	if err != nil {
 		return nil, err
 	}
 	return messages, nil
 }
 
 func (p *awsCloudwatchLogsPlugin) loadState() (*logState, error) {
+	var s logState
 	f, err := os.Open(p.StateFile)
+	defer f.Close()
 	if err != nil {
+		if os.IsNotExist(err) {
+			return &s, nil
+		}
 		return nil, err
 	}
-	defer f.Close()
-	var s logState
 	err = json.NewDecoder(f).Decode(&s)
 	if err != nil {
 		return nil, err
