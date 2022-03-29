@@ -114,6 +114,7 @@ func (p *awsCloudwatchLogsPlugin) collect(now time.Time) ([]string, error) {
 	}
 	if s.StartTime == nil || *s.StartTime <= now.Add(-time.Hour).Unix()*1000 {
 		s.StartTime = aws.Int64(now.Add(-1*time.Minute).Unix() * 1000)
+		s.NextToken = nil
 	}
 	var messages []string
 	input := &cloudwatchlogs.FilterLogEventsInput{
