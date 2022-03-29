@@ -3,11 +3,11 @@ package checkawscloudwatchlogs
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -20,23 +20,23 @@ import (
 
 type mockAWSCloudWatchLogsClient struct {
 	cloudwatchlogsiface.CloudWatchLogsAPI
-	outputs map[string]*cloudwatchlogs.FilterLogEventsOutput
+	outputs []*cloudwatchlogs.FilterLogEventsOutput
 }
 
-func (c *mockAWSCloudWatchLogsClient) FilterLogEvents(input *cloudwatchlogs.FilterLogEventsInput) (*cloudwatchlogs.FilterLogEventsOutput, error) {
-	if input.NextToken == nil {
-		return c.outputs[""], nil
+func (c *mockAWSCloudWatchLogsClient) FilterLogEventsPages(input *cloudwatchlogs.FilterLogEventsInput, fn func(*cloudwatchlogs.FilterLogEventsOutput, bool) bool) error {
+	for i, output := range c.outputs {
+		lastPage := i == len(c.outputs)-1
+		if !fn(output, lastPage) {
+			break
+		}
 	}
-	if out, ok := c.outputs[*input.NextToken]; ok {
-		return out, nil
-	}
-	return nil, errors.New("invalid NextToken")
+	return nil
 }
 
 func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 	return &mockAWSCloudWatchLogsClient{
-		outputs: map[string]*cloudwatchlogs.FilterLogEventsOutput{
-			"": &cloudwatchlogs.FilterLogEventsOutput{
+		outputs: []*cloudwatchlogs.FilterLogEventsOutput{
+			{
 				NextToken: aws.String("1"),
 				Events: []*cloudwatchlogs.FilteredLogEvent{
 					{
@@ -51,7 +51,7 @@ func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 					},
 				},
 			},
-			"1": &cloudwatchlogs.FilterLogEventsOutput{
+			{
 				NextToken: aws.String("2"),
 				Events: []*cloudwatchlogs.FilteredLogEvent{
 					{
@@ -71,7 +71,7 @@ func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 					},
 				},
 			},
-			"2": &cloudwatchlogs.FilterLogEventsOutput{
+			{
 				Events: []*cloudwatchlogs.FilteredLogEvent{
 					{
 						EventId:   aws.String("event-id-5"),
@@ -96,13 +96,13 @@ func Test_cloudwatchLogsPlugin_collect(t *testing.T) {
 			LogGroupName: "test-group",
 		},
 	}
-	messages, err := p.collect()
+	messages, err := p.collect(time.Unix(0, 0))
 	assert.Equal(t, err, nil, "err should be nil")
 	assert.Equal(t, len(messages), 6)
 	cnt, _ := ioutil.ReadFile(file.Name())
 	var s logState
 	json.NewDecoder(bytes.NewReader(cnt)).Decode(&s)
-	assert.Equal(t, *s.NextToken, "2")
+	assert.Equal(t, s, logState{StartTime: aws.Int64(5 + 1)})
 }
 
 func Test_cloudwatchLogsPlugin_check(t *testing.T) {
