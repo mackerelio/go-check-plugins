@@ -1,3 +1,24 @@
+mackerel-check-plugins (0.42.0-1) stable; urgency=low
+
+  * [check-aws-cloudwatch-logs] stop gracefully on timeout signal (by pyto86pri)
+    <https://github.com/mackerelio/go-check-plugins/pull/588>
+  * [check-aws-cloudwatch-logs] stop gracefully on timeout signal (by pyto86pri)
+    <https://github.com/mackerelio/go-check-plugins/pull/587>
+  * Bump github.com/mackerelio/checkers from 0.0.2 to 0.0.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/586>
+  * Bump github.com/aws/aws-sdk-go from 1.43.12 to 1.43.26 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/585>
+  * Bump github.com/mackerelio/go-osstat from 0.2.1 to 0.2.2 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/584>
+  * [check-aws-cloudwatch-logs] use FilterLogEventsPages API (by pyto86pri)
+    <https://github.com/mackerelio/go-check-plugins/pull/583>
+  * Bump github.com/stretchr/testify from 1.7.0 to 1.7.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/581>
+  * Bump github.com/fsouza/go-dockerclient from 1.7.9 to 1.7.10 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/579>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 30 Mar 2022 08:26:43 +0000
+
 mackerel-check-plugins (0.41.7-1) stable; urgency=low
 
   * Bump github.com/aws/aws-sdk-go from 1.43.7 to 1.43.12 (by dependabot[bot])

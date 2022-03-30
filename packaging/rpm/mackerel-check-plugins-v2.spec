@@ -36,6 +36,16 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Mar 30 2022 <mackerel-developers@hatena.ne.jp> - 0.42.0
+- [check-aws-cloudwatch-logs] stop gracefully on timeout signal (by pyto86pri)
+- [check-aws-cloudwatch-logs] stop gracefully on timeout signal (by pyto86pri)
+- Bump github.com/mackerelio/checkers from 0.0.2 to 0.0.3 (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go from 1.43.12 to 1.43.26 (by dependabot[bot])
+- Bump github.com/mackerelio/go-osstat from 0.2.1 to 0.2.2 (by dependabot[bot])
+- [check-aws-cloudwatch-logs] use FilterLogEventsPages API (by pyto86pri)
+- Bump github.com/stretchr/testify from 1.7.0 to 1.7.1 (by dependabot[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.7.9 to 1.7.10 (by dependabot[bot])
+
 * Tue Mar 15 2022 <mackerel-developers@hatena.ne.jp> - 0.41.7
 - Bump github.com/aws/aws-sdk-go from 1.43.7 to 1.43.12 (by dependabot[bot])
 - Bump github.com/shirou/gopsutil/v3 from 3.22.1 to 3.22.2 (by dependabot[bot])
