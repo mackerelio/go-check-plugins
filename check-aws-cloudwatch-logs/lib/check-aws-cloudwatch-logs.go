@@ -6,7 +6,6 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -42,15 +41,8 @@ type logOpts struct {
 
 // Do the plugin
 func Do() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	sigCh := make(chan os.Signal, 1)
-	go func() {
-		sig := <-sigCh
-		log.Printf("check-aws-cloudwatch-logs is exiting: caught a signal: %v", sig)
-		cancel()
-	}()
-	signal.Notify(sigCh, defaultSignal)
+	ctx, stop := signal.NotifyContext(context.Background(), defaultSignal)
+	defer stop()
 
 	ckr := run(ctx, os.Args[1:])
 	ckr.Name = "CloudWatch Logs"
