@@ -2,10 +2,12 @@ package checkawscloudwatchlogs
 
 import (
 	"bytes"
+	"context"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -22,6 +24,9 @@ import (
 	"github.com/natefinch/atomic"
 )
 
+// overwritten with syscall.SIGTERM on unix environment (see check-log_unix.go)
+var defaultSignal = os.Interrupt
+
 type logOpts struct {
 	LogGroupName        string `long:"log-group-name" required:"true" value-name:"LOG-GROUP-NAME" description:"Log group name" unquote:"false"`
 	LogStreamNamePrefix string `long:"log-stream-name-prefix" value-name:"LOG-STREAM-NAME-PREFIX" description:"Log stream name prefix" unquote:"false"`
@@ -36,7 +41,10 @@ type logOpts struct {
 
 // Do the plugin
 func Do() {
-	ckr := run(os.Args[1:])
+	ctx, stop := signal.NotifyContext(context.Background(), defaultSignal)
+	defer stop()
+
+	ckr := run(ctx, os.Args[1:])
 	ckr.Name = "CloudWatch Logs"
 	ckr.Exit()
 }
@@ -107,7 +115,7 @@ type logState struct {
 	StartTime *int64
 }
 
-func (p *awsCloudwatchLogsPlugin) collect(now time.Time) ([]string, error) {
+func (p *awsCloudwatchLogsPlugin) collect(ctx context.Context, now time.Time) ([]string, error) {
 	s, err := p.loadState()
 	if err != nil {
 		return nil, err
@@ -127,6 +135,9 @@ func (p *awsCloudwatchLogsPlugin) collect(now time.Time) ([]string, error) {
 		input.LogStreamNamePrefix = aws.String(p.LogStreamNamePrefix)
 	}
 	err = p.Service.FilterLogEventsPages(input, func(output *cloudwatchlogs.FilterLogEventsOutput, lastPage bool) bool {
+		if ctx.Err() != nil {
+			return false
+		}
 		for _, event := range output.Events {
 			messages = append(messages, *event.Message)
 			if s.StartTime == nil || *s.StartTime <= *event.Timestamp {
@@ -195,15 +206,15 @@ func (p *awsCloudwatchLogsPlugin) check(messages []string) *checkers.Checker {
 	return checkers.NewChecker(status, msg)
 }
 
-func (p *awsCloudwatchLogsPlugin) run(now time.Time) *checkers.Checker {
-	messages, err := p.collect(now)
+func (p *awsCloudwatchLogsPlugin) run(ctx context.Context, now time.Time) *checkers.Checker {
+	messages, err := p.collect(ctx, now)
 	if err != nil {
 		return checkers.Unknown(fmt.Sprint(err))
 	}
 	return p.check(messages)
 }
 
-func run(args []string) *checkers.Checker {
+func run(ctx context.Context, args []string) *checkers.Checker {
 	opts := &logOpts{}
 	_, err := flags.ParseArgs(opts, args)
 	if err != nil {
@@ -213,5 +224,5 @@ func run(args []string) *checkers.Checker {
 	if err != nil {
 		return checkers.Unknown(fmt.Sprint(err))
 	}
-	return p.run(time.Now())
+	return p.run(ctx, time.Now())
 }
