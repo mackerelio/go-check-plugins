@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.42.1 (2022-06-22)
+
+* Bump github.com/aws/aws-sdk-go from 1.43.26 to 1.44.37 #612 (dependabot[bot])
+
+
 ## 0.42.0 (2022-03-30)
 
 * [check-aws-cloudwatch-logs] stop gracefully on timeout signal #588 (pyto86pri)
