@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.42.1-1) stable; urgency=low
+
+  * Bump github.com/aws/aws-sdk-go from 1.43.26 to 1.44.37 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/612>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 22 Jun 2022 06:35:59 +0000
+
 mackerel-check-plugins (0.42.0-1) stable; urgency=low
 
   * [check-aws-cloudwatch-logs] stop gracefully on timeout signal (by pyto86pri)

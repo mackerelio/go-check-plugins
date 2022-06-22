@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jun 22 2022 <mackerel-developers@hatena.ne.jp> - 0.42.1
+- Bump github.com/aws/aws-sdk-go from 1.43.26 to 1.44.37 (by dependabot[bot])
+
 * Wed Mar 30 2022 <mackerel-developers@hatena.ne.jp> - 0.42.0
 - [check-aws-cloudwatch-logs] stop gracefully on timeout signal (by pyto86pri)
 - [check-aws-cloudwatch-logs] stop gracefully on timeout signal (by pyto86pri)
