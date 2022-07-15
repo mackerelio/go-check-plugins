@@ -18,13 +18,14 @@ type tcpOpts struct {
 	Service  string `long:"service" description:"Service name. e.g. ftp, smtp, pop, imap and so on"`
 	Hostname string `short:"H" long:"hostname" description:"Host name or IP Address"`
 	exchange
-	Timeout    float64 `short:"t" long:"timeout" default:"10" description:"Seconds before connection times out"`
-	MaxBytes   int     `short:"m" long:"maxbytes" description:"Close connection once more than this number of bytes are received"`
-	Delay      float64 `short:"d" long:"delay" description:"Seconds to wait between sending string and polling for response"`
-	Warning    float64 `short:"w" long:"warning" description:"Response time to result in warning status (seconds)"`
-	Critical   float64 `short:"c" long:"critical" description:"Response time to result in critical status (seconds)"`
-	Escape     bool    `short:"E" long:"escape" description:"Can use \\n, \\r, \\t or \\ in send or quit string. Must come before send or quit option. By default, nothing added to send, \\r\\n added to end of quit"`
-	ErrWarning bool    `short:"W" long:"error-warning" description:"Set the error level to warning when exiting with unexpected error (default: critical). In the case of request succeeded, evaluation result of -c option eval takes priority."`
+	Timeout             float64 `short:"t" long:"timeout" default:"10" description:"Seconds before connection times out"`
+	MaxBytes            int     `short:"m" long:"maxbytes" description:"Close connection once more than this number of bytes are received"`
+	Delay               float64 `short:"d" long:"delay" description:"Seconds to wait between sending string and polling for response"`
+	Warning             float64 `short:"w" long:"warning" description:"Response time to result in warning status (seconds)"`
+	Critical            float64 `short:"c" long:"critical" description:"Response time to result in critical status (seconds)"`
+	Escape              bool    `short:"E" long:"escape" description:"Can use \\n, \\r, \\t or \\ in send or quit string. Must come before send or quit option. By default, nothing added to send, \\r\\n added to end of quit"`
+	ErrWarning          bool    `short:"W" long:"error-warning" description:"Set the error level to warning when exiting with unexpected error (default: critical). In the case of request succeeded, evaluation result of -c option eval takes priority."`
+	NoResTimeSuccessMsg bool    `long:"no-restime-success-msg" description:"Do not output response time on success. Omissioning success report in mackerel-agent."`
 }
 
 type exchange struct {
@@ -232,7 +233,21 @@ func (opts *tcpOpts) run() *checkers.Checker {
 	if opts.Critical > 0 && elapsedSeconds > opts.Critical {
 		chkSt = checkers.CRITICAL
 	}
-	msg := fmt.Sprintf("%.3f seconds response time on", elapsedSeconds)
+	msg := ""
+	if opts.NoResTimeSuccessMsg && chkSt == checkers.OK {
+		var threshold float64 = 0
+		if opts.Critical > 0 {
+			threshold = opts.Critical
+		}
+		if opts.Warning > 0 {
+			threshold = opts.Warning
+		}
+		if threshold > 0 {
+			msg += fmt.Sprintf("Response time faster than %v seconds on", threshold)
+		}
+	} else {
+		msg += fmt.Sprintf("%.3f seconds response time on", elapsedSeconds)
+	}
 	if opts.Hostname != "" {
 		msg += " " + opts.Hostname
 	}
