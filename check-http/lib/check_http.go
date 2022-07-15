@@ -24,24 +24,25 @@ import (
 
 // XXX more options
 type checkHTTPOpts struct {
-	URL                string   `short:"u" long:"url" required:"true" description:"A URL to connect to"`
-	Statuses           []string `short:"s" long:"status" description:"mapping of HTTP status"`
-	NoCheckCertificate bool     `long:"no-check-certificate" description:"Do not check certificate"`
-	SourceIP           string   `short:"i" long:"source-ip" description:"source IP address"`
-	Headers            []string `short:"H" description:"HTTP request headers"`
-	Regexp             string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
-	MaxRedirects       int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
-	Method             string   `short:"m" long:"method" choice:"GET" choice:"HEAD" choice:"POST" choice:"PUT" default:"GET" description:"Specify a GET, HEAD, POST, or PUT operation"`
-	ConnectTos         []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1"`
-	Proxy              string   `short:"x" long:"proxy" value-name:"[PROTOCOL://][USER:PASS@]HOST[:PORT]" description:"Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080."`
-	BasicAuth          string   `long:"user" value-name:"USER[:PASSWORD]" description:"Basic Authentication user ID and an optional password."`
-	RequireBytes       int64    `short:"B" long:"require-bytes" description:"Check the response contains exactly BYTES bytes" default:"-1"`
-	Body               string   `short:"d" long:"body" description:"Send a data body string with the request"`
-	MinBytes           int64    `short:"g" long:"min-bytes" description:"Check the response contains at least BYTES bytes" default:"-1"`
-	Timeout            int64    `short:"t" long:"timeout" description:"Set the total execution timeout in seconds" default:"0"`
-	CertFile           string   `long:"cert-file" description:"A Cert file to use for client authentication"`
-	KeyFile            string   `long:"key-file" description:"A Key file to use for client authentication"`
-	CaFile             string   `long:"ca-file" description:"A CA Cert file to use for client authentication"`
+	URL                 string   `short:"u" long:"url" required:"true" description:"A URL to connect to"`
+	Statuses            []string `short:"s" long:"status" description:"mapping of HTTP status"`
+	NoCheckCertificate  bool     `long:"no-check-certificate" description:"Do not check certificate"`
+	SourceIP            string   `short:"i" long:"source-ip" description:"source IP address"`
+	Headers             []string `short:"H" description:"HTTP request headers"`
+	Regexp              string   `short:"p" long:"pattern" description:"Expected pattern in the content"`
+	MaxRedirects        int      `long:"max-redirects" description:"Maximum number of redirects followed" default:"10"`
+	Method              string   `short:"m" long:"method" choice:"GET" choice:"HEAD" choice:"POST" choice:"PUT" default:"GET" description:"Specify a GET, HEAD, POST, or PUT operation"`
+	ConnectTos          []string `long:"connect-to" value-name:"HOST1:PORT1:HOST2:PORT2" description:"Request to HOST2:PORT2 instead of HOST1:PORT1"`
+	Proxy               string   `short:"x" long:"proxy" value-name:"[PROTOCOL://][USER:PASS@]HOST[:PORT]" description:"Use the specified proxy. PROTOCOL's default is http, and PORT's default is 1080."`
+	BasicAuth           string   `long:"user" value-name:"USER[:PASSWORD]" description:"Basic Authentication user ID and an optional password."`
+	RequireBytes        int64    `short:"B" long:"require-bytes" description:"Check the response contains exactly BYTES bytes" default:"-1"`
+	Body                string   `short:"d" long:"body" description:"Send a data body string with the request"`
+	MinBytes            int64    `short:"g" long:"min-bytes" description:"Check the response contains at least BYTES bytes" default:"-1"`
+	Timeout             int64    `short:"t" long:"timeout" description:"Set the total execution timeout in seconds" default:"0"`
+	CertFile            string   `long:"cert-file" description:"A Cert file to use for client authentication"`
+	KeyFile             string   `long:"key-file" description:"A Key file to use for client authentication"`
+	CaFile              string   `long:"ca-file" description:"A CA Cert file to use for client authentication"`
+	NoResTimeSuccessMsg bool     `long:"no-restime-success-msg" description:"Do not output response time on success. Omissioning success report in mackerel-agent."`
 }
 
 // Do the plugin
@@ -392,8 +393,13 @@ func Run(args []string) *checkers.Checker {
 		checkSt = checkers.CRITICAL
 	}
 
-	fmt.Fprintf(respMsg, "%s %s - %d bytes in %f second response time",
-		resp.Proto, resp.Status, cLength, elapsed.Seconds())
+	if opts.NoResTimeSuccessMsg && checkSt == checkers.OK {
+		fmt.Fprintf(respMsg, "%s %s - %d bytes",
+			resp.Proto, resp.Status, cLength)
+	} else {
+		fmt.Fprintf(respMsg, "%s %s - %d bytes in %f second response time",
+			resp.Proto, resp.Status, cLength, elapsed.Seconds())
+	}
 
 	return checkers.NewChecker(checkSt, respMsg.String())
 }

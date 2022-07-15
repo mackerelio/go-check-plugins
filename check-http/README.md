@@ -60,6 +60,7 @@ command = ["check-http", "-u", "http://example.com"]
       --cert-file=                                    A Cert file to use for client authentication
       --key-file=                                     A Key file to use for client authentication
       --ca-file=                                      A CA Cert file to use for client authentication
+      --no-restime-success-msg                        Do not output response time on success. Omissioning success report in mackerel-agent.
 ```
 
 
