@@ -159,7 +159,7 @@ func run(args []string) *checkers.Checker {
 	for _, partition := range partitions {
 		disk, err := gpud.Usage(partition.Mountpoint)
 		if err != nil {
-			return checkers.Unknown(fmt.Sprintf("Failed to fetch disk usage: %s", err))
+			return checkers.Unknown(fmt.Sprintf("%s[type=%s]: Failed to fetch disk usage: %s", partition.Mountpoint, partition.Fstype, err))
 		}
 
 		if disk.Total != 0 {
@@ -188,7 +188,7 @@ func run(args []string) *checkers.Checker {
 		for _, disk := range disks {
 			checkSt, err = checkInodes(checkSt, *opts.InodeCritical, disk, checkers.CRITICAL)
 			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
+				return checkers.Unknown(fmt.Sprintf("%s: Failed to check disk status: %s", disk.Path, err))
 			}
 
 			if checkSt == checkers.CRITICAL {
@@ -201,7 +201,7 @@ func run(args []string) *checkers.Checker {
 		for _, disk := range disks {
 			checkSt, err = checkDisk(checkSt, *opts.Critical, u.Size, disk, checkers.CRITICAL)
 			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
+				return checkers.Unknown(fmt.Sprintf("%s: Failed to check disk status: %s", disk.Path, err))
 			}
 
 			if checkSt == checkers.CRITICAL {
@@ -214,7 +214,7 @@ func run(args []string) *checkers.Checker {
 		for _, disk := range disks {
 			checkSt, err = checkInodes(checkSt, *opts.InodeWarning, disk, checkers.WARNING)
 			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
+				return checkers.Unknown(fmt.Sprintf("%s: Failed to check disk status: %s", disk.Path, err))
 			}
 
 			if checkSt == checkers.WARNING {
@@ -227,7 +227,7 @@ func run(args []string) *checkers.Checker {
 		for _, disk := range disks {
 			checkSt, err = checkDisk(checkSt, *opts.Warning, u.Size, disk, checkers.WARNING)
 			if err != nil {
-				return checkers.Unknown(fmt.Sprintf("Failed to check disk status: %s", err))
+				return checkers.Unknown(fmt.Sprintf("%s: Failed to check disk status: %s", disk.Path, err))
 			}
 
 			if checkSt == checkers.WARNING {
