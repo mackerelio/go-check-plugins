@@ -10,4 +10,7 @@ then
 	exit 2
 fi
 
-exec $plugin
+# GitHub-hosted Linux runner mounts tracefs on /sys/kernel/debug/tracing.
+# That fstype don't appear in ME_DUMMY macro on coreutils.
+# Thus, for now, we ignore it only in test.sh.
+exec $plugin -X tracefs
