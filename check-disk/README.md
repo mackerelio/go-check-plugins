@@ -13,9 +13,7 @@ check-disk --warning=10 --critical=5 --path=/
 First, build this program.
 
 ```
-go get github.com/mackerelio/go-check-plugins
-cd $(go env GOPATH)/src/github.com/mackerelio/go-check-plugins/check-disk
-go install
+go install github.com/mackerelio/go-check-plugins/check-disk@latest
 ```
 
 Or you can use this program by installing the official Mackerel package. See [Using the official check plugin pack for check monitoring - Mackerel Docs](https://mackerel.io/docs/entry/howto/mackerel-check-plugins).
