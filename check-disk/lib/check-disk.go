@@ -250,7 +250,7 @@ func run(args []string) *checkers.Checker {
 }
 
 // ref: mountlist.c in gnulib
-// https://github.com/coreutils/gnulib/blob/a742bdb3/lib/mountlist.c#L168
+// https://github.com/coreutils/gnulib/blob/df336dc/lib/mountlist.c#L164
 func listPartitions() ([]gpud.PartitionStat, error) {
 	allPartitions, err := gpud.Partitions(true)
 	if err != nil {
@@ -265,6 +265,7 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 			"debugfs",
 			"devpts",
 			"fusectl",
+			"fuse.portal",
 			"mqueue",
 			"rpc_pipefs",
 			"sysfs",
