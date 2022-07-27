@@ -45,6 +45,16 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jul 27 2022 <mackerel-developers@hatena.ne.jp> - 0.42.2
+- Ignores fuse.portal partitions (by lufia)
+- Bump github.com/aws/aws-sdk-go from 1.44.37 to 1.44.56 (by dependabot[bot])
+- Bump github.com/gomodule/redigo from 1.8.8 to 1.8.9 (by dependabot[bot])
+- Bump github.com/stretchr/testify from 1.7.1 to 1.8.0 (by dependabot[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.7.10 to 1.8.1 (by dependabot[bot])
+- Bump github.com/lib/pq from 1.10.4 to 1.10.6 (by dependabot[bot])
+- Bump github.com/jmoiron/sqlx from 1.3.4 to 1.3.5 (by dependabot[bot])
+- Bump github.com/go-ldap/ldap/v3 from 3.4.2 to 3.4.3 (by dependabot[bot])
+
 * Wed Jun 22 2022 <mackerel-developers@hatena.ne.jp> - 0.42.1
 - Bump github.com/aws/aws-sdk-go from 1.43.26 to 1.44.37 (by dependabot[bot])
 

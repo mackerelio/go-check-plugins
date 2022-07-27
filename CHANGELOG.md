@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.42.2 (2022-07-27)
+
+* Ignores fuse.portal partitions #626 (lufia)
+* Bump github.com/aws/aws-sdk-go from 1.44.37 to 1.44.56 #623 (dependabot[bot])
+* Bump github.com/gomodule/redigo from 1.8.8 to 1.8.9 #620 (dependabot[bot])
+* Bump github.com/stretchr/testify from 1.7.1 to 1.8.0 #618 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.7.10 to 1.8.1 #610 (dependabot[bot])
+* Bump github.com/lib/pq from 1.10.4 to 1.10.6 #603 (dependabot[bot])
+* Bump github.com/jmoiron/sqlx from 1.3.4 to 1.3.5 #595 (dependabot[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.4.2 to 3.4.3 #592 (dependabot[bot])
+
+
 ## 0.42.1 (2022-06-22)
 
 * Bump github.com/aws/aws-sdk-go from 1.43.26 to 1.44.37 #612 (dependabot[bot])
