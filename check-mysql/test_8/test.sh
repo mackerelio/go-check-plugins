@@ -18,7 +18,6 @@ then
 	exit 2
 fi
 
-sleep_time=35
 user=root
 password=mysql
 primary_port=13306
@@ -30,9 +29,9 @@ if $plugin connection --host=127.0.0.1 --port=$primary_port --user=$user --passw
 fi
 
 docker-compose up -d
-
 trap 'docker-compose down --rmi local -v' EXIT
-sleep $sleep_time
+
+USER=$user PASSWORD=$password PORT=$primary_port ../wait.sh
 
 if ! $plugin connection --host=127.0.0.1 --port=$primary_port --user=$user --password=$password; then
 	echo 'FAIL: connection should be OK'
