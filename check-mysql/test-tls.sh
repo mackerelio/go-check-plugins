@@ -8,7 +8,6 @@ then
 fi
 
 cd "$(dirname "$0")" || exit
-PATH=$(pwd):$PATH
 plugin=$(basename "$(pwd)")
 if ! which "$plugin" >/dev/null
 then
