@@ -79,6 +79,9 @@ mysql -u$user -p$password --host 127.0.0.1 --port=$replica_port -e """
 START REPLICA USER='repl' PASSWORD='repl';
 """
 
+# starting replication may take a while
+sleep 1
+
 if ! $plugin replication --host=127.0.0.1 --port=$replica_port --user=$user --password=$password; then
 	echo 'FAIL: replication of replica server should be started'
 	exit 1
