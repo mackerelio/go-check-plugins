@@ -38,6 +38,8 @@ if ! $plugin connection --host=127.0.0.1 --port=$primary_port --user=$user --pas
 	exit 1
 fi
 
+sleep 2
+
 if ! $plugin uptime --host=127.0.0.1 --port=$primary_port --user=$user --password=$password --critical=2 --warning=1; then
 	echo 'FAIL: uptime should be OK'
 	exit 1
