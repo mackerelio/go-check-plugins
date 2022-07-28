@@ -12,7 +12,7 @@ fi
 
 cd $(dirname $0)
 plugin=$(basename $(realpath ../))
-if ! which -s $plugin
+if ! which "$plugin" >/dev/null
 then
 	echo "$prog: $plugin is not installed" >&2
 	exit 2
