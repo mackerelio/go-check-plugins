@@ -17,8 +17,6 @@ services:
 
   replica:
     image: mysql:5.7.8
-    ports:
-      - 23306:3306
     environment:
       MYSQL_ROOT_PASSWORD: mysql
     command:
@@ -27,3 +25,5 @@ services:
       - --bind_address=0.0.0.0
       - --log_bin=bin.log
       - --read_only=1
+    ports:
+      - 23306:3306
