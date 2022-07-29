@@ -8,7 +8,6 @@ then
 fi
 
 cd "$(dirname "$0")" || exit
-PATH=$(pwd):$PATH
 plugin=$(basename "$(pwd)")
 if ! which "$plugin" >/dev/null
 then
@@ -27,17 +26,7 @@ docker run -d \
 	-e "MYSQL_ROOT_PASSWORD=$password" "$image"
 trap 'docker stop test-$plugin; docker rm test-$plugin; rm $cacert; exit 1' 1 2 3 15
 
-# wait until bootstrap mysqld..
-for i in $(seq 10)
-do
-	echo "Connecting $i..."
-	if $plugin connection --port $port --password $password >/dev/null 2>&1
-	then
-		break
-	fi
-	sleep 3
-done
-sleep 1
+USER=root PASSWORD=$password PORT=$port ./wait.sh
 
 docker cp "test-$plugin:/var/lib/mysql/ca.pem" "$cacert"
 

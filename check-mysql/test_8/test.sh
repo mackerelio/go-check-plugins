@@ -12,13 +12,12 @@ fi
 
 cd $(dirname $0)
 plugin=$(basename $(realpath ../))
-if ! which -s $plugin
+if ! which "$plugin" >/dev/null
 then
 	echo "$prog: $plugin is not installed" >&2
 	exit 2
 fi
 
-sleep_time=35
 user=root
 password=mysql
 primary_port=13306
@@ -30,16 +29,18 @@ if $plugin connection --host=127.0.0.1 --port=$primary_port --user=$user --passw
 fi
 
 docker-compose up -d
-
 trap 'docker-compose down --rmi local -v' EXIT
-sleep $sleep_time
+
+USER=$user PASSWORD=$password PORT=$primary_port ../wait.sh
 
 if ! $plugin connection --host=127.0.0.1 --port=$primary_port --user=$user --password=$password; then
 	echo 'FAIL: connection should be OK'
 	exit 1
 fi
 
-if ! $plugin uptime --host=127.0.0.1 --port=$primary_port --user=$user --password=$password --critical=2 --warning=1; then
+sleep 2
+
+if ! $plugin uptime --host=127.0.0.1 --port=$primary_port --user=$user --password=$password --critical=1 --warning=2; then
 	echo 'FAIL: uptime should be OK'
 	exit 1
 fi
@@ -78,6 +79,9 @@ fi
 mysql -u$user -p$password --host 127.0.0.1 --port=$replica_port -e """
 START REPLICA USER='repl' PASSWORD='repl';
 """
+
+# starting replication may take a while
+sleep 1
 
 if ! $plugin replication --host=127.0.0.1 --port=$replica_port --user=$user --password=$password; then
 	echo 'FAIL: replication of replica server should be started'

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # prepare tests
-for f in check-*/test.sh check-*/test-*.sh
+for f in check-*/test.sh
 do
 	dir=$(dirname "$f")
 	name=$(basename "$dir")
@@ -11,7 +11,7 @@ done
 # run tests
 declare -A plugins=()
 declare -a pids=()
-for f in check-*/test.sh check-*/test-*.sh
+for f in check-*/test.sh
 do
 	./"$f" &
 	pid=$!
