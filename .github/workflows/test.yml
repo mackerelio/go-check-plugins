@@ -14,11 +14,21 @@ jobs:
   lint:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - uses: golangci/golangci-lint-action@v3
+  lint-windows:
+    strategy:
+      matrix:
+        os: [windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: golangci/golangci-lint-action@v3
+        with:
+          args: ./check-log/... ./check-procs/... ./check-ntservice/... ./check-windows-eventlog/...
   test:
     strategy:
       matrix:
