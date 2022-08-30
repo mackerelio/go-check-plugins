@@ -79,7 +79,7 @@ func (c subcommand) executeAll() *checkers.Checker {
 
 	configFiles, err := c.ConfigFiles()
 	if err != nil {
-		checker.Status  = checkers.UNKNOWN
+		checker.Status = checkers.UNKNOWN
 		checker.Message = err.Error()
 		return checker
 	}
