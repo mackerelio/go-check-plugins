@@ -164,13 +164,13 @@ func (p *awsCloudwatchLogsPlugin) collect(ctx context.Context, now time.Time) ([
 func (p *awsCloudwatchLogsPlugin) loadState() (*logState, error) {
 	var s logState
 	f, err := os.Open(p.StateFile)
-	defer f.Close()
 	if err != nil {
 		if os.IsNotExist(err) {
 			return &s, nil
 		}
 		return nil, err
 	}
+	defer f.Close()
 	err = json.NewDecoder(f).Decode(&s)
 	if err != nil {
 		return nil, err

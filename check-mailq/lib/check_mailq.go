@@ -79,6 +79,9 @@ func run(args []string) *checkers.Checker {
 		if re.MatchString(line) {
 			queueStr = re.ReplaceAllString(line, "$1")
 			queue, err = strconv.ParseInt(queueStr, 10, 64)
+			if err != nil {
+				return checkers.Unknown(err.Error())
+			}
 		}
 	} else if opts.Mta == "qmail" {
 		out, err := exec.Command("qmail-qstat").Output()
@@ -94,6 +97,9 @@ func run(args []string) *checkers.Checker {
 		if re.MatchString(line) {
 			queueStr = re.ReplaceAllString(line, "$1")
 			queue, err = strconv.ParseInt(queueStr, 10, 64)
+			if err != nil {
+				return checkers.Unknown(err.Error())
+			}
 		}
 	} else {
 		return checkers.Unknown(fmt.Sprintf("%s: specified mta's check is not implemented.", opts.Mta))
