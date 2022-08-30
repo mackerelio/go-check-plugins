@@ -7,7 +7,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/textproto"
@@ -236,7 +236,7 @@ func Run(args []string) *checkers.Checker {
 
 	if opts.CaFile != "" {
 		// Load CA cert
-		caCert, err := ioutil.ReadFile(opts.CaFile)
+		caCert, err := os.ReadFile(opts.CaFile)
 		if err != nil {
 			return checkers.Unknown(err.Error())
 		}
@@ -340,7 +340,7 @@ func Run(args []string) *checkers.Checker {
 	elapsed := time.Since(stTime)
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	cLength := resp.ContentLength
 	if cLength == -1 {

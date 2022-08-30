@@ -4,7 +4,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -33,7 +32,7 @@ func checkCertExpiration() *checkers.Checker {
 		os.Exit(1)
 	}
 
-	cfByte, err := ioutil.ReadFile(opts.CertFile)
+	cfByte, err := os.ReadFile(opts.CertFile)
 	if err != nil {
 		return checkers.Critical(err.Error())
 	}

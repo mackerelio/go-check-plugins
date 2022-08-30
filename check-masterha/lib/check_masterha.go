@@ -2,7 +2,6 @@ package checkmasterha
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -41,7 +40,7 @@ type subcommand struct {
 
 func (c subcommand) ConfigFiles() ([]string, error) {
 	if c.All {
-		files, err := ioutil.ReadDir("/service")
+		files, err := os.ReadDir("/service")
 		if err != nil {
 			return nil, err
 		}
