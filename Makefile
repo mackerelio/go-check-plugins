@@ -12,7 +12,7 @@ export GO111MODULE=on
 all: clean testconvention test build rpm deb
 
 .PHONY: test
-test: lint
+test:
 	go test $(TESTFLAGS) ./...
 	./test.bash
 
