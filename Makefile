@@ -16,24 +16,14 @@ test: lint
 	go test $(TESTFLAGS) ./...
 	./test.bash
 
-.PHONY: devel-deps
-devel-deps:
-	cd && go get golang.org/x/lint/golint  \
-	  github.com/mattn/goveralls
-
 .PHONY: lint
-lint: devel-deps
-	go vet ./...
-	golint -set_exit_status ./...
+lint:
+	golangci-lint run
 
 .PHONY: testconvention
 testconvention:
 	prove -r t/
 	@go generate ./... && git diff --exit-code -- . ':(exclude)go.*' || (echo 'please `go generate ./...` and commit them' && false)
-
-.PHONY: cover
-cover: devel-deps
-	go test -race -covermode atomic -coverprofile=.profile.cov ./...
 
 .PHONY: build
 build:

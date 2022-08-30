@@ -11,6 +11,14 @@ on:
 env:
   DEBIAN_FRONTEND: noninteractive
 jobs:
+  lint:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: golangci/golangci-lint-action@v3
   test:
     strategy:
       matrix:
@@ -30,7 +38,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - run: |
-          make lint cover testconvention test
+          make testconvention test
+      - run: go test -race -covermode=atomic -coverprofile=prof.out ./...
+        shell: bash
+      - uses: shogo82148/actions-goveralls@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-profile: prof.out
+          parallel: true
+          flag-name: ${{ matrix.os }}_go${{ matrix.go }}
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: shogo82148/actions-goveralls@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        parallel-finished: true
   test-windows:
     strategy:
       matrix:
