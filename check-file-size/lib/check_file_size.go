@@ -41,7 +41,7 @@ func sizeValue(input string) (float64, error) {
 	num := r[0][1]
 	unit := r[0][2]
 
-	size, err = strconv.ParseFloat(num, 10)
+	size, err = strconv.ParseFloat(num, 64)
 	if err != nil {
 		return -1, err
 	}
