@@ -113,6 +113,5 @@ func run(args []string) *checkers.Checker {
 		result = checkers.CRITICAL
 	}
 
-	msg := fmt.Sprintf(queueStr)
-	return checkers.NewChecker(result, msg)
+	return checkers.NewChecker(result, queueStr)
 }
