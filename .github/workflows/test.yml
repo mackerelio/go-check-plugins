@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: golangci/golangci-lint-action@v3
         with:
-          args: ./check-log/... ./check-procs/... ./check-ntservice/... ./check-windows-eventlog/...
+          args: --timeout 2m ./check-log/... ./check-procs/... ./check-ntservice/... ./check-windows-eventlog/...
   test:
     strategy:
       matrix:
