@@ -7,6 +7,8 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type solrOpts struct {
@@ -54,6 +56,6 @@ SubCommands:`)
 	}
 
 	ckr := fn(opts)
-	ckr.Name = fmt.Sprintf("Solr %s", strings.Title(subCmd))
+	ckr.Name = fmt.Sprintf("Solr %s", cases.Title(language.Und, cases.NoLower).String(subCmd))
 	ckr.Exit()
 }

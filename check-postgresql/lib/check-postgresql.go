@@ -8,6 +8,8 @@ import (
 	// PostgreSQL Driver
 	_ "github.com/lib/pq"
 	"github.com/mackerelio/checkers"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var commands = map[string](func([]string) *checkers.Checker){
@@ -59,6 +61,6 @@ SubCommands:`)
 		os.Exit(1)
 	}
 	ckr := fn(argv)
-	ckr.Name = fmt.Sprintf("PostgreSQL %s", strings.Title(subCmd))
+	ckr.Name = fmt.Sprintf("PostgreSQL %s", cases.Title(language.Und, cases.NoLower).String(subCmd))
 	ckr.Exit()
 }
