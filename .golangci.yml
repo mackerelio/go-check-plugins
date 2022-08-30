@@ -1,0 +1,25 @@
+linters:
+  # Detected a number of cases that could not be handled after the switchover,
+  # TODO remove this rule.
+  disable:
+    - errcheck
+    - gosimple
+    - ineffassign
+    - staticcheck
+linters-settings:
+  govet:
+    enable-all: true
+    disable:
+      # Detected a number of cases that could not be handled after the switchover,
+      # TODO remove this rule.
+      - fieldalignment
+      - shadow
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosimple
+        - staticcheck
+        - ineffassign
+
