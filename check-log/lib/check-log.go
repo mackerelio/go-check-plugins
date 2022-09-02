@@ -561,6 +561,9 @@ func findFileByInode(inode uint, dir string) (string, error) {
 	}
 	for _, entry := range entries {
 		fi, err := entry.Info()
+		if err != nil {
+			return "", err
+		}
 		if err == nil && detectInode(fi) == inode {
 			return filepath.Join(dir, fi.Name()), nil
 		}
