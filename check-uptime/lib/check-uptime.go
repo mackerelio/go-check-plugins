@@ -10,7 +10,7 @@ import (
 	"github.com/mackerelio/go-osstat/uptime"
 )
 
-var opts struct {
+type uptimeOpts struct {
 	WarnUnder    *float64 `long:"warn-under" value-name:"N" description:"(DEPRECATED) Trigger a warning if under the seconds"`
 	WarningUnder *float64 `short:"w" long:"warning-under" value-name:"N" description:"Trigger a warning if under the seconds"`
 	CritUnder    *float64 `short:"c" long:"critical-under" value-name:"N" description:"Trigger a critial if under the seconds"`
@@ -21,16 +21,22 @@ var opts struct {
 
 // Do the plugin
 func Do() {
-	ckr := run(os.Args[1:])
+	opts, err := parseArgs(os.Args[1:])
+	if err != nil {
+		os.Exit(1)
+	}
+	ckr := opts.run()
 	ckr.Name = "Uptime"
 	ckr.Exit()
 }
 
-func run(args []string) *checkers.Checker {
-	_, err := flags.ParseArgs(&opts, args)
-	if err != nil {
-		os.Exit(1)
-	}
+func parseArgs(args []string) (*uptimeOpts, error) {
+	opts := &uptimeOpts{}
+	_, err := flags.ParseArgs(opts, args)
+	return opts, err
+}
+
+func (opts *uptimeOpts) run() *checkers.Checker {
 	utDur, err := uptime.Get()
 	if err != nil {
 		return checkers.Unknown(fmt.Sprintf("Failed to fetch uptime metrics: %s", err))
