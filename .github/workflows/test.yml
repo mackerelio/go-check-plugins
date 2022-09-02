@@ -48,9 +48,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - run: |
-          make testconvention test
-      - run: go test -race -covermode=atomic -coverprofile=prof.out ./...
-        shell: bash
+          go test -race -covermode=atomic -coverprofile=prof.out ./...
+          ./test.bash
+          make testconvention
       - uses: shogo82148/actions-goveralls@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
