@@ -2,7 +2,6 @@ package checkmasterha
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -41,7 +40,7 @@ type subcommand struct {
 
 func (c subcommand) ConfigFiles() ([]string, error) {
 	if c.All {
-		files, err := ioutil.ReadDir("/service")
+		files, err := os.ReadDir("/service")
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +79,7 @@ func (c subcommand) executeAll() *checkers.Checker {
 
 	configFiles, err := c.ConfigFiles()
 	if err != nil {
-		checker.Status  = checkers.UNKNOWN
+		checker.Status = checkers.UNKNOWN
 		checker.Message = err.Error()
 		return checker
 	}

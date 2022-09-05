@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -436,7 +435,7 @@ func parseFilePattern(directory, filePattern string, caseInsensitive bool) ([]st
 		return nil, fmt.Errorf("file-pattern is invalid")
 	}
 
-	fileInfos, err := ioutil.ReadDir(dirStr)
+	fileInfos, err := os.ReadDir(dirStr)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read the directory:" + err.Error())
 	}
@@ -461,7 +460,7 @@ type state struct {
 
 func loadState(fname string) (*state, error) {
 	state := &state{}
-	b, err := ioutil.ReadFile(fname)
+	b, err := os.ReadFile(fname)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
@@ -514,7 +513,7 @@ func getBytesToSkip(f string) (int64, error) {
 }
 
 func getBytesToSkipOld(f string) (int64, error) {
-	b, err := ioutil.ReadFile(f)
+	b, err := os.ReadFile(f)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return 0, errValidStateFileNotFound
@@ -556,11 +555,15 @@ func saveState(f string, state *state) error {
 var errFileNotFoundByInode = fmt.Errorf("old file not found")
 
 func findFileByInode(inode uint, dir string) (string, error) {
-	fis, err := ioutil.ReadDir(dir)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return "", err
 	}
-	for _, fi := range fis {
+	for _, entry := range entries {
+		fi, err := entry.Info()
+		if err != nil {
+			return "", err
+		}
 		if detectInode(fi) == inode {
 			return filepath.Join(dir, fi.Name()), nil
 		}

@@ -5,7 +5,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"strconv"
@@ -63,7 +62,7 @@ func decrypt(block *pem.Block, passphrase string) (*pem.Block, error) {
 }
 
 func readPrivateKey(file, passphrase string) ([]byte, error) {
-	privateKey, err := ioutil.ReadFile(file)
+	privateKey, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
