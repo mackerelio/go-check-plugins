@@ -23,7 +23,7 @@ require (
 	github.com/mattn/go-encoding v0.0.2
 	github.com/mattn/go-zglob v0.0.3
 	github.com/natefinch/atomic v0.0.0-20150920032501-a62ce929ffcc
-	github.com/shirou/gopsutil/v3 v3.22.2
+	github.com/shirou/gopsutil/v3 v3.22.8
 	github.com/stretchr/testify v1.8.0
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
