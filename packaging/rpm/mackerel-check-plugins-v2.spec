@@ -36,6 +36,23 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu Oct 20 2022 <mackerel-developers@hatena.ne.jp> - 0.42.3
+- Bump golang.org/x/text from 0.3.7 to 0.4.0 (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go from 1.44.56 to 1.44.116 (by dependabot[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.8.3 to 1.9.0 (by dependabot[bot])
+- use Go 1.19 on build (by yseto)
+- Bump github.com/shirou/gopsutil/v3 from 3.22.2 to 3.22.9 (by dependabot[bot])
+- Bump github.com/lib/pq from 1.10.6 to 1.10.7 (by dependabot[bot])
+- Bump github.com/mackerelio/checkers from 0.0.3 to 0.0.4 (by dependabot[bot])
+- [uptime] rewite to testable and add test (by wafuwafu13)
+- go.mod from 1.16 to 1.18 (by yseto)
+- added test check-file-age (by yseto)
+- added test check-file-size (by yseto)
+- Bump github.com/mackerelio/go-osstat from 0.2.2 to 0.2.3 (by dependabot[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.8.1 to 1.8.3 (by dependabot[bot])
+- Bump github.com/go-ldap/ldap/v3 from 3.4.3 to 3.4.4 (by dependabot[bot])
+- Improve tests for check-mysql (by susisu)
+
 * Wed Jul 27 2022 <mackerel-developers@hatena.ne.jp> - 0.42.2
 - Ignores fuse.portal partitions (by lufia)
 - Bump github.com/aws/aws-sdk-go from 1.44.37 to 1.44.56 (by dependabot[bot])
