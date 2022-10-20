@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.42.3 (2022-10-20)
+
+* Bump golang.org/x/text from 0.3.7 to 0.4.0 #658 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go from 1.44.56 to 1.44.116 #656 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.8.3 to 1.9.0 #655 (dependabot[bot])
+* use Go 1.19 on build #654 (yseto)
+* Bump github.com/shirou/gopsutil/v3 from 3.22.2 to 3.22.9 #652 (dependabot[bot])
+* Bump github.com/lib/pq from 1.10.6 to 1.10.7 #648 (dependabot[bot])
+* Bump github.com/mackerelio/checkers from 0.0.3 to 0.0.4 #645 (dependabot[bot])
+* [uptime] rewite to testable and add test #643 (wafuwafu13)
+* go.mod from 1.16 to 1.18 #642 (yseto)
+* added test check-file-age #641 (yseto)
+* added test check-file-size #640 (yseto)
+* Bump github.com/mackerelio/go-osstat from 0.2.2 to 0.2.3 #638 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.8.1 to 1.8.3 #637 (dependabot[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.4.3 to 3.4.4 #631 (dependabot[bot])
+* Improve tests for check-mysql #629 (susisu)
+
+
 ## 0.42.2 (2022-07-27)
 
 * Ignores fuse.portal partitions #626 (lufia)

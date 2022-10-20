@@ -1,3 +1,38 @@
+mackerel-check-plugins (0.42.3-1.v2) stable; urgency=low
+
+  * Bump golang.org/x/text from 0.3.7 to 0.4.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/658>
+  * Bump github.com/aws/aws-sdk-go from 1.44.56 to 1.44.116 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/656>
+  * Bump github.com/fsouza/go-dockerclient from 1.8.3 to 1.9.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/655>
+  * use Go 1.19 on build (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/654>
+  * Bump github.com/shirou/gopsutil/v3 from 3.22.2 to 3.22.9 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/652>
+  * Bump github.com/lib/pq from 1.10.6 to 1.10.7 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/648>
+  * Bump github.com/mackerelio/checkers from 0.0.3 to 0.0.4 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/645>
+  * [uptime] rewite to testable and add test (by wafuwafu13)
+    <https://github.com/mackerelio/go-check-plugins/pull/643>
+  * go.mod from 1.16 to 1.18 (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/642>
+  * added test check-file-age (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/641>
+  * added test check-file-size (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/640>
+  * Bump github.com/mackerelio/go-osstat from 0.2.2 to 0.2.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/638>
+  * Bump github.com/fsouza/go-dockerclient from 1.8.1 to 1.8.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/637>
+  * Bump github.com/go-ldap/ldap/v3 from 3.4.3 to 3.4.4 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/631>
+  * Improve tests for check-mysql (by susisu)
+    <https://github.com/mackerelio/go-check-plugins/pull/629>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 20 Oct 2022 02:30:47 +0000
+
 mackerel-check-plugins (0.42.2-1.v2) stable; urgency=low
 
   * Ignores fuse.portal partitions (by lufia)
