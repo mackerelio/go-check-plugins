@@ -24,7 +24,7 @@ require (
 	github.com/mattn/go-zglob v0.0.3
 	github.com/natefinch/atomic v0.0.0-20150920032501-a62ce929ffcc
 	github.com/shirou/gopsutil/v3 v3.22.9
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f
