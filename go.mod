@@ -8,7 +8,7 @@ require (
 	github.com/beevik/ntp v0.3.0
 	github.com/bradfitz/gomemcache v0.0.0-20221031212613-62deef7fc822
 	github.com/elazarl/goproxy v0.0.0-20221015165544-a0805db90819
-	github.com/elazarl/goproxy/ext v0.0.0-20191011121108-aa519ddbe484
+	github.com/elazarl/goproxy/ext v0.0.0-20221015165544-a0805db90819
 	github.com/fsouza/go-dockerclient v1.9.0
 	github.com/go-ldap/ldap/v3 v3.4.4
 	github.com/go-ole/go-ole v1.2.6
