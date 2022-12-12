@@ -6,9 +6,9 @@ require (
 	github.com/StackExchange/wmi v1.2.1
 	github.com/aws/aws-sdk-go v1.44.116
 	github.com/beevik/ntp v0.3.0
-	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
-	github.com/elazarl/goproxy v0.0.0-20191011121108-aa519ddbe484
-	github.com/elazarl/goproxy/ext v0.0.0-20191011121108-aa519ddbe484
+	github.com/bradfitz/gomemcache v0.0.0-20221031212613-62deef7fc822
+	github.com/elazarl/goproxy v0.0.0-20221015165544-a0805db90819
+	github.com/elazarl/goproxy/ext v0.0.0-20221015165544-a0805db90819
 	github.com/fsouza/go-dockerclient v1.9.0
 	github.com/go-ldap/ldap/v3 v3.4.4
 	github.com/go-ole/go-ole v1.2.6
@@ -21,14 +21,14 @@ require (
 	github.com/mackerelio/go-osstat v0.2.3
 	github.com/mackerelio/golib v1.2.1
 	github.com/mattn/go-encoding v0.0.2
-	github.com/mattn/go-zglob v0.0.3
-	github.com/natefinch/atomic v0.0.0-20150920032501-a62ce929ffcc
-	github.com/shirou/gopsutil/v3 v3.22.9
-	github.com/stretchr/testify v1.8.0
+	github.com/mattn/go-zglob v0.0.4
+	github.com/natefinch/atomic v1.0.1
+	github.com/shirou/gopsutil/v3 v3.22.11
+	github.com/stretchr/testify v1.8.1
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
-	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
-	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f
-	golang.org/x/text v0.4.0
+	golang.org/x/crypto v0.4.0
+	golang.org/x/sys v0.3.0
+	golang.org/x/text v0.5.0
 )
 
 require (
@@ -60,7 +60,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
+	golang.org/x/net v0.3.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
