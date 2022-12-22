@@ -29,7 +29,7 @@ testconvention:
 build:
 	mkdir -p build
 	for i in $(filter-out check-windows-%, $(wildcard check-*)); do \
-	  go build -ldflags "-s -w" -o build/$$i \
+	  CGO_ENABLED=0 go build -ldflags "-s -w" -o build/$$i \
 	  `pwd | sed -e "s|${GOPATH_ROOT}/src/||"`/$$i; \
 	done
 
