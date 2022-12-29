@@ -77,7 +77,11 @@ jobs:
           go build -o check-log/check-log.exe ./check-log
           go build -o check-procs/check-procs.exe ./check-procs
           go build -o check-windows-eventlog/check-windows-evenglog.exe ./check-windows-eventlog
-          go test ./check-log/... ./check-procs/... ./check-ntservice/... ./check-windows-eventlog/...
+          go build -o check-ntservice/check-ntservice.exe ./check-ntservice
+          go build -o check-disk/check-disk.exe ./check-disk
+          go build -o check-uptime/check-uptime.exe ./check-uptime
+          go build -o check-tcp/check-tcp.exe ./check-tcp
+          go test -v ./...
   build:
     needs: [test, test-windows]
     runs-on: ubuntu-latest
