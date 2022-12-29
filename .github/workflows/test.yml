@@ -28,7 +28,6 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - run: sudo apt-get install memcached
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
