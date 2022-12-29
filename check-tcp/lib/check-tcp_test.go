@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"runtime"
 	"strconv"
 	"testing"
 	"time"
@@ -221,6 +222,9 @@ func TestHTTP(t *testing.T) {
 }
 
 func TestUnixDomainSocket(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("skipping test on windows")
+	}
 	dir, err := ioutil.TempDir(os.TempDir(), "")
 	if err != nil {
 		t.Error(err)

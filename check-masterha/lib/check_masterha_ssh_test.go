@@ -1,3 +1,5 @@
+//go:build !windows
+
 package checkmasterha
 
 import (
@@ -96,4 +98,3 @@ SSH Configuration Check Failed!
 	assert.Equal(t, checkers.CRITICAL, status)
 	assert.Equal(t, "SSH Configuration Check Failed!", msg)
 }
-
