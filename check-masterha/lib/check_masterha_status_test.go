@@ -32,4 +32,3 @@ func TestParseStatusFailure(t *testing.T) {
 	assert.Equal(t, checkers.CRITICAL, status)
 	assert.Equal(t, "db001 is stopped(2:NOT_RUNNING).", msg)
 }
-

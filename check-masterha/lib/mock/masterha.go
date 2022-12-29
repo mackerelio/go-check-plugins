@@ -4,14 +4,13 @@ import (
 	"github.com/mackerelio/checkers"
 )
 
-
 // Executer is dummy executer for testing
 type Executer struct {
-	CommandName string
-	CommandArgs []string
+	CommandName   string
+	CommandArgs   []string
 	CommandResult string
-	Status checkers.Status
-	ParseResult string
+	Status        checkers.Status
+	ParseResult   string
 }
 
 // MakeCommandName is dummy command name maker for testing
