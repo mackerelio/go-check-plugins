@@ -72,7 +72,8 @@ func listFiles(base string, depth int) ([]string, error) {
 		}
 
 		rel, _ := filepath.Rel(base, path)
-		if len(strings.Split(rel, "/")) > depth {
+		s := string(filepath.Separator)
+		if len(strings.Split(rel, s)) > depth {
 			return nil
 		}
 		files = append(files, path)

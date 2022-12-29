@@ -2,6 +2,7 @@ package checkfilesize
 
 import (
 	"fmt"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"testing"
@@ -53,12 +54,13 @@ func TestSizeValueWithInvalidInput(t *testing.T) {
 }
 
 func TestListFiles(t *testing.T) {
+	s := string(filepath.Separator)
 	// map[depth] = expected files
 	var testData = map[int][]string{
-		1: []string{"test_dir/file1"},
-		2: []string{"test_dir/file1", "test_dir/depth1/file2"},
-		3: []string{"test_dir/file1", "test_dir/depth1/file2", "test_dir/depth1/depth2/file3"},
-		4: []string{"test_dir/file1", "test_dir/depth1/file2", "test_dir/depth1/depth2/file3"},
+		1: {"test_dir" + s + "file1"},
+		2: {"test_dir" + s + "file1", "test_dir" + s + "depth1" + s + "file2"},
+		3: {"test_dir" + s + "file1", "test_dir" + s + "depth1" + s + "file2", "test_dir" + s + "depth1" + s + "depth2" + s + "file3"},
+		4: {"test_dir" + s + "file1", "test_dir" + s + "depth1" + s + "file2", "test_dir" + s + "depth1" + s + "depth2" + s + "file3"},
 	}
 	for depth, expects := range testData {
 		files, err := listFiles("test_dir", depth)
