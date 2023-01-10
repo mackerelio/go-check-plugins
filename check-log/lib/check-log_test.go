@@ -85,13 +85,7 @@ func TestGetBytesToSkip(t *testing.T) {
 }
 
 func TestSearchReader(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Fatalf("TempDir failed: %s", err)
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	opts := &logOpts{
 		StateDir: dir,
@@ -106,7 +100,7 @@ FATAL 22
 Fatal
 `
 	r := strings.NewReader(content)
-	warnNum, critNum, readBytes, errLines, err := opts.searchReader(context.Background(), r)
+	warnNum, critNum, readBytes, errLines, _ := opts.searchReader(context.Background(), r)
 
 	assert.Equal(t, int64(2), warnNum, "warnNum should be 2")
 	assert.Equal(t, int64(2), critNum, "critNum should be 2")
@@ -115,13 +109,7 @@ Fatal
 }
 
 func TestScenario(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Fatalf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
@@ -320,13 +308,7 @@ func (r *slowReader) Read(p []byte) (int, error) {
 }
 
 func TestRunWithGlob(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf1 := filepath.Join(dir, "dummy1")
 	fh1, _ := os.Create(logf1)
@@ -370,15 +352,9 @@ func TestRunWithGlob(t *testing.T) {
 }
 
 func TestRunWithZGlob(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
-	err = os.MkdirAll(filepath.Join(dir, "subdir"), 0755)
+	err := os.MkdirAll(filepath.Join(dir, "subdir"), 0755)
 	if err != nil {
 		t.Errorf("something went wrong")
 	}
@@ -425,13 +401,7 @@ func TestRunWithZGlob(t *testing.T) {
 }
 
 func TestRunWithMiddleOfLine(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
@@ -474,13 +444,7 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 }
 
 func TestRunWithNoState(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
@@ -516,13 +480,7 @@ func TestRunWithNoState(t *testing.T) {
 }
 
 func TestSearchReaderWithLevel(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 	ptn := `FATAL level:([0-9]+)`
@@ -550,7 +508,7 @@ FATAL level:22
 Fatal level:17
 `
 	r := strings.NewReader(content)
-	warnNum, critNum, readBytes, errLines, err := opts.searchReader(context.Background(), r)
+	warnNum, critNum, readBytes, errLines, _ := opts.searchReader(context.Background(), r)
 
 	assert.Equal(t, int64(2), warnNum, "warnNum should be 2")
 	assert.Equal(t, int64(1), critNum, "critNum should be 1")
@@ -559,13 +517,7 @@ Fatal level:17
 }
 
 func TestRunWithEncoding(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
@@ -601,13 +553,7 @@ func TestRunWithEncoding(t *testing.T) {
 }
 
 func TestRunWithoutEncoding(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
@@ -640,13 +586,7 @@ func TestRunWithoutEncoding(t *testing.T) {
 }
 
 func TestRunWithMissingOk(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -665,13 +605,7 @@ func TestRunWithMissingOk(t *testing.T) {
 }
 
 func TestRunWithMissingWarning(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -690,13 +624,7 @@ func TestRunWithMissingWarning(t *testing.T) {
 }
 
 func TestRunWithMissingCritical(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -715,13 +643,7 @@ func TestRunWithMissingCritical(t *testing.T) {
 }
 
 func TestRunWithMissingUnknown(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 
@@ -740,13 +662,7 @@ func TestRunWithMissingUnknown(t *testing.T) {
 }
 
 func TestRunWithGlobAndMissingWarning(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logfGlob := filepath.Join(dir, "dummy*")
 
@@ -765,13 +681,7 @@ func TestRunWithGlobAndMissingWarning(t *testing.T) {
 }
 
 func TestRunMultiplePattern(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
@@ -836,13 +746,7 @@ func TestRunMultiplePattern(t *testing.T) {
 }
 
 func TestRunWithSuppressOption(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
@@ -907,13 +811,7 @@ func TestRunWithSuppressOption(t *testing.T) {
 }
 
 func TestRunMultipleExcludePattern(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-log-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	t.Cleanup(func() {
-		os.RemoveAll(dir)
-	})
+	dir := t.TempDir()
 
 	logf := filepath.Join(dir, "dummy")
 	fh, _ := os.Create(logf)
