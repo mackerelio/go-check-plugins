@@ -3,7 +3,6 @@ package checktcp
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -225,11 +224,7 @@ func TestUnixDomainSocket(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("skipping test on windows")
 	}
-	dir, err := ioutil.TempDir(os.TempDir(), "")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	sock := fmt.Sprintf("%s/test.sock", dir)
 

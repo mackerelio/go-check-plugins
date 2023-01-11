@@ -3,8 +3,6 @@
 package checkwindowseventlog
 
 import (
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"reflect"
 	"runtime"
@@ -65,11 +63,7 @@ func raiseEvent(t *testing.T, typ int, msg string) {
 }
 
 func TestRun(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	origArgs := []string{"-s", dir, "--log", "Application"}
 	args := make([]string, len(origArgs))
@@ -207,11 +201,7 @@ func TestRun(t *testing.T) {
 }
 
 func TestPattern(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application"})
 	opts.prepare()
@@ -320,11 +310,7 @@ func TestPattern(t *testing.T) {
 }
 
 func TestIDs(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application"})
 	opts.prepare()
@@ -343,7 +329,7 @@ func TestIDs(t *testing.T) {
 		writeLastOffset(stateFile, lastNumber)
 	}
 
-	_, _, _, err = opts.searchLog("Application")
+	_, _, _, err := opts.searchLog("Application")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -396,11 +382,7 @@ func TestIDs(t *testing.T) {
 }
 
 func TestFailFirst(t *testing.T) {
-	dir, err := ioutil.TempDir("", "check-windows-eventlog-test")
-	if err != nil {
-		t.Errorf("something went wrong")
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	opts, _ := parseArgs([]string{"-s", dir, "--log", "Application", "--fail-first", "--warning-over", "0", "--critical-over", "0"})
 	opts.prepare()
