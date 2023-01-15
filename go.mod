@@ -9,7 +9,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20221031212613-62deef7fc822
 	github.com/elazarl/goproxy v0.0.0-20221015165544-a0805db90819
 	github.com/elazarl/goproxy/ext v0.0.0-20221015165544-a0805db90819
-	github.com/fsouza/go-dockerclient v1.9.0
+	github.com/fsouza/go-dockerclient v1.9.2
 	github.com/go-ldap/ldap/v3 v3.4.4
 	github.com/go-ole/go-ole v1.2.6
 	github.com/go-sql-driver/mysql v1.6.0
@@ -35,11 +35,11 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20220621081337-cb9428e4ac1e // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
-	github.com/Microsoft/hcsshim v0.9.3 // indirect
-	github.com/containerd/cgroups v1.0.3 // indirect
-	github.com/containerd/containerd v1.6.6 // indirect
+	github.com/Microsoft/hcsshim v0.9.6 // indirect
+	github.com/containerd/cgroups v1.0.4 // indirect
+	github.com/containerd/containerd v1.6.14 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/docker/docker v20.10.19+incompatible // indirect
+	github.com/docker/docker v20.10.22+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.4 // indirect
