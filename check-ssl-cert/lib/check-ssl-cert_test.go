@@ -79,8 +79,9 @@ func TestSelfCertification(t *testing.T) {
 	host, port, _ := net.SplitHostPort(u.Host)
 
 	ckr := Run([]string{
-		"-H", host, "-p",
-		port, "--ca-file", filepath.Join(tmpDir, ca_crt),
+		"-H", host,
+		"-p", port,
+		"--ca-file", filepath.Join(tmpDir, ca_crt),
 		"-c", "25",
 		"-w", "30"})
 	assert.Equal(t, checkers.WARNING, ckr.Status, "should be WARNING")
