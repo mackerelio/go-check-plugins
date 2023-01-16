@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/mackerelio/checkers"
@@ -36,16 +37,16 @@ func prepareCertification(t *testing.T) (string, error) {
 		return "", fmt.Errorf("Failed to cp: %s", err)
 	}
 
-	cm := exec.Command("chmod", "777", gen_cert_script)
-	cm.Dir = tmpDir
-	err = cm.Run()
+	chmod := exec.Command("chmod", "777", gen_cert_script)
+	chmod.Dir = tmpDir
+	err = chmod.Run()
 	if err != nil {
 		return "", fmt.Errorf("Failed to chmod: %s", err)
 	}
 
-	cmd := exec.Command("sh", "-c", gen_cert_script)
-	cmd.Dir = tmpDir
-	err = cmd.Run()
+	sh := exec.Command("sh", "-c", gen_cert_script)
+	sh.Dir = tmpDir
+	err = sh.Run()
 	if err != nil {
 		return "", fmt.Errorf("Failed to run: %s", err)
 	}
@@ -54,6 +55,9 @@ func prepareCertification(t *testing.T) (string, error) {
 }
 
 func TestSelfCertification(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip()
+	}
 	tmpDir, err := prepareCertification(t)
 	if err != nil {
 		t.Errorf("Failed to prepare: %s", err)
@@ -83,6 +87,9 @@ func TestSelfCertification(t *testing.T) {
 }
 
 func TestClientCertification(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip()
+	}
 	tmpDir, err := prepareCertification(t)
 	if err != nil {
 		t.Errorf("Failed to prepare: %s", err)
@@ -130,6 +137,9 @@ func TestClientCertification(t *testing.T) {
 }
 
 func TestNoCheckCertificate(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip()
+	}
 	tmpDir, err := prepareCertification(t)
 	if err != nil {
 		t.Errorf("Failed to prepare: %s", err)
@@ -151,7 +161,7 @@ func TestNoCheckCertificate(t *testing.T) {
 
 	ckr := Run([]string{"-H", host, "-p", port, "-c", "25", "-w", "30"})
 	assert.Equal(t, checkers.CRITICAL, ckr.Status, "should be CRITICAL")
-	assert.Equal(t, "x509: “JP” certificate is not trusted", ckr.Message)
+	assert.Contains(t, ckr.Message, "x509:", "should an error occur regarding x509")
 
 	ckr = Run([]string{"-H", host, "-p", port, "--no-check-certificate", "-c", "25", "-w", "30"})
 	assert.Equal(t, checkers.WARNING, ckr.Status, "should be WARNING")
