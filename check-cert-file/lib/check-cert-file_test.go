@@ -1,8 +1,9 @@
 package checkcertfile
 
 import (
-	"os"
+	// "os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -13,24 +14,25 @@ import (
 func TestCertFile(t *testing.T) {
 	goroot, err := exec.Command("go", "env", "GOROOT").Output()
 	if err != nil {
-		t.Fatalf("Faild to get GOROOT: %s", err)
+		t.Fatalf("Failed to get GOROOT: %s", err)
 	}
-	err = exec.Command(
+
+	tmpDir := t.TempDir()
+	cmd := exec.Command(
 		"go",
 		"run",
-		strings.TrimSuffix(string(goroot), "\n")+"/src/crypto/tls/generate_cert.go",
+		filepath.FromSlash(filepath.Join(strings.TrimSuffix(string(goroot), "\n"), "/src/crypto/tls/generate_cert.go")),
 		"-host",
 		"localhost",
 		"-duration",
 		"720h0m0s", // 30*24*time.Hour
-	).Run()
+	)
+	cmd.Dir = tmpDir
+	err = cmd.Run()
 	if err != nil {
-		t.Fatalf("Faild to generate cert.pem: %s", err)
+		t.Fatalf("Failed to generate cert.pem: %s", err)
 	}
 
-	ckr := Run([]string{"-f", "./cert.pem", "-w", "35", "-c", "25"})
+	ckr := Run([]string{"-f", filepath.Join(tmpDir, "cert.pem"), "-w", "35", "-c", "25"})
 	assert.Equal(t, checkers.WARNING, ckr.Status, "should be WARNING")
-
-	os.Remove("./cert.pem")
-	os.Remove("./key.pem")
 }
