@@ -3,7 +3,7 @@ package checkcertfile
 import (
 	"os/exec"
 	"path/filepath"
-	"strings"
+	"runtime"
 	"testing"
 
 	"github.com/mackerelio/checkers"
@@ -11,23 +11,18 @@ import (
 )
 
 func TestCertFile(t *testing.T) {
-	goroot, err := exec.Command("go", "env", "GOROOT").Output()
-	if err != nil {
-		t.Fatalf("Failed to get GOROOT: %s", err)
-	}
-
 	tmpDir := t.TempDir()
 	cmd := exec.Command(
 		"go",
 		"run",
-		filepath.FromSlash(filepath.Join(strings.TrimSuffix(string(goroot), "\n"), "/src/crypto/tls/generate_cert.go")),
+		filepath.FromSlash(filepath.Join(runtime.GOROOT(), "/src/crypto/tls/generate_cert.go")),
 		"-host",
 		"localhost",
 		"-duration",
 		"720h0m0s", // 30*24*time.Hour
 	)
 	cmd.Dir = tmpDir
-	err = cmd.Run()
+	err := cmd.Run()
 	if err != nil {
 		t.Fatalf("Failed to generate cert.pem: %s", err)
 	}
