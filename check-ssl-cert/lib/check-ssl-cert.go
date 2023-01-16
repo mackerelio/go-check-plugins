@@ -12,10 +12,14 @@ import (
 )
 
 type certOpts struct {
-	Host     string `short:"H" long:"host" required:"true" description:"Host name"`
-	Port     int    `short:"p" long:"port" default:"443" description:"Port number"`
-	Warning  int    `short:"w" long:"warning" value-name:"days" default:"30" description:"The warning threshold in days before expiry"`
-	Critical int    `short:"c" long:"critical" value-name:"days" default:"14" description:"The critical threshold in days before expiry"`
+	Host               string `short:"H" long:"host" required:"true" description:"Host name"`
+	Port               int    `short:"p" long:"port" default:"443" description:"Port number"`
+	Warning            int    `short:"w" long:"warning" value-name:"days" default:"30" description:"The warning threshold in days before expiry"`
+	Critical           int    `short:"c" long:"critical" value-name:"days" default:"14" description:"The critical threshold in days before expiry"`
+	CAfile             string `long:"ca-file" description:"A CA Cert file to use for server authentication"`
+	CertFile           string `long:"cert-file" description:"A Cert file to use for client authentication"`
+	KeyFile            string `long:"key-file" description:"A Key file to use for client authentication"`
+	NoCheckCertificate bool   `long:"no-check-certificate" description:"Do not check certificate"`
 }
 
 func parseArgs(args []string) (*certOpts, error) {
@@ -26,19 +30,19 @@ func parseArgs(args []string) (*certOpts, error) {
 
 // Do the plugin
 func Do() {
-	ckr := run(os.Args[1:])
+	ckr := Run(os.Args[1:])
 	ckr.Name = "SSL"
 	ckr.Exit()
 }
 
-func run(args []string) *checkers.Checker {
-	opts, err := parseArgs(os.Args[1:])
+func Run(args []string) *checkers.Checker {
+	opts, err := parseArgs(args)
 	if err != nil {
 		os.Exit(1)
 	}
 
 	addr := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
-	cert, err := getCert(addr)
+	cert, err := getCert(addr, opts)
 	if err != nil {
 		return checkers.Critical(err.Error())
 	}
@@ -63,8 +67,29 @@ func run(args []string) *checkers.Checker {
 	return checkers.NewChecker(chkSt, msg)
 }
 
-func getCert(addr string) (*x509.Certificate, error) {
-	conn, err := tls.Dial("tcp", addr, &tls.Config{})
+func getCert(addr string, opts *certOpts) (*x509.Certificate, error) {
+	tlsConfig := &tls.Config{}
+	if opts.CAfile != "" {
+		caCert, err := os.ReadFile(opts.CAfile)
+		if err != nil {
+			return nil, err
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
+		tlsConfig.RootCAs = caCertPool
+		tlsConfig.BuildNameToCertificate()
+	}
+	if opts.CertFile != "" && opts.KeyFile != "" {
+		cert, err := tls.LoadX509KeyPair(opts.CertFile, opts.KeyFile)
+		if err != nil {
+			return nil, err
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
+	}
+	if opts.NoCheckCertificate {
+		tlsConfig.InsecureSkipVerify = true
+	}
+	conn, err := tls.Dial("tcp", addr, tlsConfig)
 	if err != nil {
 		return nil, err
 	}
