@@ -45,6 +45,14 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Wed Jan 18 2023 <mackerel-developers@hatena.ne.jp> - 0.42.4
+- check-cert-file: add test (by wafuwafu13)
+- test: use `T.TempDir` to create temporary test directory (by Juneezee)
+- combine lint, lint-windows, fix test on windows. (by yseto)
+- added compile option, fix packaging format (by yseto)
+- Update dependencies (by lufia)
+- Bump github.com/aws/aws-sdk-go from 1.44.116 to 1.44.157 (by dependabot[bot])
+
 * Thu Oct 20 2022 <mackerel-developers@hatena.ne.jp> - 0.42.3
 - Bump golang.org/x/text from 0.3.7 to 0.4.0 (by dependabot[bot])
 - Bump github.com/aws/aws-sdk-go from 1.44.56 to 1.44.116 (by dependabot[bot])

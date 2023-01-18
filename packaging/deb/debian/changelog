@@ -1,3 +1,20 @@
+mackerel-check-plugins (0.42.4-1) stable; urgency=low
+
+  * check-cert-file: add test (by wafuwafu13)
+    <https://github.com/mackerelio/go-check-plugins/pull/687>
+  * test: use `T.TempDir` to create temporary test directory (by Juneezee)
+    <https://github.com/mackerelio/go-check-plugins/pull/686>
+  * combine lint, lint-windows, fix test on windows. (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/678>
+  * added compile option, fix packaging format (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/676>
+  * Update dependencies (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/674>
+  * Bump github.com/aws/aws-sdk-go from 1.44.116 to 1.44.157 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/673>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 18 Jan 2023 06:21:28 +0000
+
 mackerel-check-plugins (0.42.3-1) stable; urgency=low
 
   * Bump golang.org/x/text from 0.3.7 to 0.4.0 (by dependabot[bot])
