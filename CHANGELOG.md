@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.42.4 (2023-01-18)
+
+* check-cert-file: add test #687 (wafuwafu13)
+* test: use `T.TempDir` to create temporary test directory #686 (Juneezee)
+* combine lint, lint-windows, fix test on windows. #678 (yseto)
+* added compile option, fix packaging format #676 (yseto)
+* Update dependencies #674 (lufia)
+* Bump github.com/aws/aws-sdk-go from 1.44.116 to 1.44.157 #673 (dependabot[bot])
+
+
 ## 0.42.3 (2022-10-20)
 
 * Bump golang.org/x/text from 0.3.7 to 0.4.0 #658 (dependabot[bot])
