@@ -77,7 +77,6 @@ func getCert(addr string, opts *certOpts) (*x509.Certificate, error) {
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
 		tlsConfig.RootCAs = caCertPool
-		tlsConfig.BuildNameToCertificate()
 	}
 	if opts.CertFile != "" && opts.KeyFile != "" {
 		cert, err := tls.LoadX509KeyPair(opts.CertFile, opts.KeyFile)
