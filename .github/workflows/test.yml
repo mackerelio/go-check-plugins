@@ -4,9 +4,9 @@ name: test
 on:
   push:
     branches:
-    - master
+      - master
     tags:
-    - v*
+      - v*
   pull_request:
 env:
   DEBIAN_FRONTEND: noninteractive
@@ -64,10 +64,10 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - uses: shogo82148/actions-goveralls@v1
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        parallel-finished: true
+      - uses: shogo82148/actions-goveralls@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -114,8 +114,8 @@ jobs:
         with:
           directory: artifacts/
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          tag-prefix: 'refs/tags/v'
-          bump-up-branch-prefix: 'bump-version-'
+          tag-prefix: "refs/tags/v"
+          bump-up-branch-prefix: "bump-version-"
       - uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
