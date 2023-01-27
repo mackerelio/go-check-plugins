@@ -53,9 +53,7 @@ sub update_packaging_specs {
         $content =~ s/for i in.*?;\s*do/$for_in/ms;
         $content;
     };
-    replace $_, $replace_sub for ("packaging/rpm/$PACKAGE_NAME*.spec", "packaging/deb*/debian/rules");
-
-    path('packaging/deb/debian/source/include-binaries')->spew(join("\n", map { "debian/$PLUGIN_PREFIX$_" } @plugins) . "\n");
+    replace $_, $replace_sub for ("packaging/rpm/$PACKAGE_NAME*.spec", "packaging/deb-v2/debian/rules");
 }
 
 sub load_packaging_confg {
