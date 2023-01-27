@@ -81,16 +81,16 @@ rpm-v2-arm:
 	  --target aarch64 -bb packaging/rpm/mackerel-check-plugins-v2.spec
 
 .PHONY: deb
-deb: deb-x86 deb-arm
+deb: deb-v2-x86 deb-v2-arm
 
-.PHONY: deb-x86
-deb-x86:
+.PHONY: deb-v2-x86
+deb-v2-x86:
 	make build/mackerel-check GOOS=linux GOARCH=amd64
 	cp build/mackerel-check packaging/deb-v2/debian/
 	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us
 
-.PHONY: deb-arm
-deb-arm:
+.PHONY: deb-v2-arm
+deb-v2-arm:
 	make build/mackerel-check GOOS=linux GOARCH=arm64
 	cp build/mackerel-check packaging/deb-v2/debian/
 	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us -aarm64
