@@ -42,10 +42,14 @@ command = ["check-ssl-cert", "--host", "mackerel.io", "--warning", "30", "--crit
 ### Options
 
 ```
-  -H, --host=            Host name
-  -p, --port=            Port number (default: 443)
-  -w, --warning=days     The warning threshold in days before expiry (default: 30)
-  -c, --critical=days    The critical threshold in days before expiry (default: 14)
+  -H, --host=                   Host name
+  -p, --port=                   Port number (default: 443)
+  -w, --warning=days            The warning threshold in days before expiry (default: 30)
+  -c, --critical=days           The critical threshold in days before expiry (default: 14)
+      --ca-file=                A CA Cert file to use for server authentication
+      --cert-file=              A Cert file to use for client authentication
+      --key-file=               A Key file to use for client authentication
+      --no-check-certificate    Do not check certificate
 ```
 
 ## For more information
