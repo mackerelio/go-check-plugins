@@ -13,15 +13,13 @@ my $PACKAGE_NAME = 'mackerel-check-plugins';
 sub replace {
     my ($glob, $code) = @_;
     for my $file (glob $glob) {
-        my $content = $code->(path($file)->slurp_utf8, $file);
+        my $content = $code->(slurp_utf8($file), $file);
         $content .= "\n" if $content !~ /\n\z/ms;
 
-        my $f = path($file);
         # for keeping permission
-        $f->append_utf8({truncate => 1}, $content);
+        append_file($file, $content);
     }
 }
-
 
 sub retrieve_plugins {
     sort map {s/^$PLUGIN_PREFIX//; $_} <$PLUGIN_PREFIX*>;
