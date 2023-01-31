@@ -54,7 +54,9 @@ sub update_packaging_specs {
     replace $_, $replace_sub for ("packaging/rpm/$PACKAGE_NAME*.spec", "packaging/deb-v2/debian/rules");
 }
 
+####
 # file utility
+####
 sub slurp_utf8 {
     my $filename = shift;
     my $fh = IO::File->new($filename, "<:utf8");
@@ -79,6 +81,11 @@ sub append_file {
 sub load_packaging_confg {
     decode_json(slurp_utf8('packaging/config.json'));
 }
+
+
+####
+# some file generate task
+####
 
 sub subtask {
     my @plugins = retrieve_plugins;
