@@ -3,15 +3,18 @@ use 5.014;
 use warnings;
 use utf8;
 use autodie;
+use IO::File;
 use JSON::PP;
 
-my $json = do {
+# file utility
+sub slurp_utf8 {
+    my $filename = shift;
+    my $fh = IO::File->new($filename, "<:utf8");
     local $/;
-    open my $fh, '<', 'packaging/config.json';
-    <$fh>
-};
+    <$fh>;
+}
 
-my @plugins = sort @{ decode_json($json)->{plugins}};
+my @plugins = sort @{ decode_json(slurp_utf8('packaging/config.json'))->{plugins}};
 
 my $imports = "";
 my $case = "";
