@@ -34,10 +34,6 @@ jobs:
           NEXT=${{ steps.start.outputs.nextVersion }}
           mv packaging/mackerel-check-plugins_$CURRENT.orig.tar.gz packaging/mackerel-check-plugins_$NEXT.orig.tar.gz
 
-      - run: |
-          cpanm -qn Path::Tiny
-          perl tool/update-docs.pl
-
       - uses: mackerelio/mackerel-create-release-pull-request-action@main
         with:
           github_token: ${{ secrets.MACKERELBOT_GITHUB_TOKEN }}
