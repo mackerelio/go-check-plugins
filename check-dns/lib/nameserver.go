@@ -3,9 +3,9 @@
 package checkdns
 
 import (
-	"net"
 	"fmt"
 	"github.com/miekg/dns"
+	"net"
 )
 
 func adapterAddress() (string, error) {

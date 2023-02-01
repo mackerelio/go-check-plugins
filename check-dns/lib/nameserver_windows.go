@@ -33,7 +33,7 @@ func adapterAddress() (string, error) {
 	for aa := (*windows.IpAdapterAddresses)(unsafe.Pointer(&b[0])); aa != nil; aa = aa.Next {
 		aas = append(aas, aa)
 	}
-  nameserver := aas[0].FirstDnsServerAddress.Address.IP().String()
+	nameserver := aas[0].FirstDnsServerAddress.Address.IP().String()
 	// ref: https://github.com/miekg/exdns/blob/d851fa434ad51cb84500b3e18b8aa7d3bead2c51/q/q.go#L154-L158
 	if net.ParseIP(nameserver) == nil {
 		nameserver = dns.Fqdn(nameserver)
