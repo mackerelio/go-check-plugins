@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.43.0 (2023-02-01)
+
+* fix generate docs #703 (yseto)
+* Bump actions/checkout from 2 to 3 #702 (dependabot[bot])
+* Bump actions/setup-go from 2 to 3 #701 (dependabot[bot])
+* Bump actions/cache from 2 to 3 #700 (dependabot[bot])
+* Bump actions/upload-artifact from 2 to 3 #699 (dependabot[bot])
+* Bump actions/download-artifact from 2 to 3 #698 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go from 1.44.157 to 1.44.189 #697 (dependabot[bot])
+* Enables Dependabot version updates for GitHub Actions #696 (Arthur1)
+* Stop build for apt v1 #695 (Arthur1)
+* Bump github.com/fsouza/go-dockerclient from 1.9.0 to 1.9.3 #694 (dependabot[bot])
+* [check-http] add test.sh #692 (lufia)
+* check-ssl-cert: add `ca-file`, `cert-file`, `key-file`, `no-check-certificate` options #690 (wafuwafu13)
+* Bump golang.org/x/text from 0.5.0 to 0.6.0 #684 (dependabot[bot])
+* Bump golang.org/x/crypto from 0.4.0 to 0.5.0 #682 (dependabot[bot])
+* Bump github.com/shirou/gopsutil/v3 from 3.22.11 to 3.22.12 #679 (dependabot[bot])
+* Bump github.com/go-sql-driver/mysql from 1.6.0 to 1.7.0 #671 (dependabot[bot])
+
+
 ## 0.42.4 (2023-01-18)
 
 * check-cert-file: add test #687 (wafuwafu13)
