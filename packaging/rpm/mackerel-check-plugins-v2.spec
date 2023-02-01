@@ -36,6 +36,24 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Feb 1 2023 <mackerel-developers@hatena.ne.jp> - 0.43.0
+- fix generate docs (by yseto)
+- Bump actions/checkout from 2 to 3 (by dependabot[bot])
+- Bump actions/setup-go from 2 to 3 (by dependabot[bot])
+- Bump actions/cache from 2 to 3 (by dependabot[bot])
+- Bump actions/upload-artifact from 2 to 3 (by dependabot[bot])
+- Bump actions/download-artifact from 2 to 3 (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go from 1.44.157 to 1.44.189 (by dependabot[bot])
+- Enables Dependabot version updates for GitHub Actions (by Arthur1)
+- Stop build for apt v1 (by Arthur1)
+- Bump github.com/fsouza/go-dockerclient from 1.9.0 to 1.9.3 (by dependabot[bot])
+- [check-http] add test.sh (by lufia)
+- check-ssl-cert: add `ca-file`, `cert-file`, `key-file`, `no-check-certificate` options (by wafuwafu13)
+- Bump golang.org/x/text from 0.5.0 to 0.6.0 (by dependabot[bot])
+- Bump golang.org/x/crypto from 0.4.0 to 0.5.0 (by dependabot[bot])
+- Bump github.com/shirou/gopsutil/v3 from 3.22.11 to 3.22.12 (by dependabot[bot])
+- Bump github.com/go-sql-driver/mysql from 1.6.0 to 1.7.0 (by dependabot[bot])
+
 * Wed Jan 18 2023 <mackerel-developers@hatena.ne.jp> - 0.42.4
 - check-cert-file: add test (by wafuwafu13)
 - test: use `T.TempDir` to create temporary test directory (by Juneezee)

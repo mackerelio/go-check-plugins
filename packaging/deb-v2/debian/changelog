@@ -1,3 +1,40 @@
+mackerel-check-plugins (0.43.0-1.v2) stable; urgency=low
+
+  * fix generate docs (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/703>
+  * Bump actions/checkout from 2 to 3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/702>
+  * Bump actions/setup-go from 2 to 3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/701>
+  * Bump actions/cache from 2 to 3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/700>
+  * Bump actions/upload-artifact from 2 to 3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/699>
+  * Bump actions/download-artifact from 2 to 3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/698>
+  * Bump github.com/aws/aws-sdk-go from 1.44.157 to 1.44.189 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/697>
+  * Enables Dependabot version updates for GitHub Actions (by Arthur1)
+    <https://github.com/mackerelio/go-check-plugins/pull/696>
+  * Stop build for apt v1 (by Arthur1)
+    <https://github.com/mackerelio/go-check-plugins/pull/695>
+  * Bump github.com/fsouza/go-dockerclient from 1.9.0 to 1.9.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/694>
+  * [check-http] add test.sh (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/692>
+  * check-ssl-cert: add `ca-file`, `cert-file`, `key-file`, `no-check-certificate` options (by wafuwafu13)
+    <https://github.com/mackerelio/go-check-plugins/pull/690>
+  * Bump golang.org/x/text from 0.5.0 to 0.6.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/684>
+  * Bump golang.org/x/crypto from 0.4.0 to 0.5.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/682>
+  * Bump github.com/shirou/gopsutil/v3 from 3.22.11 to 3.22.12 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/679>
+  * Bump github.com/go-sql-driver/mysql from 1.6.0 to 1.7.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/671>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 1 Feb 2023 06:05:22 +0000
+
 mackerel-check-plugins (0.42.4-1.v2) stable; urgency=low
 
   * check-cert-file: add test (by wafuwafu13)
