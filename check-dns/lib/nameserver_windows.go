@@ -3,7 +3,10 @@
 package checkdns
 
 import (
+	"fmt"
+	"github.com/miekg/dns"
 	"golang.org/x/sys/windows"
+	"net"
 	"os"
 	"syscall"
 	"unsafe"
