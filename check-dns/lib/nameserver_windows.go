@@ -9,7 +9,7 @@ import (
 	"unsafe"
 )
 
-// https://go.dev/src/net/interface_windows.go
+// ref: https://go.dev/src/net/interface_windows.go
 func adapterAddress() (string, error) {
 	var b []byte
 	l := uint32(15000) // recommended initial size
@@ -33,5 +33,13 @@ func adapterAddress() (string, error) {
 	for aa := (*windows.IpAdapterAddresses)(unsafe.Pointer(&b[0])); aa != nil; aa = aa.Next {
 		aas = append(aas, aa)
 	}
-	return aas[0].FirstDnsServerAddress.Address.IP().String(), nil
+  nameserver := aas[0].FirstDnsServerAddress.Address.IP().String()
+	// ref: https://github.com/miekg/exdns/blob/d851fa434ad51cb84500b3e18b8aa7d3bead2c51/q/q.go#L154-L158
+	if net.ParseIP(nameserver) == nil {
+		nameserver = dns.Fqdn(nameserver)
+	}
+	if net.ParseIP(nameserver) == nil {
+		return "", fmt.Errorf("invalid nameserver: %s", nameserver)
+	}
+	return nameserver, nil
 }
