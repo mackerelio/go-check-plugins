@@ -10,6 +10,7 @@ on:
   pull_request:
 env:
   DEBIAN_FRONTEND: noninteractive
+  RUN_TEST_ON_GITHUB_ACTIONS: 1
 jobs:
   lint:
     strategy:
