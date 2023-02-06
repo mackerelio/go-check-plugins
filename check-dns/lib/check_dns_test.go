@@ -59,6 +59,18 @@ func TestCheckDns(t *testing.T) {
 			"status: NXDOMAIN",
 			false,
 		},
+		{
+			[]string{"-H", "jprs.co.jp", "-s", "202.11.16.49", "--norec"},
+			checkers.OK,
+			"status: NOERROR",
+			false,
+		},
+		{
+			[]string{"-H", "www.google.com", "-s", "202.11.16.49", "--norec"},
+			checkers.CRITICAL,
+			"status: REFUSED",
+			false,
+		},
 	}
 
 	for i, tt := range tests {
