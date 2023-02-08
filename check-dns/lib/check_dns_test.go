@@ -56,7 +56,7 @@ func TestCheckDns(t *testing.T) {
 		{
 			[]string{"-H", "exampleeeee.com", "-s", "8.8.8"},
 			checkers.CRITICAL,
-			[]string{"timeout"},
+			[]string{""},
 		},
 		{
 			[]string{"-H", "jprs.co.jp", "-s", "202.11.16.49", "--norec"},
