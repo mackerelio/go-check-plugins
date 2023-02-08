@@ -26,47 +26,67 @@ func TestCheckDns(t *testing.T) {
 	tests := []struct {
 		args        []string
 		want_status checkers.Status
-		want_msg    string
+		want_msg    []string
 	}{
 		{
 			[]string{"-H", "example.com"},
 			checkers.OK,
-			"status: NOERROR",
+			[]string{"status: NOERROR"},
 		},
 		{
 			[]string{"-H", "example.com", "--norec"},
 			checkers.OK,
-			"status: NOERROR",
+			[]string{"status: NOERROR"},
 		},
 		{
 			[]string{"-H", "exampleeeee.com"},
 			checkers.CRITICAL,
-			"status: NXDOMAIN",
+			[]string{"status: NXDOMAIN"},
 		},
 		{
 			[]string{"-H", "example.com", "-s", "8.8.8.8"},
 			checkers.OK,
-			"status: NOERROR",
+			[]string{"status: NOERROR"},
 		},
 		{
 			[]string{"-H", "exampleeeee.com", "-s", "8.8.8.8"},
 			checkers.CRITICAL,
-			"status: NXDOMAIN",
+			[]string{"status: NXDOMAIN"},
 		},
 		{
 			[]string{"-H", "exampleeeee.com", "-s", "8.8.8"},
 			checkers.CRITICAL,
-			"timeout",
+			[]string{"timeout"},
 		},
 		{
 			[]string{"-H", "jprs.co.jp", "-s", "202.11.16.49", "--norec"},
 			checkers.OK,
-			"status: NOERROR",
+			[]string{"status: NOERROR"},
 		},
 		{
 			[]string{"-H", "www.google.com", "-s", "202.11.16.49", "--norec"},
 			checkers.CRITICAL,
-			"status: REFUSED",
+			[]string{"status: REFUSED"},
+		},
+		{
+			[]string{"-H", "example.com", "-s", "8.8.8.8", "-q", "AAAA"},
+			checkers.OK,
+			[]string{"status: NOERROR", "AAAA"},
+		},
+		{
+			[]string{"-H", "example.com", "-s", "8.8.8.8", "-q", "AAA"},
+			checkers.CRITICAL,
+			[]string{"AAA is invalid queryType"},
+		},
+		{
+			[]string{"-H", "example.com", "-s", "8.8.8.8", "-c", "IN"},
+			checkers.OK,
+			[]string{"status: NOERROR"},
+		},
+		{
+			[]string{"-H", "example.com", "-s", "8.8.8.8", "-c", "INN"},
+			checkers.CRITICAL,
+			[]string{"INN is invalid queryClass"},
 		},
 	}
 
@@ -84,8 +104,10 @@ func TestCheckDns(t *testing.T) {
 
 		assert.Equal(t, tt.want_status, ckr.Status)
 
-		if !strings.Contains(ckr.Message, tt.want_msg) {
-			t.Errorf("%s is not incleded in message", tt.want_msg)
+		for _, want := range tt.want_msg {
+			if !strings.Contains(ckr.Message, want) {
+				t.Errorf("%s is not incleded in message", want)
+			}
 		}
 	}
 }

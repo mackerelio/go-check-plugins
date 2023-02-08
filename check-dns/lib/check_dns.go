@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -12,10 +13,12 @@ import (
 )
 
 type dnsOpts struct {
-	Host   string `short:"H" long:"host" required:"true" description:"The name or address you want to query"`
-	Server string `short:"s" long:"server" description:"DNS server you want to use for the lookup"`
-	Port   int    `short:"p" long:"port" default:"53" description:"Port number you want to use"`
-	Norec  bool   `long:"norec" description:"Set not recursive mode"`
+	Host       string `short:"H" long:"host" required:"true" description:"The name or address you want to query"`
+	Server     string `short:"s" long:"server" description:"DNS server you want to use for the lookup"`
+	Port       int    `short:"p" long:"port" default:"53" description:"Port number you want to use"`
+	QueryType  string `short:"q" long:"querytype" default:"A" description:"DNS record query type where TYPE =(A, AAAA, SRV, TXT, MX, ANY)"`
+	QueryClass string `short:"c" long:"queryclass" default:"IN" description:"DNS record class type where TYPE =(IN, CS, CH, HS, NONE, ANY)"`
+	Norec      bool   `long:"norec" description:"Set not recursive mode"`
 }
 
 // Do the plugin
@@ -48,13 +51,22 @@ func (opts *dnsOpts) run() *checkers.Checker {
 	}
 	nameserver = net.JoinHostPort(nameserver, strconv.Itoa(opts.Port))
 
+	queryType, ok := dns.StringToType[strings.ToUpper(opts.QueryType)]
+	if !ok {
+		return checkers.Critical(fmt.Sprintf("%s is invalid queryType", opts.QueryType))
+	}
+	queryClass, ok := dns.StringToClass[strings.ToUpper(opts.QueryClass)]
+	if !ok {
+		return checkers.Critical(fmt.Sprintf("%s is invalid queryClass", opts.QueryClass))
+	}
+
 	c := new(dns.Client)
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
 			RecursionDesired: !opts.Norec,
 			Opcode:           dns.OpcodeQuery,
 		},
-		Question: []dns.Question{{Name: dns.Fqdn(opts.Host), Qtype: dns.TypeA, Qclass: uint16(dns.ClassINET)}},
+		Question: []dns.Question{{Name: dns.Fqdn(opts.Host), Qtype: queryType, Qclass: uint16(queryClass)}},
 	}
 	m.Id = dns.Id()
 
