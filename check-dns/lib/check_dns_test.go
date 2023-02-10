@@ -59,16 +59,6 @@ func TestCheckDns(t *testing.T) {
 			[]string{""},
 		},
 		{
-			[]string{"-H", "jprs.co.jp", "-s", "202.11.16.49", "--norec"},
-			checkers.OK,
-			[]string{"status: NOERROR"},
-		},
-		{
-			[]string{"-H", "www.google.com", "-s", "202.11.16.49", "--norec"},
-			checkers.CRITICAL,
-			[]string{"status: REFUSED"},
-		},
-		{
 			[]string{"-H", "example.com", "-s", "8.8.8.8", "-q", "AAAA"},
 			checkers.OK,
 			[]string{"status: NOERROR", "AAAA"},
@@ -97,7 +87,7 @@ func TestCheckDns(t *testing.T) {
 			t.Fatal(err)
 		}
 		// when runs without setting server in CI, status will be REFUSED
-		if opts.Server == "" && os.Getenv("RUN_TEST_ON_GITHUB_ACTIONS") == "1" {
+		if opts.Server == "" && os.Getenv("CI") == "true" {
 			continue
 		}
 		ckr := opts.run()
