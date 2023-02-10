@@ -79,7 +79,10 @@ func (opts *dnsOpts) run() *checkers.Checker {
 	if r.MsgHdr.Rcode != dns.RcodeSuccess {
 		checkSt = checkers.CRITICAL
 	}
-	msg := fmt.Sprintf("%s", r)
+	msg := fmt.Sprintf("HEADER-> %s\n", r.MsgHdr.String())
+	for _, answer := range r.Answer {
+		msg += fmt.Sprintf("ANSWER-> %s\n", answer)
+	}
 
 	return checkers.NewChecker(checkSt, msg)
 }

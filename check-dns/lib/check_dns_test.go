@@ -54,7 +54,7 @@ func TestCheckDns(t *testing.T) {
 			[]string{"status: NXDOMAIN"},
 		},
 		{
-			[]string{"-H", "exampleeeee.com", "-s", "8.8.8"},
+			[]string{"-H", "example.com", "-s", "8.8.8"},
 			checkers.CRITICAL,
 			[]string{""},
 		},
