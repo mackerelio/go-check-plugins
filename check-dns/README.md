@@ -19,12 +19,12 @@ check-dns -H example.com -s 8.8.8.8
 Check IP-ADDRESS DNS server returns  
 If DNS server returns 1.1.1.1 and 2.2.2.2
 ```
--a 1.1.1.1, 2.2.2.2          -> OK  
--a 1.1.1.1, 2.2.2.2, 3.3.3.3 -> WARNING  
--a 1.1.1.1                   -> WARNING  
--a 1.1.1.1, 3.3.3.3          -> WARNING  
--a 3.3.3.3                   -> CRITICAL  
--a 3.3.3.3, 4.4.4.4, 5.5.5.5 -> CRITICAL  
+-a 1.1.1.1 -a 2.2.2.2            -> OK  
+-a 1.1.1.1 -a 2.2.2.2 -a 3.3.3.3 -> WARNING  
+-a 1.1.1.1                       -> WARNING  
+-a 1.1.1.1 -a 3.3.3.3            -> WARNING  
+-a 3.3.3.3                       -> CRITICAL  
+-a 3.3.3.3 -a 4.4.4.4 -a 5.5.5.5 -> CRITICAL  
 ```
 ```
 check-dns -H example.com -s 8.8.8.8 -a 93.184.216.34
@@ -69,7 +69,7 @@ command = ["check-dns", "-H", "example.com", "-s", "8.8.8.8"]
   -q, --querytype=        DNS record query type where TYPE =(A, AAAA, SRV, TXT, MX, ANY) (default: A)
   -c, --queryclass=       DNS record class type where TYPE =(IN, CS, CH, HS, NONE, ANY) (default: IN)
       --norec             Set not recursive mode
-  -a, --expected-address= IP-ADDRESS you expect the DNS server to return. If multiple addresses are returned at once, you have to match the whole string of addresses separated with commas
+  -a, --expected-address= IP-ADDRESS you expect the DNS server to return. If multiple addresses are returned at once, you have to specify whole string of addresses
 ```
 
 ## For more information

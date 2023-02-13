@@ -99,12 +99,12 @@ func TestCheckDns(t *testing.T) {
 			[]string{"status: NXDOMAIN"},
 		},
 		{
-			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-a", "198.41.0.3,198.41.0.4"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-a", "198.41.0.3", "-a", "198.41.0.4"},
 			checkers.WARNING,
 			[]string{"status: NOERROR", "198.41.0.4"},
 		},
 		{
-			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-a", "198.41.0.3,    198.41.0.4"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-a", "198.41.0.3", "-a", "   198.41.0.4   "},
 			checkers.WARNING,
 			[]string{"status: NOERROR", "198.41.0.4"},
 		},

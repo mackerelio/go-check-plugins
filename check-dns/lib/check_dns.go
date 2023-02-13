@@ -13,13 +13,13 @@ import (
 )
 
 type dnsOpts struct {
-	Host            string `short:"H" long:"host" required:"true" description:"The name or address you want to query"`
-	Server          string `short:"s" long:"server" description:"DNS server you want to use for the lookup"`
-	Port            int    `short:"p" long:"port" default:"53" description:"Port number you want to use"`
-	QueryType       string `short:"q" long:"querytype" default:"A" description:"DNS record query type where TYPE =(A, AAAA, SRV, TXT, MX, ANY)"`
-	QueryClass      string `short:"c" long:"queryclass" default:"IN" description:"DNS record class type where TYPE =(IN, CS, CH, HS, NONE, ANY)"`
-	Norec           bool   `long:"norec" description:"Set not recursive mode"`
-	ExpectedAddress string `short:"a" long:"expected-address" description:"IP-ADDRESS you expect the DNS server to return. If multiple addresses are returned at once, you have to match the whole string of addresses separated with commas"`
+	Host            string   `short:"H" long:"host" required:"true" description:"The name or address you want to query"`
+	Server          string   `short:"s" long:"server" description:"DNS server you want to use for the lookup"`
+	Port            int      `short:"p" long:"port" default:"53" description:"Port number you want to use"`
+	QueryType       string   `short:"q" long:"querytype" default:"A" description:"DNS record query type where TYPE =(A, AAAA, SRV, TXT, MX, ANY)"`
+	QueryClass      string   `short:"c" long:"queryclass" default:"IN" description:"DNS record class type where TYPE =(IN, CS, CH, HS, NONE, ANY)"`
+	Norec           bool     `long:"norec" description:"Set not recursive mode"`
+	ExpectedAddress []string `short:"a" long:"expected-address" description:"IP-ADDRESS you expect the DNS server to return. If multiple addresses are returned at once, you have to specify whole string of addresses"`
 }
 
 // Do the plugin
@@ -86,10 +86,9 @@ func (opts *dnsOpts) run() *checkers.Checker {
 		5: --expected-address 3.3.3.3                   -> CRITICAL
 		6: --expected-address 3.3.3.3, 4.4.4.4, 5.5.5.5 -> CRITICAL
 	**/
-	if opts.ExpectedAddress != "" {
-		expectedAddress := strings.Split(opts.ExpectedAddress, ",")
+	if len(opts.ExpectedAddress) != 0 {
 		match := 0
-		for _, v := range expectedAddress {
+		for _, v := range opts.ExpectedAddress {
 			for _, answer := range r.Answer {
 				if strings.Contains(answer.String(), strings.TrimSpace(v)) {
 					match += 1
@@ -97,7 +96,7 @@ func (opts *dnsOpts) run() *checkers.Checker {
 			}
 		}
 		if match == len(r.Answer) {
-			if len(expectedAddress) == len(r.Answer) { // case 1
+			if len(opts.ExpectedAddress) == len(r.Answer) { // case 1
 				checkSt = checkers.OK
 			} else { // case 2
 				checkSt = checkers.WARNING
