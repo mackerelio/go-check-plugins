@@ -90,7 +90,8 @@ func (opts *dnsOpts) run() *checkers.Checker {
 		match := 0
 		for _, v := range opts.ExpectedAddress {
 			for _, answer := range r.Answer {
-				if strings.Contains(answer.String(), strings.TrimSpace(v)) {
+				// strings.Split(answer.String(), "\t") is formatted as [a.root-servers.net. 328177 IN A 198.41.0.4] 
+				if strings.Split(answer.String(), "\t")[4] == strings.TrimSpace(v) {
 					match += 1
 				}
 			}
