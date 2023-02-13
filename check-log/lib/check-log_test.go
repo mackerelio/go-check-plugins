@@ -473,18 +473,11 @@ func TestRotated(t *testing.T) {
 		assert.Equal(t, int64(len("FATAL\n")), bytes, "it should move up to the size of a single line `FATAL\n`")
 	})
 
-	// save to a different file
-	if err := os.Rename(logf, logf+"old"); err != nil {
-		t.Fatal(err)
-	}
-	// recreate a same name file
-	logf = filepath.Join(dir, "dummy")
-	fh, _ = os.Create(logf)
-	t.Cleanup(func() {
-		fh.Close()
-	})
-
 	t.Run("check recreated file", func(t *testing.T) {
+		// delete the inherited file and create a new file with the same name but a different inode.
+		fh.Close()
+		os.Remove(logf)
+		fh, _ = os.Create(logf)
 		fh.WriteString("FATAL\nfoobarbaz")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
