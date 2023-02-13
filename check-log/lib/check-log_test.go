@@ -443,6 +443,60 @@ func TestRunWithMiddleOfLine(t *testing.T) {
 	})
 }
 
+func TestRotated(t *testing.T) {
+	dir := t.TempDir()
+
+	logf := filepath.Join(dir, "dummy")
+	fh, _ := os.Create(logf)
+	t.Cleanup(func() {
+		fh.Close()
+	})
+
+	ptn := `FATAL`
+	opts, _ := parseArgs([]string{"-s", dir, "-f", logf, "-p", ptn, "--check-first"})
+	opts.prepare()
+
+	stateFile := getStateFile(opts.StateDir, logf, opts.origArgs)
+
+	bytes, _ := getBytesToSkip(stateFile)
+	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
+
+	t.Run("check crated file", func(t *testing.T) {
+		fh.WriteString("FATAL\n")
+		w, c, errLines, err := opts.searchLog(context.Background(), logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "there are one error string, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error string, so one should be detected")
+		assert.Equal(t, "FATAL\n", errLines, "it should detect one line.")
+
+		bytes, _ = getBytesToSkip(stateFile)
+		assert.Equal(t, int64(len("FATAL\n")), bytes, "it should move up to the size of a single line `FATAL\n`")
+	})
+
+	// save to a different file
+	if err := os.Rename(logf, logf+"old"); err != nil {
+		t.Fatal(err)
+	}
+	// recreate a same name file
+	logf = filepath.Join(dir, "dummy")
+	fh, _ = os.Create(logf)
+	t.Cleanup(func() {
+		fh.Close()
+	})
+
+	t.Run("check recreated file", func(t *testing.T) {
+		fh.WriteString("FATAL\nfoobarbaz")
+		w, c, errLines, err := opts.searchLog(context.Background(), logf)
+		assert.Equal(t, err, nil, "err should be nil")
+		assert.Equal(t, int64(1), w, "there are one error string, so one should be detected")
+		assert.Equal(t, int64(1), c, "there are one error string, so one should be detected")
+		assert.Equal(t, "FATAL\n", errLines, "it should detect one line.")
+
+		bytes, _ = getBytesToSkip(stateFile)
+		assert.Equal(t, int64(len("FATAL\n")), bytes, "it should move up to the size of a single line `FATAL\n`")
+	})
+}
+
 func TestRunWithNoState(t *testing.T) {
 	dir := t.TempDir()
 
