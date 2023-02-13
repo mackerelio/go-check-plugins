@@ -78,6 +78,36 @@ func TestCheckDns(t *testing.T) {
 			checkers.CRITICAL,
 			[]string{"INN is invalid queryClass"},
 		},
+		{
+			[]string{"-H", "example.com", "-s", "8.8.8.8", "-a", "93.184.216.34"},
+			checkers.OK,
+			[]string{"status: NOERROR", "93.184.216.34"},
+		},
+		{
+			[]string{"-H", "example.com", "-s", "8.8.8.8", "-q", "AAAA", "--expected-address", "2606:2800:220:1"},
+			checkers.OK,
+			[]string{"status: NOERROR", "2606:2800:220:1"},
+		},
+		{
+			[]string{"-H", "example.com", "-s", "8.8.8.8", "-a", "93.184.216.33"},
+			checkers.CRITICAL,
+			[]string{"status: NOERROR", "93.184.216.34"},
+		},
+		{
+			[]string{"-H", "exampleeeee.com", "-s", "8.8.8.8", "-a", "93.184.216.34"},
+			checkers.CRITICAL,
+			[]string{"status: NXDOMAIN"},
+		},
+		{
+			[]string{"-H", "example.com", "-s", "8.8.8.8", "-a", "93.184.216.33,93.184.216.34"},
+			checkers.WARNING,
+			[]string{"status: NOERROR", "93.184.216.34"},
+		},
+		{
+			[]string{"-H", "example.com", "-s", "8.8.8.8", "-a", "93.184.216.33,    93.184.216.34"},
+			checkers.WARNING,
+			[]string{"status: NOERROR", "93.184.216.34"},
+		},
 	}
 
 	for i, tt := range tests {

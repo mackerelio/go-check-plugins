@@ -5,8 +5,29 @@
 Monitor DNS response.
 
 ## Synopsis
+
+Check DNS server status  
+If DNS server returns  
+```
+NOERROR   -> OK  
+otherwise -> CRITICAL
+```
 ```
 check-dns -H example.com -s 8.8.8.8
+```
+
+Check IP-ADDRESS DNS server returns  
+If DNS server returns 1.1.1.1 and 2.2.2.2
+```
+-a 1.1.1.1, 2.2.2.2          -> OK  
+-a 1.1.1.1, 2.2.2.2, 3.3.3.3 -> WARNING  
+-a 1.1.1.1                   -> WARNING  
+-a 1.1.1.1, 3.3.3.3          -> WARNING  
+-a 3.3.3.3                   -> CRITICAL  
+-a 3.3.3.3, 4.4.4.4, 5.5.5.5 -> CRITICAL  
+```
+```
+check-dns -H example.com -s 8.8.8.8 -a 93.184.216.34
 ```
 
 ## Installation
@@ -42,12 +63,13 @@ command = ["check-dns", "-H", "example.com", "-s", "8.8.8.8"]
 ### Options
 
 ```
-  -H, --host=       The name or address you want to query
-  -s, --server=     DNS server you want to use for the lookup
-  -p, --port=       Port number you want to use (default: 53)
-  -q, --querytype=  DNS record query type where TYPE =(A, AAAA, SRV, TXT, MX, ANY) (default: A)
-  -c, --queryclass= DNS record class type where TYPE =(IN, CS, CH, HS, NONE, ANY) (default: IN)
-      --norec       Set not recursive mode
+  -H, --host=             The name or address you want to query
+  -s, --server=           DNS server you want to use for the lookup
+  -p, --port=             Port number you want to use (default: 53)
+  -q, --querytype=        DNS record query type where TYPE =(A, AAAA, SRV, TXT, MX, ANY) (default: A)
+  -c, --queryclass=       DNS record class type where TYPE =(IN, CS, CH, HS, NONE, ANY) (default: IN)
+      --norec             Set not recursive mode
+  -a, --expected-address= IP-ADDRESS you expect the DNS server to return. If multiple addresses are returned at once, you have to match the whole string of addresses separated with commas
 ```
 
 ## For more information
