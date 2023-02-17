@@ -66,7 +66,7 @@ func TestCheckDns(t *testing.T) {
 		{
 			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-q", "AAA"},
 			checkers.CRITICAL,
-			[]string{"AAA is invalid queryType"},
+			[]string{"AAA is not supported query type"},
 		},
 		{
 			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-c", "IN"},
@@ -76,36 +76,36 @@ func TestCheckDns(t *testing.T) {
 		{
 			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-c", "INN"},
 			checkers.CRITICAL,
-			[]string{"INN is invalid queryClass"},
+			[]string{"INN is invalid query class"},
 		},
 		{
-			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-a", "198.41.0.4"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-e", "198.41.0.4"},
 			checkers.OK,
 			[]string{"status: NOERROR", "198.41.0.4"},
 		},
 		{
-			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-q", "AAAA", "--expected-address", "2001:503:ba3e::2:30"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-q", "AAAA", "--expected-string", "2001:503:ba3e::2:30"},
 			checkers.OK,
 			[]string{"status: NOERROR", "2001:503:ba3e::2:30"},
 		},
 		{
-			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-a", "198.41.0.3"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-e", "198.41.0.3"},
 			checkers.CRITICAL,
 			[]string{"status: NOERROR", "198.41.0.4"},
 		},
 		{
-			[]string{"-H", "a.root-servers.invalid", "-s", "8.8.8.8", "-a", "198.41.0.4"},
+			[]string{"-H", "a.root-servers.invalid", "-s", "8.8.8.8", "-e", "198.41.0.4"},
 			checkers.CRITICAL,
 			[]string{"status: NXDOMAIN"},
 		},
 		{
-			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-a", "198.41.0.3", "-a", "198.41.0.4"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-e", "198.41.0.3", "-e", "198.41.0.4"},
 			checkers.WARNING,
 			[]string{"status: NOERROR", "198.41.0.4"},
 		},
 		{
-			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-a", "198.41.0.3", "-a", "   198.41.0.4   "},
-			checkers.WARNING,
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-e", "198.41.0.3", "-e", "   198.41.0.4   "},
+			checkers.CRITICAL,
 			[]string{"status: NOERROR", "198.41.0.4"},
 		},
 	}

@@ -13,14 +13,16 @@ import (
 )
 
 type dnsOpts struct {
-	Host            string   `short:"H" long:"host" required:"true" description:"The name or address you want to query"`
-	Server          string   `short:"s" long:"server" description:"DNS server you want to use for the lookup"`
-	Port            int      `short:"p" long:"port" default:"53" description:"Port number you want to use"`
-	QueryType       string   `short:"q" long:"querytype" default:"A" description:"DNS record query type where TYPE =(A, AAAA, SRV, TXT, MX, ANY)"`
-	QueryClass      string   `short:"c" long:"queryclass" default:"IN" description:"DNS record class type where TYPE =(IN, CS, CH, HS, NONE, ANY)"`
-	Norec           bool     `long:"norec" description:"Set not recursive mode"`
-	ExpectedAddress []string `short:"a" long:"expected-address" description:"IP-ADDRESS you expect the DNS server to return. If multiple addresses are returned at once, you have to specify whole string of addresses"`
+	Host           string   `short:"H" long:"host" required:"true" description:"The name or address you want to query"`
+	Server         string   `short:"s" long:"server" description:"DNS server you want to use for the lookup"`
+	Port           int      `short:"p" long:"port" default:"53" description:"Port number you want to use"`
+	QueryType      string   `short:"q" long:"querytype" default:"A" description:"DNS record query type where TYPE =(A, AAAA, TXT, MX, CNAME)"`
+	QueryClass     string   `short:"c" long:"queryclass" default:"IN" description:"DNS record class type where TYPE =(IN, CS, CH, HS, NONE, ANY)"`
+	Norec          bool     `long:"norec" description:"Set not recursive mode"`
+	ExpectedString []string `short:"e" long:"expected-string" description:"The string you expect the DNS server to return. If multiple responses are returned at once, you have to specify whole string"`
 }
+
+var supportedQueryType = map[string]int{"A": 1, "AAAA": 1, "TXT": 1, "MX": 1, "CNAME": 1}
 
 // Do the plugin
 func Do() {
@@ -52,13 +54,14 @@ func (opts *dnsOpts) run() *checkers.Checker {
 	}
 	nameserver = net.JoinHostPort(nameserver, strconv.Itoa(opts.Port))
 
-	queryType, ok := dns.StringToType[strings.ToUpper(opts.QueryType)]
+	_, ok := supportedQueryType[strings.ToUpper(opts.QueryType)]
 	if !ok {
-		return checkers.Critical(fmt.Sprintf("%s is invalid queryType", opts.QueryType))
+		return checkers.Critical(fmt.Sprintf("%s is not supported query type", opts.QueryType))
 	}
+	queryType := dns.StringToType[strings.ToUpper(opts.QueryType)]
 	queryClass, ok := dns.StringToClass[strings.ToUpper(opts.QueryClass)]
 	if !ok {
-		return checkers.Critical(fmt.Sprintf("%s is invalid queryClass", opts.QueryClass))
+		return checkers.Critical(fmt.Sprintf("%s is invalid query class", opts.QueryClass))
 	}
 
 	c := new(dns.Client)
@@ -78,26 +81,43 @@ func (opts *dnsOpts) run() *checkers.Checker {
 
 	checkSt := checkers.OK
 	/**
-	   if DNS server return 1.1.1.1, 2.2.2.2
-		1: --expected-address 1.1.1.1, 2.2.2.2          -> OK
-		2: --expected-address 1.1.1.1, 2.2.2.2, 3.3.3.3 -> WARNING
-		3: --expected-address 1.1.1.1                   -> WARNING
-		4: --expected-address 1.1.1.1, 3.3.3.3          -> WARNING
-		5: --expected-address 3.3.3.3                   -> CRITICAL
-		6: --expected-address 3.3.3.3, 4.4.4.4, 5.5.5.5 -> CRITICAL
+	  if DNS server return 1.1.1.1, 2.2.2.2
+		1: -e 1.1.1.1 -e 2.2.2.2            -> OK
+		2: -e 1.1.1.1 -e 2.2.2.2 -e 3.3.3.3 -> WARNING
+		3: -e 1.1.1.1 -e                    -> WARNING
+		4: -e 1.1.1.1 -e 3.3.3.3            -> WARNING
+		5: -e 3.3.3.3 -e                    -> CRITICAL
+		6: -e 3.3.3.3 -e 4.4.4.4 -e 5.5.5.5 -> CRITICAL
 	**/
-	if len(opts.ExpectedAddress) != 0 {
+	if len(opts.ExpectedString) != 0 {
 		match := 0
-		for _, v := range opts.ExpectedAddress {
+		for _, expectedString := range opts.ExpectedString {
 			for _, answer := range r.Answer {
-				// strings.Split(answer.String(), "\t") is formatted as [a.root-servers.net. 328177 IN A 198.41.0.4] 
-				if strings.Split(answer.String(), "\t")[4] == strings.TrimSpace(v) {
+				var anserWithoutHeader string
+				expectMatch := expectedString
+				switch t := answer.(type) {
+				case *dns.A:
+					anserWithoutHeader = t.A.String()
+				case *dns.AAAA:
+					anserWithoutHeader = t.AAAA.String()
+				case *dns.TXT:
+					anserWithoutHeader = sprintTxt(t.Txt)
+					// " is added by sprintTxt
+					expectMatch = "\"" + expectedString + "\""
+				case *dns.MX:
+					anserWithoutHeader = strconv.Itoa(int(t.Preference)) + " " + sprintName(t.Mx)
+				case *dns.CNAME:
+					anserWithoutHeader = sprintName(t.Target)
+				default:
+					return checkers.Critical(fmt.Sprintf("%s is not supported query type", opts.QueryType))
+				}
+				if anserWithoutHeader == expectMatch {
 					match += 1
 				}
 			}
 		}
 		if match == len(r.Answer) {
-			if len(opts.ExpectedAddress) == len(r.Answer) { // case 1
+			if len(opts.ExpectedString) == len(r.Answer) { // case 1
 				checkSt = checkers.OK
 			} else { // case 2
 				checkSt = checkers.WARNING
