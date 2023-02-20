@@ -34,12 +34,12 @@ check-dns -H a.root-servers.net -s 8.8.8.8
 
 If DNS server returns 1.1.1.1 and 2.2.2.2
 ```
--a 1.1.1.1 -a 2.2.2.2            -> OK  
--a 1.1.1.1 -a 2.2.2.2 -a 3.3.3.3 -> WARNING  
--a 1.1.1.1                       -> WARNING  
--a 1.1.1.1 -a 3.3.3.3            -> WARNING  
--a 3.3.3.3                       -> CRITICAL  
--a 3.3.3.3 -a 4.4.4.4 -a 5.5.5.5 -> CRITICAL  
+-e 1.1.1.1 -e 2.2.2.2            -> OK  
+-e 1.1.1.1 -e 2.2.2.2 -e 3.3.3.3 -> WARNING  
+-e 1.1.1.1                       -> WARNING  
+-e 1.1.1.1 -e 3.3.3.3            -> WARNING  
+-e 3.3.3.3                       -> CRITICAL  
+-e 3.3.3.3 -e 4.4.4.4 -e 5.5.5.5 -> CRITICAL  
 ```
 ```
 check-dns -H a.root-servers.net -s 8.8.8.8 -e 198.41.0.4
@@ -61,7 +61,7 @@ Or you can use this program by installing the official Mackerel package. See [Us
 Next, you can execute this program :-)
 
 ```
-check-dns -H example.com -s 8.8.8.8
+check-dns -H a.root-servers.net -s 8.8.8.8
 ```
 
 
@@ -71,5 +71,5 @@ If there are no problems in the execution result, add a setting in mackerel-agen
 
 ```
 [plugin.checks.dns-sample]
-command = ["check-dns", "-H", "example.com", "-s", "8.8.8.8"]
+command = ["check-dns", "-H", "a.root-servers.net", "-s", "8.8.8.8"]
 ```
