@@ -277,6 +277,9 @@ func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int6
 		skipBytes = stat.Size()
 	}
 
+	fmt.Println("=================================")
+	fmt.Println("inode-> ", inode)
+	fmt.Println("detectInode inode-> ", detectInode(stat))
 	rotated := false
 	if stat.Size() < skipBytes || (inode != 0 && inode != detectInode(stat)) {
 		rotated = true
