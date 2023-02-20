@@ -66,7 +66,7 @@ func TestCheckDns(t *testing.T) {
 		{
 			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-q", "AAA"},
 			checkers.CRITICAL,
-			[]string{"AAA is not supported query type"},
+			[]string{"AAA is invalid query type"},
 		},
 		{
 			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-c", "IN"},

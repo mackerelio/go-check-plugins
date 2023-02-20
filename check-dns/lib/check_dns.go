@@ -54,7 +54,7 @@ func (opts *dnsOpts) run() *checkers.Checker {
 
 	queryType, ok := dns.StringToType[strings.ToUpper(opts.QueryType)]
 	if !ok {
-		return checkers.Critical(fmt.Sprintf("%s is not supported query type", opts.QueryType))
+		return checkers.Critical(fmt.Sprintf("%s is invalid query type", opts.QueryType))
 	}
 	queryClass, ok := dns.StringToClass[strings.ToUpper(opts.QueryClass)]
 	if !ok {
