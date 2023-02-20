@@ -89,6 +89,11 @@ func TestCheckDns(t *testing.T) {
 			[]string{"status: NOERROR", "2001:503:ba3e::2:30"},
 		},
 		{
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-q", "TXT", "-e", ""},
+			checkers.CRITICAL,
+			[]string{"is not supported query type. Only A, AAAA is supported for expectation."},
+		},
+		{
 			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-e", "198.41.0.3"},
 			checkers.CRITICAL,
 			[]string{"status: NOERROR", "198.41.0.4"},
