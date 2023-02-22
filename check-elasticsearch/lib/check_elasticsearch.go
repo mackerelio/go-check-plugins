@@ -57,7 +57,7 @@ func run(args []string) *checkers.Checker {
 	var health healthStat
 	dec.Decode(&health)
 
-	checkSt := checkers.UNKNOWN
+	var checkSt checkers.Status
 	switch health.Status {
 	case "green":
 		checkSt = checkers.OK

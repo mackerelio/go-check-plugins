@@ -3,7 +3,6 @@ linters:
   # TODO remove this rule.
   disable:
     - errcheck
-    - ineffassign
     - staticcheck
 linters-settings:
   govet:
