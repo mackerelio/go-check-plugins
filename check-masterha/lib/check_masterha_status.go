@@ -29,7 +29,7 @@ func (c statusChecker) MakeCommandArgs() []string {
 
 func (c statusChecker) Parse(out string) (checkers.Status, string) {
 	lines := strings.Split(out, "\n")
-	errors := make([]string, 0, 0)
+	errors := make([]string, 0)
 
 	for _, line := range lines {
 		if line != "" && !strings.Contains(line, "running(0:PING_OK)") {

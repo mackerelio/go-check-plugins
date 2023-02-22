@@ -136,7 +136,7 @@ func (opts *sshOpts) run() *checkers.Checker {
 	if err != nil {
 		if addrerr, ok := err.(*net.AddrError); ok {
 			if addrerr.Timeout() {
-				elapsed := time.Now().Sub(start)
+				elapsed := time.Since(start)
 				return opts.checkTimeoutError(elapsed, err)
 			} else if addrerr.Temporary() {
 				return checkers.Warning(err.Error())
@@ -152,7 +152,7 @@ func (opts *sshOpts) run() *checkers.Checker {
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
-	elapsed := time.Now().Sub(start)
+	elapsed := time.Since(start)
 	return opts.checkTimeout(elapsed)
 }
 
