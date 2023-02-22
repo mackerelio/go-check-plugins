@@ -461,7 +461,7 @@ func TestRotated(t *testing.T) {
 	bytes, _ := getBytesToSkip(stateFile)
 	assert.Equal(t, int64(0), bytes, "should be a 0-byte indicated value")
 
-	t.Run("check crated file", func(t *testing.T) {
+	t.Run("check created file", func(t *testing.T) {
 		fh.WriteString("FATAL\n")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
 		assert.Equal(t, err, nil, "err should be nil")
@@ -476,7 +476,7 @@ func TestRotated(t *testing.T) {
 	t.Run("check recreated file", func(t *testing.T) {
 		// delete the inherited file and create a new file with the same name but a different inode.
 		fh.Close()
-		os.Remove(logf)
+		os.Rename(logf, logf+"-yyyymmdd")
 		fh, _ = os.Create(logf)
 		fh.WriteString("FATAL\nfoobarbaz")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
