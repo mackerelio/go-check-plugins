@@ -146,7 +146,7 @@ func TestRun(t *testing.T) {
 	}
 	testError()
 
-	lastNumber = recordNumber
+	lastNumber = recordNumber // nolint
 
 	origArgs = []string{"-s", dir, "--log", "Application", "-r"}
 	args = make([]string, len(origArgs))
