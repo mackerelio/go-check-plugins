@@ -81,9 +81,9 @@ func (opts *dnsOpts) run() *checkers.Checker {
 	  if DNS server return 1.1.1.1, 2.2.2.2
 		1: -e 1.1.1.1 -e 2.2.2.2            -> OK
 		2: -e 1.1.1.1 -e 2.2.2.2 -e 3.3.3.3 -> WARNING
-		3: -e 1.1.1.1 -e                    -> WARNING
+		3: -e 1.1.1.1                       -> WARNING
 		4: -e 1.1.1.1 -e 3.3.3.3            -> WARNING
-		5: -e 3.3.3.3 -e                    -> CRITICAL
+		5: -e 3.3.3.3                       -> CRITICAL
 		6: -e 3.3.3.3 -e 4.4.4.4 -e 5.5.5.5 -> CRITICAL
 	**/
 	if len(opts.ExpectedString) != 0 {
