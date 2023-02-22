@@ -203,9 +203,10 @@ func TestRotated(t *testing.T) {
 	})
 
 	t.Run("check recreated file", func(t *testing.T) {
-		// delete the inherited file and create a new file with the same name but a different inode.
 		fh.Close()
+		// save to different file.
 		os.Rename(logf, logf+"-yyyymmdd")
+		// recreate a same name file. inode is different.
 		fh, _ = os.Create(logf)
 		fh.WriteString("FATAL\nfoobarbaz")
 		w, c, errLines, err := opts.searchLog(context.Background(), logf)
