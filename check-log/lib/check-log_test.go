@@ -59,7 +59,7 @@ func TestGetInode(t *testing.T) {
 
 	i, err = getInode(f)
 	assert.Equal(t, err, nil, "err should be nil")
-	assert.Equal(t, state.Inode, uint(150))
+	assert.Equal(t, i, uint(150))
 }
 
 func TestGetBytesToSkip(t *testing.T) {
