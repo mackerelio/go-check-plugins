@@ -4,9 +4,45 @@
 
 Monitor DNS response.
 
-## Synopsis
+## Usage
+
+### Options
+
 ```
-check-dns -H example.com -s 8.8.8.8
+  -H, --host=            The name or address you want to query
+  -s, --server=          DNS server you want to use for the lookup
+  -p, --port=            Port number you want to use (default: 53)
+  -q, --querytype=       DNS record query type (default: A)
+      --norec            Set not recursive mode
+  -e, --expected-string= IP-ADDRESS string you expect the DNS server to return. If multiple IP-ADDRESS are returned at once, you have to specify whole string
+```
+
+- query class is always IN.
+- Punycode is not supported.
+
+### Check DNS server status
+
+If DNS server returns `NOERROR` in status of HEADER, then the checker result becomes `OK`, if not `NOERROR`, then `CRITICAL`
+
+```
+check-dns -H a.root-servers.net -s 8.8.8.8
+```
+
+### Check string DNS server returns
+
+- The currently supported query types are A, AAAA.
+
+If DNS server returns 1.1.1.1 and 2.2.2.2
+```
+-e 1.1.1.1 -e 2.2.2.2            -> OK  
+-e 1.1.1.1 -e 2.2.2.2 -e 3.3.3.3 -> WARNING  
+-e 1.1.1.1                       -> WARNING  
+-e 1.1.1.1 -e 3.3.3.3            -> WARNING  
+-e 3.3.3.3                       -> CRITICAL  
+-e 3.3.3.3 -e 4.4.4.4 -e 5.5.5.5 -> CRITICAL  
+```
+```
+check-dns -H a.root-servers.net -s 8.8.8.8 -e 198.41.0.4
 ```
 
 ## Installation
@@ -25,7 +61,7 @@ Or you can use this program by installing the official Mackerel package. See [Us
 Next, you can execute this program :-)
 
 ```
-check-dns -H example.com -s 8.8.8.8
+check-dns -H a.root-servers.net -s 8.8.8.8
 ```
 
 
@@ -34,22 +70,6 @@ check-dns -H example.com -s 8.8.8.8
 If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
-[plugin.checks.fileage-sample]
-command = ["check-dns", "-H", "example.com", "-s", "8.8.8.8"]
+[plugin.checks.dns-sample]
+command = ["check-dns", "-H", "a.root-servers.net", "-s", "8.8.8.8"]
 ```
-
-## Usage
-### Options
-
-```
-  -H, --host=       The name or address you want to query
-  -s, --server=     DNS server you want to use for the lookup
-  -p, --port=       Port number you want to use (default: 53)
-  -q, --querytype=  DNS record query type where TYPE =(A, AAAA, SRV, TXT, MX, ANY) (default: A)
-  -c, --queryclass= DNS record class type where TYPE =(IN, CS, CH, HS, NONE, ANY) (default: IN)
-      --norec       Set not recursive mode
-```
-
-## For more information
-
-Please execute `check-dns -h` and you can get command line options.
