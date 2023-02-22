@@ -17,7 +17,6 @@ type dnsOpts struct {
 	Server         string   `short:"s" long:"server" description:"DNS server you want to use for the lookup"`
 	Port           int      `short:"p" long:"port" default:"53" description:"Port number you want to use"`
 	QueryType      string   `short:"q" long:"querytype" default:"A" description:"DNS record query type"`
-	QueryClass     string   `short:"c" long:"queryclass" default:"IN" description:"DNS record class type"`
 	Norec          bool     `long:"norec" description:"Set not recursive mode"`
 	ExpectedString []string `short:"e" long:"expected-string" description:"IP-ADDRESS string you expect the DNS server to return. If multiple IP-ADDRESS are returned at once, you have to specify whole string"`
 }
@@ -56,10 +55,6 @@ func (opts *dnsOpts) run() *checkers.Checker {
 	if !ok {
 		return checkers.Critical(fmt.Sprintf("%s is invalid query type", opts.QueryType))
 	}
-	queryClass, ok := dns.StringToClass[strings.ToUpper(opts.QueryClass)]
-	if !ok {
-		return checkers.Critical(fmt.Sprintf("%s is invalid query class", opts.QueryClass))
-	}
 
 	c := new(dns.Client)
 	m := &dns.Msg{
@@ -67,7 +62,7 @@ func (opts *dnsOpts) run() *checkers.Checker {
 			RecursionDesired: !opts.Norec,
 			Opcode:           dns.OpcodeQuery,
 		},
-		Question: []dns.Question{{Name: dns.Fqdn(opts.Host), Qtype: queryType, Qclass: uint16(queryClass)}},
+		Question: []dns.Question{{Name: dns.Fqdn(opts.Host), Qtype: queryType, Qclass: dns.StringToClass["IN"]}},
 	}
 	m.Id = dns.Id()
 

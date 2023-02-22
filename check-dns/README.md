@@ -13,11 +13,11 @@ Monitor DNS response.
   -s, --server=          DNS server you want to use for the lookup
   -p, --port=            Port number you want to use (default: 53)
   -q, --querytype=       DNS record query type (default: A)
-  -c, --queryclass=      DNS record class type (default: IN)
       --norec            Set not recursive mode
   -e, --expected-string= IP-ADDRESS string you expect the DNS server to return. If multiple IP-ADDRESS are returned at once, you have to specify whole string
 ```
 
+- query class is always IN.
 - Punycode is not supported.
 
 ### Check DNS server status
