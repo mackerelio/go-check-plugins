@@ -47,7 +47,7 @@ func Run(args []string) *checkers.Checker {
 		return checkers.Critical(err.Error())
 	}
 	expiry := cert.NotAfter
-	dur := expiry.Sub(time.Now())
+	dur := time.Until(expiry)
 
 	chkSt := checkers.OK
 	days := int(dur.Hours() / 24)

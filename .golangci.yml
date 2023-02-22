@@ -3,8 +3,6 @@ linters:
   # TODO remove this rule.
   disable:
     - errcheck
-    - gosimple
-    - ineffassign
     - staticcheck
 linters-settings:
   govet:
@@ -19,7 +17,5 @@ issues:
     - path: _test\.go
       linters:
         - errcheck
-        - gosimple
         - staticcheck
         - ineffassign
-
