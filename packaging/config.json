@@ -5,6 +5,7 @@
        "aws-sqs-queue-size",
        "cert-file",
        "disk",
+       "dns",
        "elasticsearch",
        "file-age",
        "file-size",
