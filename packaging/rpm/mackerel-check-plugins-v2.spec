@@ -24,7 +24,7 @@ mackerel.io check plugins
 
 %{__install} -m0755 %{_sourcedir}/build/mackerel-check %{buildroot}%{__targetdir}/
 
-for i in aws-cloudwatch-logs aws-sqs-queue-size cert-file disk elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset ping postgresql procs redis smtp solr ssh ssl-cert tcp uptime; do \
+for i in aws-cloudwatch-logs aws-sqs-queue-size cert-file disk dns elasticsearch file-age file-size http jmx-jolokia ldap load log mailq masterha memcached mysql ntpoffset ping postgresql procs redis smtp solr ssh ssl-cert tcp uptime; do \
     ln -s ./mackerel-check %{buildroot}%{__targetdir}/check-$i; \
 done
 
