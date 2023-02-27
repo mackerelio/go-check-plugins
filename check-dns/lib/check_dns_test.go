@@ -29,54 +29,79 @@ func TestCheckDns(t *testing.T) {
 		want_msg    []string
 	}{
 		{
-			[]string{"-H", "example.com"},
+			[]string{"-H", "a.root-servers.net"},
 			checkers.OK,
 			[]string{"status: NOERROR"},
 		},
 		{
-			[]string{"-H", "example.com", "--norec"},
+			[]string{"-H", "a.root-servers.net", "--norec"},
 			checkers.OK,
 			[]string{"status: NOERROR"},
 		},
 		{
-			[]string{"-H", "exampleeeee.com"},
+			[]string{"-H", "a.root-servers.invalid"},
 			checkers.CRITICAL,
 			[]string{"status: NXDOMAIN"},
 		},
 		{
-			[]string{"-H", "example.com", "-s", "8.8.8.8"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8"},
 			checkers.OK,
 			[]string{"status: NOERROR"},
 		},
 		{
-			[]string{"-H", "exampleeeee.com", "-s", "8.8.8.8"},
+			[]string{"-H", "a.root-servers.invalid", "-s", "8.8.8.8"},
 			checkers.CRITICAL,
 			[]string{"status: NXDOMAIN"},
 		},
 		{
-			[]string{"-H", "example.com", "-s", "8.8.8"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8"},
 			checkers.CRITICAL,
 			[]string{""},
 		},
 		{
-			[]string{"-H", "example.com", "-s", "8.8.8.8", "-q", "AAAA"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-q", "AAAA"},
 			checkers.OK,
 			[]string{"status: NOERROR", "AAAA"},
 		},
 		{
-			[]string{"-H", "example.com", "-s", "8.8.8.8", "-q", "AAA"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-q", "AAA"},
 			checkers.CRITICAL,
-			[]string{"AAA is invalid queryType"},
+			[]string{"AAA is invalid query type"},
 		},
 		{
-			[]string{"-H", "example.com", "-s", "8.8.8.8", "-c", "IN"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-e", "198.41.0.4"},
 			checkers.OK,
-			[]string{"status: NOERROR"},
+			[]string{"status: NOERROR", "198.41.0.4"},
 		},
 		{
-			[]string{"-H", "example.com", "-s", "8.8.8.8", "-c", "INN"},
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-q", "AAAA", "--expected-string", "2001:503:ba3e::2:30"},
+			checkers.OK,
+			[]string{"status: NOERROR", "2001:503:ba3e::2:30"},
+		},
+		{
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-q", "TXT", "-e", ""},
 			checkers.CRITICAL,
-			[]string{"INN is invalid queryClass"},
+			[]string{"is not supported query type. Only A, AAAA is supported for expectation."},
+		},
+		{
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-e", "198.41.0.3"},
+			checkers.CRITICAL,
+			[]string{"status: NOERROR", "198.41.0.4"},
+		},
+		{
+			[]string{"-H", "a.root-servers.invalid", "-s", "8.8.8.8", "-e", "198.41.0.4"},
+			checkers.CRITICAL,
+			[]string{"status: NXDOMAIN"},
+		},
+		{
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-e", "198.41.0.3", "-e", "198.41.0.4"},
+			checkers.WARNING,
+			[]string{"status: NOERROR", "198.41.0.4"},
+		},
+		{
+			[]string{"-H", "a.root-servers.net", "-s", "8.8.8.8", "-e", "198.41.0.3", "-e", "   198.41.0.4   "},
+			checkers.CRITICAL,
+			[]string{"status: NOERROR", "198.41.0.4"},
 		},
 	}
 

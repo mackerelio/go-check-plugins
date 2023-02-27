@@ -223,7 +223,7 @@ func (opts *tcpOpts) run() *checkers.Checker {
 			return checkers.Critical(err.Error())
 		}
 	}
-	elapsedSeconds := float64(time.Now().Sub(start)) / float64(time.Second)
+	elapsedSeconds := float64(time.Since(start)) / float64(time.Second)
 
 	chkSt := checkers.OK
 	if opts.Warning > 0 && elapsedSeconds > opts.Warning {

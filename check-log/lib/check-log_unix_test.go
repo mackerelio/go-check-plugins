@@ -21,6 +21,7 @@ func TestFindFileByInode(t *testing.T) {
 
 	testFileExist := func() {
 		logfi, err := os.Stat(logf)
+		assert.Equal(t, err, nil, "err should be nil")
 		inode := detectInode(logfi)
 		f, err := findFileByInode(inode, dir)
 		assert.Equal(t, err, nil, "err should be nil")
