@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.44.0 (2023-02-27)
+
+* Bump github.com/stretchr/testify from 1.8.1 to 1.8.2 #722 (dependabot[bot])
+* fix gosimple, ineffassign #720 (wafuwafu13)
+* Bump github.com/containerd/containerd from 1.6.14 to 1.6.18 #717 (dependabot[bot])
+* check-dns: add `expected-string` option #715 (wafuwafu13)
+* Bump github.com/aws/aws-sdk-go from 1.44.189 to 1.44.199 #714 (dependabot[bot])
+* Bump golang.org/x/crypto from 0.5.0 to 0.6.0 #713 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.9.3 to 1.9.4 #712 (dependabot[bot])
+* Bump golang.org/x/text from 0.6.0 to 0.7.0 #711 (dependabot[bot])
+* Bump golang.org/x/sys from 0.4.0 to 0.5.0 #710 (dependabot[bot])
+* added dns plugin on package #709 (yseto)
+* Remove `circle.yml` #708 (wafuwafu13)
+* Bump github.com/shirou/gopsutil/v3 from 3.22.12 to 3.23.1 #706 (dependabot[bot])
+* Add check-dns plugin #704 (wafuwafu13)
+
+
 ## 0.43.0 (2023-02-01)
 
 * fix generate docs #703 (yseto)
