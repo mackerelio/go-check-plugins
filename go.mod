@@ -9,7 +9,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20221031212613-62deef7fc822
 	github.com/elazarl/goproxy v0.0.0-20221015165544-a0805db90819
 	github.com/elazarl/goproxy/ext v0.0.0-20221015165544-a0805db90819
-	github.com/fsouza/go-dockerclient v1.9.4
+	github.com/fsouza/go-dockerclient v1.9.6
 	github.com/go-ldap/ldap/v3 v3.4.4
 	github.com/go-ole/go-ole v1.2.6
 	github.com/go-sql-driver/mysql v1.7.0
@@ -28,7 +28,7 @@ require (
 	github.com/stretchr/testify v1.8.2
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.6.0
-	golang.org/x/sys v0.5.0
+	golang.org/x/sys v0.6.0
 	golang.org/x/text v0.7.0
 )
 
@@ -38,7 +38,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/containerd/containerd v1.6.18 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/docker/docker v23.0.0+incompatible // indirect
+	github.com/docker/docker v23.0.1+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.4 // indirect
