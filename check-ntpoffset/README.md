@@ -34,7 +34,7 @@ check-ntpoffset -w=50 -c=100
 If there are no problems in the execution result, add a setting in mackerel-agent.conf .
 
 ```
-[plugin.checks.cert-file]
+[plugin.checks.ntpoffset-sample]
 command = ["check-ntpoffset", "-w", "50", "-c", "100"]
 ```
 
