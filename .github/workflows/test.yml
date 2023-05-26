@@ -54,6 +54,7 @@ jobs:
           go build -o check-disk/check-disk.exe ./check-disk
           go build -o check-uptime/check-uptime.exe ./check-uptime
           go build -o check-tcp/check-tcp.exe ./check-tcp
+          go build -o check-file-age/check-file-age.exe ./check-file-age
       - uses: shogo82148/actions-goveralls@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
