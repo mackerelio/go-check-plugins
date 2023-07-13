@@ -45,6 +45,9 @@ done
 %{__oldtargetdir}/*
 
 %changelog
+* Thu Jul 13 2023 <mackerel-developers@hatena.ne.jp> - 0.44.1
+- added build tests. (by yseto)
+
 * Mon Feb 27 2023 <mackerel-developers@hatena.ne.jp> - 0.44.0
 - Bump github.com/stretchr/testify from 1.8.1 to 1.8.2 (by dependabot[bot])
 - fix gosimple, ineffassign (by wafuwafu13)
