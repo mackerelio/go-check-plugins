@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.44.1-1.v2) stable; urgency=low
+
+  * added build tests. (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/760>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 13 Jul 2023 06:30:13 +0000
+
 mackerel-check-plugins (0.44.0-1.v2) stable; urgency=low
 
   * Bump github.com/stretchr/testify from 1.8.1 to 1.8.2 (by dependabot[bot])

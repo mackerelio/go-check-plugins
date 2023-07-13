@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.44.1 (2023-07-13)
+
+* added build tests. #760 (yseto)
+
+
 ## 0.44.0 (2023-02-27)
 
 * Bump github.com/stretchr/testify from 1.8.1 to 1.8.2 #722 (dependabot[bot])
