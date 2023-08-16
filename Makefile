@@ -48,14 +48,7 @@ depends_on:
 	@:
 
 .PHONY: rpm
-rpm: rpm-v1 rpm-v2
-
-.PHONY: rpm-v1
-rpm-v1:
-	make build GOOS=linux GOARCH=386
-	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch noarch" --target noarch -bb packaging/rpm/mackerel-check-plugins.spec
-	make build GOOS=linux GOARCH=amd64
-	rpmbuild --define "_sourcedir `pwd`"  --define "_version ${VERSION}" --define "buildarch x86_64" --target x86_64 -bb packaging/rpm/mackerel-check-plugins.spec
+rpm: rpm-v2
 
 .PHONY: rpm-v2
 rpm-v2: rpm-v2-x86 rpm-v2-arm
