@@ -10,8 +10,8 @@ import (
 )
 
 var opts struct {
-	ServiceName    string `long:"service-name" short:"s" description:"matches if contained in a service name"`
-	ExcludeService string `long:"exclude-service" short:"x" description:"exclude if contained in service name. This option takes precedence over --service-name"`
+	ServiceName    string `long:"service-name" short:"s" description:"matches if contained in service name."`
+	ExcludeService string `long:"exclude-service" short:"x" description:"exclude if contained in service name. This option takes precedence over --service-name."`
 	ListService    bool   `long:"list-service" short:"l" description:"list service"`
 	Exact          bool   `long:"exact" description:"more exact checking of the service. This option applies only to --service-name."`
 }
