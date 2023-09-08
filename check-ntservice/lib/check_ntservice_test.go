@@ -89,7 +89,7 @@ func TestRun(t *testing.T) {
 			casename:      "check about running service",
 			cmdline:       []string{"-s", "running-service"},
 			expectStatus:  checkers.OK,
-			expectMessage: "",
+			expectMessage: "running-service-name: running-service-caption - Running",
 		},
 		{
 			casename:      "check about stopped service",
@@ -101,7 +101,25 @@ func TestRun(t *testing.T) {
 			casename:      "check about running service with exclude option",
 			cmdline:       []string{"-s", "service", "-x", "stopped"},
 			expectStatus:  checkers.OK,
-			expectMessage: "",
+			expectMessage: "running-service-name: running-service-caption - Running",
+		},
+		{
+			casename:      "check about unknown service",
+			cmdline:       []string{"-s", "unknown-service-name"},
+			expectStatus:  checkers.UNKNOWN,
+			expectMessage: "unknown-service-name: service does not exist.",
+		},
+		{
+			casename:      "check about running service with --exact option",
+			cmdline:       []string{"-s", "running-service-name", "--exact"},
+			expectStatus:  checkers.OK,
+			expectMessage: "running-service-name: running-service-caption - Running",
+		},
+		{
+			casename:      "check about unmatched service with --exact option",
+			cmdline:       []string{"-s", "service", "--exact"},
+			expectStatus:  checkers.UNKNOWN,
+			expectMessage: "service: service does not exist.",
 		},
 	}
 

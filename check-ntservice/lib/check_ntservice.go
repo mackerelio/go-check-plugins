@@ -10,9 +10,10 @@ import (
 )
 
 var opts struct {
-	ServiceName    string `long:"service-name" short:"s" description:"service name"`
-	ExcludeService string `long:"exclude-service" short:"x" description:"service name to exclude from matching. This option takes precedence over --service-name"`
+	ServiceName    string `long:"service-name" short:"s" description:"matches if contained in service name."`
+	ExcludeService string `long:"exclude-service" short:"x" description:"exclude if contained in service name. This option takes precedence over --service-name."`
 	ListService    bool   `long:"list-service" short:"l" description:"list service"`
+	Exact          bool   `long:"exact" description:"more exact checking of the service. This option applies only to --service-name."`
 }
 
 // Win32Service is struct for Win32_Service.
@@ -58,19 +59,26 @@ func run(args []string) *checkers.Checker {
 		return checkers.Critical(err.Error())
 	}
 
-	checkSt := checkers.OK
-	msg := ""
+	checkSt := checkers.UNKNOWN
+	msg := fmt.Sprintf("%s: service does not exist.", opts.ServiceName)
 	for _, s := range ss {
 		if opts.ExcludeService != "" && strings.Contains(s.Name, opts.ExcludeService) {
 			continue
 		}
-		if !strings.Contains(s.Name, opts.ServiceName) {
-			continue
+		if opts.Exact {
+			if s.Name != opts.ServiceName {
+				continue
+			}
+		} else {
+			if !strings.Contains(s.Name, opts.ServiceName) {
+				continue
+			}
 		}
 		if s.State == "Running" {
-			continue
+			checkSt = checkers.OK
+		} else {
+			checkSt = checkers.CRITICAL
 		}
-		checkSt = checkers.CRITICAL
 		msg = fmt.Sprintf("%s: %s - %s", s.Name, s.Caption, s.State)
 		break
 	}
