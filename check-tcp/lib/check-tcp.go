@@ -36,6 +36,7 @@ type exchange struct {
 	SSL                bool   `short:"S" long:"ssl" description:"Use SSL for the connection."`
 	UnixSock           string `short:"U" long:"unix-sock" description:"Unix Domain Socket"`
 	NoCheckCertificate bool   `long:"no-check-certificate" description:"Do not check certificate"`
+	StatusAs           string `long:"status-as" description:"Overwrite status=to-status, support multiple comma separetes."`
 	expectReg          *regexp.Regexp
 }
 
@@ -45,12 +46,18 @@ func Do() {
 	if err != nil {
 		os.Exit(1)
 	}
+	maps, err := checkers.ParseStatusMap(opts.StatusAs)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	ckr := opts.run()
 	ckr.Name = "TCP"
 	if opts.Service != "" {
 		ckr.Name = opts.Service
 	}
-	ckr.Exit()
+	ckr.ExitStatusAs(maps)
 }
 
 func parseArgs(args []string) (*tcpOpts, error) {
