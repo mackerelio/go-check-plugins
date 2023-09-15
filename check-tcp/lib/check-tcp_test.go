@@ -218,6 +218,35 @@ func TestHTTP(t *testing.T) {
 		assert.Regexp(t, `seconds response time on`, ckr.Message, "Unexpected response")
 	}
 	testOverCritWithErrWarn()
+
+	errMsgWithExpectClosed := fmt.Sprintf("Unexpectedly open port. (port=%s)", port)
+
+	testOkIfPortClosed := func() {
+		opts, err := parseArgs([]string{"-H", host, "-p", "1", "--expect-closed"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.OK, ckr.Status, "Verified that the port is closed. (port=1)")
+	}
+	testOkIfPortClosed()
+
+	testCriticalIfPortOpened := func() {
+		opts, err := parseArgs([]string{"-H", host, "-p", port, "--expect-closed"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.CRITICAL, ckr.Status, errMsgWithExpectClosed)
+	}
+	testCriticalIfPortOpened()
+
+	testWarningIfPortOpened := func() {
+		opts, err := parseArgs([]string{"-H", host, "-p", port, "--expect-closed", "--error-warning"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.WARNING, ckr.Status, errMsgWithExpectClosed)
+	}
+	testWarningIfPortOpened()
 }
 
 func TestUnixDomainSocket(t *testing.T) {
@@ -290,6 +319,35 @@ func TestUnixDomainSocket(t *testing.T) {
 		assert.Regexp(t, `seconds response time on`, ckr.Message, "Unexpected response")
 	}
 	testOverCrit()
+
+	errMsgWithExpectClosed := fmt.Sprintf("Unexpectedly open unixsock. (sock=%s)", sock)
+
+	testOkIfUnixSocketClosed := func() {
+		opts, err := parseArgs([]string{"-U", "/foo/bar.sock", "--send", `PING`, "-E", "-e", "OKOK", "--expect-closed"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.OK, ckr.Status, "Verified that the unixsock is closed. (sock=/foo/bar.sock)")
+	}
+	testOkIfUnixSocketClosed()
+
+	testCriticalIfUnixSocketOpened := func() {
+		opts, err := parseArgs([]string{"-U", sock, "--send", `PING`, "-E", "-e", "OKOK", "--expect-closed"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.CRITICAL, ckr.Status, errMsgWithExpectClosed)
+	}
+	testCriticalIfUnixSocketOpened()
+
+	testWarningIfUnixSocketOpened := func() {
+		opts, err := parseArgs([]string{"-U", sock, "--send", `PING`, "-E", "-e", "OKOK", "--expect-closed", "--error-warning"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.WARNING, ckr.Status, errMsgWithExpectClosed)
+	}
+	testWarningIfUnixSocketOpened()
 }
 
 func TestHTTPIPv6(t *testing.T) {
@@ -355,4 +413,46 @@ func TestHTTPIPv6(t *testing.T) {
 		assert.Regexp(t, `seconds response time on`, ckr.Message, "Unexpected response")
 	}
 	testOverCrit()
+}
+
+func TestExpectClosedWithPort(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		time.Sleep(time.Second / 5)
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "text/plain")
+		fmt.Fprint(w, "OKOK")
+	}))
+	defer ts.Close()
+
+	u, _ := url.Parse(ts.URL)
+	host, port, _ := net.SplitHostPort(u.Host)
+
+	errMsg := fmt.Sprintf("Unexpectedly open port. (port=%s)", port)
+
+	testOkIfPortClosed := func() {
+		opts, err := parseArgs([]string{"-H", host, "-p", "1", "--expect-closed"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.OK, ckr.Status, "Verified that the port(1) is closed.")
+	}
+	testOkIfPortClosed()
+
+	testCriticalIfPortOpened := func() {
+		opts, err := parseArgs([]string{"-H", host, "-p", port, "--expect-closed"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.CRITICAL, ckr.Status, errMsg)
+	}
+	testCriticalIfPortOpened()
+
+	testWarningIfPortOpened := func() {
+		opts, err := parseArgs([]string{"-H", host, "-p", port, "--expect-closed", "--error-warning"})
+		assert.Equal(t, nil, err, "no errors")
+		ckr := opts.run()
+		fmt.Println(ckr)
+		assert.Equal(t, checkers.WARNING, ckr.Status, errMsg)
+	}
+	testWarningIfPortOpened()
 }
