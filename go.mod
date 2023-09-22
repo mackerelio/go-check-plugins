@@ -24,8 +24,8 @@ require (
 	github.com/mattn/go-zglob v0.0.4
 	github.com/miekg/dns v1.1.50
 	github.com/natefinch/atomic v1.0.1
-	github.com/shirou/gopsutil/v3 v3.23.1
-	github.com/stretchr/testify v1.8.2
+	github.com/shirou/gopsutil/v3 v3.23.8
+	github.com/stretchr/testify v1.8.4
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.13.0
 	golang.org/x/sys v0.12.0
@@ -58,7 +58,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/yusufpapurcu/wmi v1.2.2 // indirect
+	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
