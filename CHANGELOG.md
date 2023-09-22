@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.45.0 (2023-09-22)
+
+* Bump golang.org/x/crypto from 0.6.0 to 0.13.0 #771 (dependabot[bot])
+* Bump github.com/shirou/gopsutil/v3 from 3.23.1 to 3.23.8 #770 (dependabot[bot])
+* [check-tcp] Supports option to monitor that ports are closed. #767 (tukaelu)
+* Improve ntservice #765 (tukaelu)
+* Remove old rpm packaging #764 (yseto)
+* Bump github.com/aws/aws-sdk-go from 1.44.199 to 1.44.271 #762 (dependabot[bot])
+* Bump actions/setup-go from 3 to 4 #737 (dependabot[bot])
+* Bump github.com/mackerelio/go-osstat from 0.2.3 to 0.2.4 #735 (dependabot[bot])
+
+
 ## 0.44.1 (2023-07-13)
 
 * added build tests. #760 (yseto)

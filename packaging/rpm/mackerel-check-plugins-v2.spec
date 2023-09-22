@@ -36,6 +36,16 @@ done
 %{__targetdir}/*
 
 %changelog
+* Fri Sep 22 2023 <mackerel-developers@hatena.ne.jp> - 0.45.0
+- Bump golang.org/x/crypto from 0.6.0 to 0.13.0 (by dependabot[bot])
+- Bump github.com/shirou/gopsutil/v3 from 3.23.1 to 3.23.8 (by dependabot[bot])
+- [check-tcp] Supports option to monitor that ports are closed. (by tukaelu)
+- Improve ntservice (by tukaelu)
+- Remove old rpm packaging (by yseto)
+- Bump github.com/aws/aws-sdk-go from 1.44.199 to 1.44.271 (by dependabot[bot])
+- Bump actions/setup-go from 3 to 4 (by dependabot[bot])
+- Bump github.com/mackerelio/go-osstat from 0.2.3 to 0.2.4 (by dependabot[bot])
+
 * Thu Jul 13 2023 <mackerel-developers@hatena.ne.jp> - 0.44.1
 - added build tests. (by yseto)
 
