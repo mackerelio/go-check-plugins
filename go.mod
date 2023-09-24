@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/StackExchange/wmi v1.2.1
 	github.com/aws/aws-sdk-go v1.44.271
-	github.com/beevik/ntp v0.3.0
+	github.com/beevik/ntp v1.3.0
 	github.com/bradfitz/gomemcache v0.0.0-20221031212613-62deef7fc822
 	github.com/elazarl/goproxy v0.0.0-20221015165544-a0805db90819
 	github.com/elazarl/goproxy/ext v0.0.0-20221015165544-a0805db90819
@@ -60,7 +60,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.10.0 // indirect
+	golang.org/x/net v0.11.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
