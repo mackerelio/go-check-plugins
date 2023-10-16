@@ -13,3 +13,14 @@ updates:
       interval: weekly
       time: "01:00"
       timezone: Asia/Tokyo
+    groups:
+      golang/x:
+        patterns:
+          - "golang.org/x/*"
+      mackerelio:
+        patterns:
+          - "github.com/mackerelio/*"
+      testlibs:
+        patterns:
+          - "github.com/elazarl/goproxy*"
+          - "github.com/stretchr/testify"
