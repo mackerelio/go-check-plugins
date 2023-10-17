@@ -7,12 +7,6 @@ updates:
       time: "01:00"
       timezone: Asia/Tokyo
     open-pull-requests-limit: 10
-  - package-ecosystem: github-actions
-    directory: "/"
-    schedule:
-      interval: weekly
-      time: "01:00"
-      timezone: Asia/Tokyo
     groups:
       golang/x:
         patterns:
@@ -24,3 +18,9 @@ updates:
         patterns:
           - "github.com/elazarl/goproxy*"
           - "github.com/stretchr/testify"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "01:00"
+      timezone: Asia/Tokyo
