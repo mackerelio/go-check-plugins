@@ -12,65 +12,32 @@ env:
   DEBIAN_FRONTEND: noninteractive
 jobs:
   lint:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: golangci/golangci-lint-action@v3
-        with:
-          args: --timeout 5m
+    uses: mackerelio/workflows/.github/workflows/go-lint.yml@v1.0.2
   test:
-    strategy:
-      matrix:
-        go: ["1.19.x", "1.18.x"]
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/setup-go@v4
-        with:
-          go-version: ${{ matrix.go }}
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - run: |
-          go test -race -covermode=atomic -coverprofile=prof.out ./...
-        shell: bash
-      - if: matrix.os == 'ubuntu-latest'
-        run: |
-          ./test.bash
-          make testconvention
-      - if: matrix.os == 'windows-latest'
-        run: |
-          go build -o check-log/check-log.exe ./check-log
-          go build -o check-procs/check-procs.exe ./check-procs
-          go build -o check-windows-eventlog/check-windows-evenglog.exe ./check-windows-eventlog
-          go build -o check-ntservice/check-ntservice.exe ./check-ntservice
-          go build -o check-disk/check-disk.exe ./check-disk
-          go build -o check-uptime/check-uptime.exe ./check-uptime
-          go build -o check-tcp/check-tcp.exe ./check-tcp
-          go build -o check-file-age/check-file-age.exe ./check-file-age
-      - uses: shogo82148/actions-goveralls@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-profile: prof.out
-          parallel: true
-          flag-name: ${{ matrix.os }}_go${{ matrix.go }}
-  finish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: shogo82148/actions-goveralls@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel-finished: true
+    uses: mackerelio/workflows/.github/workflows/go-test.yml@v1.0.2
+  test-linux:
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.0.2
+    with:
+      run: |
+        ./test.bash
+        make testconvention
+      os-versions: '["ubuntu-22.04"]'
+  test-windows:
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.0.2
+    with:
+      run: |
+        go build -o check-log/check-log.exe ./check-log
+        go build -o check-procs/check-procs.exe ./check-procs
+        go build -o check-windows-eventlog/check-windows-evenglog.exe ./check-windows-eventlog
+        go build -o check-ntservice/check-ntservice.exe ./check-ntservice
+        go build -o check-disk/check-disk.exe ./check-disk
+        go build -o check-uptime/check-uptime.exe ./check-uptime
+        go build -o check-tcp/check-tcp.exe ./check-tcp
+        go build -o check-file-age/check-file-age.exe ./check-file-age
+      os-versions: '["windows-2022"]'
+  # TODO: use workflows repo
   build:
-    needs: test
+    needs: [test, test-linux]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     steps:
@@ -95,6 +62,7 @@ jobs:
           path: |
             ~/rpmbuild/RPMS/*/*.rpm
             packaging/*.deb
+  # TODO: use workflows repo
   release:
     needs: build
     runs-on: ubuntu-latest
