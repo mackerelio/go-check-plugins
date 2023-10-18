@@ -51,6 +51,7 @@ command = ["check-tcp", "-H", "localhost", "-p", "4224", "-w", "3", "-c", "5"]
   -S, --ssl                   Use SSL for the connection.
   -U, --unix-sock=            Unix Domain Socket
       --no-check-certificate  Do not check certificate
+      --status-as=            Overwrite status=to-status, support multiple comma separetes.
   -t, --timeout=              Seconds before connection times out (default: 10)
   -m, --maxbytes=             Close connection once more than this number of bytes are received
   -d, --delay=                Seconds to wait between sending string and polling for response
