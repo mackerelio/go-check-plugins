@@ -353,6 +353,15 @@ func (opts *logOpts) searchReader(ctx context.Context, rdr io.Reader) (warnNum, 
 		readBytes += int64(len(lineBytes))
 
 		if opts.decoder != nil {
+			if opts.Encoding == "UTF-16le" {
+				// Separating UTF-16 little endian lines by byte 0x0a ("\n")
+				// leaves 0x00 at the beginning of second line onwards. Remove it.
+				if lineBytes[0] == 0x00 {
+					lineBytes = lineBytes[1:]
+				}
+				// Since it ends with 0x0a, use 0x0a 0x00 as UTF-16 little endian
+				lineBytes = append(lineBytes, 0x00)
+			}
 			lineBytes, err = opts.decoder.Bytes(lineBytes)
 			if err != nil {
 				break
