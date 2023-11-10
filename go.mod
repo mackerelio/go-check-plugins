@@ -16,7 +16,7 @@ require (
 	github.com/gomodule/redigo v1.8.9
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/lib/pq v1.10.7
+	github.com/lib/pq v1.10.9
 	github.com/mackerelio/checkers v0.2.0
 	github.com/mackerelio/go-osstat v0.2.4
 	github.com/mackerelio/golib v1.2.1
