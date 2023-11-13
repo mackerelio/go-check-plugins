@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.46.0 (2023-11-13)
+
+* Bump github.com/aws/aws-sdk-go from 1.47.3 to 1.47.9 #798 (dependabot[bot])
+* Bump github.com/shirou/gopsutil/v3 from 3.23.8 to 3.23.10 #797 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go from 1.44.271 to 1.47.3 #795 (dependabot[bot])
+* bump go version on build #791 (yseto)
+* fix the line handling of UTF-16le #790 (kmuto)
+* use mackerelio/workflows and upgrade maximum Go version to 1.21 #788 (lufia)
+* check-ntservice: exclude should be -x, not -E #782 (kmuto)
+* Bump github.com/lib/pq from 1.10.7 to 1.10.9 #780 (dependabot[bot])
+* Bump github.com/go-sql-driver/mysql from 1.7.0 to 1.7.1 #775 (dependabot[bot])
+* Bump actions/checkout from 3 to 4 #773 (dependabot[bot])
+* support overwrite status #766 (yseto)
+
+
 ## 0.45.0 (2023-09-22)
 
 * Bump golang.org/x/crypto from 0.6.0 to 0.13.0 #771 (dependabot[bot])

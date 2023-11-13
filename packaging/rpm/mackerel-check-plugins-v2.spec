@@ -36,6 +36,19 @@ done
 %{__targetdir}/*
 
 %changelog
+* Mon Nov 13 2023 <mackerel-developers@hatena.ne.jp> - 0.46.0
+- Bump github.com/aws/aws-sdk-go from 1.47.3 to 1.47.9 (by dependabot[bot])
+- Bump github.com/shirou/gopsutil/v3 from 3.23.8 to 3.23.10 (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go from 1.44.271 to 1.47.3 (by dependabot[bot])
+- bump go version on build (by yseto)
+- fix the line handling of UTF-16le (by kmuto)
+- use mackerelio/workflows and upgrade maximum Go version to 1.21 (by lufia)
+- check-ntservice: exclude should be -x, not -E (by kmuto)
+- Bump github.com/lib/pq from 1.10.7 to 1.10.9 (by dependabot[bot])
+- Bump github.com/go-sql-driver/mysql from 1.7.0 to 1.7.1 (by dependabot[bot])
+- Bump actions/checkout from 3 to 4 (by dependabot[bot])
+- support overwrite status (by yseto)
+
 * Fri Sep 22 2023 <mackerel-developers@hatena.ne.jp> - 0.45.0
 - Bump golang.org/x/crypto from 0.6.0 to 0.13.0 (by dependabot[bot])
 - Bump github.com/shirou/gopsutil/v3 from 3.23.1 to 3.23.8 (by dependabot[bot])

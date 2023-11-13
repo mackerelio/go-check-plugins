@@ -1,3 +1,30 @@
+mackerel-check-plugins (0.46.0-1.v2) stable; urgency=low
+
+  * Bump github.com/aws/aws-sdk-go from 1.47.3 to 1.47.9 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/798>
+  * Bump github.com/shirou/gopsutil/v3 from 3.23.8 to 3.23.10 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/797>
+  * Bump github.com/aws/aws-sdk-go from 1.44.271 to 1.47.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/795>
+  * bump go version on build (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/791>
+  * fix the line handling of UTF-16le (by kmuto)
+    <https://github.com/mackerelio/go-check-plugins/pull/790>
+  * use mackerelio/workflows and upgrade maximum Go version to 1.21 (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/788>
+  * check-ntservice: exclude should be -x, not -E (by kmuto)
+    <https://github.com/mackerelio/go-check-plugins/pull/782>
+  * Bump github.com/lib/pq from 1.10.7 to 1.10.9 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/780>
+  * Bump github.com/go-sql-driver/mysql from 1.7.0 to 1.7.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/775>
+  * Bump actions/checkout from 3 to 4 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/773>
+  * support overwrite status (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/766>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Mon, 13 Nov 2023 06:59:46 +0000
+
 mackerel-check-plugins (0.45.0-1.v2) stable; urgency=low
 
   * Bump golang.org/x/crypto from 0.6.0 to 0.13.0 (by dependabot[bot])
