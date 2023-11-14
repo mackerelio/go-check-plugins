@@ -40,7 +40,7 @@ build:
 # We need to force rebuild "mackerel-check" if GOOS or GOARCH are passed.
 build/mackerel-check: $(patsubst %,depends_on,$(GOOS)$(GOARCH))
 	mkdir -p build
-	go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
+	CGO_ENABLED=0 go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
 	  -o build/mackerel-check
 
 .PHONY: depends_on
