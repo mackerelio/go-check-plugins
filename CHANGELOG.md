@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.46.1 (2023-11-15)
+
+* CGO_ENABLED=0 when build for packaging #800 (Arthur1)
+
+
 ## 0.46.0 (2023-11-13)
 
 * Bump github.com/aws/aws-sdk-go from 1.47.3 to 1.47.9 #798 (dependabot[bot])

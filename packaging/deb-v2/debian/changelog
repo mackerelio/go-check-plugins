@@ -1,3 +1,10 @@
+mackerel-check-plugins (0.46.1-1.v2) stable; urgency=low
+
+  * CGO_ENABLED=0 when build for packaging (by Arthur1)
+    <https://github.com/mackerelio/go-check-plugins/pull/800>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 15 Nov 2023 05:16:45 +0000
+
 mackerel-check-plugins (0.46.0-1.v2) stable; urgency=low
 
   * Bump github.com/aws/aws-sdk-go from 1.47.3 to 1.47.9 (by dependabot[bot])

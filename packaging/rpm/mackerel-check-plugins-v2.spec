@@ -36,6 +36,9 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Nov 15 2023 <mackerel-developers@hatena.ne.jp> - 0.46.1
+- CGO_ENABLED=0 when build for packaging (by Arthur1)
+
 * Mon Nov 13 2023 <mackerel-developers@hatena.ne.jp> - 0.46.0
 - Bump github.com/aws/aws-sdk-go from 1.47.3 to 1.47.9 (by dependabot[bot])
 - Bump github.com/shirou/gopsutil/v3 from 3.23.8 to 3.23.10 (by dependabot[bot])
