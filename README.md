@@ -57,7 +57,7 @@ Installation
 Install the plugin package from either the yum or the apt repository.
 To setup these package repositories, see the documentation regarding the installation of mackerel-agent ([rpm](https://mackerel.io/docs/entry/howto/install-agent/rpm) / [deb](https://mackerel.io/docs/entry/howto/install-agent/deb)).
 
-mackerel-check-plugins will be installed to ```/usr/local/bin/check-*```.
+mackerel-check-plugins will be installed to ```/usr/bin/check-*```.
 
 ### yum
 
