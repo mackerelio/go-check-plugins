@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -564,20 +565,21 @@ func saveState(f string, state *state) error {
 var errFileNotFoundByInode = fmt.Errorf("old file not found")
 
 func findFileByInode(inode uint, dir string) (string, error) {
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return "", err
-	}
+	entries, readDirErr := os.ReadDir(dir)
 	for _, entry := range entries {
 		fi, err := entry.Info()
-		if err != nil {
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
 			return "", err
 		}
 		if detectInode(fi) == inode {
 			return filepath.Join(dir, fi.Name()), nil
 		}
 	}
-	return "", errFileNotFoundByInode
+	err := errFileNotFoundByInode
+	if readDirErr != nil {
+		err = errors.Join(err, readDirErr)
+	}
+	return "", err
 }
 
 func openOldFile(f string, state *state) (*os.File, error) {
