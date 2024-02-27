@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.46.2 (2024-02-27)
+
+* Reduce check-log errors when a file in the log directory has been removed at the moment of running check-log #823 (ne-sachirou)
+* Bump the golang-x group with 3 updates #820 (dependabot[bot])
+* Fix path #814 (yohfee)
+
+
 ## 0.46.1 (2023-11-15)
 
 * CGO_ENABLED=0 when build for packaging #800 (Arthur1)

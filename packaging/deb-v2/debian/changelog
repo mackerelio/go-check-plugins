@@ -1,3 +1,14 @@
+mackerel-check-plugins (0.46.2-1.v2) stable; urgency=low
+
+  * Reduce check-log errors when a file in the log directory has been removed at the moment of running check-log (by ne-sachirou)
+    <https://github.com/mackerelio/go-check-plugins/pull/823>
+  * Bump the golang-x group with 3 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/820>
+  * Fix path (by yohfee)
+    <https://github.com/mackerelio/go-check-plugins/pull/814>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 27 Feb 2024 06:04:11 +0000
+
 mackerel-check-plugins (0.46.1-1.v2) stable; urgency=low
 
   * CGO_ENABLED=0 when build for packaging (by Arthur1)
