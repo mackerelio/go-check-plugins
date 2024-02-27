@@ -36,6 +36,11 @@ done
 %{__targetdir}/*
 
 %changelog
+* Tue Feb 27 2024 <mackerel-developers@hatena.ne.jp> - 0.46.2
+- Reduce check-log errors when a file in the log directory has been removed at the moment of running check-log (by ne-sachirou)
+- Bump the golang-x group with 3 updates (by dependabot[bot])
+- Fix path (by yohfee)
+
 * Wed Nov 15 2023 <mackerel-developers@hatena.ne.jp> - 0.46.1
 - CGO_ENABLED=0 when build for packaging (by Arthur1)
 
