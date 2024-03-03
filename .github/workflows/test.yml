@@ -12,18 +12,18 @@ env:
   DEBIAN_FRONTEND: noninteractive
 jobs:
   lint:
-    uses: mackerelio/workflows/.github/workflows/go-lint.yml@v1.0.2
+    uses: mackerelio/workflows/.github/workflows/go-lint.yml@v1.1.0
   test:
-    uses: mackerelio/workflows/.github/workflows/go-test.yml@v1.0.2
+    uses: mackerelio/workflows/.github/workflows/go-test.yml@v1.1.0
   test-linux:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.0.2
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.1.0
     with:
       run: |
         ./test.bash
         make testconvention
       os-versions: '["ubuntu-22.04"]'
   test-windows:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.0.2
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.1.0
     with:
       run: |
         go build -o check-log/check-log.exe ./check-log
