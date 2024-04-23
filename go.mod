@@ -11,7 +11,7 @@ require (
 	github.com/elazarl/goproxy/ext v0.0.0-20221015165544-a0805db90819
 	github.com/fsouza/go-dockerclient v1.11.0
 	github.com/go-ldap/ldap/v3 v3.4.8
-	github.com/go-ole/go-ole v1.2.6
+	github.com/go-ole/go-ole v1.3.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/gomodule/redigo v1.8.9
 	github.com/jessevdk/go-flags v1.5.0
