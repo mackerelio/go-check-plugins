@@ -10,7 +10,7 @@ require (
 	github.com/elazarl/goproxy v0.0.0-20221015165544-a0805db90819
 	github.com/elazarl/goproxy/ext v0.0.0-20221015165544-a0805db90819
 	github.com/fsouza/go-dockerclient v1.9.4
-	github.com/go-ldap/ldap/v3 v3.4.4
+	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/go-ole/go-ole v1.2.6
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/gomodule/redigo v1.8.9
@@ -34,15 +34,16 @@ require (
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
-	github.com/Azure/go-ntlmssp v0.0.0-20220621081337-cb9428e4ac1e // indirect
+	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/containerd/containerd v1.6.26 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/docker v24.0.9+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
-	github.com/go-asn1-ber/asn1-ber v1.5.4 // indirect
+	github.com/go-asn1-ber/asn1-ber v1.5.5 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/kr/text v0.2.0 // indirect
