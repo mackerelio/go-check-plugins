@@ -36,6 +36,26 @@ done
 %{__targetdir}/*
 
 %changelog
+* Tue Apr 23 2024 <mackerel-developers@hatena.ne.jp> - 0.46.3
+- Revert "Bump github.com/miekg/dns from 1.1.50 to 1.1.59" (by ne-sachirou)
+- Bump github.com/go-ldap/ldap/v3 from 3.4.4 to 3.4.8 (by dependabot[bot])
+- Bump github.com/miekg/dns from 1.1.50 to 1.1.59 (by dependabot[bot])
+- Bump golang.org/x/net from 0.17.0 to 0.23.0 (by dependabot[bot])
+- Fix: check-log panic with invalid memory address or nil pointer dereference (by ne-sachirou)
+- Bump the golang-x group with 2 updates (by dependabot[bot])
+- Bump github.com/docker/docker from 23.0.0+incompatible to 24.0.9+incompatible (by dependabot[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.9.4 to 1.11.0 (by dependabot[bot])
+- Bump mackerelio/workflows from 1.0.2 to 1.1.0 (by dependabot[bot])
+- Bump the testlibs group with 1 update (by dependabot[bot])
+- Bump github.com/opencontainers/runc from 1.1.2 to 1.1.12 (by dependabot[bot])
+- Bump actions/cache from 3 to 4 (by dependabot[bot])
+- Bump github.com/beevik/ntp from 0.3.0 to 1.3.1 (by dependabot[bot])
+- Bump github.com/containerd/containerd from 1.6.18 to 1.6.26 (by dependabot[bot])
+- Bump actions/upload-artifact from 3 to 4 (by dependabot[bot])
+- Bump actions/download-artifact from 3 to 4 (by dependabot[bot])
+- Bump actions/setup-go from 4 to 5 (by dependabot[bot])
+- Bump github.com/go-ole/go-ole from 1.2.6 to 1.3.0 (by dependabot[bot])
+
 * Tue Feb 27 2024 <mackerel-developers@hatena.ne.jp> - 0.46.2
 - Reduce check-log errors when a file in the log directory has been removed at the moment of running check-log (by ne-sachirou)
 - Bump the golang-x group with 3 updates (by dependabot[bot])
