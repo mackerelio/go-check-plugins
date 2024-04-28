@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/StackExchange/wmi v1.2.1
-	github.com/aws/aws-sdk-go v1.47.9
+	github.com/aws/aws-sdk-go v1.51.30
 	github.com/beevik/ntp v1.3.1
 	github.com/bradfitz/gomemcache v0.0.0-20221031212613-62deef7fc822
 	github.com/elazarl/goproxy v0.0.0-20221015165544-a0805db90819
