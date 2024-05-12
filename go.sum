@@ -10,8 +10,8 @@ github.com/StackExchange/wmi v1.2.1 h1:VIkavFPXSjcnS+O8yTq7NI32k0R5Aj+v39y29VYDO
 github.com/StackExchange/wmi v1.2.1/go.mod h1:rcmrprowKIVzvc+NUiLncP2uuArMWLCbu9SBzvHz7e8=
 github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa h1:LHTHcTQiSGT7VVbI0o4wBRNQIgn917usHWOd6VAffYI=
 github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa/go.mod h1:cEWa1LVoE5KvSD9ONXsZrj0z6KqySlCCNKHlLzbqAt4=
-github.com/aws/aws-sdk-go v1.47.9 h1:rarTsos0mA16q+huicGx0e560aYRtOucV5z2Mw23JRY=
-github.com/aws/aws-sdk-go v1.47.9/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
+github.com/aws/aws-sdk-go v1.53.0 h1:MMo1x1ggPPxDfHMXJnQudTbGXYlD4UigUAud1DJxPVo=
+github.com/aws/aws-sdk-go v1.53.0/go.mod h1:LF8svs817+Nz+DmiMQKTO3ubZ/6IaTpq3TjupRn3Eqk=
 github.com/beevik/ntp v1.3.1 h1:Y/srlT8L1yQr58kyPWFPZIxRL8ttx2SRIpVYJqZIlAM=
 github.com/beevik/ntp v1.3.1/go.mod h1:fT6PylBq86Tsq23ZMEe47b7QQrZfYBFPnpzt0a9kJxw=
 github.com/bradfitz/gomemcache v0.0.0-20221031212613-62deef7fc822 h1:hjXJeBcAMS1WGENGqDpzvmgS43oECTx8UXq31UBu0Jw=
