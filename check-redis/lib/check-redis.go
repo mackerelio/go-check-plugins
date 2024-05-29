@@ -139,7 +139,7 @@ func checkReachable(args []string) *checkers.Checker {
 
 	c, info, err := connectRedisGetInfo(opts)
 	if err != nil {
-		return checkers.Unknown(err.Error())
+		return checkers.Critical(err.Error())
 	}
 	defer c.Close()
 

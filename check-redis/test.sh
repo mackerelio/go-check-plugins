@@ -20,6 +20,14 @@ password=passpass
 port=16379
 image=redis:5
 
+RET=$($plugin reachable --port $port --password $password)
+# check-redis should return CRITICAL (exit code 2) when the server is unreachable
+if [ $? -ne 2 ]; then
+	echo "$prog: $plugin returned $? (2 is expected)" >&2
+	exit 2
+fi
+echo "$RET"
+
 docker run --name "test-$plugin" -p "$port:6379" -d "$image" --requirepass "$password"
 trap 'docker stop test-$plugin; docker rm test-$plugin; exit' EXIT
 sleep 10
