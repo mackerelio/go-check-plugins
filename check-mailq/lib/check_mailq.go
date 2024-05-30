@@ -75,7 +75,7 @@ func run(args []string) *checkers.Checker {
 		outs := strings.Split(string(out), "\n")
 		line := outs[len(outs)-2]
 
-		re := regexp.MustCompile(`-- \d+ Kbytes in (\d+) Requests.`)
+		re := regexp.MustCompile(`-- \d+ Kbytes in (\d+) (?:Request|Requests)\.`)
 		if re.MatchString(line) {
 			queueStr = re.ReplaceAllString(line, "$1")
 			queue, err = strconv.ParseInt(queueStr, 10, 64)
