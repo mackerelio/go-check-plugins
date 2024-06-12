@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.47.0 (2024-06-12)
+
+* return CRITICAL instead of UNKNOWN when check-redis reachable is failed #865 (kmuto)
+* Bump the golang-x group with 3 updates #863 (dependabot[bot])
+* use go 1.22.x on build phase #862 (lufia)
+* update dependencies #861 (lufia)
+* [check-mailq] fix pattern #857 (lufia)
+* Bump github.com/docker/docker from 25.0.4+incompatible to 25.0.5+incompatible #839 (dependabot[bot])
+
+
 ## 0.46.3 (2024-04-23)
 
 * Revert "Bump github.com/miekg/dns from 1.1.50 to 1.1.59" #840 (ne-sachirou)

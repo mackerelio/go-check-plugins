@@ -36,6 +36,14 @@ done
 %{__targetdir}/*
 
 %changelog
+* Wed Jun 12 2024 <mackerel-developers@hatena.ne.jp> - 0.47.0
+- return CRITICAL instead of UNKNOWN when check-redis reachable is failed (by kmuto)
+- Bump the golang-x group with 3 updates (by dependabot[bot])
+- use go 1.22.x on build phase (by lufia)
+- update dependencies (by lufia)
+- [check-mailq] fix pattern (by lufia)
+- Bump github.com/docker/docker from 25.0.4+incompatible to 25.0.5+incompatible (by dependabot[bot])
+
 * Tue Apr 23 2024 <mackerel-developers@hatena.ne.jp> - 0.46.3
 - Revert "Bump github.com/miekg/dns from 1.1.50 to 1.1.59" (by ne-sachirou)
 - Bump github.com/go-ldap/ldap/v3 from 3.4.4 to 3.4.8 (by dependabot[bot])

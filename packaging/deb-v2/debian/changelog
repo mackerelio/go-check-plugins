@@ -1,3 +1,20 @@
+mackerel-check-plugins (0.47.0-1.v2) stable; urgency=low
+
+  * return CRITICAL instead of UNKNOWN when check-redis reachable is failed (by kmuto)
+    <https://github.com/mackerelio/go-check-plugins/pull/865>
+  * Bump the golang-x group with 3 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/863>
+  * use go 1.22.x on build phase (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/862>
+  * update dependencies (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/861>
+  * [check-mailq] fix pattern (by lufia)
+    <https://github.com/mackerelio/go-check-plugins/pull/857>
+  * Bump github.com/docker/docker from 25.0.4+incompatible to 25.0.5+incompatible (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/839>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 12 Jun 2024 06:58:04 +0000
+
 mackerel-check-plugins (0.46.3-1.v2) stable; urgency=low
 
   * Revert "Bump github.com/miekg/dns from 1.1.50 to 1.1.59" (by ne-sachirou)
