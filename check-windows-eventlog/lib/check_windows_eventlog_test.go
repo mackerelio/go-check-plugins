@@ -48,6 +48,7 @@ func TestWriteLastOffset(t *testing.T) {
 }
 
 func raiseEvent(t *testing.T, typ int, msg string) {
+	t.Helper()
 	ole.CoInitialize(0)
 	defer ole.CoUninitialize()
 
