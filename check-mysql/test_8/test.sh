@@ -4,9 +4,9 @@ set -ex
 
 echo $0
 prog=$(basename $0)
-if ! command -v docker-compose > /dev/null
+if ! command -v docker > /dev/null
 then
-	echo "$prog: docker-compose is not installed" >&2
+	echo "$prog: docker is not installed" >&2
 	exit 2
 fi
 
@@ -28,8 +28,8 @@ if $plugin connection --host=127.0.0.1 --port=$primary_port --user=$user --passw
 	exit 1
 fi
 
-docker-compose up -d
-trap 'docker-compose down --rmi local -v' EXIT
+docker compose up -d
+trap 'docker compose down --rmi local -v' EXIT
 
 USER=$user PASSWORD=$password PORT=$primary_port ../wait.sh
 
