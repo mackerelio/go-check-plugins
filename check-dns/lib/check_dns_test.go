@@ -13,12 +13,12 @@ import (
 func TestNameServer(t *testing.T) {
 	nameserver, err := adapterAddress()
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Error(err)
 	}
-	t.Logf(nameserver)
+	t.Log(nameserver)
 	address := net.ParseIP(nameserver)
 	if address == nil {
-		t.Errorf("nameserver is invalid IP")
+		t.Error("nameserver is invalid IP")
 	}
 }
 
