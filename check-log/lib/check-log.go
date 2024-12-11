@@ -290,7 +290,7 @@ func (opts *logOpts) searchLog(ctx context.Context, logFile string) (int64, int6
 	if opts.Encoding != "" {
 		e := encoding.GetEncoding(opts.Encoding)
 		if e == nil {
-			return 0, 0, "", fmt.Errorf("unknown encoding:" + opts.Encoding)
+			return 0, 0, "", fmt.Errorf("unknown encoding: %s", opts.Encoding)
 		}
 		opts.decoder = e.NewDecoder()
 	}
@@ -447,7 +447,7 @@ func parseFilePattern(directory, filePattern string, caseInsensitive bool) ([]st
 
 	fileInfos, err := os.ReadDir(dirStr)
 	if err != nil {
-		return nil, fmt.Errorf("cannot read the directory:" + err.Error())
+		return nil, fmt.Errorf("cannot read the directory: %s", err.Error())
 	}
 
 	var fileList []string
