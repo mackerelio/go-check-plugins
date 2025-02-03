@@ -34,7 +34,7 @@ jobs:
         go build -o check-uptime/check-uptime.exe ./check-uptime
         go build -o check-tcp/check-tcp.exe ./check-tcp
         go build -o check-file-age/check-file-age.exe ./check-file-age
-      os-versions: '["windows-2022"]'
+      os-versions: '["windows-2022", "windows-2025"]' # When windows-2025 become stable, remove windows-2022
   # TODO: use workflows repo
   build:
     needs: [test, test-linux]
