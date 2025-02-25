@@ -12,18 +12,18 @@ env:
   DEBIAN_FRONTEND: noninteractive
 jobs:
   lint:
-    uses: mackerelio/workflows/.github/workflows/go-lint.yml@v1.2.0
+    uses: mackerelio/workflows/.github/workflows/go-lint.yml@v1.3.0
   test:
-    uses: mackerelio/workflows/.github/workflows/go-test.yml@v1.2.0
+    uses: mackerelio/workflows/.github/workflows/go-test.yml@v1.3.0
   test-linux:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.2.0
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.3.0
     with:
       run: |
         ./test.bash
         make testconvention
       os-versions: '["ubuntu-22.04"]'
   test-windows:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.2.0
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.3.0
     with:
       run: |
         go build -o check-log/check-log.exe ./check-log
@@ -34,7 +34,7 @@ jobs:
         go build -o check-uptime/check-uptime.exe ./check-uptime
         go build -o check-tcp/check-tcp.exe ./check-tcp
         go build -o check-file-age/check-file-age.exe ./check-file-age
-      os-versions: '["windows-2022"]'
+      os-versions: '["windows-2022", "windows-2025"]' # When windows-2025 become stable, remove windows-2022
   # TODO: use workflows repo
   build:
     needs: [test, test-linux]
