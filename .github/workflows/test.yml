@@ -39,7 +39,7 @@ jobs:
   build:
     needs: [test, test-linux]
     runs-on: ubuntu-latest
-    # if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     steps:
       - run: |
           sudo apt-get update
