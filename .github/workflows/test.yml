@@ -21,7 +21,7 @@ jobs:
       run: |
         ./test.bash
         make testconvention
-      os-versions: '["ubuntu-22.04"]'
+      os-versions: '["ubuntu-24.04"]'
   test-windows:
     uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.3.0
     with:
@@ -43,7 +43,7 @@ jobs:
     steps:
       - run: |
           sudo apt-get update
-          sudo apt-get install -y rpm devscripts debhelper fakeroot crossbuild-essential-arm64
+          sudo apt-get install -y rpm devscripts debhelper fakeroot crossbuild-essential-arm64 build-essential
           mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
       - uses: actions/cache@v4
         with:
