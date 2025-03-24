@@ -485,9 +485,6 @@ loop_events:
 			warnNum++
 		case "Information":
 			warnNum++
-		case "AuditSuccess":
-			warnNum++
-		}
 	}
 
 	if !opts.NoState {
