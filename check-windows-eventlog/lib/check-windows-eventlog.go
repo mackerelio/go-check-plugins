@@ -483,6 +483,8 @@ loop_events:
 			critNum++
 		case "Warning":
 			warnNum++
+		case "Information":
+			warnNum++
 		}
 	}
 

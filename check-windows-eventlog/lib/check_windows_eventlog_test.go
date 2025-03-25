@@ -105,10 +105,10 @@ func TestRun(t *testing.T) {
 	lastNumber = recordNumber
 
 	testInfo := func() {
-		raiseEvent(t, 0, "check-windows-eventlog: something info occured")
+		raiseEvent(t, 4, "check-windows-eventlog: something info occured")
 		w, c, errLines, err := opts.searchLog("Application")
 		assert.Equal(t, err, nil, "err should be nil")
-		assert.Equal(t, int64(0), w, "something went wrong")
+		assert.Equal(t, int64(1), w, "something went wrong")
 		assert.Equal(t, int64(0), c, "something went wrong")
 		assert.Equal(t, "", errLines, "something went wrong")
 
