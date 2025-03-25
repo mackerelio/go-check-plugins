@@ -485,6 +485,7 @@ loop_events:
 			warnNum++
 		case "Information":
 			warnNum++
+		}
 	}
 
 	if !opts.NoState {
