@@ -51,6 +51,7 @@ type logOpts struct {
 	EventIDExclude string `long:"event-id-exclude" description:"Event IDs ignorable (separated by comma, or range)"`
 	WarnOver       int64  `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver       int64  `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
+	StatusAs       string `long:"status-as" description:"Overwrite status=to-status, support multiple comma separetes."`
 	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
 	StateDir       string `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState        bool   `long:"no-state" description:"Don't use state file and read whole logs"`
@@ -158,9 +159,18 @@ func (opts *logOpts) prepare() error {
 
 // Do the plugin
 func Do() {
-	ckr := run(os.Args[1:])
+	opts, err := parseArgs(os.Args[1:])
+	if err != nil {
+		os.Exit(1)
+	}
+	maps, err := checkers.ParseStatusMap(opts.StatusAs)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	ckr := opts.run()
 	ckr.Name = "Event Log"
-	ckr.Exit()
+	ckr.ExitStatusAs(maps)
 }
 
 func parseArgs(args []string) (*logOpts, error) {
@@ -176,13 +186,8 @@ func parseArgs(args []string) (*logOpts, error) {
 	return opts, err
 }
 
-func run(args []string) *checkers.Checker {
-	opts, err := parseArgs(args)
-	if err != nil {
-		os.Exit(1)
-	}
-
-	err = opts.prepare()
+func (opts *logOpts) run() *checkers.Checker {
+	err := opts.prepare()
 	if err != nil {
 		return checkers.Unknown(err.Error())
 	}
