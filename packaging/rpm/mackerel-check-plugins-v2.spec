@@ -36,6 +36,15 @@ done
 %{__targetdir}/*
 
 %changelog
+* Mon Mar 31 2025 <mackerel-developers@hatena.ne.jp> - 0.48.0
+- [check-windows-eventlog] add status-as option (by masarasi)
+- [check-windows-eventlog] add target event type (by masarasi)
+- replace to newer runner-images (by yseto)
+- Bump golang.org/x/net from 0.25.0 to 0.36.0 (by dependabot[bot])
+- Bump mackerelio/workflows from 1.3.0 to 1.4.0 (by dependabot[bot])
+- Bump mackerelio/workflows from 1.2.0 to 1.3.0 (by dependabot[bot])
+- use mackerelio/workflows@v1.2.0 (by yseto)
+
 * Wed Jun 12 2024 <mackerel-developers@hatena.ne.jp> - 0.47.0
 - return CRITICAL instead of UNKNOWN when check-redis reachable is failed (by kmuto)
 - Bump the golang-x group with 3 updates (by dependabot[bot])
