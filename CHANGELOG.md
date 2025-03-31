@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.48.0 (2025-03-31)
+
+* [check-windows-eventlog] add status-as option #908 (masarasi)
+* [check-windows-eventlog] add target event type #907 (masarasi)
+* replace to newer runner-images #904 (yseto)
+* Bump golang.org/x/net from 0.25.0 to 0.36.0 #903 (dependabot[bot])
+* Bump mackerelio/workflows from 1.3.0 to 1.4.0 #901 (dependabot[bot])
+* Bump mackerelio/workflows from 1.2.0 to 1.3.0 #892 (dependabot[bot])
+* use mackerelio/workflows@v1.2.0 #886 (yseto)
+
+
 ## 0.47.0 (2024-06-12)
 
 * return CRITICAL instead of UNKNOWN when check-redis reachable is failed #865 (kmuto)
