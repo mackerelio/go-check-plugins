@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/signal"
 	"strconv"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -16,9 +17,15 @@ import (
 	"github.com/mackerelio/checkers"
 )
 
+// overwritten with syscall.SIGTERM on unix environment (see check-log_unix.go)
+var defaultSignal = os.Interrupt
+
 // Do the plugin
 func Do() {
-	ckr := run(os.Args[1:])
+	ctx, stop := signal.NotifyContext(context.Background(), defaultSignal)
+	defer stop()
+
+	ckr := run(ctx, os.Args[1:])
 	ckr.Name = "SQSQueueSize"
 	ckr.Exit()
 }
@@ -89,9 +96,7 @@ func getSqsQueueSize(ctx context.Context, region, awsAccessKeyID, awsSecretAcces
 	return size, nil
 }
 
-func run(args []string) *checkers.Checker {
-	ctx := context.Background()
-
+func run(ctx context.Context, args []string) *checkers.Checker {
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
 		os.Exit(1)
