@@ -1,15 +1,17 @@
 package checkawssqsqueuesize
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"strconv"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
 )
@@ -32,30 +34,31 @@ var opts struct {
 
 const sqsAttributeOfQueueSize = "ApproximateNumberOfMessages"
 
-func createService(region, awsAccessKeyID, awsSecretAccessKey string) (*sqs.SQS, error) {
-	sess, err := session.NewSession()
+func createService(ctx context.Context, region, awsAccessKeyID, awsSecretAccessKey string) (*sqs.Client, error) {
+	var opts []func(*config.LoadOptions) error
+	if awsAccessKeyID != "" && awsSecretAccessKey != "" {
+		opts = append(opts, config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(awsAccessKeyID, awsSecretAccessKey, "")))
+	}
+	if region != "" {
+		opts = append(opts, config.WithRegion(region))
+	}
+
+	cfg, err := config.LoadDefaultConfig(ctx, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	config := aws.NewConfig()
-	if awsAccessKeyID != "" && awsSecretAccessKey != "" {
-		config = config.WithCredentials(credentials.NewStaticCredentials(awsAccessKeyID, awsSecretAccessKey, ""))
-	}
-	if region != "" {
-		config = config.WithRegion(region)
-	}
-	return sqs.New(sess, config), nil
+	return sqs.NewFromConfig(cfg), nil
 }
 
-func getSqsQueueSize(region, awsAccessKeyID, awsSecretAccessKey, queueName string) (int, error) {
-	sqsClient, err := createService(region, awsAccessKeyID, awsSecretAccessKey)
+func getSqsQueueSize(ctx context.Context, region, awsAccessKeyID, awsSecretAccessKey, queueName string) (int, error) {
+	sqsClient, err := createService(ctx, region, awsAccessKeyID, awsSecretAccessKey)
 	if err != nil {
 		return -1, err
 	}
 
 	// Get queue url
-	q, err := sqsClient.GetQueueUrl(&sqs.GetQueueUrlInput{
+	q, err := sqsClient.GetQueueUrl(ctx, &sqs.GetQueueUrlInput{
 		QueueName: aws.String(queueName),
 	})
 	if err != nil {
@@ -63,9 +66,11 @@ func getSqsQueueSize(region, awsAccessKeyID, awsSecretAccessKey, queueName strin
 	}
 
 	// Get queue attribute
-	attr, err := sqsClient.GetQueueAttributes(&sqs.GetQueueAttributesInput{
-		QueueUrl:       q.QueueUrl,
-		AttributeNames: []*string{aws.String(sqsAttributeOfQueueSize)},
+	attr, err := sqsClient.GetQueueAttributes(ctx, &sqs.GetQueueAttributesInput{
+		QueueUrl: q.QueueUrl,
+		AttributeNames: []types.QueueAttributeName{
+			types.QueueAttributeNameApproximateNumberOfMessages,
+		},
 	})
 	if err != nil {
 		return -1, err
@@ -73,10 +78,10 @@ func getSqsQueueSize(region, awsAccessKeyID, awsSecretAccessKey, queueName strin
 
 	// Queue size
 	sizeStr, ok := attr.Attributes[sqsAttributeOfQueueSize]
-	if !ok || sizeStr == nil {
+	if !ok {
 		return -1, errors.New("attribute not found")
 	}
-	size, err := strconv.Atoi(*sizeStr)
+	size, err := strconv.Atoi(sizeStr)
 	if err != nil {
 		return -1, err
 	}
@@ -85,12 +90,14 @@ func getSqsQueueSize(region, awsAccessKeyID, awsSecretAccessKey, queueName strin
 }
 
 func run(args []string) *checkers.Checker {
+	ctx := context.Background()
+
 	_, err := flags.ParseArgs(&opts, args)
 	if err != nil {
 		os.Exit(1)
 	}
 
-	size, err := getSqsQueueSize(opts.Region, opts.AccessKeyID, opts.SecretAccessKey, opts.QueueName)
+	size, err := getSqsQueueSize(ctx, opts.Region, opts.AccessKeyID, opts.SecretAccessKey, opts.QueueName)
 	if err != nil {
 		return checkers.NewChecker(checkers.UNKNOWN, err.Error())
 	}
