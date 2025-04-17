@@ -13,10 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs/cloudwatchlogsiface"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/jessevdk/go-flags"
 
 	"github.com/mackerelio/checkers"
@@ -50,15 +49,15 @@ func Do() {
 }
 
 type awsCloudwatchLogsPlugin struct {
-	Service   cloudwatchlogsiface.CloudWatchLogsAPI
+	Service   cloudwatchlogs.FilterLogEventsAPIClient
 	StateFile string
 	*logOpts
 }
 
-func newCloudwatchLogsPlugin(opts *logOpts, args []string) (*awsCloudwatchLogsPlugin, error) {
+func newCloudwatchLogsPlugin(ctx context.Context, opts *logOpts, args []string) (*awsCloudwatchLogsPlugin, error) {
 	var err error
 	p := &awsCloudwatchLogsPlugin{logOpts: opts}
-	p.Service, err = createService(opts)
+	p.Service, err = createService(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -94,20 +93,22 @@ func getStateFile(stateDir, logGroupName, logStreamNamePrefix string, args []str
 	)
 }
 
-func createAWSConfig(opts *logOpts) *aws.Config {
-	conf := aws.NewConfig()
+func createCloudwatchlogsOptions(opts *logOpts) (optFns []func(*cloudwatchlogs.Options)) {
 	if opts.MaxRetries > 0 {
-		return conf.WithMaxRetries(opts.MaxRetries)
+		optFns = append(optFns, func(o *cloudwatchlogs.Options) {
+			o.RetryMaxAttempts = opts.MaxRetries
+		})
 	}
-	return conf
+	return
 }
 
-func createService(opts *logOpts) (*cloudwatchlogs.CloudWatchLogs, error) {
-	sess, err := session.NewSession()
+func createService(ctx context.Context, opts *logOpts) (*cloudwatchlogs.Client, error) {
+	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return cloudwatchlogs.New(sess, createAWSConfig(opts)), nil
+
+	return cloudwatchlogs.NewFromConfig(cfg, createCloudwatchlogsOptions(opts)...), nil
 }
 
 type logState struct {
@@ -134,9 +135,12 @@ func (p *awsCloudwatchLogsPlugin) collect(ctx context.Context, now time.Time) ([
 	if p.LogStreamNamePrefix != "" {
 		input.LogStreamNamePrefix = aws.String(p.LogStreamNamePrefix)
 	}
-	err = p.Service.FilterLogEventsPages(input, func(output *cloudwatchlogs.FilterLogEventsOutput, lastPage bool) bool {
-		if ctx.Err() != nil {
-			return false
+
+	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(p.Service, input)
+	for paginator.HasMorePages() {
+		output, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
 		}
 		for _, event := range output.Events {
 			messages = append(messages, *event.Message)
@@ -145,18 +149,11 @@ func (p *awsCloudwatchLogsPlugin) collect(ctx context.Context, now time.Time) ([
 			}
 		}
 		s.NextToken = output.NextToken
-		if lastPage {
-			s.NextToken = nil
-		}
-		err = p.saveState(s)
-		if err != nil {
-			return false
+
+		if err = p.saveState(s); err != nil {
+			return nil, err
 		}
 		time.Sleep(150 * time.Millisecond)
-		return true
-	})
-	if err != nil {
-		return nil, err
 	}
 	return messages, nil
 }
@@ -220,7 +217,7 @@ func run(ctx context.Context, args []string) *checkers.Checker {
 	if err != nil {
 		os.Exit(1)
 	}
-	p, err := newCloudwatchLogsPlugin(opts, args)
+	p, err := newCloudwatchLogsPlugin(ctx, opts, args)
 	if err != nil {
 		return checkers.Unknown(fmt.Sprint(err))
 	}

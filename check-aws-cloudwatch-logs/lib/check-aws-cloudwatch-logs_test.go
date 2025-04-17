@@ -7,8 +7,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strconv"
 	"testing"
 	"time"
 
@@ -16,32 +17,34 @@ import (
 	"github.com/mackerelio/checkers"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs/cloudwatchlogsiface"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 )
 
 type mockAWSCloudWatchLogsClient struct {
-	cloudwatchlogsiface.CloudWatchLogsAPI
+	cloudwatchlogs.FilterLogEventsAPIClient
 	outputs []*cloudwatchlogs.FilterLogEventsOutput
 }
 
-func (c *mockAWSCloudWatchLogsClient) FilterLogEventsPages(input *cloudwatchlogs.FilterLogEventsInput, fn func(*cloudwatchlogs.FilterLogEventsOutput, bool) bool) error {
-	for i, output := range c.outputs {
-		lastPage := i == len(c.outputs)-1
-		if !fn(output, lastPage) {
-			break
-		}
+func (c *mockAWSCloudWatchLogsClient) FilterLogEvents(ctx context.Context, input *cloudwatchlogs.FilterLogEventsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.FilterLogEventsOutput, error) {
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
 	}
-	return nil
+
+	var pageNo = 0
+	if input.NextToken != nil {
+		pageNo, _ = strconv.Atoi(*input.NextToken)
+	}
+	return c.outputs[pageNo], nil
 }
 
-func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
+func createMockService() cloudwatchlogs.FilterLogEventsAPIClient {
 	return &mockAWSCloudWatchLogsClient{
 		outputs: []*cloudwatchlogs.FilterLogEventsOutput{
 			{
 				NextToken: aws.String("1"),
-				Events: []*cloudwatchlogs.FilteredLogEvent{
+				Events: []types.FilteredLogEvent{
 					{
 						EventId:   aws.String("event-id-0"),
 						Message:   aws.String("message-0"),
@@ -56,7 +59,7 @@ func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 			},
 			{
 				NextToken: aws.String("2"),
-				Events: []*cloudwatchlogs.FilteredLogEvent{
+				Events: []types.FilteredLogEvent{
 					{
 						EventId:   aws.String("event-id-2"),
 						Message:   aws.String("message-2"),
@@ -75,7 +78,7 @@ func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 				},
 			},
 			{
-				Events: []*cloudwatchlogs.FilteredLogEvent{
+				Events: []types.FilteredLogEvent{
 					{
 						EventId:   aws.String("event-id-5"),
 						Message:   aws.String("message-5"),
@@ -88,13 +91,11 @@ func createMockService() cloudwatchlogsiface.CloudWatchLogsAPI {
 }
 
 func Test_cloudwatchLogsPlugin_collect(t *testing.T) {
-	file, _ := ioutil.TempFile("", "check-cloudwatch-logs-test-collect")
-	os.Remove(file.Name())
-	file.Close()
-	defer os.Remove(file.Name())
+	stateFile := filepath.Join(t.TempDir(), "check-cloudwatch-logs-test-collect")
+
 	p := &awsCloudwatchLogsPlugin{
 		Service:   createMockService(),
-		StateFile: file.Name(),
+		StateFile: stateFile,
 		logOpts: &logOpts{
 			LogGroupName: "test-group",
 		},
@@ -104,7 +105,7 @@ func Test_cloudwatchLogsPlugin_collect(t *testing.T) {
 		messages, err := p.collect(context.Background(), time.Unix(0, 0))
 		assert.Equal(t, err, nil, "err should be nil")
 		assert.Equal(t, len(messages), 6)
-		cnt, _ := ioutil.ReadFile(file.Name())
+		cnt, _ := os.ReadFile(stateFile)
 		var s logState
 		json.NewDecoder(bytes.NewReader(cnt)).Decode(&s)
 		assert.Equal(t, s, logState{StartTime: aws.Int64(5 + 1)})
@@ -115,7 +116,7 @@ func Test_cloudwatchLogsPlugin_collect(t *testing.T) {
 		cancel()
 
 		messages, err := p.collect(ctx, time.Unix(0, 0))
-		assert.Equal(t, err, nil, "err should be nil")
+		assert.NotEqual(t, err, nil, "err should be someting")
 		assert.Equal(t, len(messages), 0)
 	})
 }
@@ -221,25 +222,32 @@ func Test_cloudwatchLogsPlugin_options(t *testing.T) {
 	}
 }
 
-func Test_createAWSConfig(t *testing.T) {
+func Test_createCloudwatchlogsOptions(t *testing.T) {
 	tests := []struct {
-		opts *logOpts
-		want *aws.Config
+		opts   *logOpts
+		want   cloudwatchlogs.Options
+		length int
 	}{
 		{
-			opts: &logOpts{MaxRetries: 0},
-			want: aws.NewConfig(),
+			opts:   &logOpts{MaxRetries: 0},
+			length: 0,
 		},
 		{
-			opts: &logOpts{MaxRetries: 1},
-			want: aws.NewConfig().WithMaxRetries(1),
+			opts:   &logOpts{MaxRetries: 1},
+			want:   cloudwatchlogs.Options{RetryMaxAttempts: 1},
+			length: 1,
 		},
 	}
 
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case:%d", i), func(t *testing.T) {
-			res := createAWSConfig(tt.opts)
-			assert.Equal(t, tt.want, res)
+			res := createCloudwatchlogsOptions(tt.opts)
+			assert.Equal(t, len(res), tt.length)
+			if tt.length > 0 {
+				opts := cloudwatchlogs.Options{}
+				res[0](&opts)
+				assert.Equal(t, tt.want, opts)
+			}
 		})
 	}
 }
