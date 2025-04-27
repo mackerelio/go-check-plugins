@@ -6,7 +6,7 @@ toolchain go1.23.7
 
 require (
 	github.com/StackExchange/wmi v1.2.1
-	github.com/aws/aws-sdk-go v1.53.14
+	github.com/aws/aws-sdk-go v1.55.7
 	github.com/beevik/ntp v1.3.1
 	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874
 	github.com/elazarl/goproxy v0.0.0-20231117061959-7cc037d33fb5
