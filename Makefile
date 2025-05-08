@@ -1,5 +1,5 @@
-VERSION = 0.48.0
-CURRENT_REVISION = $(shell git rev-parse --short HEAD)
+# This VERSION variable indicates the latest tag.
+VERSION = $(subst v,,$(shell git describe --abbrev=0 --tags))
 ifeq ($(OS),Windows_NT)
 GOPATH_ROOT:=$(shell cygpath ${GOPATH})
 else
@@ -40,7 +40,7 @@ build:
 # We need to force rebuild "mackerel-check" if GOOS or GOARCH are passed.
 build/mackerel-check: $(patsubst %,depends_on,$(GOOS)$(GOARCH))
 	mkdir -p build
-	CGO_ENABLED=0 go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
+	CGO_ENABLED=0 go build -ldflags="-s -w" \
 	  -o build/mackerel-check
 
 .PHONY: depends_on
