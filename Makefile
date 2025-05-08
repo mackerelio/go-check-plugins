@@ -81,6 +81,7 @@ deb-v2-x86:
 	git clean -f -d ./packaging
 	make build/mackerel-check GOOS=linux GOARCH=amd64
 	cp build/mackerel-check packaging/deb-v2/debian/
+	cp -f packaging/dummy-empty.tar.gz packaging/mackerel-check-plugins_${VERSION}.orig.tar.gz
 	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us
 
 .PHONY: deb-v2-arm
@@ -88,6 +89,7 @@ deb-v2-arm:
 	git clean -f -d ./packaging
 	make build/mackerel-check GOOS=linux GOARCH=arm64
 	cp build/mackerel-check packaging/deb-v2/debian/
+	cp -f packaging/dummy-empty.tar.gz packaging/mackerel-check-plugins_${VERSION}.orig.tar.gz
 	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us -aarm64
 
 .PHONY: clean

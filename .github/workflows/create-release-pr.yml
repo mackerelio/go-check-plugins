@@ -25,11 +25,6 @@ jobs:
           package_name: mackerel-check-plugins
           version_go_file_path: mackerel-check.go
 
-      - run: |
-          CURRENT=${{ steps.start.outputs.currentVersion }}
-          NEXT=${{ steps.start.outputs.nextVersion }}
-          mv packaging/mackerel-check-plugins_$CURRENT.orig.tar.gz packaging/mackerel-check-plugins_$NEXT.orig.tar.gz
-
       - uses: mackerelio/mackerel-create-release-pull-request-action@main
         with:
           github_token: ${{ secrets.MACKERELBOT_GITHUB_TOKEN }}
