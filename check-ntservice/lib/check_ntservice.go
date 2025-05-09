@@ -14,6 +14,7 @@ var opts struct {
 	ExcludeService string `long:"exclude-service" short:"x" description:"exclude if contained in service name. This option takes precedence over --service-name."`
 	ListService    bool   `long:"list-service" short:"l" description:"list service"`
 	Exact          bool   `long:"exact" description:"more exact checking of the service. This option applies only to --service-name."`
+	StatusAs       string `long:"status-as" description:"Overwrite status=to-status, support multiple comma separates."`
 }
 
 // Win32Service is struct for Win32_Service.
@@ -27,7 +28,12 @@ type Win32Service struct {
 func Do() {
 	ckr := run(os.Args[1:])
 	ckr.Name = "NtService"
-	ckr.Exit()
+	maps, err := checkers.ParseStatusMap(opts.StatusAs)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	ckr.ExitStatusAs(maps)
 }
 
 var getServiceStateFunc = getServiceState
