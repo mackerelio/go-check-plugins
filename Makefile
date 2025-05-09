@@ -1,5 +1,5 @@
-VERSION = 0.48.0
-CURRENT_REVISION = $(shell git rev-parse --short HEAD)
+# This VERSION variable indicates the latest tag.
+VERSION = $(subst v,,$(shell git describe --abbrev=0 --tags))
 ifeq ($(OS),Windows_NT)
 GOPATH_ROOT:=$(shell cygpath ${GOPATH})
 else
@@ -40,7 +40,7 @@ build:
 # We need to force rebuild "mackerel-check" if GOOS or GOARCH are passed.
 build/mackerel-check: $(patsubst %,depends_on,$(GOOS)$(GOARCH))
 	mkdir -p build
-	CGO_ENABLED=0 go build -ldflags="-s -w -X main.gitcommit=$(CURRENT_REVISION)" \
+	CGO_ENABLED=0 go build -ldflags="-s -w" \
 	  -o build/mackerel-check
 
 .PHONY: depends_on
@@ -78,14 +78,18 @@ deb: deb-v2-x86 deb-v2-arm
 
 .PHONY: deb-v2-x86
 deb-v2-x86:
+	git clean -f -d ./packaging
 	make build/mackerel-check GOOS=linux GOARCH=amd64
 	cp build/mackerel-check packaging/deb-v2/debian/
+	cp -f packaging/dummy-empty.tar.gz packaging/mackerel-check-plugins_${VERSION}.orig.tar.gz
 	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us
 
 .PHONY: deb-v2-arm
 deb-v2-arm:
+	git clean -f -d ./packaging
 	make build/mackerel-check GOOS=linux GOARCH=arm64
 	cp build/mackerel-check packaging/deb-v2/debian/
+	cp -f packaging/dummy-empty.tar.gz packaging/mackerel-check-plugins_${VERSION}.orig.tar.gz
 	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us -aarm64
 
 .PHONY: clean
