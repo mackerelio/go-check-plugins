@@ -36,11 +36,6 @@ done
 %{__targetdir}/*
 
 %changelog
-* Fri May 16 2025 <mackerel-developers@hatena.ne.jp> - 0.49.0
-- Remove rewrite some files on every releases (by yseto)
-- introduce status-as option to check-ntservice (by kmuto)
-- replace to aws-sdk-go-v2 (by yseto)
-
 * Mon Mar 31 2025 <mackerel-developers@hatena.ne.jp> - 0.48.0
 - [check-windows-eventlog] add status-as option (by masarasi)
 - [check-windows-eventlog] add target event type (by masarasi)
