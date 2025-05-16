@@ -1,12 +1,5 @@
 # Changelog
 
-## 0.49.0 (2025-05-16)
-
-* Remove rewrite some files on every releases #915 (yseto)
-* introduce status-as option to check-ntservice #914 (kmuto)
-* replace to aws-sdk-go-v2 #912 (yseto)
-
-
 ## 0.48.0 (2025-03-31)
 
 * [check-windows-eventlog] add status-as option #908 (masarasi)
