@@ -39,7 +39,7 @@ func (m *mockSMTPServer) runServe() error {
 		tc := textproto.NewConn(conn)
 
 		for _, res := range m.responses {
-			if err := tc.PrintfLine(res); err != nil { // nolint
+			if err := tc.PrintfLine("%s", res); err != nil { // nolint
 				errCh <- err
 				return
 			}
