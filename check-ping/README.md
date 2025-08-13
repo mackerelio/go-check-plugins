@@ -44,6 +44,7 @@ command = ["check-ping", "-H", "127.0.0.1", "-n", "5", "-w", "100"]
   -H, --host=      check target IP Address
   -n, --count=     sending (and receiving) count ping packets (default: 1)
   -w, --wait-time= wait time, Max RTT(ms) (default: 1000)
+      --status-as= Overwrite status=to-status, support multiple comma separetes.
 ```
 
 ## For more information
