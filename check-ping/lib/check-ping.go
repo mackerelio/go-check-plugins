@@ -1,6 +1,7 @@
 package checkping
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"time"
@@ -14,6 +15,7 @@ var opts struct {
 	Host     string `long:"host" short:"H" description:"check target IP Address"`
 	Count    int    `long:"count" short:"n" default:"1" description:"sending (and receiving) count ping packets"`
 	WaitTime int    `long:"wait-time" short:"w" default:"1000" description:"wait time, Max RTT(ms)"`
+	StatusAs string `long:"status-as" description:"Overwrite status=to-status, support multiple comma separetes."`
 }
 
 func run(args []string) *checkers.Checker {
@@ -70,5 +72,10 @@ func isIPv6(host string) bool {
 func Do() {
 	ckr := run(os.Args[1:])
 	ckr.Name = "Ping"
-	ckr.Exit()
+	maps, err := checkers.ParseStatusMap(opts.StatusAs)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	ckr.ExitStatusAs(maps)
 }
