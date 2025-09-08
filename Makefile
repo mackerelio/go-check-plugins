@@ -73,6 +73,8 @@ rpm-v2-arm:
 	  --define "buildarch aarch64" --define "dist .amzn2" \
 	  --target aarch64 -bb packaging/rpm/mackerel-check-plugins-v2.spec
 
+NEXT_VERSION := $(shell grep -o -e "[0-9]\+.[0-9]\+.[0-9]\+-[0-9]" "packaging/deb-v2/debian/changelog" | head -1 | sed 's/-.*$$//')
+
 .PHONY: deb
 deb: deb-v2-x86 deb-v2-arm
 
@@ -81,7 +83,7 @@ deb-v2-x86:
 	git clean -f -d ./packaging
 	make build/mackerel-check GOOS=linux GOARCH=amd64
 	cp build/mackerel-check packaging/deb-v2/debian/
-	cp -f packaging/dummy-empty.tar.gz packaging/mackerel-check-plugins_${VERSION}.orig.tar.gz
+	cp -f packaging/dummy-empty.tar.gz packaging/mackerel-check-plugins_${NEXT_VERSION}.orig.tar.gz
 	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us
 
 .PHONY: deb-v2-arm
@@ -89,7 +91,7 @@ deb-v2-arm:
 	git clean -f -d ./packaging
 	make build/mackerel-check GOOS=linux GOARCH=arm64
 	cp build/mackerel-check packaging/deb-v2/debian/
-	cp -f packaging/dummy-empty.tar.gz packaging/mackerel-check-plugins_${VERSION}.orig.tar.gz
+	cp -f packaging/dummy-empty.tar.gz packaging/mackerel-check-plugins_${NEXT_VERSION}.orig.tar.gz
 	cd packaging/deb-v2 && debuild --no-tgz-check -rfakeroot -uc -us -aarm64
 
 .PHONY: clean
