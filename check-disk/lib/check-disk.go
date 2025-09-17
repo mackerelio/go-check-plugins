@@ -116,11 +116,12 @@ func run(args []string) *checkers.Checker {
 	}
 
 	partitions, err := listPartitions()
-	if err != nil {
-		return checkers.Unknown(fmt.Sprintf("Failed to fetch partitions: %s", err))
-	}
 
-	if !opts.All {
+	if opts.All {
+		if err != nil {
+			return checkers.Unknown(fmt.Sprintf("Failed to fetch partitions: %s", err))
+		}
+	} else {
 		// Filtering partitions by Fstype
 		if opts.IncludeType != nil {
 			partitions = filterPartitionsByInclusion(partitions, *opts.IncludeType, fstypeOfPartition)
@@ -140,8 +141,12 @@ func run(args []string) *checkers.Checker {
 			}
 
 			partitions = filterPartitionsByInclusion(partitions, *opts.Path, mountpointOfPartition)
-			if len(partitions) == 0 {
+			if len(partitions) < len(*opts.Path) {
 				return checkers.Unknown(fmt.Sprintf("Failed to fetch partitions: %s", errors.New("No device found for the specified *Mountpoint*")))
+			}
+		} else {
+			if err != nil {
+				return checkers.Unknown(fmt.Sprintf("Failed to fetch partitions: %s", err))
 			}
 		}
 
@@ -253,9 +258,6 @@ func run(args []string) *checkers.Checker {
 // https://github.com/coreutils/gnulib/blob/df336dc/lib/mountlist.c#L164
 func listPartitions() ([]gpud.PartitionStat, error) {
 	allPartitions, err := gpud.Partitions(true)
-	if err != nil {
-		return nil, err
-	}
 	partitions := make([]gpud.PartitionStat, 0, len(allPartitions))
 	for _, p := range allPartitions {
 		switch p.Fstype {
@@ -283,7 +285,7 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 		}
 	}
 
-	return partitions, nil
+	return partitions, err
 }
 
 func isBindMount(mountOpts []string) bool {
