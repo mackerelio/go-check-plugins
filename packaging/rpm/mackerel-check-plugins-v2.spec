@@ -36,6 +36,11 @@ done
 %{__targetdir}/*
 
 %changelog
+* Fri Sep 19 2025 <mackerel-developers@hatena.ne.jp> - 0.50.0
+- Fix error handling in check-disk to avoid unnecessary failures when using --path option (by mechairoi)
+- Bump github.com/fsouza/go-dockerclient from 1.11.0 to 1.12.2 (by dependabot[bot])
+- Bump golang.org/x/net from 0.36.0 to 0.38.0 (by dependabot[bot])
+
 * Fri May 16 2025 <mackerel-developers@hatena.ne.jp> - 0.49.0
 - use Go 1.24 (by yseto)
 - Release version 0.49.0 (by mackerelbot)

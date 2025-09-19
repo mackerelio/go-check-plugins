@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.50.0 (2025-09-19)
+
+* Fix error handling in check-disk to avoid unnecessary failures when using --path option #932 (mechairoi)
+* Bump github.com/fsouza/go-dockerclient from 1.11.0 to 1.12.2 #929 (dependabot[bot])
+* Bump golang.org/x/net from 0.36.0 to 0.38.0 #911 (dependabot[bot])
+
+
 ## 0.49.0 (2025-05-16)
 
 * use Go 1.24 #918 (yseto)
