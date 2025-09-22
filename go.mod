@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.5
 	github.com/beevik/ntp v1.4.3
 	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874
-	github.com/elazarl/goproxy v0.0.0-20231117061959-7cc037d33fb5
+	github.com/elazarl/goproxy v1.7.2
 	github.com/elazarl/goproxy/ext v0.0.0-20231117061959-7cc037d33fb5
 	github.com/fsouza/go-dockerclient v1.12.2
 	github.com/go-ldap/ldap/v3 v3.4.8
@@ -31,7 +31,7 @@ require (
 	github.com/miekg/dns v1.1.50
 	github.com/natefinch/atomic v1.0.1
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.42.0
 	golang.org/x/sys v0.36.0
