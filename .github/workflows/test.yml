@@ -12,18 +12,18 @@ env:
   DEBIAN_FRONTEND: noninteractive
 jobs:
   lint:
-    uses: mackerelio/workflows/.github/workflows/go-lint.yml@v1.5.0
+    uses: mackerelio/workflows/.github/workflows/go-lint.yml@c7e130d3908894f18068ca4a877e80539b535881 # v1.5.0
   test:
-    uses: mackerelio/workflows/.github/workflows/go-test.yml@v1.5.0
+    uses: mackerelio/workflows/.github/workflows/go-test.yml@c7e130d3908894f18068ca4a877e80539b535881 # v1.5.0
   test-linux:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.5.0
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@c7e130d3908894f18068ca4a877e80539b535881 # v1.5.0
     with:
       run: |
         ./test.bash
         make testconvention
       os-versions: '["ubuntu-24.04"]'
   test-windows:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@v1.5.0
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@c7e130d3908894f18068ca4a877e80539b535881 # v1.5.0
     with:
       run: |
         go build -o check-log/check-log.exe ./check-log
@@ -45,20 +45,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y rpm devscripts debhelper fakeroot crossbuild-essential-arm64 build-essential
           mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-      - uses: actions/cache@v4
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
           go-version: 1.24.x
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
       - run: make clean build rpm deb
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: linux-build-artifacts
           path: |
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: linux-build-artifacts
           path: artifacts/
@@ -87,7 +87,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           tag-prefix: "refs/tags/v"
           bump-up-branch-prefix: "bump-version-"
-      - uses: 8398a7/action-slack@v3
+      - uses: 8398a7/action-slack@77eaa4f1c608a7d68b38af4e3f739dcd8cba273e # v3.19.0
         with:
           status: ${{ job.status }}
           fields: repo,message,commit,action,eventName,ref,workflow,job,took
