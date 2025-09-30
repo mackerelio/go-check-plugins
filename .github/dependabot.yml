@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: gomod
     directory: "/"
     schedule:
-      interval: weekly
+      interval: daily
       time: "01:00"
       timezone: Asia/Tokyo
     open-pull-requests-limit: 10
@@ -18,9 +18,25 @@ updates:
         patterns:
           - "github.com/elazarl/goproxy*"
           - "github.com/stretchr/testify"
+      aws/aws-sdk-go-v2:
+        patterns:
+          - "github.com/aws/aws-sdk-go-v2"
+          - "github.com/aws/aws-sdk-go-v2/*"
+    cooldown:
+      default-days: 5
+      include:
+        - "*"
+      exclude:
+        - "github.com/mackerelio/*"
+        - "github.com/aws/aws-sdk-go-v2"
+        - "github.com/aws/aws-sdk-go-v2/*"
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: weekly
+      interval: daily
       time: "01:00"
       timezone: Asia/Tokyo
+    cooldown:
+      default-days: 5
+      include:
+        - "*"
