@@ -36,6 +36,21 @@ done
 %{__targetdir}/*
 
 %changelog
+* Mon Oct 20 2025 <mackerel-developers@hatena.ne.jp> - 0.50.1
+- added dependabot cooldown (by yseto)
+- Bump github.com/mackerelio/go-osstat from 0.2.5 to 0.2.6 in the mackerelio group (by dependabot[bot])
+- Bump actions/setup-go from 5 to 6 (by dependabot[bot])
+- Bump actions/checkout from 4 to 5 (by dependabot[bot])
+- implement status-as option to check-ping (by kga)
+- Bump actions/download-artifact from 4 to 5 (by dependabot[bot])
+- Bump github.com/miekg/dns from 1.1.50 to 1.1.68 (by dependabot[bot])
+- Bump mackerelio/workflows from 1.4.0 to 1.5.0 (by dependabot[bot])
+- Bump the golang-x group across 1 directory with 3 updates (by dependabot[bot])
+- Bump the testlibs group across 1 directory with 2 updates (by dependabot[bot])
+- Bump github.com/mattn/go-zglob from 0.0.4 to 0.0.6 (by dependabot[bot])
+- Bump github.com/jessevdk/go-flags from 1.5.0 to 1.6.1 (by dependabot[bot])
+- Bump github.com/beevik/ntp from 1.3.1 to 1.4.3 (by dependabot[bot])
+
 * Fri Sep 19 2025 <mackerel-developers@hatena.ne.jp> - 0.50.0
 - Fix error handling in check-disk to avoid unnecessary failures when using --path option (by mechairoi)
 - Bump github.com/fsouza/go-dockerclient from 1.11.0 to 1.12.2 (by dependabot[bot])
