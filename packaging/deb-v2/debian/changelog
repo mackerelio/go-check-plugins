@@ -1,3 +1,34 @@
+mackerel-check-plugins (0.50.1-1.v2) stable; urgency=low
+
+  * added dependabot cooldown (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/944>
+  * Bump github.com/mackerelio/go-osstat from 0.2.5 to 0.2.6 in the mackerelio group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/934>
+  * Bump actions/setup-go from 5 to 6 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/930>
+  * Bump actions/checkout from 4 to 5 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/928>
+  * implement status-as option to check-ping (by kga)
+    <https://github.com/mackerelio/go-check-plugins/pull/927>
+  * Bump actions/download-artifact from 4 to 5 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/926>
+  * Bump github.com/miekg/dns from 1.1.50 to 1.1.68 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/925>
+  * Bump mackerelio/workflows from 1.4.0 to 1.5.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/923>
+  * Bump the golang-x group across 1 directory with 3 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/902>
+  * Bump the testlibs group across 1 directory with 2 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/899>
+  * Bump github.com/mattn/go-zglob from 0.0.4 to 0.0.6 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/889>
+  * Bump github.com/jessevdk/go-flags from 1.5.0 to 1.6.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/870>
+  * Bump github.com/beevik/ntp from 1.3.1 to 1.4.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/859>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Mon, 20 Oct 2025 02:05:20 +0000
+
 mackerel-check-plugins (0.50.0-1.v2) stable; urgency=low
 
   * Fix error handling in check-disk to avoid unnecessary failures when using --path option (by mechairoi)
