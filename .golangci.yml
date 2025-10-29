@@ -1,21 +1,35 @@
+version: "2"
 linters:
-  # Detected a number of cases that could not be handled after the switchover,
-  # TODO remove this rule.
   disable:
     - errcheck
     - staticcheck
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      # Detected a number of cases that could not be handled after the switchover,
-      # TODO remove this rule.
-      - fieldalignment
-      - shadow
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
-        - staticcheck
-        - ineffassign
+  settings:
+    govet:
+      disable:
+        - fieldalignment
+        - shadow
+      enable-all: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - errcheck
+          - ineffassign
+          - staticcheck
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
