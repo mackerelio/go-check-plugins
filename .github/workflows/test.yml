@@ -12,18 +12,18 @@ env:
   DEBIAN_FRONTEND: noninteractive
 jobs:
   lint:
-    uses: mackerelio/workflows/.github/workflows/go-lint.yml@c7e130d3908894f18068ca4a877e80539b535881 # v1.5.0
+    uses: mackerelio/workflows/.github/workflows/go-lint.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
   test:
-    uses: mackerelio/workflows/.github/workflows/go-test.yml@c7e130d3908894f18068ca4a877e80539b535881 # v1.5.0
+    uses: mackerelio/workflows/.github/workflows/go-test.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
   test-linux:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@c7e130d3908894f18068ca4a877e80539b535881 # v1.5.0
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
     with:
       run: |
         ./test.bash
         make testconvention
       os-versions: '["ubuntu-24.04"]'
   test-windows:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@c7e130d3908894f18068ca4a877e80539b535881 # v1.5.0
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
     with:
       run: |
         go build -o check-log/check-log.exe ./check-log
@@ -58,7 +58,7 @@ jobs:
         with:
           fetch-depth: 0
       - run: make clean build rpm deb
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: linux-build-artifacts
           path: |
@@ -70,17 +70,17 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: linux-build-artifacts
           path: artifacts/
-      - uses: mackerelio/staging-release-update-action@main
+      - uses: mackerelio/staging-release-update-action@bc0e3a9f7bd0d890dc044592a798bc307bacc956 # v0.0.1
         if: github.ref == 'refs/heads/master'
         with:
           directory: artifacts/
           github-token: ${{ secrets.GITHUB_TOKEN }}
           tag: staging
-      - uses: mackerelio/create-release-action@main
+      - uses: mackerelio/create-release-action@5af34070474b72efdb3f5057e50d2f3836453c56 # v0.0.4
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           directory: artifacts/
