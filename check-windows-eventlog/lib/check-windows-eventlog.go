@@ -41,22 +41,22 @@ type idRange struct {
 }
 
 type logOpts struct {
-	Log            string `long:"log" description:"Event Names (comma separated)"`
-	Type           string `long:"type" description:"Event Types (comma separated)"`
-	SourcePattern  string `long:"source-pattern" description:"Event Source (regexp pattern)"`
-	SourceExclude  string `long:"source-exclude" description:"Event Source excluded (regexp pattern)"`
-	MessagePattern string `long:"message-pattern" description:"Message Pattern (regexp pattern)"`
-	MessageExclude string `long:"message-exclude" description:"Message Pattern excluded (regexp pattern)"`
-	EventIDPattern string `long:"event-id-pattern" description:"Event IDs acceptable (separated by comma, or range)"`
-	EventIDExclude string `long:"event-id-exclude" description:"Event IDs ignorable (separated by comma, or range)"`
-	WarnOver       int64  `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
-	CritOver       int64  `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
-	StatusAs       string `long:"status-as" description:"Overwrite status=to-status, support multiple comma separetes."`
-	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
-	StateDir       string `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
-	NoState        bool   `long:"no-state" description:"Don't use state file and read whole logs"`
-	FailFirst      bool   `long:"fail-first" description:"Count errors on first seek"`
-	Verbose        bool   `long:"verbose" description:"Verbose output"`
+	Log            string   `long:"log" description:"Event Names (comma separated)"`
+	Type           string   `long:"type" description:"Event Types (comma separated)"`
+	SourcePattern  string   `long:"source-pattern" description:"Event Source (regexp pattern)"`
+	SourceExclude  string   `long:"source-exclude" description:"Event Source excluded (regexp pattern)"`
+	MessagePattern []string `long:"message-pattern" description:"Message Pattern (regexp pattern)"`
+	MessageExclude []string `long:"message-exclude" description:"Message Pattern excluded (regexp pattern)"`
+	EventIDPattern string   `long:"event-id-pattern" description:"Event IDs acceptable (separated by comma, or range)"`
+	EventIDExclude string   `long:"event-id-exclude" description:"Event IDs ignorable (separated by comma, or range)"`
+	WarnOver       int64    `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
+	CritOver       int64    `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
+	StatusAs       string   `long:"status-as" description:"Overwrite status=to-status, support multiple comma separetes."`
+	ReturnContent  bool     `short:"r" long:"return" description:"Return matched line"`
+	StateDir       string   `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
+	NoState        bool     `long:"no-state" description:"Don't use state file and read whole logs"`
+	FailFirst      bool     `long:"fail-first" description:"Count errors on first seek"`
+	Verbose        bool     `long:"verbose" description:"Verbose output"`
 
 	logList        []string
 	typeList       []string
@@ -64,8 +64,8 @@ type logOpts struct {
 	eventIDExclude []idRange
 	sourcePattern  *regexp.Regexp
 	sourceExclude  *regexp.Regexp
-	messagePattern *regexp.Regexp
-	messageExclude *regexp.Regexp
+	messagePattern []*regexp.Regexp
+	messageExclude []*regexp.Regexp
 	origArgs       []string
 }
 
@@ -142,17 +142,19 @@ func (opts *logOpts) prepare() error {
 			return err
 		}
 	}
-	if opts.MessagePattern != "" {
-		opts.messagePattern, err = regexp.Compile(opts.MessagePattern)
+	for _, pat := range opts.MessagePattern {
+		reg, err := regexp.Compile(pat)
 		if err != nil {
 			return err
 		}
+		opts.messagePattern = append(opts.messagePattern, reg)
 	}
-	if opts.MessageExclude != "" {
-		opts.messageExclude, err = regexp.Compile(opts.MessageExclude)
+	for _, pat := range opts.MessageExclude {
+		reg, err := regexp.Compile(pat)
 		if err != nil {
 			return err
 		}
+		opts.messageExclude = append(opts.messageExclude, reg)
 	}
 	return nil
 }
@@ -463,14 +465,21 @@ loop_events:
 		}
 
 		// match message if pattern provied
-		if opts.messagePattern != nil {
-			if !opts.messagePattern.MatchString(message) {
+		for _, eReg := range opts.messagePattern {
+			if !eReg.MatchString(message) {
 				continue
 			}
 		}
 		// exclude-match message if pattern provied
-		if opts.messageExclude != nil {
-			if opts.messageExclude.MatchString(message) {
+		if len(opts.messageExclude) > 0 {
+			exclude := true
+			for _, eReg := range opts.messageExclude {
+				if !eReg.MatchString(message) {
+					exclude = false
+					break
+				}
+			}
+			if exclude {
 				continue
 			}
 		}
