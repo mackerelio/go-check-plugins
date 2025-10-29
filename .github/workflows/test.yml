@@ -15,10 +15,14 @@ jobs:
     uses: mackerelio/workflows/.github/workflows/go-lint.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
   test:
     uses: mackerelio/workflows/.github/workflows/go-test.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
+    with:
+      pre: |
+        echo "GOTOOLCHAIN=auto" >> $GITHUB_ENV
   test-linux:
     uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
     with:
       run: |
+        export GOTOOLCHAIN=auto
         ./test.bash
         make testconvention
       os-versions: '["ubuntu-24.04"]'
@@ -26,6 +30,7 @@ jobs:
     uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
     with:
       run: |
+        export GOTOOLCHAIN=auto
         go build -o check-log/check-log.exe ./check-log
         go build -o check-procs/check-procs.exe ./check-procs
         go build -o check-windows-eventlog/check-windows-evenglog.exe ./check-windows-eventlog
