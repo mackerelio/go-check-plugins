@@ -38,7 +38,7 @@ func makeConn(host, port string, timeout int, isSMTPS bool, tlsConfig *tls.Confi
 	if isSMTPS {
 		return tls.DialWithDialer(&d, "tcp", fmt.Sprintf("%s:%s", host, port), tlsConfig)
 	}
-	return d.Dial("tcp", fmt.Sprintf("%s:%s", host, port))
+	return d.Dial("tcp", net.JoinHostPort(host, port))
 }
 
 func run(args []string) *checkers.Checker {
