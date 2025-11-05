@@ -31,7 +31,7 @@ require (
 	github.com/miekg/dns v1.1.68
 	github.com/natefinch/atomic v1.0.1
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.42.0
 	golang.org/x/sys v0.36.0
