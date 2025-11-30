@@ -19,7 +19,7 @@ jobs:
       pre: |
         echo "GOTOOLCHAIN=auto" >> $GITHUB_ENV
   test-linux:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@6cab415574bf67882182b34516fd2934b9dc5800 # v1.7.0
     with:
       run: |
         export GOTOOLCHAIN=auto
@@ -27,7 +27,7 @@ jobs:
         make testconvention
       os-versions: '["ubuntu-24.04"]'
   test-windows:
-    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
+    uses: mackerelio/workflows/.github/workflows/setup-go-matrix.yml@6cab415574bf67882182b34516fd2934b9dc5800 # v1.7.0
     with:
       run: |
         export GOTOOLCHAIN=auto
