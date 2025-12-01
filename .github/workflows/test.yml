@@ -14,7 +14,7 @@ jobs:
   lint:
     uses: mackerelio/workflows/.github/workflows/go-lint.yml@6cab415574bf67882182b34516fd2934b9dc5800 # v1.7.0
   test:
-    uses: mackerelio/workflows/.github/workflows/go-test.yml@7653987676cc233af59a390d142b5cf6e65a526f # v1.6.0
+    uses: mackerelio/workflows/.github/workflows/go-test.yml@6cab415574bf67882182b34516fd2934b9dc5800 # v1.7.0
     with:
       pre: |
         echo "GOTOOLCHAIN=auto" >> $GITHUB_ENV
