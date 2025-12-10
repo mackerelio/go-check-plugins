@@ -1,3 +1,52 @@
+mackerel-check-plugins (0.51.0-1.v2) stable; urgency=low
+
+  * Add check-redis --username flag (by fujiwara)
+    <https://github.com/mackerelio/go-check-plugins/pull/974>
+  * Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/973>
+  * Bump golang.org/x/sys from 0.38.0 to 0.39.0 in the golang-x group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/972>
+  * Bump mackerelio/workflows/.github/workflows/setup-go-matrix.yml from 1.7.0 to 1.8.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/971>
+  * Bump mackerelio/workflows/.github/workflows/go-lint.yml from 1.7.0 to 1.8.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/970>
+  * Bump mackerelio/workflows/.github/workflows/go-test.yml from 1.7.0 to 1.8.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/969>
+  * Bump actions/checkout from 6.0.0 to 6.0.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/968>
+  * Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/967>
+  * Bump mackerelio/workflows/.github/workflows/go-lint.yml from 1.6.0 to 1.7.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/966>
+  * Bump mackerelio/workflows/.github/workflows/setup-go-matrix.yml from 1.6.0 to 1.7.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/965>
+  * Bump mackerelio/workflows/.github/workflows/go-test.yml from 1.6.0 to 1.7.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/964>
+  * Bump actions/checkout from 5.0.0 to 6.0.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/963>
+  * Bump actions/setup-go from 6.0.0 to 6.1.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/962>
+  * Bump github.com/fsouza/go-dockerclient from 1.12.2 to 1.12.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/961>
+  * Bump golang.org/x/crypto from 0.42.0 to 0.45.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/960>
+  * fix buildtag (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/958>
+  * update CI (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/954>
+  * Bump github.com/gomodule/redigo from 1.9.2 to 1.9.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/950>
+  * Bump github.com/go-ldap/ldap/v3 from 3.4.8 to 3.4.12 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/947>
+  * Bump github.com/beevik/ntp from 1.4.3 to 1.5.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/946>
+  * Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/945>
+  * Bump github.com/go-sql-driver/mysql from 1.8.1 to 1.9.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/936>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Wed, 10 Dec 2025 07:54:25 +0000
+
 mackerel-check-plugins (0.50.1-1.v2) stable; urgency=low
 
   * added dependabot cooldown (by yseto)
