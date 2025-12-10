@@ -18,6 +18,7 @@ type redisSetting struct {
 	Host     string `short:"H" long:"host" default:"localhost" description:"Hostname"`
 	Socket   string `short:"s" long:"socket" default:"" description:"Server socket"`
 	Port     string `short:"p" long:"port" default:"6379" description:"Port"`
+	Username string `short:"U" long:"username" default:"" description:"Username"`
 	Password string `short:"P" long:"password" default:"" description:"Password"`
 	Timeout  uint64 `short:"t" long:"timeout" default:"5" description:"Dial Timeout in sec"`
 }
@@ -77,7 +78,13 @@ func connectRedis(m redisSetting) (redis.Conn, error) {
 	}
 
 	if password != "" {
-		_, err := c.Do("AUTH", password)
+		var authArgs []interface{}
+		if m.Username != "" {
+			authArgs = []interface{}{m.Username, password}
+		} else {
+			authArgs = []interface{}{password}
+		}
+		_, err := c.Do("AUTH", authArgs...)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't authenticate: %v", err)
 		}
