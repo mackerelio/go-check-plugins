@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.51.0 (2025-12-10)
+
+* Add check-redis --username flag #974 (fujiwara)
+* Bump the aws-aws-sdk-go-v2 group with 5 updates #973 (dependabot[bot])
+* Bump golang.org/x/sys from 0.38.0 to 0.39.0 in the golang-x group #972 (dependabot[bot])
+* Bump mackerelio/workflows/.github/workflows/setup-go-matrix.yml from 1.7.0 to 1.8.0 #971 (dependabot[bot])
+* Bump mackerelio/workflows/.github/workflows/go-lint.yml from 1.7.0 to 1.8.0 #970 (dependabot[bot])
+* Bump mackerelio/workflows/.github/workflows/go-test.yml from 1.7.0 to 1.8.0 #969 (dependabot[bot])
+* Bump actions/checkout from 6.0.0 to 6.0.1 #968 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 5 updates #967 (dependabot[bot])
+* Bump mackerelio/workflows/.github/workflows/go-lint.yml from 1.6.0 to 1.7.0 #966 (dependabot[bot])
+* Bump mackerelio/workflows/.github/workflows/setup-go-matrix.yml from 1.6.0 to 1.7.0 #965 (dependabot[bot])
+* Bump mackerelio/workflows/.github/workflows/go-test.yml from 1.6.0 to 1.7.0 #964 (dependabot[bot])
+* Bump actions/checkout from 5.0.0 to 6.0.0 #963 (dependabot[bot])
+* Bump actions/setup-go from 6.0.0 to 6.1.0 #962 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.12.2 to 1.12.3 #961 (dependabot[bot])
+* Bump golang.org/x/crypto from 0.42.0 to 0.45.0 #960 (dependabot[bot])
+* fix buildtag #958 (yseto)
+* update CI #954 (yseto)
+* Bump github.com/gomodule/redigo from 1.9.2 to 1.9.3 #950 (dependabot[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.4.8 to 3.4.12 #947 (dependabot[bot])
+* Bump github.com/beevik/ntp from 1.4.3 to 1.5.0 #946 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 5 updates #945 (dependabot[bot])
+* Bump github.com/go-sql-driver/mysql from 1.8.1 to 1.9.3 #936 (dependabot[bot])
+
+
 ## 0.50.1 (2025-10-20)
 
 * added dependabot cooldown #944 (yseto)
