@@ -49,6 +49,12 @@ func TestWriteLastOffset(t *testing.T) {
 
 func raiseEvent(t *testing.T, typ int, msg string) {
 	t.Helper()
+
+	// Ensure that CoInitialize and CoUninitialize are executed on the same thread
+	// cf.) https://github.com/go-ole/go-ole/issues/124
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	ole.CoInitialize(0)
 	defer ole.CoUninitialize()
 
