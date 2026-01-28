@@ -28,7 +28,7 @@ require (
 	github.com/mackerelio/golib v1.2.1
 	github.com/mattn/go-encoding v0.0.2
 	github.com/mattn/go-zglob v0.0.6
-	github.com/miekg/dns v1.1.70
+	github.com/miekg/dns v1.1.72
 	github.com/natefinch/atomic v1.0.1
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/stretchr/testify v1.11.1
