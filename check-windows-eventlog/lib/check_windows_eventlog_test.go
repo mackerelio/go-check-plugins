@@ -160,7 +160,7 @@ func TestRun(t *testing.T) {
 	if !reflect.DeepEqual(&logOpts{
 		StateDir:      dir,
 		Log:           `Application`,
-		ReturnContent: true,
+		ReturnContent: "{{source}}:{{message}}",
 		origArgs:      origArgs,
 	}, opts) {
 		t.Errorf("something went wrong: %#v", opts)

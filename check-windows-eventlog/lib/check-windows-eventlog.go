@@ -52,7 +52,7 @@ type logOpts struct {
 	WarnOver       int64  `short:"w" long:"warning-over" description:"Trigger a warning if matched lines is over a number"`
 	CritOver       int64  `short:"c" long:"critical-over" description:"Trigger a critical if matched lines is over a number"`
 	StatusAs       string `long:"status-as" description:"Overwrite status=to-status, support multiple comma separetes."`
-	ReturnContent  bool   `short:"r" long:"return" description:"Return matched line"`
+	ReturnContent  string `short:"r" long:"return" description:"Return matched line with custom format. Available placeholders: {{source}}, {{id}}, {{message}}" optional-value:"{{source}}:{{message}}" optional:"true"`
 	StateDir       string `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under"`
 	NoState        bool   `long:"no-state" description:"Don't use state file and read whole logs"`
 	FailFirst      bool   `long:"fail-first" description:"Count errors on first seek"`
@@ -204,7 +204,7 @@ func (opts *logOpts) run() *checkers.Checker {
 		}
 		warnNum += w
 		critNum += c
-		if opts.ReturnContent {
+		if opts.ReturnContent != "" {
 			errorOverall += errLines
 		}
 	}
@@ -475,12 +475,20 @@ loop_events:
 			}
 		}
 
-		if opts.ReturnContent {
+		if opts.ReturnContent != "" {
 			if message == "" {
 				message = "Because the message resource could not be found, the event log message could not be obtained. Please access the target server and check the event log directly."
 			}
-			errLines += sourceName + ":" + strings.Replace(message, "\n", "", -1) + "\n"
+
+			replacer := strings.NewReplacer(
+				"{{source}}", sourceName,
+				"{{id}}", strconv.Itoa(int(r.EventID)),
+				"{{message}}", strings.ReplaceAll(message, "\n", ""),
+			)
+
+			errLines += replacer.Replace(opts.ReturnContent) + "\n"
 		}
+
 		switch tn {
 		case "Error":
 			critNum++
