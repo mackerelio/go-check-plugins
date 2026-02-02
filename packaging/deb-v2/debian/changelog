@@ -1,3 +1,48 @@
+mackerel-check-plugins (0.52.0-1.v2) stable; urgency=low
+
+  * [check-windows-eventlog] test: fix the OS thread between CoInitialize and CoUninitialize (by Arthur1)
+    <https://github.com/mackerelio/go-check-plugins/pull/995>
+  * Support formatting return value of check-windows-eventlog (by appare45)
+    <https://github.com/mackerelio/go-check-plugins/pull/994>
+  * Bump github.com/miekg/dns from 1.1.70 to 1.1.72 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/993>
+  * Bump actions/checkout from 6.0.1 to 6.0.2 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/992>
+  * Bump github.com/elazarl/goproxy from 1.7.2 to 1.8.0 in the testlibs group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/991>
+  * Bump actions/cache from 5.0.1 to 5.0.2 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/990>
+  * Bump golang.org/x/crypto from 0.46.0 to 0.47.0 in the golang-x group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/989>
+  * Bump actions/setup-go from 6.1.0 to 6.2.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/988>
+  * Bump golang.org/x/text from 0.32.0 to 0.33.0 in the golang-x group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/987>
+  * Bump github.com/miekg/dns from 1.1.69 to 1.1.70 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/986>
+  * Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/985>
+  * Bump golang.org/x/sys from 0.39.0 to 0.40.0 in the golang-x group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/984>
+  * Bump actions/download-artifact from 6.0.0 to 7.0.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/983>
+  * Bump actions/upload-artifact from 5.0.0 to 6.0.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/982>
+  * Bump actions/cache from 4.3.0 to 5.0.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/981>
+  * Bump github.com/miekg/dns from 1.1.68 to 1.1.69 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/980>
+  * Bump the aws-aws-sdk-go-v2 group with 2 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/979>
+  * Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.62.2 to 1.63.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/978>
+  * Bump the golang-x group with 2 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/977>
+  * Bump the aws-aws-sdk-go-v2 group with 4 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/976>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Mon, 2 Feb 2026 06:17:29 +0000
+
 mackerel-check-plugins (0.51.0-1.v2) stable; urgency=low
 
   * Add check-redis --username flag (by fujiwara)

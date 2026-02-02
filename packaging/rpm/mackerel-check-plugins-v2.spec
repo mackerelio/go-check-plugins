@@ -36,6 +36,28 @@ done
 %{__targetdir}/*
 
 %changelog
+* Mon Feb 2 2026 <mackerel-developers@hatena.ne.jp> - 0.52.0
+- [check-windows-eventlog] test: fix the OS thread between CoInitialize and CoUninitialize (by Arthur1)
+- Support formatting return value of check-windows-eventlog (by appare45)
+- Bump github.com/miekg/dns from 1.1.70 to 1.1.72 (by dependabot[bot])
+- Bump actions/checkout from 6.0.1 to 6.0.2 (by dependabot[bot])
+- Bump github.com/elazarl/goproxy from 1.7.2 to 1.8.0 in the testlibs group (by dependabot[bot])
+- Bump actions/cache from 5.0.1 to 5.0.2 (by dependabot[bot])
+- Bump golang.org/x/crypto from 0.46.0 to 0.47.0 in the golang-x group (by dependabot[bot])
+- Bump actions/setup-go from 6.1.0 to 6.2.0 (by dependabot[bot])
+- Bump golang.org/x/text from 0.32.0 to 0.33.0 in the golang-x group (by dependabot[bot])
+- Bump github.com/miekg/dns from 1.1.69 to 1.1.70 (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+- Bump golang.org/x/sys from 0.39.0 to 0.40.0 in the golang-x group (by dependabot[bot])
+- Bump actions/download-artifact from 6.0.0 to 7.0.0 (by dependabot[bot])
+- Bump actions/upload-artifact from 5.0.0 to 6.0.0 (by dependabot[bot])
+- Bump actions/cache from 4.3.0 to 5.0.1 (by dependabot[bot])
+- Bump github.com/miekg/dns from 1.1.68 to 1.1.69 (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 2 updates (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.62.2 to 1.63.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+- Bump the golang-x group with 2 updates (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 4 updates (by dependabot[bot])
+
 * Wed Dec 10 2025 <mackerel-developers@hatena.ne.jp> - 0.51.0
 - Add check-redis --username flag (by fujiwara)
 - Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
