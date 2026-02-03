@@ -22,7 +22,7 @@ require (
 	github.com/gomodule/redigo v1.9.3
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.11.1
 	github.com/mackerelio/checkers v0.2.0
 	github.com/mackerelio/go-osstat v0.2.6
 	github.com/mackerelio/golib v1.2.1
