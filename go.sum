@@ -61,8 +61,8 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4=
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
-github.com/elazarl/goproxy v1.8.0 h1:dt561rX7UAYMeFRLtzFx6uQGl2TpL1dr6uCG23nFQSY=
-github.com/elazarl/goproxy v1.8.0/go.mod h1:b5xm6W48AUHNpRTCvlnd0YVh+JafCCtsLsJZvvNTz+E=
+github.com/elazarl/goproxy v1.8.1 h1:/qGpPJGgIPOTZ7IoIQvjavocp//qYSe9LQnIGCgRY5k=
+github.com/elazarl/goproxy v1.8.1/go.mod h1:b5xm6W48AUHNpRTCvlnd0YVh+JafCCtsLsJZvvNTz+E=
 github.com/elazarl/goproxy/ext v0.0.0-20231117061959-7cc037d33fb5 h1:iGoePcl8bIDJxxRAL2Q4E4Rt35z5m917RJb8lAvdrQw=
 github.com/elazarl/goproxy/ext v0.0.0-20231117061959-7cc037d33fb5/go.mod h1:gNh8nYJoAm43RfaxurUnxr+N1PwuFV3ZMl/efxlIlY8=
 github.com/fsouza/go-dockerclient v1.13.0 h1:i6VWBKrFprrqDDK6rEYw0Zp5KsN+cVlqZ/ODaIX2erM=
