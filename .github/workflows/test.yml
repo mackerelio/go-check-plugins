@@ -44,7 +44,7 @@ jobs:
   build:
     needs: [test, test-linux]
     runs-on: ubuntu-latest
-    #if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -63,12 +63,12 @@ jobs:
         with:
           go-version-file: go.mod
       - run: make clean build rpm deb
-      #- uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-      #  with:
-      #    name: linux-build-artifacts
-      #    path: |
-      #      ~/rpmbuild/RPMS/*/*.rpm
-      #      packaging/*.deb
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: linux-build-artifacts
+          path: |
+            ~/rpmbuild/RPMS/*/*.rpm
+            packaging/*.deb
   # TODO: use workflows repo
   release:
     needs: build
