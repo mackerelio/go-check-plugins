@@ -124,10 +124,11 @@ func (opts *dnsOpts) run() *checkers.Checker {
 		checkSt = checkers.CRITICAL
 	}
 
-	msg := fmt.Sprintf("HEADER-> %s\n", r.MsgHdr.String())
+	var msg strings.Builder
+	msg.WriteString(fmt.Sprintf("HEADER-> %s\n", r.MsgHdr.String()))
 	for _, answer := range r.Answer {
-		msg += fmt.Sprintf("ANSWER-> %s\n", answer)
+		msg.WriteString(fmt.Sprintf("ANSWER-> %s\n", answer))
 	}
 
-	return checkers.NewChecker(checkSt, msg)
+	return checkers.NewChecker(checkSt, msg.String())
 }

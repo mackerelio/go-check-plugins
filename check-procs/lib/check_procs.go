@@ -5,6 +5,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mackerelio/checkers"
@@ -96,7 +97,7 @@ func run(args []string) *checkers.Checker {
 		cmdExcludePatRegexp = r
 	}
 	result := checkers.OK
-	var msg string
+	var msg strings.Builder
 
 	var resultrocStates []procState
 	for _, reg := range cmdPatRegexp {
@@ -107,11 +108,11 @@ func run(args []string) *checkers.Checker {
 		}
 		count := int64(len(resultrocStates))
 		result = mergeStatus(count, result)
-		msg += fmt.Sprintf("\n%s", gatherMsg(count, reg.String()))
+		msg.WriteString(fmt.Sprintf("\n%s", gatherMsg(count, reg.String())))
 
 		resultrocStates = []procState{}
 	}
-	return checkers.NewChecker(result, msg)
+	return checkers.NewChecker(result, msg.String())
 }
 
 func matchProc(proc procState, cmdPatRegexp *regexp.Regexp, cmdExcludePatRegexp *regexp.Regexp) bool {

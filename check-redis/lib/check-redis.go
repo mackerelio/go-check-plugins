@@ -78,11 +78,11 @@ func connectRedis(m redisSetting) (redis.Conn, error) {
 	}
 
 	if password != "" {
-		var authArgs []interface{}
+		var authArgs []any
 		if m.Username != "" {
-			authArgs = []interface{}{m.Username, password}
+			authArgs = []any{m.Username, password}
 		} else {
-			authArgs = []interface{}{password}
+			authArgs = []any{password}
 		}
 		_, err := c.Do("AUTH", authArgs...)
 		if err != nil {
@@ -101,7 +101,7 @@ func getRedisInfo(c redis.Conn) (*map[string]string, error) {
 		return nil, errors.New("couldn't execute query")
 	}
 
-	for _, line := range strings.Split(str, "\r\n") {
+	for line := range strings.SplitSeq(str, "\r\n") {
 		if line == "" {
 			continue
 		}

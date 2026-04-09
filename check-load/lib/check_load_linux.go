@@ -14,7 +14,7 @@ func getloadavg() (loadavgs [3]float64, _ error) {
 	}
 	content := string(contentbytes)
 	cols := strings.Split(content, " ")
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		f, err := strconv.ParseFloat(cols[i], 64)
 		if err != nil {
 			return loadavgs, fmt.Errorf("Failed to parse loadavg metrics: %s", err)

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -289,12 +290,7 @@ func listPartitions() ([]gpud.PartitionStat, error) {
 }
 
 func isBindMount(mountOpts []string) bool {
-	for _, opt := range mountOpts {
-		if opt == "bind" {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(mountOpts, "bind")
 }
 
 func mountpointOfPartition(partition gpud.PartitionStat) string {
@@ -309,11 +305,8 @@ func filterPartitionsByInclusion(partitions []gpud.PartitionStat, list []string,
 	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
 	for _, partition := range partitions {
 		var ok = false
-		for _, l := range list {
-			if l == key(partition) {
-				ok = true
-				break
-			}
+		if slices.Contains(list, key(partition)) {
+			ok = true
 		}
 		if ok {
 			newPartitions = append(newPartitions, partition)
@@ -327,11 +320,8 @@ func filterPartitionsByExclusion(partitions []gpud.PartitionStat, list []string,
 	newPartitions := make([]gpud.PartitionStat, 0, len(partitions))
 	for _, partition := range partitions {
 		var ok = true
-		for _, l := range list {
-			if l == key(partition) {
-				ok = false
-				break
-			}
+		if slices.Contains(list, key(partition)) {
+			ok = false
 		}
 		if ok {
 			newPartitions = append(newPartitions, partition)

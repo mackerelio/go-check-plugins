@@ -2,6 +2,8 @@ module github.com/mackerelio/go-check-plugins
 
 go 1.25.5
 
+toolchain go1.26.2
+
 require (
 	github.com/StackExchange/wmi v1.2.1
 	github.com/aws/aws-sdk-go-v2 v1.41.5

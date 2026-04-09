@@ -139,7 +139,7 @@ func getNTPOffset(ntpServers string, checkStratum bool) (float64, error) {
 // FIXME need fluent cancel mechanism
 func getNTPOffsetFromNTPServers(ntpServers string) (offset float64, err error) {
 	resultChan := make(chan float64)
-	for _, ntpServer := range strings.Split(ntpServers, ",") {
+	for ntpServer := range strings.SplitSeq(ntpServers, ",") {
 		go func(ntpServer string) error {
 			ntpServer = strings.Trim(ntpServer, " ")
 			options := ntp.QueryOptions{Timeout: time.Duration(ntpTimeout) * time.Second}
@@ -176,7 +176,7 @@ func parseNTPOffsetFromNTPD(out io.Reader, checkStratum bool) (float64, error) {
 	var offset *float64
 	for scr.Scan() {
 		line := scr.Text()
-		for _, column := range strings.Split(line, ",") {
+		for column := range strings.SplitSeq(line, ",") {
 			column = strings.TrimPrefix(column, " ")
 			if checkStratum && strings.HasPrefix(column, stratumPrefix) {
 				stratum, err := strconv.ParseInt(strings.TrimPrefix(column, stratumPrefix), 10, 64)
