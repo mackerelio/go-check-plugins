@@ -166,7 +166,7 @@ func run(ctx context.Context, args []string) *checkers.Checker {
 	warnNum := int64(0)
 	critNum := int64(0)
 	var missingFiles []string
-	errorOverall := ""
+	var errorOverall strings.Builder
 
 	if opts.LogFile != "" && len(opts.fileListFromGlob) == 0 {
 		missingFiles = append(missingFiles, opts.LogFile)
@@ -188,7 +188,7 @@ func run(ctx context.Context, args []string) *checkers.Checker {
 		warnNum += w
 		critNum += c
 		if opts.ReturnContent && errLines != "" {
-			errorOverall += "[" + f + "]\n" + errLines
+			errorOverall.WriteString("[" + f + "]\n" + errLines)
 		}
 	}
 
@@ -202,8 +202,8 @@ func run(ctx context.Context, args []string) *checkers.Checker {
 	} else {
 		msg = fmt.Sprintf("%d warnings, %d criticals for pattern %s.", warnNum, critNum, strings.Join(patterns, " and "))
 	}
-	if errorOverall != "" {
-		msg += "\n" + errorOverall
+	if errorOverall.String() != "" {
+		msg += "\n" + errorOverall.String()
 	}
 	checkSt := checkers.OK
 	if len(missingFiles) > 0 {

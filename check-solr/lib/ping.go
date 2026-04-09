@@ -24,7 +24,7 @@ func checkPing(opts solrOpts) *checkers.Checker {
 	defer resp.Body.Close()
 
 	dec := json.NewDecoder(resp.Body)
-	var stats map[string]interface{}
+	var stats map[string]any
 	err = dec.Decode(&stats)
 	if err != nil {
 		return checkers.Unknown("couldn't parse JSON at " + uri)

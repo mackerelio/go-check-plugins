@@ -134,7 +134,7 @@ func extractNonEmptyLines(lines []string) []string {
 
 func extractErrorMsg(msg string) string {
 	var errors []string
-	for _, line := range strings.Split(msg, "\n") {
+	for line := range strings.SplitSeq(msg, "\n") {
 		if strings.Contains(line, "[error]") {
 			errors = append(errors, line)
 		}
