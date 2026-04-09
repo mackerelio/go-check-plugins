@@ -116,8 +116,8 @@ github.com/mackerelio/checkers v0.2.1 h1:vRXzAT+CEyaLjSrHVxKUBjyWq1kfo8QcI8ZoSKZ
 github.com/mackerelio/checkers v0.2.1/go.mod h1:CW3k/5bvHhxDrfKgWvMvNH0R51zco141ZVxlI7o/KAc=
 github.com/mackerelio/go-osstat v0.2.7 h1:TCavZi10wF49bT6iQZ9eT2keGZQpC69MTDfdJej5e94=
 github.com/mackerelio/go-osstat v0.2.7/go.mod h1:dwpYh5pIPmvk+IEwBKNIWRFMB92mrC08CmXOhDC7nQk=
-github.com/mackerelio/golib v1.2.1 h1:SDcDn6Jw3p9bi1N0bg1Z/ilG5qcBB23qL8xNwrU0gg4=
-github.com/mackerelio/golib v1.2.1/go.mod h1:b8ZaapsHGH1FlEJlCqfD98CqafLeyMevyATDlID2BsM=
+github.com/mackerelio/golib v1.2.2 h1:fQfW1o2KvPyIsAH/7+M2J0gpf2jLu+NyYpDCN79zxW4=
+github.com/mackerelio/golib v1.2.2/go.mod h1:itcSOfrsT5XvkzflFPebT43RrliaKDz2T6YGYt3jclw=
 github.com/mattn/go-encoding v0.0.2 h1:OC1L+QXLJge9n7yIE3R5Os/UNasUeFvK3Sa4NjbDi6c=
 github.com/mattn/go-encoding v0.0.2/go.mod h1:WUNsdPQLK4JYRzkn8IAdmYKFYGGJ4/9YPxdPoMumPgY=
 github.com/mattn/go-sqlite3 v1.14.22 h1:2gZY6PC6kBnID23Tichd1K+Z0oS6nE/XwU+Vz/5o4kU=
