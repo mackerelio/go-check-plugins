@@ -1,3 +1,92 @@
+mackerel-check-plugins (0.52.1-1.v2) stable; urgency=low
+
+  * Bump github.com/mackerelio/golib from 1.2.1 to 1.2.2 in the mackerelio group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1039>
+  * Go 1.26 (by mechairoi)
+    <https://github.com/mackerelio/go-check-plugins/pull/1038>
+  * Bump github.com/lib/pq from 1.12.1 to 1.12.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1037>
+  * Bump golang.org/x/sys from 0.42.0 to 0.43.0 in the golang-x group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1036>
+  * Bump github.com/mackerelio/checkers from 0.2.0 to 0.2.1 in the mackerelio group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1034>
+  * Bump github.com/lib/pq from 1.12.0 to 1.12.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1033>
+  * Bump github.com/fsouza/go-dockerclient from 1.13.0 to 1.13.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1032>
+  * Bump the aws-aws-sdk-go-v2 group with 3 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1031>
+  * Bump github.com/elazarl/goproxy from 1.8.2 to 1.8.3 in the testlibs group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1030>
+  * Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.65.0 to 1.66.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1029>
+  * Bump actions/setup-go from 6.3.0 to 6.4.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1028>
+  * Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1027>
+  * Bump github.com/moby/moby/v2 from 2.0.0-beta.6 to 2.0.0-beta.8 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1026>
+  * Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.64.1 to 1.64.2 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1025>
+  * Bump actions/cache from 5.0.3 to 5.0.4 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1024>
+  * Bump github.com/lib/pq from 1.11.2 to 1.12.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1023>
+  * Bump github.com/go-ldap/ldap/v3 from 3.4.12 to 3.4.13 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1022>
+  * Bump actions/download-artifact from 8.0.0 to 8.0.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1021>
+  * Bump golang.org/x/crypto from 0.48.0 to 0.49.0 in the golang-x group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1020>
+  * Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1019>
+  * Bump golang.org/x/text from 0.34.0 to 0.35.0 in the golang-x group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1018>
+  * Use Go toolchain (or mod) version in CI build process (by ne-sachirou)
+    <https://github.com/mackerelio/go-check-plugins/pull/1017>
+  * Bump github.com/mackerelio/go-osstat from 0.2.6 to 0.2.7 in the mackerelio group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1016>
+  * Bump golang.org/x/sys from 0.41.0 to 0.42.0 in the golang-x group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1015>
+  * Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1014>
+  * Bump actions/upload-artifact from 6.0.0 to 7.0.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1013>
+  * Bump actions/setup-go from 6.2.0 to 6.3.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1012>
+  * Bump mackerelio/workflows/.github/workflows/setup-go-matrix.yml from 1.8.0 to 1.9.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1011>
+  * Bump mackerelio/workflows/.github/workflows/go-test.yml from 1.8.0 to 1.9.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1010>
+  * Bump mackerelio/workflows/.github/workflows/go-lint.yml from 1.8.0 to 1.9.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1009>
+  * Bump actions/download-artifact from 7.0.0 to 8.0.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1008>
+  * Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1007>
+  * Bump the aws-aws-sdk-go-v2 group with 2 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1006>
+  * Bump filippo.io/edwards25519 from 1.1.0 to 1.1.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1005>
+  * Bump the aws-aws-sdk-go-v2 group with 2 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1004>
+  * Bump github.com/elazarl/goproxy from 1.8.1 to 1.8.2 in the testlibs group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1003>
+  * Bump github.com/lib/pq from 1.11.1 to 1.11.2 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1002>
+  * Bump the golang-x group with 3 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1001>
+  * Bump github.com/elazarl/goproxy from 1.8.0 to 1.8.1 in the testlibs group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1000>
+  * Bump github.com/fsouza/go-dockerclient from 1.12.3 to 1.13.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/999>
+  * Bump actions/cache from 5.0.2 to 5.0.3 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/998>
+  * Bump github.com/lib/pq from 1.10.9 to 1.11.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/997>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Mon, 13 Apr 2026 08:22:57 +0000
+
 mackerel-check-plugins (0.52.0-1.v2) stable; urgency=low
 
   * [check-windows-eventlog] test: fix the OS thread between CoInitialize and CoUninitialize (by Arthur1)
