@@ -52,7 +52,7 @@ command = ["check-windows-eventlog", "--log", "LOGTYPE", "--type", "EVENTTYPE", 
       --event-id-exclude  Event IDs ignorable (separated by comma, or range)
   -w, --warning-over      Trigger a warning if matched lines is over a number
   -c, --critical-over     Trigger a critical if matched lines is over a number
-  -r, --return            Return matched line
+  -r, --return            Return matched line with custom format. Available placeholders: {{source}}, {{id}}, {{message}} (default format: {{source}}:{{message}})
   -s, --state-dir         Dir to keep state files under
       --no-state          Don't use state file and read whole logs
       --fail-first        Count errors on first seek
