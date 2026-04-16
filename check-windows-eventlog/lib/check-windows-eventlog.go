@@ -371,16 +371,18 @@ loop_events:
 		}
 
 		r := *(*eventlog.EVENTLOGRECORD)(unsafe.Pointer(&buf[0]))
+
+		// event code takes last 2 bytes
+		eventID := r.EventID & 0x0000FFFF
+
 		if opts.Verbose {
 			log.Printf("RecordNumber=%v", r.RecordNumber)
 			log.Printf("TimeGenerated=%v", time.Unix(int64(r.TimeGenerated), 0).String())
 			log.Printf("TimeWritten=%v", time.Unix(int64(r.TimeWritten), 0).String())
-			log.Printf("EventID=%v", r.EventID)
+			log.Printf("EventID=%v", eventID)
 		}
 		lastNumber = r.RecordNumber
 
-		// even code takes last 4 byte
-		eventID := r.EventID & 0x0000FFFF
 		if len(opts.eventIDPattern) > 0 {
 			accepted := false
 			for _, idr := range opts.eventIDPattern {
@@ -482,7 +484,7 @@ loop_events:
 
 			replacer := strings.NewReplacer(
 				"{{source}}", sourceName,
-				"{{id}}", strconv.Itoa(int(r.EventID)),
+				"{{id}}", strconv.Itoa(int(eventID)),
 				"{{message}}", strings.ReplaceAll(message, "\n", ""),
 			)
 
