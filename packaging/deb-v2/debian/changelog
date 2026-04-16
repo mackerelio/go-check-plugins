@@ -1,3 +1,14 @@
+mackerel-check-plugins (0.52.2-1.v2) stable; urgency=low
+
+  * Bump actions/upload-artifact from 7.0.0 to 7.0.1 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1043>
+  *   fix(check-windows-eventlog): mask EventID to lower 16 bits for display (by kga)
+    <https://github.com/mackerelio/go-check-plugins/pull/1042>
+  * Bump the golang-x group with 2 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1041>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Thu, 16 Apr 2026 07:04:20 +0000
+
 mackerel-check-plugins (0.52.1-1.v2) stable; urgency=low
 
   * Bump github.com/mackerelio/golib from 1.2.1 to 1.2.2 in the mackerelio group (by dependabot[bot])

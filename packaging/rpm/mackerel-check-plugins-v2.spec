@@ -36,6 +36,11 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu Apr 16 2026 <mackerel-developers@hatena.ne.jp> - 0.52.2
+- Bump actions/upload-artifact from 7.0.0 to 7.0.1 (by dependabot[bot])
+-   fix(check-windows-eventlog): mask EventID to lower 16 bits for display (by kga)
+- Bump the golang-x group with 2 updates (by dependabot[bot])
+
 * Mon Apr 13 2026 <mackerel-developers@hatena.ne.jp> - 0.52.1
 - Bump github.com/mackerelio/golib from 1.2.1 to 1.2.2 in the mackerelio group (by dependabot[bot])
 - Go 1.26 (by mechairoi)

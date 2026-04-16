@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.52.2 (2026-04-16)
+
+* Bump actions/upload-artifact from 7.0.0 to 7.0.1 #1043 (dependabot[bot])
+*   fix(check-windows-eventlog): mask EventID to lower 16 bits for display #1042 (kga)
+* Bump the golang-x group with 2 updates #1041 (dependabot[bot])
+
+
 ## 0.52.1 (2026-04-13)
 
 * Bump github.com/mackerelio/golib from 1.2.1 to 1.2.2 in the mackerelio group #1039 (dependabot[bot])
