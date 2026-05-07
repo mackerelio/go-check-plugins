@@ -5,7 +5,6 @@ package checkwindowseventlog
 import (
 	"crypto/md5"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -534,7 +533,7 @@ func getLastOffset(f string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	b, err := ioutil.ReadFile(f)
+	b, err := os.ReadFile(f)
 	if err != nil {
 		return 0, err
 	}
