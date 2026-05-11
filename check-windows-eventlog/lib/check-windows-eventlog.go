@@ -5,7 +5,6 @@ package checkwindowseventlog
 import (
 	"crypto/md5"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -81,7 +80,7 @@ func idRangeList(s string) ([]idRange, error) {
 	var idrl []idRange
 	var id1, id2 uint64
 	var err error
-	for _, t := range strings.Split(s, ",") {
+	for t := range strings.SplitSeq(s, ",") {
 		t = strings.TrimSpace(t)
 		if m1 := rid1.FindAllStringSubmatch(t, -1); len(m1) > 0 {
 			id1, err = strconv.ParseUint(m1[0][1], 10, 32)
@@ -195,7 +194,7 @@ func (opts *logOpts) run() *checkers.Checker {
 	checkSt := checkers.OK
 	warnNum := int64(0)
 	critNum := int64(0)
-	errorOverall := ""
+	var errorOverall strings.Builder
 
 	for _, lt := range opts.logList {
 		w, c, errLines, err := opts.searchLog(lt)
@@ -205,12 +204,12 @@ func (opts *logOpts) run() *checkers.Checker {
 		warnNum += w
 		critNum += c
 		if opts.ReturnContent != "" {
-			errorOverall += errLines
+			errorOverall.WriteString(errLines)
 		}
 	}
 	msg := fmt.Sprintf("%d warnings, %d criticals.", warnNum, critNum)
-	if errorOverall != "" {
-		msg += "\n" + errorOverall
+	if errorOverall.String() != "" {
+		msg += "\n" + errorOverall.String()
 	}
 	if warnNum > opts.WarnOver {
 		checkSt = checkers.WARNING
@@ -534,7 +533,7 @@ func getLastOffset(f string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	b, err := ioutil.ReadFile(f)
+	b, err := os.ReadFile(f)
 	if err != nil {
 		return 0, err
 	}

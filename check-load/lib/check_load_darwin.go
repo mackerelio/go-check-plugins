@@ -20,7 +20,7 @@ func getloadavg() (loadavgs [3]float64, err error) {
 		return loadavgs, err
 	}
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		loadavg, err := strconv.ParseFloat(fields[i+1], 64)
 		if err != nil {
 			return loadavgs, err

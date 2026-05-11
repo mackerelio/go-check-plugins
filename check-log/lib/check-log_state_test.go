@@ -3,7 +3,6 @@ package checklog
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -92,7 +91,7 @@ func TestSaveStateOverwrittenIfFileExist(t *testing.T) {
 		}
 	}()
 
-	err := ioutil.WriteFile(file, []byte(`{"skip_bytes": 10, "inode": 100}`), 0644)
+	err := os.WriteFile(file, []byte(`{"skip_bytes": 10, "inode": 100}`), 0644)
 	if err != nil {
 		t.Errorf("WriteFile: %v", err)
 		return
@@ -144,7 +143,7 @@ func TestSaveStateIfAccessDenied(t *testing.T) {
 		return
 	}
 	data := []byte(`{"skip_bytes": 10, "inode": 100}`)
-	if err := ioutil.WriteFile(file, data, 0644); err != nil {
+	if err := os.WriteFile(file, data, 0644); err != nil {
 		t.Errorf("WriteFile: %v", err)
 		return
 	}
@@ -157,7 +156,7 @@ func TestSaveStateIfAccessDenied(t *testing.T) {
 		Inode:     150,
 	}
 	saveState(file, s) // an error can be ignored in this case.
-	data1, err := ioutil.ReadFile(file)
+	data1, err := os.ReadFile(file)
 	if err != nil {
 		t.Errorf("ReadFile: %v", err)
 		return

@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -68,7 +67,7 @@ func TestGetBytesToSkip(t *testing.T) {
 	newf := ".tmp/fuga/piyo.json"
 	state := &state{SkipBytes: 15}
 	os.MkdirAll(filepath.Dir(oldf), 0755)
-	ioutil.WriteFile(oldf, fmt.Appendf(nil, "%d", state.SkipBytes), 0600)
+	os.WriteFile(oldf, fmt.Appendf(nil, "%d", state.SkipBytes), 0600)
 	t.Cleanup(func() {
 		os.RemoveAll(".tmp")
 	})
