@@ -2,13 +2,13 @@ package checkload
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
 
 func getloadavg() (loadavgs [3]float64, _ error) {
-	contentbytes, err := ioutil.ReadFile("/proc/loadavg")
+	contentbytes, err := os.ReadFile("/proc/loadavg")
 	if err != nil {
 		return loadavgs, fmt.Errorf("Failed to load /proc/loadavg: %s", err)
 	}
