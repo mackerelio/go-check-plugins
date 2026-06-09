@@ -36,6 +36,25 @@ done
 %{__targetdir}/*
 
 %changelog
+* Tue Jun 9 2026 <mackerel-developers@hatena.ne.jp> - 0.52.3
+- Bump the golang-x group across 1 directory with 2 updates (by dependabot[bot])
+- Bump actions/checkout from 6.0.2 to 6.0.3 (by dependabot[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.13.1 to 1.13.2 (by dependabot[bot])
+- Bump the golang-x group across 1 directory with 2 updates (by dependabot[bot])
+- Bump github.com/elazarl/goproxy from 1.8.3 to 1.8.4 in the testlibs group (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 2 updates (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.73.0 to 1.74.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+- Bump golang.org/x/text from 0.36.0 to 0.37.0 in the golang-x group (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.71.1 to 1.73.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+- Bump golang.org/x/sys from 0.43.0 to 0.44.0 in the golang-x group across 1 directory (by dependabot[bot])
+- remove use a io/ioutil (by yseto)
+- Bump github.com/go-sql-driver/mysql from 1.9.3 to 1.10.0 (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group across 1 directory with 5 updates (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.69.1 to 1.70.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+- Bump github.com/Azure/go-ntlmssp from 0.1.0 to 0.1.1 (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+- Bump actions/cache from 5.0.4 to 5.0.5 (by dependabot[bot])
+
 * Thu Apr 16 2026 <mackerel-developers@hatena.ne.jp> - 0.52.2
 - Bump actions/upload-artifact from 7.0.0 to 7.0.1 (by dependabot[bot])
 -   fix(check-windows-eventlog): mask EventID to lower 16 bits for display (by kga)
