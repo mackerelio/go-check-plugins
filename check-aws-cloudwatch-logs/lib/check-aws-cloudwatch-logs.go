@@ -14,7 +14,10 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials/ec2rolecreds"
+	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/jessevdk/go-flags"
 
@@ -36,6 +39,7 @@ type logOpts struct {
 	StateDir      string `short:"s" long:"state-dir" value-name:"DIR" description:"Dir to keep state files under" unquote:"false"`
 	ReturnContent bool   `short:"r" long:"return" description:"Output matched lines"`
 	MaxRetries    int    `short:"t" long:"max-retries" value-name:"MAX-RETRIES" description:"Maximum number of retries to call the AWS API"`
+	IMDSTimeout   int    `long:"imds-timeout" description:"Optional: timeout seconds of fetch authorization information from IMDS"`
 }
 
 // Do the plugin
@@ -93,6 +97,20 @@ func getStateFile(stateDir, logGroupName, logStreamNamePrefix string, args []str
 	)
 }
 
+func createAWSConfigOptions(opts *logOpts) (optFns []func(*config.LoadOptions) error) {
+	if opts.IMDSTimeout > 0 {
+		tr := awshttp.NewBuildableClient()
+		tr.WithTimeout(time.Duration(opts.IMDSTimeout) * time.Second)
+
+		optFns = append(optFns, config.WithEC2RoleCredentialOptions(func(o *ec2rolecreds.Options) {
+			o.Client = imds.New(imds.Options{
+				HTTPClient: tr.Freeze(),
+			})
+		}))
+	}
+	return
+}
+
 func createCloudwatchlogsOptions(opts *logOpts) (optFns []func(*cloudwatchlogs.Options)) {
 	if opts.MaxRetries > 0 {
 		optFns = append(optFns, func(o *cloudwatchlogs.Options) {
@@ -103,7 +121,7 @@ func createCloudwatchlogsOptions(opts *logOpts) (optFns []func(*cloudwatchlogs.O
 }
 
 func createService(ctx context.Context, opts *logOpts) (*cloudwatchlogs.Client, error) {
-	cfg, err := config.LoadDefaultConfig(ctx)
+	cfg, err := config.LoadDefaultConfig(ctx, createAWSConfigOptions(opts)...)
 	if err != nil {
 		return nil, err
 	}
