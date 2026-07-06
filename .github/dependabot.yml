@@ -3,9 +3,7 @@ updates:
   - package-ecosystem: gomod
     directory: "/"
     schedule:
-      interval: daily
-      time: "01:00"
-      timezone: Asia/Tokyo
+      interval: weekly
     open-pull-requests-limit: 10
     groups:
       golang/x:
@@ -33,9 +31,7 @@ updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: daily
-      time: "01:00"
-      timezone: Asia/Tokyo
+      interval: weekly
     cooldown:
       default-days: 5
       include:
