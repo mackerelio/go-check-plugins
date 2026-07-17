@@ -100,7 +100,7 @@ func getStateFile(stateDir, logGroupName, logStreamNamePrefix string, args []str
 func createAWSConfigOptions(opts *logOpts) (optFns []func(*config.LoadOptions) error) {
 	if opts.IMDSTimeout > 0 {
 		tr := awshttp.NewBuildableClient()
-		tr.WithTimeout(time.Duration(opts.IMDSTimeout) * time.Second)
+		tr = tr.WithTimeout(time.Duration(opts.IMDSTimeout) * time.Second)
 
 		optFns = append(optFns, config.WithEC2RoleCredentialOptions(func(o *ec2rolecreds.Options) {
 			o.Client = imds.New(imds.Options{
