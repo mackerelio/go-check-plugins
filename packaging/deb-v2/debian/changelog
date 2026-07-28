@@ -1,3 +1,46 @@
+mackerel-check-plugins (0.52.4-1.v2) stable; urgency=low
+
+  * Bump github.com/go-ldap/ldap/v3 from 3.4.13 to 3.4.14 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1086>
+  * Bump actions/setup-go from 6.5.0 to 7.0.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1085>
+  * Bump the aws-aws-sdk-go-v2 group with 4 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1084>
+  * Bump the golang-x group across 1 directory with 3 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1083>
+  * Bump the aws-aws-sdk-go-v2 group with 2 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1082>
+  * Bump github.com/mackerelio/go-osstat from 0.2.7 to 0.2.8 in the mackerelio group across 1 directory (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1080>
+  * Bump the aws-aws-sdk-go-v2 group with 4 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1078>
+  * Bump golang.org/x/text from 0.38.0 to 0.39.0 in the golang-x group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1077>
+  * Change Dependabot schedule from daily to weekly (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/1076>
+  * Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1075>
+  * Bump the aws-aws-sdk-go-v2 group with 4 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1074>
+  * Bump actions/cache from 5.0.5 to 6.1.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1073>
+  * Bump actions/setup-go from 6.4.0 to 6.5.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1072>
+  * Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.76.0 to 1.78.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1071>
+  * Bump actions/checkout from 6.0.3 to 7.0.0 (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1070>
+  * Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.75.2 to 1.76.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1069>
+  * Bump the golang-x group with 2 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1068>
+  * added IMDSTimeout on check-aws-cloudwatch-logs (by yseto)
+    <https://github.com/mackerelio/go-check-plugins/pull/1063>
+  * Bump the aws-aws-sdk-go-v2 group across 1 directory with 5 updates (by dependabot[bot])
+    <https://github.com/mackerelio/go-check-plugins/pull/1062>
+
+ -- mackerel <mackerel-developers@hatena.ne.jp>  Tue, 28 Jul 2026 06:03:11 +0000
+
 mackerel-check-plugins (0.52.3-1.v2) stable; urgency=low
 
   * Bump the golang-x group across 1 directory with 2 updates (by dependabot[bot])
