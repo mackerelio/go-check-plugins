@@ -36,6 +36,27 @@ done
 %{__targetdir}/*
 
 %changelog
+* Tue Jul 28 2026 <mackerel-developers@hatena.ne.jp> - 0.52.4
+- Bump github.com/go-ldap/ldap/v3 from 3.4.13 to 3.4.14 (by dependabot[bot])
+- Bump actions/setup-go from 6.5.0 to 7.0.0 (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 4 updates (by dependabot[bot])
+- Bump the golang-x group across 1 directory with 3 updates (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 2 updates (by dependabot[bot])
+- Bump github.com/mackerelio/go-osstat from 0.2.7 to 0.2.8 in the mackerelio group across 1 directory (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 4 updates (by dependabot[bot])
+- Bump golang.org/x/text from 0.38.0 to 0.39.0 in the golang-x group (by dependabot[bot])
+- Change Dependabot schedule from daily to weekly (by yseto)
+- Bump the aws-aws-sdk-go-v2 group with 5 updates (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 4 updates (by dependabot[bot])
+- Bump actions/cache from 5.0.5 to 6.1.0 (by dependabot[bot])
+- Bump actions/setup-go from 6.4.0 to 6.5.0 (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.76.0 to 1.78.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+- Bump actions/checkout from 6.0.3 to 7.0.0 (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.75.2 to 1.76.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+- Bump the golang-x group with 2 updates (by dependabot[bot])
+- added IMDSTimeout on check-aws-cloudwatch-logs (by yseto)
+- Bump the aws-aws-sdk-go-v2 group across 1 directory with 5 updates (by dependabot[bot])
+
 * Tue Jun 9 2026 <mackerel-developers@hatena.ne.jp> - 0.52.3
 - Bump the golang-x group across 1 directory with 2 updates (by dependabot[bot])
 - Bump actions/checkout from 6.0.2 to 6.0.3 (by dependabot[bot])
