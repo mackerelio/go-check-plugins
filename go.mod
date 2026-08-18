@@ -34,9 +34,9 @@ require (
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/stretchr/testify v1.11.1
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
-	golang.org/x/crypto v0.54.0
+	golang.org/x/crypto v0.55.0
 	golang.org/x/sys v0.47.0
-	golang.org/x/text v0.40.0
+	golang.org/x/text v0.41.0
 )
 
 require (
@@ -77,10 +77,10 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/mod v0.37.0 // indirect
+	golang.org/x/mod v0.38.0 // indirect
 	golang.org/x/net v0.57.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
-	golang.org/x/tools v0.47.0 // indirect
+	golang.org/x/tools v0.48.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
