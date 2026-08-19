@@ -32,7 +32,7 @@ require (
 	github.com/miekg/dns v1.1.72
 	github.com/natefinch/atomic v1.0.1
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/stretchr/testify v1.11.1
+	github.com/stretchr/testify v1.12.0
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.55.0
 	golang.org/x/sys v0.47.0
@@ -56,7 +56,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.45.5 // indirect
 	github.com/aws/smithy-go v1.27.7 // indirect
 	github.com/containerd/log v0.1.0 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.8 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -73,7 +72,6 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
