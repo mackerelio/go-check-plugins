@@ -29,7 +29,7 @@ require (
 	github.com/mackerelio/golib v1.2.2
 	github.com/mattn/go-encoding v0.0.2
 	github.com/mattn/go-zglob v0.0.6
-	github.com/miekg/dns v1.1.72
+	github.com/miekg/dns v1.1.73
 	github.com/natefinch/atomic v1.0.1
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/stretchr/testify v1.12.1
@@ -74,8 +74,5 @@ require (
 	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/mod v0.38.0 // indirect
 	golang.org/x/net v0.57.0 // indirect
-	golang.org/x/sync v0.22.0 // indirect
-	golang.org/x/tools v0.48.0 // indirect
 )
