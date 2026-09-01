@@ -1,6 +1,6 @@
 module github.com/mackerelio/go-check-plugins
 
-go 1.25.5
+go 1.26
 
 toolchain go1.26.2
 
@@ -16,7 +16,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874
 	github.com/elazarl/goproxy v1.9.0
 	github.com/elazarl/goproxy/ext v0.0.0-20231117061959-7cc037d33fb5
-	github.com/fsouza/go-dockerclient v1.13.2
+	github.com/fsouza/go-dockerclient v1.13.3
 	github.com/go-ldap/ldap/v3 v3.4.14
 	github.com/go-ole/go-ole v1.3.0
 	github.com/go-sql-driver/mysql v1.10.0
@@ -60,9 +60,9 @@ require (
 	github.com/go-asn1-ber/asn1-ber v1.5.8 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.18.7 // indirect
-	github.com/moby/go-archive v0.3.0 // indirect
-	github.com/moby/moby/api v1.54.2 // indirect
-	github.com/moby/moby/client v0.4.1 // indirect
+	github.com/moby/go-archive v0.3.3 // indirect
+	github.com/moby/moby/api v1.55.0 // indirect
+	github.com/moby/moby/client v0.5.1 // indirect
 	github.com/moby/patternmatcher v0.6.1 // indirect
 	github.com/moby/sys/sequential v0.7.0 // indirect
 	github.com/moby/sys/user v0.4.1 // indirect
