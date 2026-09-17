@@ -58,11 +58,9 @@ func (opts *dnsOpts) run() *checkers.Checker {
 
 	c := new(dns.Client)
 	m := &dns.Msg{
-		MsgHdr: dns.MsgHdr{
-			RecursionDesired: !opts.Norec,
-			Opcode:           dns.OpcodeQuery,
-		},
-		Question: []dns.Question{{Name: dns.Fqdn(opts.Host), Qtype: queryType, Qclass: dns.StringToClass["IN"]}},
+		RecursionDesired: !opts.Norec,
+		Opcode:           dns.OpcodeQuery,
+		Question:         []dns.Question{{Name: dns.Fqdn(opts.Host), Qtype: queryType, Qclass: dns.StringToClass["IN"]}},
 	}
 	m.Id = dns.Id()
 
