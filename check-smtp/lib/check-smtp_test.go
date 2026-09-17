@@ -22,7 +22,7 @@ type mockSMTPServer struct {
 	listener  net.Listener
 	delay     int
 	responses []string
-	closed    int32
+	closed    atomic.Int32
 }
 
 func (m *mockSMTPServer) runServe() error {
@@ -51,7 +51,7 @@ func (m *mockSMTPServer) runServe() error {
 	case <-doneCh:
 		return nil
 	case err := <-errCh:
-		if atomic.LoadInt32(&m.closed) != 0 {
+		if m.closed.Load() != 0 {
 			return nil
 		}
 		return err
@@ -59,7 +59,7 @@ func (m *mockSMTPServer) runServe() error {
 }
 
 func (m *mockSMTPServer) Close() {
-	atomic.StoreInt32(&m.closed, 1)
+	m.closed.Store(1)
 	m.listener.Close()
 }
 
