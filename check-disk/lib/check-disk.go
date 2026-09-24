@@ -179,7 +179,7 @@ func run(args []string) *checkers.Checker {
 		if us == "bytes" {
 			u = unit{us, b}
 		} else if us == "kb" {
-			u = unit{us, mb}
+			u = unit{us, kb}
 		} else if us == "gb" {
 			u = unit{us, gb}
 		} else if us == "tb" {
