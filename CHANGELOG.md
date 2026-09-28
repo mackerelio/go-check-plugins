@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.53.0 (2026-09-28)
+
+* [check-disk] fix unit size for -u kb #1112 (masarasi)
+* Bump github.com/mattn/go-zglob from 0.0.6 to 0.0.8 #1111 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.87.0 to 1.88.0 in the aws-aws-sdk-go-v2 group #1110 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1108 (dependabot[bot])
+* Bump github.com/elazarl/goproxy from 1.9.0 to 1.9.1 in the testlibs group #1107 (dependabot[bot])
+* Bump github.com/go-sql-driver/mysql from 1.10.0 to 1.10.1 #1105 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1104 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1101 (dependabot[bot])
+* Bump github.com/miekg/dns from 1.1.72 to 1.1.73 #1100 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1099 (dependabot[bot])
+* Bump github.com/stretchr/testify from 1.12.0 to 1.12.1 in the testlibs group #1098 (dependabot[bot])
+* Bump github.com/moby/go-archive from 0.2.0 to 0.3.0 #1097 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1096 (dependabot[bot])
+* Bump github.com/stretchr/testify from 1.11.1 to 1.12.0 in the testlibs group #1095 (dependabot[bot])
+* Bump the golang-x group with 2 updates #1094 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1093 (dependabot[bot])
+* Bump github.com/elazarl/goproxy from 1.8.5 to 1.9.0 in the testlibs group #1092 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1091 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1090 (dependabot[bot])
+* Bump actions/checkout from 7.0.0 to 7.0.1 #1089 (dependabot[bot])
+* Bump github.com/elazarl/goproxy from 1.8.4 to 1.8.5 in the testlibs group #1088 (dependabot[bot])
+
+
 ## 0.52.4 (2026-07-28)
 
 * Bump github.com/go-ldap/ldap/v3 from 3.4.13 to 3.4.14 #1086 (dependabot[bot])
