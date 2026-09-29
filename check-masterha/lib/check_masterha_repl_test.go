@@ -21,11 +21,9 @@ func TestMakeReplCommandArgs(t *testing.T) {
 
 func TestMakeReplCommandArgsWithSecondsBehindMaster(t *testing.T) {
 	replSubcommand := replChecker{
-		subcommand: subcommand{
-			Config:    "/path/to/masterha/db001.conf",
-			ConfigDir: "/usr/local/masterha/conf",
-			All:       false,
-		},
+		Config:              "/path/to/masterha/db001.conf",
+		ConfigDir:           "/usr/local/masterha/conf",
+		All:                 false,
 		SecondsBehindMaster: 12345,
 	}
 	args := replSubcommand.MakeCommandArgs()
