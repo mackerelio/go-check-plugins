@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.53.1 (2026-11-05)
+
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1126 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 2 updates #1125 (dependabot[bot])
+* Bump github.com/go-ldap/ldap/v3 from 3.4.14 to 3.4.15 #1124 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1123 (dependabot[bot])
+* Bump actions/download-artifact from 8.0.1 to 8.0.2 #1122 (dependabot[bot])
+* Bump actions/upload-artifact from 7.0.1 to 7.0.2 #1121 (dependabot[bot])
+* Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.88.1 to 1.89.0 in the aws-aws-sdk-go-v2 group #1120 (dependabot[bot])
+* Bump mackerelio/workflows/.github/workflows/go-lint.yml from 1.9.0 to 1.10.0 #1119 (dependabot[bot])
+* Bump mackerelio/workflows/.github/workflows/setup-go-matrix.yml from 1.9.0 to 1.10.0 #1118 (dependabot[bot])
+* Bump mackerelio/workflows/.github/workflows/go-test.yml from 1.9.0 to 1.10.0 #1117 (dependabot[bot])
+* Bump github.com/elazarl/goproxy from 1.9.1 to 1.9.2 in the testlibs group #1116 (dependabot[bot])
+* Bump github.com/beevik/ntp from 1.5.0 to 1.6.0 #1115 (dependabot[bot])
+* Bump the aws-aws-sdk-go-v2 group with 6 updates #1114 (dependabot[bot])
+* Bump the golang-x group across 1 directory with 3 updates #1106 (dependabot[bot])
+* Bump github.com/fsouza/go-dockerclient from 1.13.2 to 1.13.3 #1102 (dependabot[bot])
+
+
 ## 0.53.0 (2026-09-28)
 
 * [check-disk] fix unit size for -u kb #1112 (masarasi)

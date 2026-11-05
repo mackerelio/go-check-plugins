@@ -36,6 +36,23 @@ done
 %{__targetdir}/*
 
 %changelog
+* Thu Nov 5 2026 <mackerel-developers@hatena.ne.jp> - 0.53.1
+- Bump the aws-aws-sdk-go-v2 group with 6 updates (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 2 updates (by dependabot[bot])
+- Bump github.com/go-ldap/ldap/v3 from 3.4.14 to 3.4.15 (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 6 updates (by dependabot[bot])
+- Bump actions/download-artifact from 8.0.1 to 8.0.2 (by dependabot[bot])
+- Bump actions/upload-artifact from 7.0.1 to 7.0.2 (by dependabot[bot])
+- Bump github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs from 1.88.1 to 1.89.0 in the aws-aws-sdk-go-v2 group (by dependabot[bot])
+- Bump mackerelio/workflows/.github/workflows/go-lint.yml from 1.9.0 to 1.10.0 (by dependabot[bot])
+- Bump mackerelio/workflows/.github/workflows/setup-go-matrix.yml from 1.9.0 to 1.10.0 (by dependabot[bot])
+- Bump mackerelio/workflows/.github/workflows/go-test.yml from 1.9.0 to 1.10.0 (by dependabot[bot])
+- Bump github.com/elazarl/goproxy from 1.9.1 to 1.9.2 in the testlibs group (by dependabot[bot])
+- Bump github.com/beevik/ntp from 1.5.0 to 1.6.0 (by dependabot[bot])
+- Bump the aws-aws-sdk-go-v2 group with 6 updates (by dependabot[bot])
+- Bump the golang-x group across 1 directory with 3 updates (by dependabot[bot])
+- Bump github.com/fsouza/go-dockerclient from 1.13.2 to 1.13.3 (by dependabot[bot])
+
 * Mon Sep 28 2026 <mackerel-developers@hatena.ne.jp> - 0.53.0
 - [check-disk] fix unit size for -u kb (by masarasi)
 - Bump github.com/mattn/go-zglob from 0.0.6 to 0.0.8 (by dependabot[bot])
