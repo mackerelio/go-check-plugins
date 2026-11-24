@@ -79,7 +79,7 @@ jobs:
         with:
           name: linux-build-artifacts
           path: artifacts/
-      - uses: mackerelio/staging-release-update-action@bc0e3a9f7bd0d890dc044592a798bc307bacc956 # v0.0.1
+      - uses: mackerelio/staging-release-update-action@c250e02c41c316eaa2e4fda0f67d014473396429 # v0.0.3
         if: github.ref == 'refs/heads/master'
         with:
           directory: artifacts/
